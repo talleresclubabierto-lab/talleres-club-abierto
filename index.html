@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Club Abierto - Ecosistema Integral Talleres</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #090d16; color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 20px; display: flex; justify-content: center; }
+        .main-scroll-layout { width: 100%; max-width: 480px; background: #0f172a; border: 1px solid #1e293b; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .app-bar-global { background: #1e293b; padding: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
+        .bar-title h1 { font-size: 1.2rem; color: #38bdf8; font-weight: 700; }
+        .bar-title p { font-size: 0.75rem; color: #94a3b8; }
+        .status-banner-global { padding: 8px; text-align: center; font-size: 0.8rem; font-weight: 500; width: 100%; display: block; }
+        .status-disconnected-global { background: #334155; color: #cbd5e1; }
+        .status-connected-global { background: #14532d; color: #4ade80; }
+        .scroll-container-global { padding: 16px; display: flex; flex-direction: column; gap: 20px; }
+        .section-block-global { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 16px; }
+        .section-block-global h3 { font-size: 1.1rem; color: #f8fafc; margin-bottom: 10px; border-bottom: 1px solid #334155; padding-bottom: 6px; }
+        .desc-text { font-size: 0.85rem; color: #94a3b8; line-height: 1.4; margin-bottom: 10px; }
+        .desc-text-mini { font-size: 0.75rem; color: #64748b; margin-bottom: 10px; }
+        .form-group-global { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+        .form-group-global input { background: #0f172a; border: 1px solid #334155; padding: 12px; color: white; border-radius: 6px; width: 100%; font-size: 0.9rem; }
+        .btn-primary-global { background: #0284c7; color: white; border: none; padding: 12px; width: 100%; font-weight: 600; border-radius: 6px; cursor: pointer; transition: background 0.2s; font-size: 0.9rem; }
+        .btn-primary-global:hover:not(:disabled) { background: #0369a1; }
+        .status-row-global { display: flex; justify-content: space-between; font-size: 0.85rem; margin-top: 10px; background: #0f172a; padding: 8px; border-radius: 6px; }
+        .status-row-global strong { color: #34d399; }
+        .sub-box-global { background: #0f172a; border: 1px solid #334155; padding: 12px; border-radius: 8px; position: relative; margin-top: 12px; }
+        .tag-global { position: absolute; top: 10px; right: 10px; font-size: 0.65rem; background: #1e293b; color: #38bdf8; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+        .select-group-global label { font-size: 0.75rem; color: #94a3b8; display: block; margin-top: 8px; }
+        .select-global { width: 100%; background: #1e293b; color: white; border: 1px solid #334155; padding: 10px; border-radius: 6px; font-size: 0.85rem; margin-top: 4px; }
+        .crypto-list-global { display: flex; flex-direction: column; gap: 6px; margin: 12px 0; }
+        .crypto-item { font-size: 0.8rem; color: #94a3b8; }
+        .blind-box { background: #1e293b; color: #64748b; font-family: monospace; padding: 2px 6px; border-radius: 4px; }
+        .tag-input-box-global { background: #0f172a; border: 1px solid #334155; padding: 12px; border-radius: 8px; margin-top: 12px; }
+        .tag-input-box-global h5 { font-size: 0.85rem; margin-bottom: 6px; color: #38bdf8; border-bottom: 1px solid #334155; padding-bottom: 4px; }
+        .tag-input-box-global label { font-size: 0.75rem; color: #94a3b8; display: block; margin-top: 8px; margin-bottom: 4px; }
+        .tag-input-box-global input { width: 100%; background: #1e293b; border: 1px solid #334155; padding: 10px; color: white; border-radius: 6px; font-size: 0.85rem; }
+        .status-msg-global { font-size: 0.75rem; color: #34d399; margin-top: 6px; text-align: center; }
+        .padron-container { background: #0f172a; border: 1px solid #334155; max-height: 160px; overflow-y: scroll; border-radius: 6px; padding: 8px; font-family: monospace; font-size: 0.75rem; margin-top: 10px; }
+        .padron-item { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #1e293b; color: #94a3b8; }
+        .padron-item-destacado { color: #38bdf8; font-weight: bold; background: rgba(56, 189, 248, 0.08); padding: 4px; border-radius: 4px; }
+        .bloque-admin { background: #0f172a; border: 1px solid #334155; padding: 12px; border-radius: 8px; margin-top: 10px; }
+        .bloque-admin label { font-size: 0.75rem; color: #94a3b8; display: block; margin-top: 4px; }
+    </style>
+</head>
+<body>
+
+    <div class="main-scroll-layout">
+        <header class="app-bar-global">
+            <div class="bar-title">
+                <h1>🏛️ CLUB ABIERTO</h1>
+                <p>Por un Talleres Democrático y Digital</p>
+            </div>
+        </header>
+
+        <div id="statusBox" class="status-banner-global status-disconnected-global">
+            <span id="statusText">Estado: Identidad No Validada</span>
+        </div>
+
+        <div class="scroll-container-global">
+            
+            <section class="section-block-global">
+                <h3>🆔 1. Acceso Societario</h3>
+                <p class="desc-text">Introduce tu número de socio consecutivamente asignado para calcular tu peso electoral por antigüedad.</p>
+                <div class="form-group-global">
+                    <input type="number" id="inputNroSocio" value="21998">
+                </div>
+                <button onclick="buscarSocio()" class="btn-primary-global">🔍 Buscar Socio y Conectar App</button>
+                <div style="margin-top: 12px; opacity: 0.4;">
+                    <button class="btn-primary-global" style="background:#475569; cursor:not-allowed;" disabled>🧬 Validación Biométrica Facial/Huella (No Activa)</button>
+                </div>
+                <div class="status-row-global"><span>Socio Verificado:</span><span id="lblSocioNombre" style="color: #94a3b8; font-weight: bold;">Ninguno</span></div>
+                <div class="status-row-global"><span>Rango / Antigüedad:</span><span id="lblCategoria" style="color: #94a3b8; font-weight: bold;">Inactivo</span></div>
+                <div class="status-row-global"><span>Multiplicador de Voto:</span><span id="lblPoderVoto" style="color: #94a3b8; font-weight: bold;">0 Puntos</span></div>
+                <div style="margin-top:15px;">
+                    <span class="desc-text-mini">📋 Planilla de 100 Socios Consecutivos (Decremento de Antigüedad cada 10 Números):</span>
+                    <div class="padron-container" id="padronLista"></div>
+                </div>
+            </section>
+
+            <section class="section-block-global">
+                <h3>🗳️ 2. Consultas Estratégicas</h3>
+                <div class="sub-box-global">
+                    <span class="tag-global">INDUMENTARIA</span>
+                    <h4>Concurso de Indumentaria Oficial</h4>
+                    <p class="desc-text">Doble Filtro Obligatorio. Elegí las opciones textiles que vestirá la institución en la temporada profesional.</p>
+                    <div class="select-group-global">
+                        <label>👕 Terna Camiseta Titular</label>
+                        <select id="selTitular" class="select-global" disabled>
+                            <option value="">-- Elige Opción Camiseta Titular --</option>
+                            <option value="T1" id="optTitularA">Opción A: Remera Titular a Bastones Azules y Blancas Finas</option>
+                            <option value="T2" id="optTitularB">Opción B: Bastones Anchos Azules Intervenidos con Degradé</option>
+                            <option value="T3" id="optTitularC">Opción C: Diseño Homenaje Histórico Azul Tradicional Liso</option>
+                        </select>
+                        <label>👕 Terna Alternativa 1</label>
+                        <select id="selSuplente1" class="select-global" disabled>
+                            <option value="">-- Elige Opción Alternativa 1 --</option>
+                            <option value="S1" id="optSuplenteA">Opción A: Remera Suplente Bordó con Detalles en Blanco</option>
+                            <option value="S2" id="optSuplenteB">Opción B: Blanca Completa con Cuello y Puños Bordó</option>
+                            <option value="S3" id="optSuplenteC">Opción C: Gris Plata Alternativa con Vivos Bordó Oscuro</option>
+                        </select>
+                        <label>👕 Terna Alternativa 2</label>
+                        <select id="selSuplente2" class="select-global" disabled>
+                            <option value="">-- Elige Opción Alternativa 2 --</option>
+                            <option value="A1" id="optAlternativaA">Opción A: Remera Suplente Naranja Eléctrico</option>
+                            <option value="A2" id="optAlternativaB">Opción B: Negra de Altar con Detalles y Escudo Naranja</option>
+                            <option value="A3" id="optAlternativaC">Opción C: Azul Francia con Estampado Geométrico Naranja</option>
+                        </select>
+                    </div>
+                    <button class="btn-primary-global" id="btnVotarCamisetas" onclick="votar('Camisetas')" disabled style="margin-top:12px; background:#16a34a;">Enviar Voto Camisetas</button>
+                </div>
+
+                <div class="sub-box-global" style="margin-top: 15px;">
+                    <span class="tag-global">CUERPO TÉCNICO</span>
+                    <h4>📋 Selección de Nuevo Director Técnico</h4>
