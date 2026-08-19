@@ -546,7 +546,7 @@
             input.placeholder = 'Opción ' + letra;
             p.appendChild(input);
         }
-        /* --- SISTEMA OPERATIVO DE CONSULTAS CON GRÁFICOS NATIVOS SEGUROS --- */
+        /* --- SISTEMA OPERATIVO DE CONSULTAS CON PONDERACIÓN COMPLETA DE BARRAS --- */
         function inicializarSelectorVotaciones() {
             var cmb = document.getElementById('cmbEncuestasDisponibles'); cmb.innerHTML = '';
             Object.keys(baseEncuestas).forEach(function(k) {
@@ -566,7 +566,6 @@
             }
             
             baseEncuestas[key].opts.forEach(function(o, index) {
-                // Reemplazamos la variable confusa por un nombre claro de texto puro
                 var elementoLabel = document.createElement('label'); 
                 elementoLabel.style.display = 'block'; 
                 elementoLabel.style.margin = '6px 0';
@@ -584,13 +583,14 @@
             var idx = parseInt(seleccionado.value);
             var socioDatos = obtenerDatosSocio(ID_SOCIO_ACTIVO);
 
-            baseEncuestas[key].votos[idx] += 1;
-            baseEncuestas[key].totalSocios += 1;
-            baseEncuestas[key].puntosPonderados += socioDatos.puntos;
+            // CORRECCIÓN MATEMÁTICA: Sumamos los puntos de antigüedad directamente al casillero de la opción elegida
+            baseEncuestas[key].votos[idx] += socioDatos.puntos; 
+            baseEncuestas[key].totalSocios += 1; // Mantiene el contador simple de personas que participaron
+            baseEncuestas[key].puntosPonderados += socioDatos.puntos; // Total de puntos acumulados en la encuesta
             registroVotosEmitidos[ID_SOCIO_ACTIVO + '_' + key] = true;
 
             guardarDatosEnMemoriaLocal();
-            alert('✓ Voto registrado con éxito. Sumaste ' + socioDatos.puntos + ' puntos.');
+            alert('✓ Voto Ponderado Registrado. Aportaste ' + socioDatos.puntos + ' puntos a esta opción.');
             cargarOpcionesParaVotar();
         }
 
@@ -660,7 +660,7 @@
             actualizarReporteGrafico();
         }
 
-        /* --- GRÁFICOS NATIVOS INTERACTIVOS (INMUNES A FALLAS DE LIENZO) --- */
+        /* --- LOGICA DE RENDERIZADO CORREGIDA EN BASE A PUNTOS --- */
         function actualizarReporteGrafico() {
             var key = document.getElementById('cmbResultadosSelect').value;
             var item = baseEncuestas[key];
@@ -668,7 +668,10 @@
             document.getElementById('lblResTotalVotos').innerText = item.totalSocios;
             var restantes = TOTAL_SOCIOS - item.totalSocios;
             document.getElementById('lblResRestantes').innerText = restantes;
-            document.getElementById('lblResPuntosJuego').innerText = (restantes * 4) + " PTS";
+            
+            // Puntos en juego: Calculamos el peso de ponderación máximo estimado restante
+            var puntosFaltantesEstimados = restantes * 4;
+            document.getElementById('lblResPuntosJuego').innerText = puntosFaltantesEstimados + " PTS";
 
             var contenedor = document.getElementById('contenedorBarrasDinamicas');
             contenedor.innerHTML = '';
@@ -676,8 +679,10 @@
             var colores = Array.of('#002D62', '#d91a1a', '#ffc107', '#28a745', '#9333ea', '#06b6d4');
 
             item.opts.forEach(function(opcionTexto, i) {
-                var cantVotos = item.votos[i] || 0;
-                var porcentaje = item.totalSocios > 0 ? ((cantVotos / item.totalSocios) * 100).toFixed(1) : "0.0";
+                var puntosDeEstaOpcion = item.votos[i] || 0;
+                
+                // CORRECCIÓN CLAVE: El porcentaje de la barra se calcula sobre el total de puntos ponderados emitidos, no sobre personas
+                var porcentaje = item.puntosPonderados > 0 ? ((puntosDeEstaOpcion / item.puntosPonderados) * 100).toFixed(1) : "0.0";
                 var colorAsignado = colores[i % colores.length];
 
                 var wrapper = document.createElement('div');
@@ -685,7 +690,7 @@
                 wrapper.innerHTML = 
                     '<div class="barra-resultado-texto">' +
                         '<span>' + opcionTexto + '</span>' +
-                        '<span>' + cantVotos + ' votos (' + porcentaje + '%)</span>' +
+                        '<span>' + puntosDeEstaOpcion + ' pts (' + porcentaje + '%)</span>' +
                     '</div>' +
                     '<div class="barra-resultado-fondo">' +
                         '<div class="barra-resultado-lleno" style="width: ' + porcentaje + '%; background-color: ' + colorAsignado + ';"></div>' +
