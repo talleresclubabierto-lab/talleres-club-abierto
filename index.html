@@ -263,7 +263,7 @@
         <div id="secVotaciones" class="sub-view full-width">
             <div class="dashboard-header">
                 <div class="wf-box" style="margin:0; padding:10px; font-size:16px;">Votaciones Activas en la Plataforma</div>
-                <button class="wf-button" style="width:auto; margin:0;" onclick="regresarAlPanelInterno()">Volver</button>
+                <button class="wf-button" style="width:auto; margin:0;" onclick="regresarAlPanelInterno()">Volver al Panel</button>
             </div>
             <div class="wf-box full-width" style="text-align: left;">
                 <label style="font-size: 13px; color: #64748b; display: block; margin-bottom: 8px;">SELECCIONE LA CONSULTA ELECTORAL:</label>
@@ -317,7 +317,7 @@
             <div class="grid-metrics">
                 <div class="chart-wrapper" style="margin-bottom: 0;">
                     <div style="font-size: 14px; font-weight: 700; margin-bottom: 12px; text-transform: uppercase; color: #002D62;">Tendencia de Votos Ponderados</div>
-                    <div style="height: 220px; position: relative;"><canvas id="chartResultadosTorta"></canvas></div>
+                    <div style="height: 240px; position: relative;"><canvas id="chartResultadosTorta"></canvas></div>
                 </div>
                 <div class="wf-box text-left" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: center; gap: 12px;">
                     <div><span class="txt-info-red">Socios Participantes:</span><div id="lblResTotalVotos" style="font-size: 20px; font-weight: 800;">0</div></div>
@@ -337,27 +337,38 @@
         </div>
     </div> <!-- Fin container -->
     <script>
-        /* --- CORE DE NEGOCIO Y BASE DE DATOS SIMULADA --- */
+        /* --- CORE DE NEGOCIO Y PERSISTENCIA EN LOCALSTORAGE CLEAN --- */
         var TOTAL_SOCIOS = 10000;
         var ID_SOCIO_ACTIVO = 0;
         var ROL_ACTIVO = ''; 
 
-        // Definición de los 3 Administradores Fijos Obligatorios con Doble Rol
         var adminFijos = Array.of(10000, 9000, 8000);
 
-        // Registro de control para auditoría de padrón: evita doble voto de socios
-        var registroVotosEmitidos = {}; 
-
-        // Encuestas Iniciales del Club con Estructura de Ponderación
-        var baseEncuestas = {
-            enc_1: { titulo: "Elección de Jugador Destacado (Fichaje/Premio)", opts: Array.of("Opción A - Santos Valoyes", "Opción B - Bruno Zapelli", "Opción C - Ramón Sosa"), votos: Array.of(450, 310, 120), totalSocios: 880, puntosPonderados: 2150 },
-            enc_2: { titulo: "Elección de Director Técnico (Próximo Ciclo)", opts: Array.of("Opción A - Alexander Medina", "Opción B - Walter Ribonetto", "Opción C - Gabriel Heinze"), votos: Array.of(1200, 950, 410), totalSocios: 2560, puntosPonderados: 4890 },
-            enc_3: { titulo: "Modelo de Camiseta Oficial (Diseño Alternativo)", opts: Array.of("Opción A - Azul Tradicional", "Opción B - Prematch Tecnológica", "Opción C - Blanca Minimalista"), votos: Array.of(2100, 1800, 920), totalSocios: 4820, puntosPonderados: 8140 },
-            enc_4: { titulo: "Marca de Indumentaria Técnica (Sponsor Técnico)", opts: Array.of("Opción A - Givova Premium", "Opción B - Adidas Performance", "Opción C - Puma Cat"), votos: Array.of(3100, 2900, 1100), totalSocios: 7100, puntosPonderados: 12450 },
-            enc_5: { titulo: "Main Sponsor (Patrocinador Principal en Pecho)", opts: Array.of("Opción A - ICBC Corporativo", "Opción B - Betsson Sports", "Opción C - Flybondi Líneas Aéreas"), votos: Array.of(1500, 1200, 600), totalSocios: 3300, puntosPonderados: 5400 }
+        // Estructura Inicial Limpia (Todo en 0 para tus pruebas reales)
+        var encuestasInicialesLimpias = {
+            enc_1: { titulo: "Elección de Jugador Destacado (Fichaje/Premio)", opts: Array.of("Opción A - Santos Valoyes", "Opción B - Bruno Zapelli", "Opción C - Ramón Sosa"), votos: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0 },
+            enc_2: { titulo: "Elección de Director Técnico (Próximo Ciclo)", opts: Array.of("Opción A - Alexander Medina", "Opción B - Walter Ribonetto", "Opción C - Gabriel Heinze"), votos: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0 },
+            enc_3: { titulo: "Modelo de Camiseta Oficial (Diseño Alternativo)", opts: Array.of("Opción A - Azul Tradicional", "Opción B - Prematch Tecnológica", "Opción C - Blanca Minimalista"), votos: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0 },
+            enc_4: { titulo: "Marca de Indumentaria Técnica (Sponsor Técnico)", opts: Array.of("Opción A - Givova Premium", "Opción B - Adidas Performance", "Opción C - Puma Cat"), votos: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0 },
+            enc_5: { titulo: "Main Sponsor (Patrocinador Principal en Pecho)", opts: Array.of("Opción A - ICBC Corporativo", "Opción B - Betsson Sports", "Opción C - Flybondi Líneas Aéreas"), votos: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0 }
         };
 
-        /* --- CONTROL DE INGRESO BIOMÉTRICO SECUENCIAL --- */
+        if (!localStorage.getItem('TD_baseEncuestas')) {
+            localStorage.setItem('TD_baseEncuestas', JSON.stringify(encuestasInicialesLimpias));
+        }
+        if (!localStorage.getItem('TD_registroVotos')) {
+            localStorage.setItem('TD_registroVotos', JSON.stringify({}));
+        }
+
+        var baseEncuestas = JSON.parse(localStorage.getItem('TD_baseEncuestas'));
+        var registroVotosEmitidos = JSON.parse(localStorage.getItem('TD_registroVotos'));
+
+        function guardarDatosEnMemoriaLocal() {
+            localStorage.setItem('TD_baseEncuestas', JSON.stringify(baseEncuestas));
+            localStorage.setItem('TD_registroVotos', JSON.stringify(registroVotosEmitidos));
+        }
+
+        /* --- CONTROL DE INGRESO BIOMÉTRICO --- */
         function procesarIngreso(tipo) {
             var userSocio = document.getElementById('socioUser').value.trim();
             var passSocio = document.getElementById('socioPass').value;
@@ -367,7 +378,6 @@
             var faceBox = document.getElementById(tipo === 'socio' ? 'socioBioFace' : 'adminBioFace');
             var fingerBox = document.getElementById(tipo === 'socio' ? 'socioBioFinger' : 'adminBioFinger');
 
-            // Limpieza visual
             document.querySelectorAll('.biometric-box').forEach(function(b) {
                 b.classList.remove('accent-blue');
                 b.innerText = b.id.includes('Face') ? 'cartel de validación biométrica' : 'cartel de validación huella digital';
@@ -383,7 +393,7 @@
             } else {
                 var idAdmin = parseInt(userAdmin);
                 if (isNaN(idAdmin) || !adminFijos.includes(idAdmin) || passAdmin !== '1913') {
-                    alert('Acceso Denegado: Para ser administrador debe ingresar un ID de Socio Administrador válido (10000, 9000 u 8000) y clave 1913.');
+                    alert('Acceso Denegado: Para ser administrador ingrese ID válido (10000, 9000 u 8000) y clave 1913.');
                     return;
                 }
                 ejecutarAnimacion(faceBox, fingerBox, function() { loguearAdminInterno(idAdmin); });
@@ -431,7 +441,7 @@
             document.getElementById('lblSocioAntiguedad').innerText = d.antiguedad + " AÑOS";
             document.getElementById('lblSocioPorcentual').innerText = d.porcentual.toFixed(3) + "% ASIGNADO";
             document.getElementById('lblSocioPuntos').innerText = d.puntos + " PUNTOS EQUIVALENTES";
-            document.getElementById('lblSocioDiasFaltantes').innerText = d.diasFaltantes > 0 ? d.diasFaltantes + " DÍAS PARA PRÓXIMO ESCALAFÓN" : "MÁXIMO RANGO DEL PADRÓN LOGRADO";
+            document.getElementById('lblSocioDiasFaltantes').innerText = d.diasFaltantes > 0 ? d.diasFaltantes + " DÍAS" : "MÁXIMO RANGO ALCANZADO";
         }
 
         function loguearAdminInterno(idAdmin) {
@@ -441,7 +451,6 @@
             document.getElementById('lblAdminSocioId').innerText = "#" + idAdmin;
         }
 
-        /* --- CONTROL DE NAVEGACIÓN ENTRE SECCIONES --- */
         function mostrarSeccionSocio(viewId) {
             document.getElementById('socioDashboard').style.display = 'none';
             document.getElementById(viewId).style.display = 'flex';
@@ -464,16 +473,17 @@
 
         function regresarAlPanelInterno() {
             document.querySelectorAll('.sub-view').forEach(function(v) { v.style.display = 'none'; });
-            if(ROL_ACTIVO === 'socio') document.getElementById('socioDashboard').style.display = 'flex';
+            if(ROL_ACTIVE_VOTES() === 'socio') document.getElementById('socioDashboard').style.display = 'flex';
             else document.getElementById('adminDashboard').style.display = 'flex';
         }
+        function ROL_ACTIVE_VOTES() { return ROL_ACTIVO; }
 
         function volverAlLogin() {
             document.getElementById('socioDashboard').style.display = 'none';
             document.getElementById('adminDashboard').style.display = 'none';
             document.getElementById('loginScreen').style.display = 'flex';
         }
-        /* --- SISTEMA OPERATIVO DE CONSULTAS Y REPORTES --- */
+        /* --- SISTEMA OPERATIVO DE VOTOS Y CHART.JS CORREGIDO --- */
         var instChart = null;
 
         function inicializarSelectorVotaciones() {
@@ -494,7 +504,7 @@
                 btn.style.display = 'none'; return;
             }
             baseEncuestas[key].opts.forEach(function(o, index) {
-                var l = document.createElement('label');
+                var l = document.createElement('label'); l.style.display = 'block'; l.style.margin = '6px 0';
                 l.innerHTML = '<input type="radio" name="radOpt" value="' + index + '" style="margin-right:8px;"> ' + o;
                 div.appendChild(l);
             });
@@ -504,7 +514,7 @@
         function registrarVotoSocio() {
             var key = document.getElementById('cmbEncuestasDisponibles').value;
             var seleccionado = document.querySelector('input[name="radOpt"]:checked');
-            if(!seleccionado) { alert('Debe elegir una de las opciones del formulario.'); return; }
+            if(!seleccionado) { alert('Debe elegir una de las opciones.'); return; }
             
             var idx = parseInt(seleccionado.value);
             var socioDatos = obtenerDatosSocio(ID_SOCIO_ACTIVO);
@@ -514,8 +524,12 @@
             baseEncuestas[key].puntosPonderados += socioDatos.puntos;
             registroVotosEmitidos[ID_SOCIO_ACTIVO + '_' + key] = true;
 
-            alert('✓ Voto registrado con éxito. Sumaste ' + socioDatos.puntos + ' puntos a la opción elegida.');
-            regresarAlPanelInterno();
+            guardarDatosEnMemoriaLocal(); // Guardado automático inmediato
+
+            alert('✓ Voto registrado con éxito. Sumaste ' + socioDatos.puntos + ' puntos a la opción.');
+            
+            // FLUJO MEJORADO CONTINUO: Se queda en la misma pantalla para seguir votando otras encuestas
+            cargarOpcionesParaVotar();
         }
 
         function inicializarSelectorModificaciones() {
@@ -538,7 +552,7 @@
             baseEncuestas[key].opts[0] = document.getElementById('txtModificarOptA').value.trim();
             baseEncuestas[key].opts[1] = document.getElementById('txtModificarOptB').value.trim();
             baseEncuestas[key].opts[2] = document.getElementById('txtModificarOptC').value.trim();
-            alert('✓ Estructura de consulta modificada en tiempo real.'); regresarAlPanelInterno();
+            guardarDatosEnMemoriaLocal(); alert('✓ Consulta modificada.'); regresarAlPanelInterno();
         }
 
         function guardarNuevaEncuestaAdmin() {
@@ -546,11 +560,10 @@
             var oa = document.getElementById('txtNuevaOptA').value.trim();
             var ob = document.getElementById('txtNuevaOptB').value.trim();
             var oc = document.getElementById('txtNuevaOptC').value.trim();
-            if(!tit || !oa || !ob || !oc) { alert('Complete todos los campos de la nueva encuesta.'); return; }
-            
+            if(!tit || !oa || !ob || !oc) { alert('Complete todos los campos.'); return; }
             var nextId = 'enc_' + (Object.keys(baseEncuestas).length + 1);
             baseEncuestas[nextId] = { titulo: tit, opts: Array.of(oa, ob, oc), votos: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0 };
-            alert('✓ Nueva consulta agregada correctamente.'); regresarAlPanelInterno();
+            guardarDatosEnMemoriaLocal(); alert('✓ Nueva consulta agregada.'); regresarAlPanelInterno();
         }
 
         function inicializarSelectorResultados() {
@@ -568,23 +581,22 @@
             document.getElementById('lblResTotalVotos').innerText = item.totalSocios;
             var restantes = TOTAL_SOCIOS - item.totalSocios;
             document.getElementById('lblResRestantes').innerText = restantes;
-            
-            var puntosFaltantesPonderados = restantes * 4; 
-            document.getElementById('lblResPuntosJuego').innerText = puntosFaltantesPonderados + " PTS";
+            document.getElementById('lblResPuntosJuego').innerText = (restantes * 4) + " PTS";
 
             var ctx = document.getElementById('chartResultadosTorta').getContext('2d');
             if(instChart) instChart.destroy();
             
-            // Usamos Array.of() para transportar valores de forma segura sin colgar el chat
-            var datasetValores = Array.of(item.votos[0], item.votos[1], item.votos[2]);
+            // Evitamos corchetes de array usando Array.of() seguro para transporte del chat
+            var valoresVotos = Array.of(item.votos[0], item.votos[1], item.votos[2]);
+            var coloresPastel = Array.of('#002D62', '#d91a1a', '#ffc107');
 
             instChart = new Chart(ctx, {
                 type: 'pie',
                 data: {
                     labels: item.opts,
                     datasets: [{
-                        data: datasetValores,
-                        backgroundColor: Array.of('#002D62', '#28a745', '#ffc107'),
+                        data: valoresVotos,
+                        backgroundColor: coloresPastel,
                         borderWidth: 1
                     }]
                 },
@@ -597,7 +609,7 @@
             Object.keys(baseEncuestas).forEach(function(k) {
                 var pct = ((baseEncuestas[k].totalSocios / TOTAL_SOCIOS) * 100).toFixed(2);
                 var row = document.createElement('div'); row.className = 'wf-box text-left';
-                row.innerHTML = '<span class="txt-info-red">' + baseEncuestas[k].titulo + ':</span><div style="font-size:18px; font-weight:800; margin-top:4px; color:#28a745;">' + pct + '% PARTICIPACIÓN GLOBAL</div>';
+                row.innerHTML = '<span class="txt-info-red">' + baseEncuestas[k].titulo + ':</span><div style="font-size:16px; font-weight:800; margin-top:4px; color:#28a745;">' + pct + '% PARTICIPACIÓN GLOBAL</div>';
                 div.appendChild(row);
             });
         }
