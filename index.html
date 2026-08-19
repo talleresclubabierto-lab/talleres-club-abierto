@@ -115,7 +115,7 @@
             "1913": "Socio: Fundador Club Abierto (Activo)"
         };
 
-        // Estado del sistema: Estructura de encuestas iniciales inventadas
+        // Estado del sistema: Estructura de encuestas iniciales con votos en cero
         let encuestas = [
             {
                 id: 0,
@@ -166,8 +166,8 @@
 
         // Flujo del Administrador con credenciales estrictas
         function intentarIngresoAdmin() {
-            const user = document.getElementById('adminUser').value;
-            const pass = document.getElementById('adminPass').value;
+            const user = document.getElementById('adminUser').value.trim();
+            const pass = document.getElementById('adminPass').value.trim();
 
             if (user === "admclubabierto" && pass === "1913") {
                 mostrarAlerta("Acceso concedido al Panel Directivo.");
@@ -201,7 +201,7 @@
                     document.getElementById('socioBadge').innerText = padronSociosValidos[socioId];
                     
                     mostrarAlerta(`Identidad verificada en padrón biométrico. Bienvenido.`);
-                    renderizarPanelSocio();
+                    renderizarPanelSocio(); // Fuerza el dibujo limpio de opciones vigentes
                 }, 2500); // 2.5 segundos de retraso simulando la biometría
             } else {
                 mostrarAlerta("El número de socio no coincide con ninguna huella en el padrón activo.", true);
@@ -241,17 +241,30 @@
             });
         }
 
-        // Procesa y guarda los cambios de texto aplicados por el Admin
+        // Procesa los cambios de texto aplicados por el Admin y resetea votos si hay cambios
         function guardarCambiosAdmin() {
             encuestas.forEach((encuesta, indexEncuesta) => {
+                let huboCambiosEnEstaEncuesta = false;
+
                 encuesta.opciones.forEach((opcion, indexOpcion) => {
                     const inputVal = document.getElementById(`edit_${indexEncuesta}_${indexOpcion}`).value.trim();
-                    if (inputVal) {
+                    
+                    // Si el administrador cambió el nombre de la opción en esta iteración
+                    if (inputVal && inputVal !== opcion) {
                         encuestas[indexEncuesta].opciones[indexOpcion] = inputVal;
+                        huboCambiosEnEstaEncuesta = true;
                     }
                 });
+
+                // Reset de votos aislado por encuesta afectada
+                if (huboCambiosEnEstaEncuesta) {
+                    encuestas[indexEncuesta].votos =;
+                    encuestas[indexEncuesta].registroVotosPorSocio = {};
+                }
             });
-            mostrarAlerta("Cambios aplicados con éxito. El padrón de socios ha sido actualizado.");
+
+            mostrarAlerta("Cambios aplicados. Las encuestas modificadas se han reiniciado individualmente.");
+            renderizarPanelAdmin(); // Refresca el panel de administración
         }
 
         // Dibuja el panel de votación para el Socio activo conectado
@@ -261,12 +274,12 @@
 
             encuestas.forEach((encuesta) => {
                 let opcionesHTML = "";
-                // Verifica si este socio en particular ya emitió su voto en esta encuesta
+                // Verifica si este socio ya emitió su voto en esta encuesta
                 const yaVotoEstaEncuesta = encuesta.registroVotosPorSocio[socioActualLogueado] !== undefined;
 
                 encuesta.opciones.forEach((opcion, indexOpcion) => {
                     const totalVotos = encuesta.votos[indexOpcion];
-                    // El botón se bloquea por completo a nivel UI si ya se registra un voto del socio
+                    // El botón se bloquea si el socio ya votó
                     const disabledStr = yaVotoEstaEncuesta ? "disabled style='background-color:#bbb; cursor:not-allowed;'" : "";
                     
                     opcionesHTML += `
@@ -290,22 +303,22 @@
             });
         }
 
-        // Estructura de Control: Registra el voto e inhabilita inmediatamente segundas vueltas
+        // Estructura de Control: Registra el voto de forma única por propuesta
         function registrarVotoSocio(encuestaId, opcionId) {
             const encuesta = encuestas.find(e => e.id === encuestaId);
             
-            // Validación de doble seguridad en lógica de backend simulada
+            // Validación estricta de doble seguridad
             if (encuesta.registroVotosPorSocio[socioActualLogueado] !== undefined) {
-                mostrarAlerta("Error de Validación: Tu firma digital ya votó en esta consulta.", true);
+                mostrarAlerta("Error: Tu credencial ya registra un voto en esta consulta.", true);
                 return;
             }
 
-            // Aplicación del voto y bloqueo irreversible del ID de socio en el objeto
+            // Aplicación del voto y bloqueo irreversible del ID de socio en esta encuesta
             encuesta.votos[opcionId] += 1;
             encuesta.registroVotosPorSocio[socioActualLogueado] = opcionId;
 
-            mostrarAlerta("¡Tu voto ha sido encriptado y enviado al padrón correctamente!");
-            renderizarPanelSocio(); // Actualiza visualmente los contadores y bloquea los botones
+            mostrarAlerta("¡Tu voto ha sido procesado y guardado con éxito!");
+            renderizarPanelSocio(); // Actualiza la UI
         }
     </script>
 </body>
