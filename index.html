@@ -115,14 +115,14 @@
             "1913": "Socio: Fundador Club Abierto (Activo)"
         };
 
-        // Estado del sistema: Estructura de encuestas iniciales con votos en cero
+        // Estado del sistema: Estructura de encuestas iniciales con inicialización correcta sin comas vacías
         let encuestas = [
             {
                 id: 0,
                 titulo: "Elección de Jugador Destacado (Fichaje de Temporada)",
                 opciones: ["Julián Álvarez", "Lautaro Martínez", "Enzo Fernández"],
                 votos:,
-                registroVotosPorSocio: {} // Almacena qué socio votó para bloquear doble voto
+                registroVotosPorSocio: {}
             },
             {
                 id: 1,
@@ -190,7 +190,7 @@
 
             if (padronSociosValidos[socioId]) {
                 const loader = document.getElementById('biometricLoader');
-                loader.style.display = 'block'; // Activa animación de escaneo
+                loader.style.display = 'block';
 
                 setTimeout(() => {
                     loader.style.display = 'none';
@@ -201,8 +201,8 @@
                     document.getElementById('socioBadge').innerText = padronSociosValidos[socioId];
                     
                     mostrarAlerta(`Identidad verificada en padrón biométrico. Bienvenido.`);
-                    renderizarPanelSocio(); // Fuerza el dibujo limpio de opciones vigentes
-                }, 2500); // 2.5 segundos de retraso simulando la biometría
+                    renderizarPanelSocio();
+                }, 2500);
             } else {
                 mostrarAlerta("El número de socio no coincide con ninguna huella en el padrón activo.", true);
             }
@@ -249,14 +249,12 @@
                 encuesta.opciones.forEach((opcion, indexOpcion) => {
                     const inputVal = document.getElementById(`edit_${indexEncuesta}_${indexOpcion}`).value.trim();
                     
-                    // Si el administrador cambió el nombre de la opción en esta iteración
                     if (inputVal && inputVal !== opcion) {
                         encuestas[indexEncuesta].opciones[indexOpcion] = inputVal;
                         huboCambiosEnEstaEncuesta = true;
                     }
                 });
 
-                // Reset de votos aislado por encuesta afectada
                 if (huboCambiosEnEstaEncuesta) {
                     encuestas[indexEncuesta].votos =;
                     encuestas[indexEncuesta].registroVotosPorSocio = {};
@@ -264,7 +262,7 @@
             });
 
             mostrarAlerta("Cambios aplicados. Las encuestas modificadas se han reiniciado individualmente.");
-            renderizarPanelAdmin(); // Refresca el panel de administración
+            renderizarPanelAdmin();
         }
 
         // Dibuja el panel de votación para el Socio activo conectado
@@ -274,12 +272,10 @@
 
             encuestas.forEach((encuesta) => {
                 let opcionesHTML = "";
-                // Verifica si este socio ya emitió su voto en esta encuesta
                 const yaVotoEstaEncuesta = encuesta.registroVotosPorSocio[socioActualLogueado] !== undefined;
 
                 encuesta.opciones.forEach((opcion, indexOpcion) => {
                     const totalVotos = encuesta.votos[indexOpcion];
-                    // El botón se bloquea si el socio ya votó
                     const disabledStr = yaVotoEstaEncuesta ? "disabled style='background-color:#bbb; cursor:not-allowed;'" : "";
                     
                     opcionesHTML += `
@@ -307,18 +303,16 @@
         function registrarVotoSocio(encuestaId, opcionId) {
             const encuesta = encuestas.find(e => e.id === encuestaId);
             
-            // Validación estricta de doble seguridad
             if (encuesta.registroVotosPorSocio[socioActualLogueado] !== undefined) {
                 mostrarAlerta("Error: Tu credencial ya registra un voto en esta consulta.", true);
                 return;
             }
 
-            // Aplicación del voto y bloqueo irreversible del ID de socio en esta encuesta
             encuesta.votos[opcionId] += 1;
             encuesta.registroVotosPorSocio[socioActualLogueado] = opcionId;
 
             mostrarAlerta("¡Tu voto ha sido procesado y guardado con éxito!");
-            renderizarPanelSocio(); // Actualiza la UI
+            renderizarPanelSocio();
         }
     </script>
 </body>
