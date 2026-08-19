@@ -7,7 +7,7 @@
     <!-- Cargamos Chart.js para los gráficos de las pantallas internas -->
     <script src="https://jsdelivr.net"></script>
     <style>
-        /* --- ESTILOS GLOBALES Y FONDO CUADRICULADO --- */
+        /* --- ESTILOS GLOBALES LIMPIOS --- */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -16,11 +16,7 @@
             font-weight: bold;
         }
         body {
-            background-color: #ffffff;
-            background-image: 
-                linear-gradient(to right, #e0e0e0 1px, transparent 1px),
-                linear-gradient(to bottom, #e0e0e0 1px, transparent 1px);
-            background-size: 20px 20px;
+            background-color: #ffffff; /* Fondo blanco limpio sin cuadrícula de Excel */
             color: #000000;
             padding: 20px;
             display: flex;
@@ -139,7 +135,6 @@
                 grid-template-columns: repeat(2, 1fr);
             }
         }
-        /* --- ESTILOS DE GRÁFICOS Y UTILIDADES --- */
         .chart-wrapper {
             border: 3px solid #000000;
             background-color: #ffffff;
@@ -181,7 +176,6 @@
             <div class="wf-box full-width" style="font-size: 16px; letter-spacing: 1px;">CLUB ABIERTO - CLUB ATLETICO TALLERES</div>
             <div class="wf-box full-width" style="font-size: 14px; margin-bottom: 20px;">POR UN TALLERES DEMOCRÁTICO Y DIGITAL</div>
 
-            <!-- CONTENEDOR DE COLUMNAS SIMÉTRICAS -->
             <div class="columns-container">
                 <!-- PANEL IZQUIERDO: SOCIOS ACTIVOS -->
                 <div class="column">
@@ -221,7 +215,6 @@
                 <button class="wf-button" style="width: auto; margin: 0; padding: 5px 15px;" onclick="volverAlLogin()">Salir</button>
             </div>
 
-            <!-- BLOQUES SUPERIORES DE DATOS PERSONALES -->
             <div class="grid-metrics">
                 <div class="wf-box text-left">
                     <span style="font-size: 11px; color: #555;">N° DE SOCIO:</span>
@@ -241,7 +234,6 @@
                 </div>
             </div>
 
-            <!-- METRICAS ANALÍTICAS INFERIORES -->
             <div class="grid-metrics">
                 <div class="wf-box text-left" style="border-style: dashed;">
                     <span style="font-size: 10px; color: #666;">PORCENTUAL APORTADO AL PADRÓN</span>
@@ -263,7 +255,6 @@
                 <button class="wf-button" style="width: auto; margin: 0; padding: 5px 15px;" onclick="volverAlLogin()">Salir</button>
             </div>
 
-            <!-- DATOS PERSONALES DEL ADMINISTRADOR -->
             <div class="wf-box full-width text-left" style="background-color: #f9f9f9;">
                 <div style="font-size: 11px; color: #555; margin-bottom: 5px;">DATOS DEL ADMINISTRADOR ACTIVO:</div>
                 <div style="font-size: 14px; margin-bottom: 3px;">USUARIO: <span id="lblAdminUserActive">-</span></div>
@@ -271,7 +262,6 @@
                 <div style="font-size: 14px;">PERÍODO: <span style="font-size: 12px; font-weight: normal;">DESDE EL 01/01/2026</span></div>
             </div>
 
-            <!-- CUADRÍCULA DE SECCIONES ADMINISTRATIVAS INFERIORES -->
             <div class="grid-admin-four" style="margin-top: 5px;">
                 <div class="wf-box" style="border-style: dotted;">
                     <span style="font-size: 12px; display: block; margin-bottom: 10px;">MODIFICAR ENCUESTAS</span>
@@ -283,7 +273,7 @@
                 </div>
             </div>
 
-            <!-- RESULTADOS GENERALES Y PARTICIPACIÓN GLOBAL -->
+            <!-- RESULTADOS GENERALES -->
             <div class="chart-wrapper" style="margin-top: 15px;">
                 <div style="font-size: 12px; margin-bottom: 10px; text-transform: uppercase;">Resultados Generales de Enmiendas (Barras Verdes)</div>
                 <div style="height: 160px; position: relative;">
@@ -299,12 +289,10 @@
     <script>
         /* --- CONSTANTES DE NEGOCIO Y CONFIGURACIÓN --- */
         const TOTAL_SOCIOS = 10000;
-        
-        // Generamos la cantidad aleatoria de administradores (ej. 3) y sus IDs de socio asociados
-        const CANTIDAD_ADMINS = Math.floor(Math.random() * 4) + 2; // Rango aleatorio entre 2 y 5
+        const CANTIDAD_ADMINS = 3; // Fijado exactamente en 3 según requerimientos de balance numérico
         document.getElementById('lblCantAdmin').innerText = CANTIDAD_ADMINS;
 
-        // Lista fija de IDs de socios que actúan como administradores autorizados
+        // Lista de IDs de socios designados como administradores autorizados de forma cruzada
         const listaAdmins = [];
         while(listaAdmins.length < CANTIDAD_ADMINS) {
             let idSocioAdmin = Math.floor(Math.random() * TOTAL_SOCIOS) + 1;
@@ -320,11 +308,9 @@
             const userAdmin = document.getElementById('adminUser').value.trim();
             const passAdmin = document.getElementById('adminPass').value;
 
-            // Instancias de los contenedores de mensajes de validación según el canal
             const faceBox = document.getElementById(tipo === 'socio' ? 'socioBioFace' : 'adminBioFace');
             const fingerBox = document.getElementById(tipo === 'socio' ? 'socioBioFinger' : 'adminBioFinger');
 
-            // Reset inicial de estados visuales
             document.querySelectorAll('.biometric-box').forEach(b => {
                 b.classList.remove('accent-blue');
                 b.innerText = b.id.includes('Face') ? 'cartel de validación biométrica' : 'cartel de validación huella digital';
@@ -340,7 +326,7 @@
             } else {
                 const idAdmin = parseInt(userAdmin);
                 if (isNaN(idAdmin) || !listaAdmins.includes(idAdmin) || passAdmin !== '1913') {
-                    alert('Acceso Denegado: Para ser administrador debe ingresar un ID de Socio Administrador válido y clave 1913.');
+                    alert('Acceso Denegado: Para ser administrador debe ingresar un ID de Socio Administrador válido (se requiere doble rol) y clave 1913.');
                     return;
                 }
                 ejecutarAnimacionBiometrica(faceBox, fingerBox, () => ingresarComoAdmin(idAdmin));
@@ -370,34 +356,30 @@
             let diasFaltantes = 0;
 
             if (id <= 6000) {
-                // Rango 1 a 5 años (distribución equitativa simulada por tramos)
                 antiguedad = 1 + ((id - 1) % 5);
                 puntos = antiguedad;
-                porcentual = 0.006; // Impacto individual en el padrón
+                porcentual = 0.006;
                 diasFaltantes = (5 - antiguedad) * 365 + 120;
             } else if (id <= 8000) {
-                // Rango 5 a 10 años
                 antiguedad = 5 + ((id - 6001) % 5);
                 puntos = antiguedad;
                 porcentual = 0.010;
                 diasFaltantes = (10 - antiguedad) * 365 + 45;
             } else if (id <= 9000) {
-                // Rango 10 a 15 años
                 antiguedad = 10 + ((id - 8001) % 5);
                 puntos = antiguedad;
                 porcentual = 0.014;
                 diasFaltantes = (15 - antiguedad) * 365 + 15;
             } else {
-                // Mayor a 15 años
                 antiguedad = 15 + ((id - 9001) % 15);
-                puntos = 20; // Puntos fijos establecidos por regla
+                puntos = 20; 
                 porcentual = 0.025;
-                diasFaltantes = 0; // Ya se encuentra en el rango máximo escalafón
+                diasFaltantes = 0;
             }
             return { antiguedad, puntos, porcentual, diasFaltantes };
         }
 
-        /* --- REDIRECCIÓN Y CONFIGURACIÓN DE PANELES INTERNOS --- */
+        /* --- REDIRECCIÓN Y RENDERIZADO DE GRÁFICOS CORREGIDOS --- */
         let activeChart = null;
 
         function ingresarComoSocio(id) {
@@ -411,7 +393,6 @@
             document.getElementById('lblSocioPuntos').innerText = `${datos.puntos} PTS`;
             document.getElementById('lblSocioDiasFaltantes').innerText = datos.diasFaltantes > 0 ? `${datos.diasFaltantes} DÍAS` : 'MÁXIMO RANGO ALCANZADO';
 
-            // Renderizado de Gráfico de Escrutinio en Barras Azules
             const ctx = document.getElementById('socioChart').getContext('2d');
             if(activeChart) activeChart.destroy();
             activeChart = new Chart(ctx, {
@@ -420,7 +401,7 @@
                     labels: ['Opción A (Reforma)', 'Opción B (Continuidad)', 'Votos en Blanco'],
                     datasets: [{
                         label: 'Votos Equivalentes (Puntos)',
-                        data:,
+                        data:, /* Arreglo numérico explícito y corregido */
                         backgroundColor: '#002D62',
                         borderColor: '#000000',
                         borderWidth: 2
@@ -435,10 +416,8 @@
             document.getElementById('adminDashboard').style.display = 'flex';
             document.getElementById('lblAdminUserActive').innerText = `SOCIO #${idAdmin}`;
             
-            // Simulación del porcentaje global de votación del padrón completo
-            document.getElementById('lblAdminGlobalVotos').innerText = `${(68 + Math.random() * 12).toFixed(2)}%`;
+            document.getElementById('lblAdminGlobalVotos').innerText = `${(72.45).toFixed(2)}%`;
 
-            // Renderizado de Gráfico de Enmiendas Administrativas en Barras Verdes
             const ctx = document.getElementById('adminChart').getContext('2d');
             if(activeChart) activeChart.destroy();
             activeChart = new Chart(ctx, {
@@ -447,7 +426,7 @@
                     labels: ['Enmienda Presupuesto', 'Aprobación Memoria', 'Modernización Estatuto'],
                     datasets: [{
                         label: 'Porcentaje de Aprobación Global',
-                        data:,
+                        data:, /* Arreglo numérico de barras verdes explícito y corregido */
                         backgroundColor: '#28a745',
                         borderColor: '#000000',
                         borderWidth: 2
@@ -462,7 +441,6 @@
             document.getElementById('adminDashboard').style.display = 'none';
             document.getElementById('loginScreen').style.display = 'flex';
             
-            // Limpieza de campos de texto de credenciales
             document.getElementById('socioUser').value = '';
             document.getElementById('socioPass').value = '';
             document.getElementById('adminUser').value = '';
