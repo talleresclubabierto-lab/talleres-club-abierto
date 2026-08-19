@@ -115,41 +115,41 @@
             "1913": "Socio: Fundador Club Abierto (Activo)"
         };
 
-        // Base de datos integrada con inicialización estricta de arrays de votación [0, 0, 0]
+        // Base de datos integrada con inicialización dinámica de arreglos de votación
         let encuestas = [
             {
                 id: 0,
                 titulo: "Elección de Jugador Destacado (Fichaje de Temporada)",
                 opciones: ["Julián Álvarez", "Lautaro Martínez", "Enzo Fernández"],
-                votos:,
+                votos: Array(3).fill(0),
                 registroVotosPorSocio: {}
             },
             {
                 id: 1,
                 titulo: "Director Técnico (Próximo Ciclo Institucional)",
                 opciones: ["Marcelo Gallardo", "Lionel Scaloni", "Diego Simeone"],
-                votos:,
+                votos: Array(3).fill(0),
                 registroVotosPorSocio: {}
             },
             {
                 id: 2,
                 titulo: "Modelo de Camiseta Oficial (Edición Especial 2026)",
                 opciones: ["Diseño Retro 1913 Lines", "Bastones Clásicos Modernizados", "Estilo Monocromático Urbano"],
-                votos:,
+                votos: Array(3).fill(0),
                 registroVotosPorSocio: {}
             },
             {
                 id: 3,
                 titulo: "Marca de Indumentaria Técnica (Sponsor de Ropa)",
                 opciones: ["Adidas Performance", "Nike Football", "Puma Teamwear"],
-                votos:,
+                votos: Array(3).fill(0),
                 registroVotosPorSocio: {}
             },
             {
                 id: 4,
                 titulo: "Main Sponsor (Patrocinador Principal de Pecho)",
                 opciones: ["Fly Emirates", "Crypto.com", "Mercado Libre"],
-                votos:,
+                votos: Array(3).fill(0),
                 registroVotosPorSocio: {}
             }
         ];
