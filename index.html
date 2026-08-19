@@ -107,7 +107,7 @@
         </div>
     </div> <!-- Cierre app-container -->
     <script>
-        // Padrón de Socios simulado indexado con validación biométrica exitosa
+        // Padrón de Socios verificado
         const padronSociosValidos = {
             "1024": "Socio: Carlos Tévez (Activo)",
             "2048": "Socio: Roman Riquelme (Activo)",
@@ -115,7 +115,7 @@
             "1913": "Socio: Fundador Club Abierto (Activo)"
         };
 
-        // Estado del sistema: Estructura corregida con sintaxis válida [] para arrays vacíos
+        // Arreglo de encuestas con estructuras de votos inicializadas explícitamente en cero [0, 0, 0]
         let encuestas = [
             {
                 id: 0,
@@ -155,7 +155,7 @@
         ];
 
         let socioActualLogueado = null;
-        // Sistema global de alertas en UI
+        // Mensajes de estado en la interfaz
         function mostrarAlerta(mensaje, esError = false) {
             const alertEl = document.getElementById('statusAlert');
             alertEl.style.display = 'block';
@@ -164,7 +164,7 @@
             setTimeout(() => { alertEl.style.display = 'none'; }, 5000);
         }
 
-        // Flujo del Administrador con credenciales estrictas
+        // Validación estricta de credenciales de administración
         function intentarIngresoAdmin() {
             const user = document.getElementById('adminUser').value.trim();
             const pass = document.getElementById('adminPass').value.trim();
@@ -179,7 +179,7 @@
             }
         }
 
-        // Flujo del Socio con Simulación Biométrica de Huella y Rostro
+        // Validación y temporizador de biometría simulada
         function intentarIngresoSocio() {
             const socioId = document.getElementById('socioId').value.trim();
 
@@ -200,7 +200,7 @@
                     document.getElementById('socioView').style.display = 'block';
                     document.getElementById('socioBadge').innerText = padronSociosValidos[socioId];
                     
-                    mostrarAlerta(`Identidad verificada en padrón biométrico. Bienvenido.`);
+                    mostrarAlerta("Identidad verificada en padrón biométrico. Bienvenido.");
                     renderizarPanelSocio();
                 }, 2500);
             } else {
@@ -208,6 +208,7 @@
             }
         }
 
+        // Cierre seguro de sesión y reinicio de campos
         function cerrarSesion() {
             socioActualLogueado = null;
             document.getElementById('adminUser').value = "";
@@ -217,7 +218,7 @@
             document.getElementById('socioView').style.display = 'none';
             document.getElementById('welcomeView').style.display = 'block';
         }
-        // Dibuja el panel administrativo con las opciones editables
+        // Renderiza entradas editables para el administrador
         function renderizarPanelAdmin() {
             const container = document.getElementById('adminSurveysContainer');
             container.innerHTML = "";
@@ -241,7 +242,7 @@
             });
         }
 
-        // Procesa los cambios de texto aplicados por el Admin y resetea votos si hay cambios
+        // Guarda ediciones textuales y reinicia contadores de votos si existen modificaciones
         function guardarCambiosAdmin() {
             encuestas.forEach((encuesta, indexEncuesta) => {
                 let huboCambiosEnEstaEncuesta = false;
@@ -265,7 +266,7 @@
             renderizarPanelAdmin();
         }
 
-        // Dibuja el panel de votación para el Socio activo conectado
+        // Renderiza interfaz de votación para socios activos
         function renderizarPanelSocio() {
             const container = document.getElementById('socioSurveysContainer');
             container.innerHTML = "";
@@ -299,7 +300,7 @@
             });
         }
 
-        // Estructura de Control: Registra el voto de forma única por propuesta
+        // Inyección de voto único bloqueando dobles ejecuciones
         function registrarVotoSocio(encuestaId, opcionId) {
             const encuesta = encuestas.find(e => e.id === encuestaId);
             
