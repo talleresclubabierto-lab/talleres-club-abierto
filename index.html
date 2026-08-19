@@ -107,7 +107,7 @@
         </div>
     </div> <!-- Cierre app-container -->
     <script>
-        // Padrón de Socios verificado
+        // Padrón de Socios simulación biométrica
         const padronSociosValidos = {
             "1024": "Socio: Carlos Tévez (Activo)",
             "2048": "Socio: Roman Riquelme (Activo)",
@@ -115,7 +115,7 @@
             "1913": "Socio: Fundador Club Abierto (Activo)"
         };
 
-        // Arreglo de encuestas con estructuras de votos inicializadas explícitamente en cero [0, 0, 0]
+        // Base de datos integrada con inicialización estricta de arrays de votación [0, 0, 0]
         let encuestas = [
             {
                 id: 0,
@@ -155,7 +155,7 @@
         ];
 
         let socioActualLogueado = null;
-        // Mensajes de estado en la interfaz
+
         function mostrarAlerta(mensaje, esError = false) {
             const alertEl = document.getElementById('statusAlert');
             alertEl.style.display = 'block';
@@ -164,7 +164,6 @@
             setTimeout(() => { alertEl.style.display = 'none'; }, 5000);
         }
 
-        // Validación estricta de credenciales de administración
         function intentarIngresoAdmin() {
             const user = document.getElementById('adminUser').value.trim();
             const pass = document.getElementById('adminPass').value.trim();
@@ -179,7 +178,6 @@
             }
         }
 
-        // Validación y temporizador de biometría simulada
         function intentarIngresoSocio() {
             const socioId = document.getElementById('socioId').value.trim();
 
@@ -208,7 +206,6 @@
             }
         }
 
-        // Cierre seguro de sesión y reinicio de campos
         function cerrarSesion() {
             socioActualLogueado = null;
             document.getElementById('adminUser').value = "";
@@ -218,7 +215,7 @@
             document.getElementById('socioView').style.display = 'none';
             document.getElementById('welcomeView').style.display = 'block';
         }
-        // Renderiza entradas editables para el administrador
+
         function renderizarPanelAdmin() {
             const container = document.getElementById('adminSurveysContainer');
             container.innerHTML = "";
@@ -242,7 +239,6 @@
             });
         }
 
-        // Guarda ediciones textuales y reinicia contadores de votos si existen modificaciones
         function guardarCambiosAdmin() {
             encuestas.forEach((encuesta, indexEncuesta) => {
                 let huboCambiosEnEstaEncuesta = false;
@@ -266,7 +262,6 @@
             renderizarPanelAdmin();
         }
 
-        // Renderiza interfaz de votación para socios activos
         function renderizarPanelSocio() {
             const container = document.getElementById('socioSurveysContainer');
             container.innerHTML = "";
@@ -300,7 +295,6 @@
             });
         }
 
-        // Inyección de voto único bloqueando dobles ejecuciones
         function registrarVotoSocio(encuestaId, opcionId) {
             const encuesta = encuestas.find(e => e.id === encuestaId);
             
