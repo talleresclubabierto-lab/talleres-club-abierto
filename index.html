@@ -348,7 +348,7 @@
                 }, 1000);
             }, 1200);
         }
-        /* --- CÁLCULO DE REGLAS DE NEGOCIO DEL PADRÓN --- */
+         /* --- CÁLCULO DE REGLAS DE NEGOCIO DEL PADRÓN --- */
         function obtenerDatosSocio(id) {
             let antiguedad = 0;
             let puntos = 0;
@@ -379,7 +379,7 @@
             return { antiguedad, puntos, porcentual, diasFaltantes };
         }
 
-        /* --- REDIRECCIÓN Y RENDERIZADO DE GRÁFICOS CORREGIDOS --- */
+        /* --- REDIRECCIÓN Y RENDERIZADO DE GRÁFICOS --- */
         let activeChart = null;
 
         function ingresarComoSocio(id) {
@@ -401,7 +401,7 @@
                     labels: ['Opción A (Reforma)', 'Opción B (Continuidad)', 'Votos en Blanco'],
                     datasets: [{
                         label: 'Votos Equivalentes (Puntos)',
-                        data:, /* Arreglo numérico explícito y corregido */
+                        data:,
                         backgroundColor: '#002D62',
                         borderColor: '#000000',
                         borderWidth: 2
@@ -426,7 +426,7 @@
                     labels: ['Enmienda Presupuesto', 'Aprobación Memoria', 'Modernización Estatuto'],
                     datasets: [{
                         label: 'Porcentaje de Aprobación Global',
-                        data:, /* Arreglo numérico de barras verdes explícito y corregido */
+                        data:,
                         backgroundColor: '#28a745',
                         borderColor: '#000000',
                         borderWidth: 2
