@@ -3,114 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Club Abierto - Plataforma Institucional y Gobernanza</title>
+    <title>Club Abierto - Club Atlético Talleres</title>
     <style>
         :root {
             --primary: #1a3a5f;
-            --secondary: #007bff;
-            --success: #28a745;
-            --danger: #dc3545;
-            --dark: #212529;
-            --light: #f8f9fa;
+            --dark: #111111;
+            --light: #ffffff;
+            --gray-bg: #f8f9fa;
         }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #eef2f5; color: var(--dark); }
-        .app-container { max-width: 1000px; margin: 40px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        .header-logo { text-align: center; border-bottom: 3px solid var(--primary); padding-bottom: 20px; margin-bottom: 30px; }
-        .header-logo h1 { margin: 0; color: var(--primary); font-size: 28px; }
-        .welcome-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px; }
-        .role-card { background: var(--light); border: 2px solid #e2e8f0; border-radius: 8px; padding: 25px; text-align: center; transition: transform 0.2s, border-color 0.2s; }
-        .role-card:hover { transform: translateY(-4px); border-color: var(--secondary); }
-        .role-card h3 { margin-top: 0; color: var(--primary); }
-        .form-group { margin-bottom: 15px; text-align: left; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
-        input[type="text"], input[type="password"] { width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box; }
-        button { background-color: var(--secondary); color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; transition: background 0.2s; }
-        button:hover { background-color: #0056b3; }
-        .btn-logout { background-color: #6c757d; max-width: 150px; margin-bottom: 20px; }
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #f4f6f9;
+            color: var(--dark);
+        }
+        .app-container { 
+            max-width: 900px; 
+            margin: 30px auto; 
+            background: var(--light); 
+            padding: 40px; 
+            border: 2px solid var(--dark);
+        }
+        .logo-container { text-align: center; margin-bottom: 25px; }
+        .logo-img { width: 130px; height: auto; }
+        
+        .box-header-main {
+            border: 2px solid var(--dark);
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 20px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+        .box-header-sub {
+            border: 2px solid var(--dark);
+            padding: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            text-transform: uppercase;
+            margin-bottom: 35px;
+        }
+        .welcome-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 40px; 
+        }
+        .panel-column {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .box-title {
+            border: 2px solid var(--dark);
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            text-transform: uppercase;
+            background-color: var(--gray-bg);
+        }
+        .box-counter {
+            border: 2px solid var(--dark);
+            padding: 8px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .input-wrapper {
+            border: 2px solid var(--dark);
+            display: flex;
+            flex-direction: column;
+        }
+        .input-wrapper input {
+            border: none;
+            padding: 11px;
+            text-align: center;
+            font-size: 15px;
+            outline: none;
+            box-sizing: border-box;
+        }
+        .input-wrapper input:first-child {
+            border-bottom: 2px solid var(--dark);
+        }
+        .btn-action {
+            background-color: var(--primary);
+            color: white;
+            border: 2px solid var(--dark);
+            padding: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            width: 100%;
+        }
+        .btn-action:hover { background-color: #112844; }
+        .btn-logout { background-color: #6c757d; border: 2px solid var(--dark); color: white; padding: 10px 15px; font-weight: bold; cursor: pointer; }
+        
+        .box-biometric-container { display: flex; flex-direction: column; }
+        .box-biometric { border: 2px solid var(--dark); padding: 8px; text-align: center; font-size: 14px; background-color: var(--light); margin-top: -2px; }
+        .biometric-active { background-color: #e0f2fe !important; font-weight: bold; color: var(--primary); animation: pulse 1.5s infinite ease-in-out; }
+        @keyframes pulse { 0% { opacity: 0.7; } 50% { opacity: 1; } 100% { opacity: 0.7; } }
+
         .view-panel { display: none; }
-        .biometric-overlay { display: none; text-align: center; padding: 20px; background: #e0f2fe; border: 2px dashed var(--secondary); border-radius: 8px; margin-top: 15px; }
-        .scanner-line { height: 4px; background: var(--secondary); animation: scan 2s infinite ease-in-out; }
-        @keyframes scan { 0% { transform: translateY(0); } 50% { transform: translateY(20px); } 100% { transform: translateY(0); } }
-        .survey-box { border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; margin-bottom: 20px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .survey-box h4 { margin-top: 0; color: var(--primary); border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .option-row { padding: 10px; background: var(--light); margin-bottom: 12px; border-radius: 4px; border-left: 4px solid var(--secondary); }
-        .option-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-        .progress-bar-bg { background: #e9ecef; width: 100%; height: 12px; border-radius: 6px; overflow: hidden; margin-top: 4px; }
+        .wireframe-box { border: 2px solid var(--dark); padding: 10px; text-align: center; font-weight: bold; font-size: 15px; background: var(--light); text-transform: uppercase; }
+        .survey-container-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .survey-box { border: 2px solid var(--dark); padding: 20px; background: #fff; margin-bottom: 25px; }
+        .survey-box h4 { margin-top: 0; color: var(--primary); border-bottom: 2px solid var(--dark); padding-bottom: 10px; text-transform: uppercase; }
+        
+        .option-row { padding: 12px; border: 2px solid var(--dark); margin-bottom: 12px; background: var(--gray-bg); }
+        .progress-bar-bg { background: #e9ecef; width: 100%; height: 14px; border: 2px solid var(--dark); overflow: hidden; margin-top: 6px; }
         .progress-bar-fill { background: var(--secondary); height: 100%; width: 0%; transition: width 0.4s ease; }
-        .admin-edit-row { display: flex; gap: 10px; margin-bottom: 8px; }
-        .admin-edit-row input { flex: 1; }
-        .status-alert { padding: 12px; border-radius: 4px; margin-bottom: 20px; display: none; font-weight: bold; text-align: center; }
-        .alert-success { background: #d4edda; color: #155724; }
-        .alert-danger { background: #f8d7da; color: #721c24; }
+        .status-alert { border: 2px solid var(--dark); padding: 12px; margin-bottom: 20px; display: none; font-weight: bold; text-align: center; }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <div class="header-logo">
-            <h1>CLUB ABIERTO — SISTEMA INTEGRAL</h1>
-            <p>Módulo de Escrutinio Ponderado (Padrón Escalable de 10.000 Socios)</p>
+        <div class="logo-container">
+            <img src="https://wikimedia.org" class="logo-img" alt="Talleres Digital">
+            <div style="font-weight: bold; font-size: 14px; margin-top: 5px; letter-spacing: 1px;">TALLERES DIGITAL</div>
+            <div style="font-size: 10px; color: #555;">EL FUTURO DE LA T SE DECIDE EN TU PANTALLA</div>
         </div>
+        <div id="headerBoxes">
+            <div class="box-header-main">Club Abierto - Club Atletico Talleres</div>
+            <div class="box-header-sub">Por un Talleres Democrático y Digital</div>
+        </div>
+
         <div id="statusAlert" class="status-alert"></div>
 
-        <!-- PANTALLA DE BIENVENIDA / LOGIN -->
+        <!-- PANTALLA DE BIENVENIDA (WIREFRAME 1) -->
         <div id="welcomeView" class="view-panel" style="display: block;">
             <div class="welcome-grid">
-                <!-- ACCESO SOCIOS -->
-                <div class="role-card">
-                    <h3>Acceso Socio Activo</h3>
-                    <p>Ingresa tu número de credencial para procesar tu firma de gobernanza.</p>
-                    <div class="form-group">
-                        <label for="socioId">Número de Socio (1 al 10000):</label>
-                        <input type="text" id="socioId" placeholder="Ej: 500, 6500, 8500, 9500">
+                
+                <!-- COLUMNA PANEL DE SOCIOS ACTIVOS -->
+                <div class="panel-column">
+                    <div class="box-title">Panel de Socios Activos</div>
+                    <div class="box-counter">N° de socios activos actualmente: <strong>6.012</strong></div>
+                    <div class="input-wrapper">
+                        <input type="text" id="socioId" placeholder="N° de Socio">
+                        <input type="password" id="socioPass" placeholder="contraseña">
                     </div>
-                    <button onclick="intentarIngresoSocio()">Validar Identidad Biométrica</button>
-                    
-                    <div id="biometricLoader" class="biometric-overlay">
-                        <div class="scanner-line"></div>
-                        <p style="margin-top: 10px; font-weight: bold; color: var(--primary);">
-                            🧬 Conectando al Padrón... Escaneando Huella Dactilar y Rostro...
-                        </p>
+                    <button class="btn-action" onclick="intentarIngresoSocio()">Ingresar al Padrón</button>
+                    <div class="box-biometric-container">
+                        <div class="box-biometric" id="lblBiometricSocio">cartel de validación biométrica</div>
+                        <div class="box-biometric" id="lblHuellaSocio">cartel de validación huella digital</div>
                     </div>
                 </div>
 
-                <!-- ACCESO ADMINISTRACIÓN -->
-                <div class="role-card">
-                    <h3>Comisión Directiva</h3>
-                    <p>Panel restringido para monitoreo global de tendencias y edición.</p>
-                    <div class="form-group">
-                        <label for="adminUser">Usuario Técnico:</label>
-                        <input type="text" id="adminUser" placeholder="Usuario">
+                <!-- COLUMNA PANEL DE ADMINISTRADOR -->
+                <div class="panel-column">
+                    <div class="box-title">Panel de Administrador</div>
+                    <div class="box-counter">N° de socios activos actualmente: <strong>3.988</strong></div>
+                    <div class="input-wrapper">
+                        <input type="text" id="adminUser" placeholder="Usuario Administrador">
+                        <input type="password" id="adminPass" placeholder="contraseña">
                     </div>
-                    <div class="form-group">
-                        <label for="adminPass">Contraseña de Red:</label>
-                        <input type="password" id="adminPass" placeholder="••••••••">
+                    <button class="btn-action" style="background-color: var(--dark);" onclick="intentarIngresoAdmin()">Acceder al Panel</button>
+                    <div class="box-biometric-container">
+                        <div class="box-biometric" id="lblBiometricAdmin">cartel de validación biométrica</div>
+                        <div class="box-biometric" id="lblHuellaAdmin">cartel de validación huella digital</div>
                     </div>
-                    <button onclick="intentarIngresoAdmin()" style="background-color: var(--primary);">Acceder al Panel</button>
                 </div>
+
             </div>
         </div>
-        <!-- PANEL DE CONTROL DIRECTIVO (ADMIN) -->
-        <div id="adminView" class="view-panel">
-            <button class="btn-logout" onclick="cerrarSesion()">← Salir</button>
-            <h2>Panel de Control Directivo (Escrutinio Ponderado en Tiempo Real)</h2>
-            <p style="color: #666; margin-bottom: 25px;">Monitoreo general de puntos acumulados en el padrón de 10.000 socios.</p>
-            <div id="adminSurveysContainer"></div>
-            <button onclick="guardarCambiosAdmin()" style="background-color: var(--success); font-size: 18px; margin-top: 20px;">Publicar Cambios en el Padrón</button>
-        </div>
-
-        <!-- PANEL DEL SOCIO (VOTACIONES) -->
+        <!-- PANEL DE SOCIO ACTIVO (WIREFRAME 2) -->
         <div id="socioView" class="view-panel">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <button class="btn-logout" onclick="cerrarSesion()">← Salir</button>
-                <div id="socioBadge" style="background: var(--primary); color: white; padding: 8px 15px; border-radius: 20px; font-weight: bold;"></div>
+            <button class="btn-logout" onclick="cerrarSesion()">← Salir</button>
+            <div class="box-header-main" style="margin-top:20px;">Club Abierto - Club Atletico Talleres</div>
+            <div class="box-header-sub">Por un Talleres Democrático y Digital</div>
+            <div class="box-title" style="margin-bottom:20px;">Panel de Socios Activos</div>
+            
+            <div class="welcome-grid" style="margin-bottom:20px;">
+                <div class="wireframe-box" id="lblInfoSocioId">N° de Socio: --</div>
+                <div class="wireframe-box" id="lblInfoSocioAntiguedad">Antigüedad del Socio: --</div>
             </div>
-            <h2>Consultas y Decisiones del Club</h2>
-            <p>Tu voto sumará puntos de gobernanza equivalentes a tu antigüedad en el padrón institucional.</p>
+            
+            <div class="welcome-grid" style="margin-bottom:25px;">
+                <div class="box-title" style="font-size:14px;">Votaciones Activas</div>
+                <div class="box-title" style="font-size:14px;">Resultados de Votaciones Activas</div>
+            </div>
+
+            <!-- Contenedor donde se inyectan las encuestas y las barras del Socio -->
             <div id="socioSurveysContainer"></div>
+
+            <div class="panel-column" style="margin-top:25px; gap:8px;">
+                <div class="wireframe-box" id="lblMetricaMasa" style="background:var(--gray-bg);">Porcentual de votación respecto a total de votaciones: --</div>
+                <div class="wireframe-box" id="lblMetricaPuntos" style="background:var(--gray-bg);">Cantidad de puntos por cada voto en base a la antigüedad: --</div>
+                <div class="wireframe-box" id="lblMetricaDias" style="background:var(--gray-bg);">Antigüedad que falta para tener mayor cantidad de puntos por voto (en días): --</div>
+            </div>
+        </div>
+        <!-- PANEL DE ADMINISTRACIÓN (WIREFRAME 3) -->
+        <div id="adminView" class="view-panel">
+            <button class="btn-logout" onclick="cerrarSesion()">← Salir del Panel</button>
+            <div class="box-header-main" style="margin-top:20px;">Club Abierto - Club Atletico Talleres</div>
+            <div class="box-header-sub">Por un Talleres Democrático y Digital</div>
+            <div class="box-title" style="margin-bottom:20px;">Panel de Administradores</div>
+            
+            <div class="welcome-grid" style="gap:15px; margin-bottom:15px;">
+                <div class="wireframe-box">N° de Socio: 1913</div>
+                <div class="wireframe-box">Antigüedad del Socio: 35 Años</div>
+            </div>
+            <div class="welcome-grid" style="gap:15px; margin-bottom:15px;">
+                <div class="wireframe-box">Nombre y Apellido: Comisión Directiva</div>
+                <div class="wireframe-box">Cargo que ocupa en el Club: Administrador General</div>
+            </div>
+            
+            <div class="wireframe-box" style="margin-bottom:25px; background:var(--gray-bg);">Desde cuándo ocupa el cargo: Elecciones Institucionales Vigentes</div>
+
+            <div class="welcome-grid" style="margin-bottom:20px; gap:20px;">
+                <div class="box-title" style="font-size:13px;">Modificación de Encuestas / Resultados</div>
+                <div class="box-title" style="font-size:13px;">Agregar Nueva Encuesta / % de Votación</div>
+            </div>
+
+            <!-- Contenedor donde se inyectan el panel del Administrador -->
+            <div id="adminSurveysContainer"></div>
+            
+            <button onclick="guardarCambiosAdmin()" class="btn-action" style="background-color: var(--success); font-size:16px; margin-top:15px;">Publicar Cambios en la Plataforma</button>
         </div>
     </div> <!-- Cierre app-container -->
     <script>
-        // Algoritmo matemático para distribuir exactamente 10.000 socios en base a tus especificaciones
+        // Distribución matemática exacta del padrón de 10.000 socios en base a tus reglas
         function obtenerDatosSocioPadrón(id) {
             const numId = parseInt(id);
             if (isNaN(numId) || numId < 1 || numId > 10000) {
@@ -119,33 +233,42 @@
 
             let antiguedadAnos = 0;
             let puntosVoto = 0;
-            let rangoTexto = "";
+            let diasFaltantes = 0;
 
+            // REGLA 1: El 60% (Socios 1 al 6000) -> Distribución equitativa de 1 a 5 años. 1 punto por año.
             if (numId <= 6000) {
                 antiguedadAnos = Math.floor((numId - 1) / 1200) + 1; 
                 puntosVoto = antiguedadAnos;
-                rangoTexto = "Padrón Inicial (60% del Club)";
+                diasFaltantes = (6 - antiguedadAnos) * 365;
             }
+            // REGLA 2: El 20% (Socios 6001 al 8000) -> Distribución equitativa de 5 a 10 años. 1 punto por año.
             else if (numId <= 8000) {
                 antiguedadAnos = Math.floor((numId - 6001) / 400) + 5;
                 puntosVoto = antiguedadAnos;
-                rangoTexto = "Padrón Intermedio (20% del Club)";
+                diasFaltantes = (11 - antiguedadAnos) * 365;
             }
+            // REGLA 3: El 10% (Socios 8001 al 9000) -> Distribución equitativa de 10 a 15 años. 1 punto por año.
             else if (numId <= 9000) {
                 antiguedadAnos = Math.floor((numId - 8001) / 200) + 10;
                 puntosVoto = antiguedadAnos;
-                rangoTexto = "Padrón Antiguo (10% del Club)";
+                diasFaltantes = (16 - antiguedadAnos) * 365;
             }
+            // REGLA 4: El 10% final (Socios 9001 al 10000) -> Más de 15 años de antigüedad. Dan 20 puntos fijos.
             else {
                 antiguedadAnos = Math.floor((numId - 9001) / 66) + 16;
-                puntosVoto = 20; 
-                rangoTexto = "Alto Consejo Directivo / Vitalicios (10% del Club)";
+                puntosVoto = 20; // Ponderación máxima
+                diasFaltantes = 0; // Ya alcanzó la ponderación máxima de la DAO
             }
 
-            return { nombre: "Socio N° " + numId,章antiguedad: antiguedadAnos, puntos: puntosVoto, rango: rangoTexto };
+            return {
+                nombre: "Socio N° " + numId,
+                antiguedad: antiguedadAnos,
+                puntos: puntosVoto,
+                diasParaSiguiente: diasFaltantes
+            };
         }
 
-        // Base de datos de encuestas con inicialización dinámica libre de corchetes filtrables
+        // Base de datos de encuestas sin corchetes vacíos para blindar la transmisión
         let encuestas = [
             { id: 0, titulo: "Elección de Jugador Destacado (Fichaje de Temporada)", opciones: ["Julián Álvarez", "Lautaro Martínez", "Enzo Fernández"], votos: Array(3).fill(0), registroVotosPorSocio: {} },
             { id: 1, titulo: "Director Técnico (Próximo Ciclo Institucional)", opciones: ["Marcelo Gallardo", "Lionel Scaloni", "Diego Simeone"], votos: Array(3).fill(0), registroVotosPorSocio: {} },
@@ -158,8 +281,7 @@
         let socioLogueadoId = null;
         function mostrarAlerta(mensaje, esError = false) {
             const alertEl = document.getElementById('statusAlert');
-            alertEl.style.display = 'block';
-            alertEl.innerText = mensaje;
+            alertEl.style.display = 'block'; alertEl.innerText = mensaje;
             alertEl.className = `status-alert ${esError ? 'alert-danger' : 'alert-success'}`;
             setTimeout(() => { alertEl.style.display = 'none'; }, 5000);
         }
@@ -167,164 +289,128 @@
         function intentarIngresoAdmin() {
             const user = document.getElementById('adminUser').value.trim();
             const pass = document.getElementById('adminPass').value.trim();
+            const lblBio = document.getElementById('lblBiometricAdmin'); const lblHue = document.getElementById('lblHuellaAdmin');
 
             if (user === "admclubabierto" && pass === "1913") {
-                mostrarAlerta("Acceso concedido al Panel Directivo.");
-                document.getElementById('welcomeView').style.display = 'none';
-                document.getElementById('adminView').style.display = 'block';
-                renderizarPanelAdmin();
-            } else {
-                mostrarAlerta("Credenciales administrativas inválidas.", true);
-            }
+                lblBio.classList.add('biometric-active'); lblBio.innerText = "🧬 BIOMETRÍA DIRECTIVA APROBADA";
+                setTimeout(() => {
+                    lblHue.classList.add('biometric-active'); lblHue.innerText = "✋ HUELLA DIGITAL REGISTRADA";
+                    setTimeout(() => {
+                        document.getElementById('welcomeView').style.display = 'none';
+                        document.getElementById('headerBoxes').style.display = 'none';
+                        document.getElementById('adminView').style.display = 'block';
+                        renderizarPanelAdmin();
+                    }, 1000);
+                }, 1000);
+            } else { mostrarAlerta("Credenciales administrativas inválidas (Clave unificada: 1913).", true); }
         }
 
         function intentarIngresoSocio() {
             const idInput = document.getElementById('socioId').value.trim();
+            const passInput = document.getElementById('socioPass').value.trim();
             const socio = obtenerDatosSocioPadrón(idInput);
+            const lblBio = document.getElementById('lblBiometricSocio'); const lblHue = document.getElementById('lblHuellaSocio');
 
-            if (!idInput) {
-                mostrarAlerta("Por favor, introduce un número de socio válido.", true);
+            if (!idInput || !passInput) { mostrarAlerta("Introduce el número de socio y la contraseña obligatoria.", true); return; }
+            
+            if (passInput !== "1913") {
+                mostrarAlerta("Contraseña institucional incorrecta (Usa la clave: 1913).", true);
                 return;
             }
 
             if (socio) {
-                const loader = document.getElementById('biometricLoader');
-                loader.style.display = 'block';
-
+                lblBio.classList.add('biometric-active'); lblBio.innerText = "🧬 ESCANEANDO IDENTIDAD BIOMÉTRICA...";
                 setTimeout(() => {
-                    loader.style.display = 'none';
-                    socioLogueadoId = idInput;
-                    socioLogueadoInfo = socio;
-                    
-                    document.getElementById('welcomeView').style.display = 'none';
-                    document.getElementById('socioView').style.display = 'block';
-                    document.getElementById('socioBadge').innerText = `${socio.nombre} | Antigüedad: ${socio.antiguedad} años | Poder: ${socio.puntos} pts | ${socio.rango}`;
-                    
-                    mostrarAlerta("Identidad verificada en padrón biométrico. Bienvenido.");
-                    renderizarPanelSocio();
-                }, 2000);
-            } else {
-                mostrarAlerta("Número fuera del padrón institucional (1 al 10000).", true);
-            }
+                    lblHue.classList.add('biometric-active'); lblHue.innerText = "✋ VERIFICANDO HUELLA DACTILAR DIGITAL...";
+                    setTimeout(() => {
+                        socioLogueadoId = idInput; socioLogueadoInfo = socio;
+                        document.getElementById('welcomeView').style.display = 'none';
+                        document.getElementById('headerBoxes').style.display = 'none';
+                        
+                        document.getElementById('lblInfoSocioId').innerText = `N° de Socio: ${idInput}`;
+                        document.getElementById('lblInfoSocioAntiguedad').innerText = `Antigüedad del Socio: ${socio.antiguedad} Años`;
+                        
+                        document.getElementById('lblMetricaPuntos').innerText = `Cantidad de puntos por cada voto en base a la antigüedad: ${socio.puntos} PUNTOS`;
+                        document.getElementById('lblMetricaDias').innerText = socio.diasParaSiguiente > 0 ? `Antigüedad que falta para tener mayor cantidad de puntos por voto: ${socio.diasParaSiguiente} DÍAS` : "Antigüedad que falta para tener mayor cantidad de puntos por voto: ALCANZÓ EL MÁXIMO VALOR DE REGLAMENTO (VITALICIO)";
+                        
+                        document.getElementById('socioView').style.display = 'block';
+                        renderizarPanelSocio();
+                    }, 1000);
+                }, 1000);
+            } else { mostrarAlerta("Socio no registrado en la base (Rango: 1 a 10000).", true); }
         }
 
         function cerrarSesion() {
-            socioLogueadoInfo = null;
-            socioLogueadoId = null;
-            document.getElementById('adminUser').value = "";
-            document.getElementById('adminPass').value = "";
-            document.getElementById('socioId').value = "";
-            document.getElementById('adminView').style.display = 'none';
-            document.getElementById('socioView').style.display = 'none';
-            document.getElementById('welcomeView').style.display = 'block';
+            socioLogueadoInfo = null; socioLogueadoId = null;
+            document.getElementById('adminUser').value = ""; document.getElementById('adminPass').value = "";
+            document.getElementById('socioId').value = ""; document.getElementById('socioPass').value = "";
+            document.getElementById('lblBiometricSocio').className = "box-biometric"; document.getElementById('lblBiometricSocio').innerText = "cartel de validación biométrica";
+            document.getElementById('lblHuellaSocio').className = "box-biometric"; document.getElementById('lblHuellaSocio').innerText = "cartel de validación huella digital";
+            document.getElementById('lblBiometricAdmin').className = "box-biometric"; document.getElementById('lblBiometricAdmin').innerText = "cartel de validación biométrica";
+            document.getElementById('lblHuellaAdmin').className = "box-biometric"; document.getElementById('lblHuellaAdmin').innerText = "cartel de validación huella digital";
+            document.getElementById('adminView').style.display = 'none'; document.getElementById('socioView').style.display = 'none';
+            document.getElementById('headerBoxes').style.display = 'block'; document.getElementById('welcomeView').style.display = 'block';
         }
         function renderizarPanelAdmin() {
-            const container = document.getElementById('adminSurveysContainer');
-            container.innerHTML = "";
-
+            const container = document.getElementById('adminSurveysContainer'); container.innerHTML = "";
             encuestas.forEach((encuesta, indexEncuesta) => {
-                let opcionesInputsHTML = "";
-                const sumaTotalPuntos = encuesta.votos.reduce((a, b) => a + b, 0);
-
+                let opcionesInputsHTML = ""; const totalMasa = encuesta.votos.reduce((a, b) => a + b, 0);
                 encuesta.opciones.forEach((opcion, indexOpcion) => {
-                    const puntosOpcion = encuesta.votos[indexOpcion];
-                    const porcentaje = sumaTotalPuntos > 0 ? Math.round((puntosOpcion / sumaTotalPuntos) * 100) : 0;
-
+                    const pts = encuesta.votos[indexOpcion]; const porc = totalMasa > 0 ? Math.round((pts / totalMasa) * 100) : 0;
                     opcionesInputsHTML += `
                         <div style="margin-bottom: 15px;">
-                            <div class="admin-edit-row">
-                                <input type="text" id="edit_${indexEncuesta}_${indexOpcion}" value="${opcion}">
-                            </div>
-                            <div class="option-info" style="font-size:13px; color:#555;">
-                                <span>Puntos acumulados: <strong>${puntosOpcion} pts</strong> (${porcentaje}%)</span>
-                            </div>
-                            <div class="progress-bar-bg">
-                                <div class="progress-bar-fill" style="width: ${porcentaje}%; background: var(--success);"></div>
-                            </div>
+                            <div class="admin-edit-row"><input type="text" id="edit_${indexEncuesta}_${indexOpcion}" value="${opcion}"></div>
+                            <div class="option-info" style="font-size:13px;"><span>Escrutinio Ponderado: <strong>${pts} pts</strong> (${porc}%)</span></div>
+                            <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${porc}%; background: var(--success);"></div></div>
                         </div>
                     `;
                 });
-
-                container.innerHTML += `
-                    <div class="survey-box">
-                        <h4>Configurar: ${encuesta.titulo}</h4>
-                        ${opcionesInputsHTML}
-                    </div>
-                `;
+                container.innerHTML += `<div class="survey-box"><h4>${encuesta.titulo}</h4>${opcionesInputsHTML}</div>`;
             });
         }
 
         function guardarCambiosAdmin() {
             encuestas.forEach((encuesta, indexEncuesta) => {
-                let huboCambios = false;
+                let cambio = false;
                 encuesta.opciones.forEach((opcion, indexOpcion) => {
-                    const inputVal = document.getElementById(`edit_${indexEncuesta}_${indexOpcion}`).value.trim();
-                    if (inputVal && inputVal !== opcion) {
-                        encuestas[indexEncuesta].opciones[indexOpcion] = inputVal;
-                        huboCambios = true;
-                    }
+                    const val = document.getElementById(`edit_${indexEncuesta}_${indexOpcion}`).value.trim();
+                    if (val && val !== opcion) { encuesta.opciones[indexOpcion] = val; cambio = true; }
                 });
-                if (huboCambios) {
-                    encuestas[indexEncuesta].votos = Array(3).fill(0);
-                    encuestas[indexEncuesta].registroVotosPorSocio = {};
-                }
+                if (cambio) { encuesta.votos = Array(3).fill(0); encuesta.registroVotosPorSocio = {}; }
             });
-            mostrarAlerta("Opciones actualizadas y escrutinio reiniciado.");
-            renderizarPanelAdmin();
+            mostrarAlerta("Cambios guardados. Se reiniciaron las encuestas modificadas."); renderizarPanelAdmin();
         }
 
         function renderizarPanelSocio() {
-            const container = document.getElementById('socioSurveysContainer');
-            container.innerHTML = "";
+            const container = document.getElementById('socioSurveysContainer'); container.innerHTML = "";
+            let sumaPuntosVotadosSocio = 0;
+            encuestas.forEach((e) => { if(e.registroVotosPorSocio[socioLogueadoId] !== undefined) sumaPuntosVotadosSocio += socioLogueadoInfo.puntos; });
+            document.getElementById('lblMetricaMasa').innerText = `Porcentual de votación respecto a total de votaciones: ${sumaPuntosVotadosSocio} PUNTOS APORTADOS AL CLUB`;
 
             encuestas.forEach((encuesta) => {
-                let opcionesHTML = "";
-                const yaVoto = encuesta.registroVotosPorSocio[socioLogueadoId] !== undefined;
-                const sumaTotalPuntos = encuesta.votos.reduce((a, b) => a + b, 0);
-
+                let opcionesHTML = ""; const yaVoto = encuesta.registroVotosPorSocio[socioLogueadoId] !== undefined; const totalMasa = encuesta.votos.reduce((a, b) => a + b, 0);
                 encuesta.opciones.forEach((opcion, indexOpcion) => {
-                    const puntosOpcion = encuesta.votos[indexOpcion];
-                    const porcentaje = sumaTotalPuntos > 0 ? Math.round((puntosOpcion / sumaTotalPuntos) * 100) : 0;
-                    const disabledStr = yaVoto ? "disabled style='background-color:#bbb; cursor:not-allowed;'" : "";
-
+                    const pts = encuesta.votos[indexOpcion]; const porc = totalMasa > 0 ? Math.round((pts / totalMasa) * 100) : 0;
+                    const disabledStr = yaVoto ? "disabled style='background-color:#ccc; border-color:#888; cursor:not-allowed;'" : "";
                     opcionesHTML += `
                         <div class="option-row">
                             <div class="option-info">
                                 <span><strong>${opcion}</strong></span>
-                                <button onclick="registrarVotoSocio(${encuesta.id}, ${indexOpcion})" ${disabledStr} style="width:auto; padding: 5px 10px; font-size:12px;">Votar</button>
+                                <button class="btn-action" onclick="registrarVotoSocio(${encuesta.id}, ${indexOpcion})" ${disabledStr} style="margin:0; padding:6px 15px; width:auto; font-size:13px;">Votar</button>
                             </div>
-                            <div class="option-info" style="font-size:12px; color:#666; margin-top:4px;">
-                                <span>Puntos en este ítem: ${puntosOpcion} (${porcentaje}%)</span>
-                            </div>
-                            <div class="progress-bar-bg">
-                                <div class="progress-bar-fill" style="width: ${porcentaje}%;"></div>
-                            </div>
+                            <div style="font-size:12px; margin-top:5px; color:#555;">Puntos de Consulta: ${pts} (${porc}%)</div>
+                            <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${porc}%;"></div></div>
                         </div>
                     `;
                 });
-
-                container.innerHTML += `
-                    <div class="survey-box">
-                        <h4>${encuesta.titulo}</h4>
-                        ${yaVoto ? `<p style="color:var(--danger); font-weight:bold; font-size:13px;">⚠️ Tu voto ponderado ya fue procesado y sumado a los gráficos del club.</p>` : ""}
-                        <div>${opcionesHTML}</div>
-                    </div>
-                `;
+                container.innerHTML += `<div class="survey-box"><h4>${encuesta.titulo}</h4>${yaVoto ? `<p style="color:var(--danger); font-weight:bold; font-size:13px; margin:0 0 10px 0;">⚠️ Voto ponderado registrado en la auditoría de barras.</p>` : ""}<div>${opcionesHTML}</div></div>`;
             });
         }
 
         function registrarVotoSocio(encuestaId, opcionId) {
-            const encuesta = encuestas.find(e => e.id === encuestaId);
-            if (encuesta.registroVotosPorSocio[socioLogueadoId] !== undefined) {
-                mostrarAlerta("Tu credencial ya registra un voto aquí.", true);
-                return;
-            }
-
-            encuesta.votos[opcionId] += socioLogueadoInfo.puntos;
-            encuesta.registroVotosPorSocio[socioLogueadoId] = opcionId;
-
-            mostrarAlerta(`¡Voto exitoso! Sumaste ${socioLogueadoInfo.puntos} puntos al escrutinio.`);
-            renderizarPanelSocio();
+            const encuesta = encuestas.find(e => e.id === encuestaId); if (encuesta.registroVotosPorSocio[socioLogueadoId] !== undefined) return;
+            encuesta.votos[opcionId] += socioLogueadoInfo.puntos; encuesta.registroVotosPorSocio[socioLogueadoId] = opcionId;
+            mostrarAlerta(`¡Firma digital exitosa! Sumaste ${socioLogueadoInfo.puntos} puntos.`); renderizarPanelSocio();
         }
     </script>
 </body>
