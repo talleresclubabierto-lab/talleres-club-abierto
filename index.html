@@ -163,6 +163,19 @@
             margin-bottom: 16px;
             width: 100%;
         }
+        .btn-secondary-dark {
+            background-color: #475569;
+            color: #ffffff;
+            border: 2px solid #000000;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+        .btn-secondary-dark:hover { background-color: #334155; }
     </style>
 </head>
 <body>
@@ -263,7 +276,7 @@
         <div id="secVotaciones" class="sub-view full-width">
             <div class="dashboard-header">
                 <div class="wf-box" style="margin:0; padding:10px; font-size:16px;">Votaciones Activas en la Plataforma</div>
-                <button class="wf-button" style="width:auto; margin:0;" onclick="regresarAlPanelInterno()">Volver al Panel</button>
+                <button class="wf-button" style="width:auto; margin:0; background-color:#64748b;" onclick="regresarAlPanelInterno()">Volver al Panel</button>
             </div>
             <div class="wf-box full-width" style="text-align: left;">
                 <label style="font-size: 13px; color: #64748b; display: block; margin-bottom: 8px;">SELECCIONE LA CONSULTA ELECTORAL:</label>
@@ -274,35 +287,48 @@
             </div>
         </div>
 
-        <!-- --- VISTA INTERNA: AGREGAR NUEVA ENCUESTA (ADMIN) --- -->
+        <!-- --- VISTA INTERNA: AGREGAR NUEVA ENCUESTA (ADMIN DINÁMICA) --- -->
         <div id="secAgregar" class="sub-view full-width">
             <div class="dashboard-header">
                 <div class="wf-box" style="margin:0; padding:10px; font-size:16px;">Crear Nueva Consulta al Padrón</div>
                 <button class="wf-button" style="width:auto; margin:0;" onclick="regresarAlPanelInterno()">Volver</button>
             </div>
             <div class="wf-box full-width" style="text-align: left;">
-                <input type="text" id="txtNuevaEncuestaTitulo" class="wf-input" placeholder="Título (Ej: Selección de Ubicación para nuevo Estadio)">
-                <input type="text" id="txtNuevaOptA" class="wf-input" placeholder="Opción A">
-                <input type="text" id="txtNuevaOptB" class="wf-input" placeholder="Opción B">
-                <input type="text" id="txtNuevaOptC" class="wf-input" placeholder="Opción C">
+                <input type="text" id="txtNuevaEncuestaTitulo" class="wf-input" placeholder="Título (Ej: Selección de Ubicación para nuevo Estadio)" style="border-color:#002D62;">
+                
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <span style="font-size:13px; font-weight:700; color:#475569;">OPCIONES DE RESPUESTA DISPONIBLES:</span>
+                    <button type="button" class="btn-secondary-dark" onclick="agregarCampoEntradaOpcion('containerCamposNuevos')">+ Añadir Opción</button>
+                </div>
+                
+                <div id="containerCamposNuevos" style="display:flex; flex-direction:column;">
+                    <input type="text" class="wf-input opt-nueva-input" placeholder="Opción A">
+                    <input type="text" class="wf-input opt-nueva-input" placeholder="Opción B">
+                    <input type="text" class="wf-input opt-nueva-input" placeholder="Opción C">
+                </div>
                 <button class="wf-button" onclick="guardarNuevaEncuestaAdmin()">Publicar Consulta en Padrón</button>
             </div>
         </div>
-
-        <!-- --- VISTA INTERNA: MODIFICAR ENCUESTA (ADMIN) --- -->
+        <!-- --- VISTA INTERNA: MODIFICAR ENCUESTA CONTINUA (ADMIN) --- -->
         <div id="secModificar" class="sub-view full-width">
             <div class="dashboard-header">
                 <div class="wf-box" style="margin:0; padding:10px; font-size:16px;">Modificación y Enmienda de Opciones</div>
                 <button class="wf-button" style="width:auto; margin:0;" onclick="regresarAlPanelInterno()">Volver</button>
             </div>
             <div class="wf-box full-width" style="text-align: left;">
+                <label style="font-size: 13px; color: #64748b; display: block; margin-bottom: 6px;">SELECCIONAR ENCUESTA A MODIFICAR:</label>
                 <select id="cmbModificarSelect" class="wf-input" onchange="cargarCamposModificar()"></select>
-                <input type="text" id="txtModificarOptA" class="wf-input" placeholder="Modificar Opción A">
-                <input type="text" id="txtModificarOptB" class="wf-input" placeholder="Modificar Opción B">
-                <input type="text" id="txtModificarOptC" class="wf-input" placeholder="Modificar Opción C">
-                <button class="wf-button" onclick="guardarModificacionAdmin()">Guardar Cambios de Consulta</button>
+                
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <span style="font-size:13px; font-weight:700; color:#475569;">EDITAR O AGREGAR OPCIONES DE RESPUESTA:</span>
+                    <button type="button" class="btn-secondary-dark" onclick="agregarCampoEntradaOpcion('containerCamposModificar')">+ Añadir Opción</button>
+                </div>
+
+                <div id="containerCamposModificar" style="display:flex; flex-direction:column;"></div>
+                <button class="wf-button" style="background-color:#28a745;" onclick="guardarModificacionAdmin()">Guardar Cambios de Consulta</button>
             </div>
         </div>
+
         <!-- --- VISTA INTERNA: RESULTADOS AVANZADOS COMPARTIDOS --- -->
         <div id="secResultados" class="sub-view full-width">
             <div class="dashboard-header">
@@ -317,7 +343,7 @@
             <div class="grid-metrics">
                 <div class="chart-wrapper" style="margin-bottom: 0;">
                     <div style="font-size: 14px; font-weight: 700; margin-bottom: 12px; text-transform: uppercase; color: #002D62;">Tendencia de Votos Ponderados</div>
-                    <div style="height: 240px; position: relative;"><canvas id="chartResultadosTorta"></canvas></div>
+                    <div style="height: 250px; position: relative;"><canvas id="chartResultadosTorta"></canvas></div>
                 </div>
                 <div class="wf-box text-left" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: center; gap: 12px;">
                     <div><span class="txt-info-red">Socios Participantes:</span><div id="lblResTotalVotos" style="font-size: 20px; font-weight: 800;">0</div></div>
@@ -327,7 +353,7 @@
             </div>
         </div>
 
-        <!-- --- VISTA INTERNA: % DE VOTACIÓN DE CADA ENCUESTA (ADMIN) --- -->
+        <!-- --- VISTA INTERNA: % DE VOTACIÓN DE CADA ENCUESTA --- -->
         <div id="secPorcentuales" class="sub-view full-width">
             <div class="dashboard-header">
                 <div class="wf-box" style="margin:0; padding:10px; font-size:16px;">% Resumen de Participación Global</div>
@@ -337,14 +363,13 @@
         </div>
     </div> <!-- Fin container -->
     <script>
-        /* --- CORE DE NEGOCIO Y PERSISTENCIA EN LOCALSTORAGE CLEAN --- */
+        /* --- CORE DE NEGOCIO Y PERSISTENCIA LOCAL --- */
         var TOTAL_SOCIOS = 10000;
         var ID_SOCIO_ACTIVO = 0;
         var ROL_ACTIVO = ''; 
 
         var adminFijos = Array.of(10000, 9000, 8000);
 
-        // Estructura Inicial Limpia (Todo en 0 para tus pruebas reales)
         var encuestasInicialesLimpias = {
             enc_1: { titulo: "Elección de Jugador Destacado (Fichaje/Premio)", opts: Array.of("Opción A - Santos Valoyes", "Opción B - Bruno Zapelli", "Opción C - Ramón Sosa"), votos: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0 },
             enc_2: { titulo: "Elección de Director Técnico (Próximo Ciclo)", opts: Array.of("Opción A - Alexander Medina", "Opción B - Walter Ribonetto", "Opción C - Gabriel Heinze"), votos: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0 },
@@ -473,17 +498,28 @@
 
         function regresarAlPanelInterno() {
             document.querySelectorAll('.sub-view').forEach(function(v) { v.style.display = 'none'; });
-            if(ROL_ACTIVE_VOTES() === 'socio') document.getElementById('socioDashboard').style.display = 'flex';
+            if(ROL_ACTIVO === 'socio') document.getElementById('socioDashboard').style.display = 'flex';
             else document.getElementById('adminDashboard').style.display = 'flex';
         }
-        function ROL_ACTIVE_VOTES() { return ROL_ACTIVO; }
 
         function volverAlLogin() {
             document.getElementById('socioDashboard').style.display = 'none';
             document.getElementById('adminDashboard').style.display = 'none';
             document.getElementById('loginScreen').style.display = 'flex';
         }
-        /* --- SISTEMA OPERATIVO DE VOTOS Y CHART.JS CORREGIDO --- */
+
+        /* --- ADICIÓN DINÁMICA DE CAMPOS INPUTS --- */
+        function agregarCampoEntradaOpcion(containerId) {
+            var p = document.getElementById(containerId);
+            var n = p.getElementsByTagName('input').length;
+            var letra = String.fromCharCode(65 + n); // Genera automáticamente D, E, F...
+            var input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'wf-input opt-nueva-input';
+            input.placeholder = 'Opción ' + letra;
+            p.appendChild(input);
+        }
+        /* --- SISTEMA OPERATIVO DE ESCREUTINIO Y ARREGLOS PLANOS --- */
         var instChart = null;
 
         function inicializarSelectorVotaciones() {
@@ -524,11 +560,8 @@
             baseEncuestas[key].puntosPonderados += socioDatos.puntos;
             registroVotosEmitidos[ID_SOCIO_ACTIVO + '_' + key] = true;
 
-            guardarDatosEnMemoriaLocal(); // Guardado automático inmediato
-
-            alert('✓ Voto registrado con éxito. Sumaste ' + socioDatos.puntos + ' puntos a la opción.');
-            
-            // FLUJO MEJORADO CONTINUO: Se queda en la misma pantalla para seguir votando otras encuestas
+            guardarDatosEnMemoriaLocal();
+            alert('✓ Voto registrado con éxito. Sumaste ' + socioDatos.puntos + ' puntos.');
             cargarOpcionesParaVotar();
         }
 
@@ -542,28 +575,57 @@
 
         function cargarCamposModificar() {
             var key = document.getElementById('cmbModificarSelect').value;
-            document.getElementById('txtModificarOptA').value = baseEncuestas[key].opts[0] || '';
-            document.getElementById('txtModificarOptB').value = baseEncuestas[key].opts[1] || '';
-            document.getElementById('txtModificarOptC').value = baseEncuestas[key].opts[2] || '';
+            var div = document.getElementById('containerCamposModificar'); div.innerHTML = '';
+            
+            baseEncuestas[key].opts.forEach(function(opcionText) {
+                var input = document.createElement('input');
+                input.type = 'text'; input.className = 'wf-input opt-mod-field'; input.value = opcionText;
+                div.appendChild(input);
+            });
         }
 
         function guardarModificacionAdmin() {
             var key = document.getElementById('cmbModificarSelect').value;
-            baseEncuestas[key].opts[0] = document.getElementById('txtModificarOptA').value.trim();
-            baseEncuestas[key].opts[1] = document.getElementById('txtModificarOptB').value.trim();
-            baseEncuestas[key].opts[2] = document.getElementById('txtModificarOptC').value.trim();
-            guardarDatosEnMemoriaLocal(); alert('✓ Consulta modificada.'); regresarAlPanelInterno();
+            var inputs = document.getElementById('containerCamposModificar').getElementsByClassName('opt-mod-field');
+            
+            var nuevasOpciones = [];
+            var nuevosVotosConteo = [];
+            
+            for(var i = 0; i < inputs.length; i++) {
+                var val = inputs[i].value.trim();
+                if(val !== "") {
+                    nuevasOpciones.push(val);
+                    // Si añadieron una opción nueva al final, inicializamos su contador en 0
+                    nuevosVotosConteo.push(baseEncuestas[key].votos[i] || 0);
+                }
+            }
+
+            baseEncuestas[key].opts = nuevasOpciones;
+            baseEncuestas[key].votos = nuevosVotosConteo;
+            
+            guardarDatosEnMemoriaLocal();
+            alert('✓ Consulta y opciones guardadas con éxito.');
+            // FLUJO CONTINUO: No vuelve atrás, se queda en la pantalla actualizando los inputs reflejados
+            cargarCamposModificar();
         }
 
         function guardarNuevaEncuestaAdmin() {
             var tit = document.getElementById('txtNuevaEncuestaTitulo').value.trim();
-            var oa = document.getElementById('txtNuevaOptA').value.trim();
-            var ob = document.getElementById('txtNuevaOptB').value.trim();
-            var oc = document.getElementById('txtNuevaOptC').value.trim();
-            if(!tit || !oa || !ob || !oc) { alert('Complete todos los campos.'); return; }
+            var inputs = document.getElementById('containerCamposNuevos').getElementsByClassName('opt-nueva-input');
+            
+            var opcionesCreadas = []; var votosCreados = [];
+            for(var i = 0; i < inputs.length; i++) {
+                var val = inputs[i].value.trim();
+                if(val !== "") { opcionesCreadas.push(val); votosCreados.push(0); }
+            }
+            if(!tit || opcionesCreadas.length < 2) { alert('Complete el título y al menos 2 opciones.'); return; }
+            
             var nextId = 'enc_' + (Object.keys(baseEncuestas).length + 1);
-            baseEncuestas[nextId] = { titulo: tit, opts: Array.of(oa, ob, oc), votos: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0 };
-            guardarDatosEnMemoriaLocal(); alert('✓ Nueva consulta agregada.'); regresarAlPanelInterno();
+            baseEncuestas[nextId] = { titulo: tit, opts: opcionesCreadas, votos: votosCreados, totalSocios: 0, puntosPonderados: 0 };
+            
+            guardarDatosEnMemoriaLocal();
+            alert('✓ Nueva consulta agregada.');
+            regresarAlPanelInterno();
         }
 
         function inicializarSelectorResultados() {
@@ -586,17 +648,17 @@
             var ctx = document.getElementById('chartResultadosTorta').getContext('2d');
             if(instChart) instChart.destroy();
             
-            // Evitamos corchetes de array usando Array.of() seguro para transporte del chat
-            var valoresVotos = Array.of(item.votos[0], item.votos[1], item.votos[2]);
-            var coloresPastel = Array.of('#002D62', '#d91a1a', '#ffc107');
+            // MAPEO SEGURO Y COMPACTO DE ARREGLO DE UNA SOLA DIMENSIÓN PLANO PARA CHART.JS
+            var listaPlanaVotos = item.votos.map(function(num) { return Number(num); });
+            var coloresPastel = Array.of('#002D62', '#d91a1a', '#ffc107', '#28a745', '#9333ea', '#06b6d4');
 
             instChart = new Chart(ctx, {
                 type: 'pie',
                 data: {
                     labels: item.opts,
                     datasets: [{
-                        data: valoresVotos,
-                        backgroundColor: coloresPastel,
+                        data: listaPlanaVotos, // Almacena datos vectoriales unidimensionales puros
+                        backgroundColor: coloresPastel.slice(0, item.opts.length),
                         borderWidth: 1
                     }]
                 },
