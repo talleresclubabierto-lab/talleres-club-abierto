@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Talleres Digital - Módulo de Gobernanza Premium</title>
-    <!-- Cargamos Chart.js para los reportes de ponderación y gráficos de torta -->
-    <script src="https://jsdelivr.net"></script>
     <style>
         /* --- DISEÑO INTERFAZ MODERNA Y AMIGABLE --- */
         * {
@@ -155,7 +153,6 @@
         @media(max-width: 600px) {
             .grid-metrics { grid-template-columns: 100%; }
         }
-        /* CONTENEDOR SEGURO FIJO PARA EVITAR EL COLAPSO DE CHART.JS */
         .chart-wrapper {
             border: 2px solid #000000;
             background-color: #ffffff;
@@ -163,7 +160,6 @@
             border-radius: 8px;
             margin-bottom: 16px;
             width: 100%;
-            position: relative;
         }
         .btn-secondary-dark {
             background-color: #475569;
@@ -178,6 +174,31 @@
             text-transform: uppercase;
         }
         .btn-secondary-dark:hover { background-color: #334155; }
+        
+        /* --- ESTILOS DE BARRAS DE PROGRESO NATIVAS --- */
+        .barra-resultado-contenedor {
+            margin-bottom: 14px;
+            text-align: left;
+        }
+        .barra-resultado-texto {
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        .barra-resultado-fondo {
+            background-color: #e2e8f0;
+            height: 16px;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #94a3b8;
+        }
+        .barra-resultado-lleno {
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
     </style>
 </head>
 <body>
@@ -246,9 +267,9 @@
             </div>
 
             <!-- INFORMACIÓN TÉCNICA INFERIOR (LETRAS ROJAS) -->
-            <div class="wf-box text-left"><span class="txt-info-red">Porcentual de Votación Respecto al Total de Votaciones:</span><div id="lblSocioPorcentual" style="font-size: 16px; margin-top: 4px; color: #1e293b;">-</div></div>
-            <div class="wf-box text-left"><span class="txt-info-red">Cantidad de Puntos por Cada Voto en Base a la Antigüedad:</span><div id="lblSocioPuntos" style="font-size: 16px; margin-top: 4px; color: #1e293b;">-</div></div>
-            <div class="wf-box text-left"><span class="txt-info-red">Antigüedad que falta para tener mayor cantidad de puntos por voto (en días):</span><div id="lblSocioDiasFaltantes" style="font-size: 16px; margin-top: 4px; color: #1e293b;">-</div></div>
+            <div class="wf-box text-left"><span class="txt-info-red">Porcentual de Votación Respecto al Total de Votaciones:</span><div id="lblSocioPorcentual" style="font-size: 16px; margin-top: 4px; color: #1e293b; font-weight: 700;">-</div></div>
+            <div class="wf-box text-left"><span class="txt-info-red">Cantidad de Puntos por Cada Voto en Base a la Antigüedad:</span><div id="lblSocioPuntos" style="font-size: 16px; margin-top: 4px; color: #1e293b; font-weight: 700;">-</div></div>
+            <div class="wf-box text-left"><span class="txt-info-red">Antigüedad que falta para tener mayor cantidad de puntos por voto (en días):</span><div id="lblSocioDiasFaltantes" style="font-size: 16px; margin-top: 4px; color: #1e293b; font-weight: 700;">-</div></div>
         </div>
         <!-- --- PANTALLA INTERNA: PANEL DEL ADMINISTRADOR --- -->
         <div id="adminDashboard" class="dashboard full-width">
@@ -318,7 +339,7 @@
                 <button class="wf-button" style="width:auto; margin:0;" onclick="regresarAlPanelInterno()">Volver</button>
             </div>
             <div class="wf-box full-width" style="text-align: left;">
-                <label style="font-size: 13px; color: #64748b; display: block; margin-bottom: 6px;">SELECCIONAR ENCUESTA A MODIFICAR:</label>
+                <label style="font-size: 13px; color: #64748b; display: block; margin-bottom: 6px;">SELECCIONAL ENCUESTA A MODIFICAR:</label>
                 <select id="cmbModificarSelect" class="wf-input" onchange="cargarCamposModificar()"></select>
                 
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
@@ -331,23 +352,23 @@
             </div>
         </div>
 
-        <!-- --- VISTA INTERNA: RESULTADOS AVANZADOS COMPARTIDOS CON CONTENEDOR RELATIVO FIJO --- -->
+        <!-- --- VISTA INTERNA: RESULTADOS REEMPLAZADOS CON PANEL DE PROGRESO INMUNE A CAÍDAS --- -->
         <div id="secResultados" class="sub-view full-width">
             <div class="dashboard-header">
                 <div class="wf-box" style="margin:0; padding:10px; font-size:16px;">Auditoría General de Escrutinio y Ponderación</div>
                 <button class="wf-button" style="width:auto; margin:0; background-color: #64748b;" onclick="regresarAlPanelInterno()">Volver</button>
             </div>
             <div class="wf-box full-width" style="text-align: left;">
-                <label style="font-size: 13px; color: #64748b; display: block; margin-bottom: 6px;">SELECCIONAR ENCUESTA ACTIVA:</label>
+                <label style="font-size: 13px; color: #64748b; display: block; margin-bottom: 6px;">SELECCIONAL ENCUESTA ACTIVA:</label>
                 <select id="cmbResultadosSelect" class="wf-input" onchange="actualizarReporteGrafico()"></select>
             </div>
             
             <div class="grid-metrics">
-                <!-- CONTENEDOR RELATIVO ABSOLUTO PARA EVITAR EL BUG DE ANCHO/ALTO CERO EN DISPLAY NONE -->
-                <div class="chart-wrapper" style="margin-bottom: 0; min-height: 260px; position: relative;">
-                    <div style="font-size: 14px; font-weight: 700; margin-bottom: 12px; text-transform: uppercase; color: #002D62;">Tendencia de Votos Ponderados</div>
-                    <div style="position: relative; width: 100%; height: 200px;">
-                        <canvas id="chartResultadosTorta"></canvas>
+                <!-- CONTENEDOR INTEGRAL DE BARRAS DE PROGRESO INTERACTIVAS -->
+                <div class="chart-wrapper" style="margin-bottom: 0; min-height: 260px;">
+                    <div style="font-size: 14px; font-weight: 700; margin-bottom: 16px; text-transform: uppercase; color: #002D62;">Tendencia de Votos Ponderados (Gráfico de Avance)</div>
+                    <div id="contenedorBarrasDinamicas" style="display: flex; flex-direction: column; gap: 4px;">
+                        <!-- Se inyecta dinámicamente vía JS -->
                     </div>
                 </div>
                 <div class="wf-box text-left" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: center; gap: 12px;">
@@ -368,11 +389,12 @@
         </div>
     </div> <!-- Fin container -->
     <script>
-        /* --- CORE DE NEGOCIO Y PERSISTENCIA LOCAL --- */
+        /* --- CORE DE NEGOCIO CORREGIDO SIN CARACTERES VACÍOS --- */
         var TOTAL_SOCIOS = 10000;
         var ID_SOCIO_ACTIVO = 0;
         var ROL_ACTIVO = ''; 
 
+        // bypass seguro sin corchetes libres
         var adminFijos = Array.of(10000, 9000, 8000);
 
         var encuestasInicialesLimpias = {
@@ -467,11 +489,12 @@
             document.getElementById('socioDashboard').style.display = 'flex';
             
             var d = obtenerDatosSocio(id);
+            // SCRIPT LIMPIO: Renderizado de datos informativos bloqueado restaurado
             document.getElementById('lblSocioId').innerText = "#" + d.id;
             document.getElementById('lblSocioAntiguedad').innerText = d.antiguedad + " AÑOS";
-            document.getElementById('lblSocioPorcentual').innerText = d.procentual.toFixed(3) + "% ASIGNADO";
-            document.getElementById('lblSocioPuntos').innerText = d.puntos + " PUNTOS EQUIVALENTES";
-            document.getElementById('lblSocioDiasFaltantes').innerText = d.diasFaltantes > 0 ? d.diasFaltantes + " DÍAS" : "MÁXIMO RANGO ALCANZADO";
+            document.getElementById('lblSocioPorcentual').innerText = d.porcentual.toFixed(3) + "% ASIGNADO DEL TOTAL";
+            document.getElementById('lblSocioPuntos').innerText = d.puntos + " PUNTOS POR VOTO OBTENIDOS";
+            document.getElementById('lblSocioDiasFaltantes').innerText = d.diasFaltantes > 0 ? d.diasFaltantes + " DÍAS RESTANTES" : "MÁXIMO ESCALAFÓN DEL RANGO";
         }
 
         function loguearAdminInterno(idAdmin) {
@@ -494,21 +517,11 @@
             if(viewId === 'secPorcentuales') renderizarListaPorcentualesAdmin();
         }
 
-        /* INVOCACIÓN CON TRIGGER DE RETARDO SEGURO PARA REDIBUJAR EL CANVAS DESPUÉS DEL DISPLAY FLEX */
         function irAResultadosGenerales() {
             document.getElementById('socioDashboard').style.display = 'none';
             document.getElementById('adminDashboard').style.display = 'none';
             document.getElementById('secResultados').style.display = 'flex';
-            
             inicializarSelectorResultados();
-            
-            // Alternativa técnica definitiva: Forzar actualización tras render visual en pantalla
-            setTimeout(function() {
-                if(instChart) {
-                    instChart.resize();
-                    instChart.update();
-                }
-            }, 80);
         }
 
         function regresarAlPanelInterno() {
@@ -533,9 +546,7 @@
             input.placeholder = 'Opción ' + letra;
             p.appendChild(input);
         }
-        /* --- SISTEMA OPERATIVO DE CONSULTAS CON EXTRACCIÓN VECTORIAL PURA --- */
-        var instChart = null;
-
+        /* --- SISTEMA OPERATIVO DE CONSULTAS CON GRÁFICOS NATIVOS SEGUROS --- */
         function inicializarSelectorVotaciones() {
             var cmb = document.getElementById('cmbEncuestasDisponibles'); cmb.innerHTML = '';
             Object.keys(baseEncuestas).forEach(function(k) {
@@ -553,10 +564,14 @@
                 div.innerHTML = '<div style="color:#d91a1a; font-weight:700; text-align:center; padding:10px;">⚠ YA EMITISTE TU VOTO EN ESTA CONSULTA ELECTORAL</div>';
                 btn.style.display = 'none'; return;
             }
+            
             baseEncuestas[key].opts.forEach(function(o, index) {
-                var l = document.createElement('label'); l.style.display = 'block'; l.style.margin = '6px 0';
-                l.innerHTML = '<input type="radio" name="radOpt" value="' + index + '" style="margin-right:8px;"> ' + o;
-                div.appendChild(l);
+                // Reemplazamos la variable confusa por un nombre claro de texto puro
+                var elementoLabel = document.createElement('label'); 
+                elementoLabel.style.display = 'block'; 
+                elementoLabel.style.margin = '6px 0';
+                elementoLabel.innerHTML = '<input type="radio" name="radOpt" value="' + index + '" style="margin-right:8px;"> ' + o;
+                div.appendChild(elementoLabel);
             });
             btn.style.display = 'block';
         }
@@ -602,9 +617,7 @@
             var key = document.getElementById('cmbModificarSelect').value;
             var inputs = document.getElementById('containerCamposModificar').getElementsByClassName('opt-mod-field');
             
-            var nuevasOpciones = [];
-            var nuevosVotosConteo = [];
-            
+            var nuevasOpciones = []; var nuevosVotosConteo = [];
             for(var i = 0; i < inputs.length; i++) {
                 var val = inputs[i].value.trim();
                 if(val !== "") {
@@ -612,13 +625,11 @@
                     nuevosVotosConteo.push(baseEncuestas[key].votos[i] || 0);
                 }
             }
-
             baseEncuestas[key].opts = nuevasOpciones;
             baseEncuestas[key].votos = nuevosVotosConteo;
             
             guardarDatosEnMemoriaLocal();
             alert('✓ Consulta y opciones guardadas con éxito.');
-            // FLUJO MODIFICACIÓN CONTINUO: Se queda estable en la pantalla para re-seleccionar o seguir operando
             cargarCamposModificar();
         }
 
@@ -649,6 +660,7 @@
             actualizarReporteGrafico();
         }
 
+        /* --- GRÁFICOS NATIVOS INTERACTIVOS (INMUNES A FALLAS DE LIENZO) --- */
         function actualizarReporteGrafico() {
             var key = document.getElementById('cmbResultadosSelect').value;
             var item = baseEncuestas[key];
@@ -658,31 +670,27 @@
             document.getElementById('lblResRestantes').innerText = restantes;
             document.getElementById('lblResPuntosJuego').innerText = (restantes * 4) + " PTS";
 
-            var ctx = document.getElementById('chartResultadosTorta').getContext('2d');
-            if(instChart) instChart.destroy();
-            
-            // PROCESAMIENTO PLANO DEFINITIVO: Mapeamos los votos a números primitivos individuales
-            var listaPlanaVotos = [];
-            for(var i = 0; i < item.votos.length; i++) {
-                listaPlanaVotos.push(Number(item.votos[i]));
-            }
+            var contenedor = document.getElementById('contenedorBarrasDinamicas');
+            contenedor.innerHTML = '';
 
-            var coloresPastel = Array.of('#002D62', '#d91a1a', '#ffc107', '#28a745', '#9333ea', '#06b6d4', '#f97316');
+            var colores = Array.of('#002D62', '#d91a1a', '#ffc107', '#28a745', '#9333ea', '#06b6d4');
 
-            instChart = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: item.opts,
-                    datasets: [{
-                        data: listaPlanaVotos, // Enviado como vector limpio unidimensional directo
-                        backgroundColor: coloresPastel.slice(0, item.opts.length),
-                        borderWidth: 1
-                    }]
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false
-                }
+            item.opts.forEach(function(opcionTexto, i) {
+                var cantVotos = item.votos[i] || 0;
+                var porcentaje = item.totalSocios > 0 ? ((cantVotos / item.totalSocios) * 100).toFixed(1) : "0.0";
+                var colorAsignado = colores[i % colores.length];
+
+                var wrapper = document.createElement('div');
+                wrapper.className = 'barra-resultado-contenedor';
+                wrapper.innerHTML = 
+                    '<div class="barra-resultado-texto">' +
+                        '<span>' + opcionTexto + '</span>' +
+                        '<span>' + cantVotos + ' votos (' + porcentaje + '%)</span>' +
+                    '</div>' +
+                    '<div class="barra-resultado-fondo">' +
+                        '<div class="barra-resultado-lleno" style="width: ' + porcentaje + '%; background-color: ' + colorAsignado + ';"></div>' +
+                    '</div>';
+                contenedor.appendChild(wrapper);
             });
         }
 
