@@ -2,275 +2,310 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Club Abierto - Ecosistema Integral Talleres</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Club Abierto - Plataforma Institucional y Gobernanza</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #090d16; color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 20px; display: flex; justify-content: center; }
-        .main-scroll-layout { width: 100%; max-width: 480px; background: #0f172a; border: 1px solid #1e293b; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
-        .app-bar-global { background: #1e293b; padding: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
-        .bar-title h1 { font-size: 1.2rem; color: #38bdf8; font-weight: 700; }
-        .bar-title p { font-size: 0.75rem; color: #94a3b8; }
-        .status-banner-global { padding: 8px; text-align: center; font-size: 0.8rem; font-weight: 500; width: 100%; display: block; }
-        .status-disconnected-global { background: #334155; color: #cbd5e1; }
-        .status-connected-global { background: #14532d; color: #4ade80; }
-        .scroll-container-global { padding: 16px; display: flex; flex-direction: column; gap: 20px; }
-        .section-block-global { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 16px; }
-        .section-block-global h3 { font-size: 1.1rem; color: #f8fafc; margin-bottom: 10px; border-bottom: 1px solid #334155; padding-bottom: 6px; }
-        .desc-text { font-size: 0.85rem; color: #94a3b8; line-height: 1.4; margin-bottom: 10px; }
-        .desc-text-mini { font-size: 0.75rem; color: #64748b; margin-bottom: 10px; }
-        .form-group-global { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
-        .form-group-global input { background: #0f172a; border: 1px solid #334155; padding: 12px; color: white; border-radius: 6px; width: 100%; font-size: 0.9rem; }
-        .btn-primary-global { background: #0284c7; color: white; border: none; padding: 12px; width: 100%; font-weight: 600; border-radius: 6px; cursor: pointer; transition: background 0.2s; font-size: 0.9rem; }
-        .btn-primary-global:hover:not(:disabled) { background: #0369a1; }
-        .status-row-global { display: flex; justify-content: space-between; font-size: 0.85rem; margin-top: 10px; background: #0f172a; padding: 8px; border-radius: 6px; }
-        .status-row-global strong { color: #34d399; }
-        .sub-box-global { background: #0f172a; border: 1px solid #334155; padding: 12px; border-radius: 8px; position: relative; margin-top: 12px; }
-        .tag-global { position: absolute; top: 10px; right: 10px; font-size: 0.65rem; background: #1e293b; color: #38bdf8; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
-        .select-group-global label { font-size: 0.75rem; color: #94a3b8; display: block; margin-top: 8px; }
-        .select-global { width: 100%; background: #1e293b; color: white; border: 1px solid #334155; padding: 10px; border-radius: 6px; font-size: 0.85rem; margin-top: 4px; }
-        .crypto-list-global { display: flex; flex-direction: column; gap: 6px; margin: 12px 0; }
-        .crypto-item { font-size: 0.8rem; color: #94a3b8; }
-        .blind-box { background: #1e293b; color: #64748b; font-family: monospace; padding: 2px 6px; border-radius: 4px; }
-        .tag-input-box-global { background: #0f172a; border: 1px solid #334155; padding: 12px; border-radius: 8px; margin-top: 12px; }
-        .tag-input-box-global h5 { font-size: 0.85rem; margin-bottom: 6px; color: #38bdf8; border-bottom: 1px solid #334155; padding-bottom: 4px; }
-        .tag-input-box-global label { font-size: 0.75rem; color: #94a3b8; display: block; margin-top: 8px; margin-bottom: 4px; }
-        .tag-input-box-global input { width: 100%; background: #1e293b; border: 1px solid #334155; padding: 10px; color: white; border-radius: 6px; font-size: 0.85rem; }
-        .status-msg-global { font-size: 0.75rem; color: #34d399; margin-top: 6px; text-align: center; }
-        .padron-container { background: #0f172a; border: 1px solid #334155; max-height: 160px; overflow-y: scroll; border-radius: 6px; padding: 8px; font-family: monospace; font-size: 0.75rem; margin-top: 10px; }
-        .padron-item { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #1e293b; color: #94a3b8; }
-        .padron-item-destacado { color: #38bdf8; font-weight: bold; background: rgba(56, 189, 248, 0.08); padding: 4px; border-radius: 4px; }
-        .bloque-admin { background: #0f172a; border: 1px solid #334155; padding: 12px; border-radius: 8px; margin-top: 10px; }
-        .bloque-admin label { font-size: 0.75rem; color: #94a3b8; display: block; margin-top: 4px; }
+        :root {
+            --primary: #1a3a5f;
+            --secondary: #007bff;
+            --success: #28a745;
+            --danger: #dc3545;
+            --dark: #212529;
+            --light: #f8f9fa;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #eef2f5; color: var(--dark); }
+        .app-container { max-width: 1000px; margin: 40px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .header-logo { text-align: center; border-bottom: 3px solid var(--primary); padding-bottom: 20px; margin-bottom: 30px; }
+        .header-logo h1 { margin: 0; color: var(--primary); font-size: 28px; }
+        .welcome-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px; }
+        .role-card { background: var(--light); border: 2px solid #e2e8f0; border-radius: 8px; padding: 25px; text-align: center; transition: transform 0.2s, border-color 0.2s; }
+        .role-card:hover { transform: translateY(-4px); border-color: var(--secondary); }
+        .role-card h3 { margin-top: 0; color: var(--primary); }
+        .form-group { margin-bottom: 15px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
+        input[type="text"], input[type="password"] { width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box; }
+        button { background-color: var(--secondary); color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; transition: background 0.2s; }
+        button:hover { background-color: #0056b3; }
+        .btn-logout { background-color: #6c757d; max-width: 150px; margin-bottom: 20px; }
+        .view-panel { display: none; }
+        .biometric-overlay { display: none; text-align: center; padding: 20px; background: #e0f2fe; border: 2px dashed var(--secondary); border-radius: 8px; margin-top: 15px; }
+        .scanner-line { height: 4px; background: var(--secondary); animation: scan 2s infinite ease-in-out; }
+        @keyframes scan { 0% { transform: translateY(0); } 50% { transform: translateY(20px); } 100% { transform: translateY(0); } }
+        .survey-box { border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; margin-bottom: 20px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .survey-box h4 { margin-top: 0; color: var(--primary); border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .option-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: var(--light); margin-bottom: 8px; border-radius: 4px; border-left: 4px solid var(--secondary); }
+        .admin-edit-row { display: flex; gap: 10px; margin-bottom: 8px; }
+        .admin-edit-row input { flex: 1; }
+        .status-alert { padding: 12px; border-radius: 4px; margin-bottom: 20px; display: none; font-weight: bold; text-align: center; }
+        .alert-success { background: #d4edda; color: #155724; }
+        .alert-danger { background: #f8d7da; color: #721c24; }
     </style>
 </head>
 <body>
+    <div class="app-container">
+        <div class="header-logo">
+            <h1>CLUB ABIERTO — SISTEMA INTEGRAL</h1>
+            <p>Módulo de Gestión Directiva y Padrón de Socios Web3</p>
+        </div>
+        <div id="statusAlert" class="status-alert"></div>
+        <!-- PANTALLA DE BIENVENIDA / LOGIN -->
+        <div id="welcomeView" class="view-panel" style="display: block;">
+            <div class="welcome-grid">
+                <!-- ACCESO SOCIOS -->
+                <div class="role-card">
+                    <h3>Acceso Socio Activo</h3>
+                    <p>Ingresa tu número de credencial para validación biométrica.</p>
+                    <div class="form-group">
+                        <label for="socioId">Número de Socio:</label>
+                        <input type="text" id="socioId" placeholder="Ej: 1024, 2048, 4096">
+                    </div>
+                    <button onclick="intentarIngresoSocio()">Validar Identidad Biométrica</button>
+                    
+                    <div id="biometricLoader" class="biometric-overlay">
+                        <div class="scanner-line"></div>
+                        <p style="margin-top: 10px; font-weight: bold; color: var(--primary);">
+                            🧬 Conectando al Padrón... Escaneando Huella Dactilar y Rostro...
+                        </p>
+                    </div>
+                </div>
 
-    <div class="main-scroll-layout">
-        <header class="app-bar-global">
-            <div class="bar-title">
-                <h1>🏛️ CLUB ABIERTO</h1>
-                <p>Por un Talleres Democrático y Digital</p>
+                <!-- ACCESO ADMINISTRACIÓN -->
+                <div class="role-card">
+                    <h3>Comisión Directiva</h3>
+                    <p>Panel restringido para la gestión y configuración de encuestas.</p>
+                    <div class="form-group">
+                        <label for="adminUser">Usuario Técnico:</label>
+                        <input type="text" id="adminUser" placeholder="Usuario">
+                    </div>
+                    <div class="form-group">
+                        <label for="adminPass">Contraseña de Red:</label>
+                        <input type="password" id="adminPass" placeholder="••••••••">
+                    </div>
+                    <button onclick="intentarIngresoAdmin()" style="background-color: var(--primary);">Acceder al Panel</button>
+                </div>
             </div>
-        </header>
-
-        <div id="statusBox" class="status-banner-global status-disconnected-global">
-            <span id="statusText">Estado: Identidad No Validada</span>
         </div>
 
-        <div class="scroll-container-global">
-            
-            <section class="section-block-global">
-                <h3>🆔 1. Acceso Societario</h3>
-                <p class="desc-text">Introduce tu número de socio consecutivamente asignado para calcular tu peso electoral por antigüedad.</p>
-                <div class="form-group-global">
-                    <input type="number" id="inputNroSocio" value="21998">
-                </div>
-                <button onclick="buscarSocio()" class="btn-primary-global">🔍 Buscar Socio y Conectar App</button>
-                <div style="margin-top: 12px; opacity: 0.4;">
-                    <button class="btn-primary-global" style="background:#475569; cursor:not-allowed;" disabled>🧬 Validación Biométrica Facial/Huella (No Activa)</button>
-                </div>
-                <div class="status-row-global"><span>Socio Verificado:</span><span id="lblSocioNombre" style="color: #94a3b8; font-weight: bold;">Ninguno</span></div>
-                <div class="status-row-global"><span>Rango / Antigüedad:</span><span id="lblCategoria" style="color: #94a3b8; font-weight: bold;">Inactivo</span></div>
-                <div class="status-row-global"><span>Multiplicador de Voto:</span><span id="lblPoderVoto" style="color: #94a3b8; font-weight: bold;">0 Puntos</span></div>
-                <div style="margin-top:15px;">
-                    <span class="desc-text-mini">📋 Planilla de 100 Socios Consecutivos (Decremento de Antigüedad cada 10 Números):</span>
-                    <div class="padron-container" id="padronLista"></div>
-                </div>
-            </section>
-
-            <section class="section-block-global">
-                <h3>🗳️ 2. Consultas Estratégicas</h3>
-                <div class="sub-box-global">
-                    <span class="tag-global">INDUMENTARIA</span>
-                    <h4>Concurso de Indumentaria Oficial</h4>
-                    <p class="desc-text">Doble Filtro Obligatorio. Elegí las opciones textiles que vestirá la institución en la temporada profesional.</p>
-                    <div class="select-group-global">
-                        <label>👕 Terna Camiseta Titular</label>
-                        <select id="selTitular" class="select-global" disabled>
-                            <option value="">-- Elige Opción Camiseta Titular --</option>
-                            <option value="T1" id="optTitularA">Opción A: Remera Titular a Bastones Azules y Blancas Finas</option>
-                            <option value="T2" id="optTitularB">Opción B: Bastones Anchos Azules Intervenidos con Degradé</option>
-                            <option value="T3" id="optTitularC">Opción C: Diseño Homenaje Histórico Azul Tradicional Liso</option>
-                        </select>
-                        <label>👕 Terna Alternativa 1</label>
-                        <select id="selSuplente1" class="select-global" disabled>
-                            <option value="">-- Elige Opción Alternativa 1 --</option>
-                            <option value="S1" id="optSuplenteA">Opción A: Remera Suplente Bordó con Detalles en Blanco</option>
-                            <option value="S2" id="optSuplenteB">Opción B: Blanca Completa con Cuello y Puños Bordó</option>
-                            <option value="S3" id="optSuplenteC">Opción C: Gris Plata Alternativa con Vivos Bordó Oscuro</option>
-                        </select>
-                        <label>👕 Terna Alternativa 2</label>
-                        <select id="selSuplente2" class="select-global" disabled>
-                            <option value="">-- Elige Opción Alternativa 2 --</option>
-                            <option value="A1" id="optAlternativaA">Opción A: Remera Suplente Naranja Eléctrico</option>
-                            <option value="A2" id="optAlternativaB">Opción B: Negra de Altar con Detalles y Escudo Naranja</option>
-                            <option value="A3" id="optAlternativaC">Opción C: Azul Francia con Estampado Geométrico Naranja</option>
-                        </select>
-                    </div>
-                    <button class="btn-primary-global" id="btnVotarCamisetas" onclick="votar('Camisetas')" disabled style="margin-top:12px; background:#16a34a;">Enviar Voto Camisetas</button>
-                </div>
-                <div class="sub-box-global" style="margin-top: 15px;">
-                    <span class="tag-global">CUERPO TÉCNICO</span>
-                    <h4>📋 Selección de Nuevo Director Técnico</h4>
-                    <p class="desc-text">Mecanismo de Copia Ciega. Tu selección ordena el orden de prioridad criptográfico para blindar la negociación directiva.</p>
-                    <select id="selDT" class="select-global" disabled>
-                        <option value="">-- Selecciona tu DT prioritario --</option>
-                        <option value="dt1" id="optDtA">Opción 1: Eduardo Berizzo (Estilo Posesión y Presión Alta)</option>
-                        <option value="dt2" id="optDtB">Opción 2: Alexander Medina (Estilo Transición e Intensidad)</option>
-                        <option value="dt3" id="optDtC">Opción 3: Gabriel Milito (Estilo Salida Limpia y Protagonista)</option>
-                    </select>
-                    <div class="crypto-list-global">
-                        <div class="crypto-item">1° Opción por Consenso: <span class="blind-box">Cifrado Hash [0x9f3a]</span></div>
-                        <div class="crypto-item">2° Opción de Respaldo: <span class="blind-box">Cifrado Hash [0x4a7e]</span></div>
-                        <div class="crypto-item">3° Opción Contingencia: <span class="blind-box">Cifrado Hash [0x2c1b]</span></div>
-                    </div>
-                    <button id="btnVotarDT" class="btn-primary-global" onclick="votar('DT')" disabled style="background: #0284c7;">Almacenar Voto Secreto de Conducción</button>
-                </div>
-
-                <div class="sub-box-global" style="margin-top: 15px;">
-                    <span class="tag-global">REFUERZOS</span>
-                    <h4>⚽ Mercado de Fichajes y Cantera</h4>
-                    <label style="font-size:0.75rem; color:#94a3b8; margin-top:4px; display:block;">Defensor Central Derecho:</label>
-                    <select id="selDefensor" class="select-global" disabled>
-                        <option value="">-- Selecciona tu opción favorita --</option>
-                        <option value="def1" id="optDefA">Opción A: Germán Pezzella (Jerarquía - Internacional)</option>
-                        <option value="def2" id="optDefB">Opción B: Valentín Gómez (Apuesta - Proyección de Compra)</option>
-                        <option value="def3" id="optDefC">Opción C: Lautaro Cañete (Inferiores - Promoción de Reserva)</option>
-                    </select>
-                    <label style="font-size:0.75rem; color:#94a3b8; margin-top:4px; display:block;">Centrodelantero de Área:</label>
-                    <select id="selDelantero" class="select-global" disabled>
-                        <option value="">-- Selecciona tu opción favorita --</option>
-                        <option value="del1" id="optDelA">Opción A: Lucas Alario (Jerarquía - Goleador Consagrado)</option>
-                        <option value="del2" id="optDelB">Opción B: Ignacio Maestro Puch (Apuesta - Despliegue Físico)</option>
-                        <option value="del3" id="optDelC">Opción C: Francisco Pozzo (Inferiores - Cantera Reserva)</option>
-                    </select>
-                    <button id="btnVotarJugadores" class="btn-primary-global" onclick="votar('Fichajes')" disabled style="background: #0284c7;">Registrar Prioridad de Fichajes</button>
-                </div>
-            </section>
-
-            <section class="section-block-global" style="border-color: #f59e0b;">
-                <h3>⚙️ 3. Panel de Control Directivo No-Code</h3>
-                <p class="desc-text">Modifica dinámicamente los textos de las encuestas inyectando las directivas directamente a las opciones del socio.</p>
-                <div class="bloque-admin">
-                    <label>Editar Opción Camiseta Titular (A):</label>
-                    <input type="text" id="editCamisetaA" value="Opción A: Remera Titular a Bastones Azules y Blancas Finas">
-                    <label>Editar Opción Alternativa 1 (A):</label>
-                    <input type="text" id="editSuplenteA" value="Opción A: Remera Suplente Bordó con Detalles en Blanco">
-                    <label>Editar Opción Alternativa 2 (A):</label>
-                    <input type="text" id="editAlternativaA" value="Opción A: Remera Suplente Naranja Eléctrico">
-                    <button onclick="modificarCamisetas()" style="background: #f59e0b; color: #0f172a; padding:8px; font-size:0.8rem; font-weight:bold; border-radius:4px; border:none; cursor:pointer; width:100%; margin-top:4px;">Actualizar Nombres de Camisetas</button>
-                </div>
-                <div class="bloque-admin" style="margin-top:10px;">
-                    <label>Editar Candidato DT 1:</label>
-                    <input type="text" id="editDtA" value="Opción 1: Eduardo Berizzo (Estilo Posesión y Presión Alta)">
-                    <label>Editar Candidato DT 2:</label>
-                    <input type="text" id="editDtB" value="Opción 2: Alexander Medina (Estilo Transición e Intensidad)">
-                    <button onclick="modificarDT()" style="background: #f59e0b; color: #0f172a; padding:8px; font-size:0.8rem; font-weight:bold; border-radius:4px; border:none; cursor:pointer; width:100%; margin-top:4px;">Actualizar Candidatos DT</button>
-                </div>
-                <div class="bloque-admin" style="margin-top:10px;">
-                    <label>Editar Defensor Opción A (Jerarquía):</label>
-                    <input type="text" id="editDefA" value="Opción A: Germán Pezzella (Jerarquía - Internacional)">
-                    <label>Editar Delantero Opción A (Jerarquía):</label>
-                    <input type="text" id="editDelA" value="Opción A: Lucas Alario (Jerarquía - Goleador Consagrado)">
-                    <button onclick="modificarFichajes()" style="background: #f59e0b; color: #0f172a; padding:8px; font-size:0.8rem; font-weight:bold; border-radius:4px; border:none; cursor:pointer; width:100%; margin-top:4px;">Actualizar Nombres de Fichajes</button>
-                </div>
-            </section>
-
+        <!-- PANEL DE CONTROL DIRECTIVO (ADMIN) -->
+        <div id="adminView" class="view-panel">
+            <button class="btn-logout" onclick="cerrarSesion()">← Salir</button>
+            <h2>Panel de Control Directivo (Configuración de Encuestas)</h2>
+            <p style="color: #666; margin-bottom: 25px;">Modifica los nombres de los candidatos o ítems en tiempo real para el padrón.</p>
+            <div id="adminSurveysContainer"></div>
+            <button onclick="guardarCambiosAdmin()" style="background-color: var(--success); font-size: 18px; margin-top: 20px;">Publicar Cambios en el Padrón</button>
         </div>
-    </div>
 
+        <!-- PANEL DEL SOCIO (VOTACIONES) -->
+        <div id="socioView" class="view-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <button class="btn-logout" onclick="cerrarSesion()">← Salir</button>
+                <div id="socioBadge" style="background: var(--primary); color: white; padding: 8px 15px; border-radius: 20px; font-weight: bold;"></div>
+            </div>
+            <h2>Consultas y Decisiones del Club</h2>
+            <p>Tu voto se procesa de forma única por opción. No se permite el doble voto.</p>
+            <div id="socioSurveysContainer"></div>
+        </div>
+    </div> <!-- Cierre app-container -->
     <script>
-        var padron = {};
-        padron["21998"] = { nombre: "Agustín Supicciatti (Tú)", ant: 13, cat: "Diamante", pts: 7 };
+        // Padrón de Socios simulado indexado con validación biométrica exitosa
+        const padronSociosValidos = {
+            "1024": "Socio: Carlos Tévez (Activo)",
+            "2048": "Socio: Roman Riquelme (Activo)",
+            "4096": "Socio: Diego Maradona (Vitalicio)",
+            "1913": "Socio: Fundador Club Abierto (Activo)"
+        };
 
-        var nombres = ["Facundo Juárez", "Bautista González", "Mateo Rodríguez", "Jerónimo Ledesma", "Santiago Bustos", "Lautaro Martínez", "Benjamín Romero", "Tomás Carrizo", "Felipe Pereyra", "Lucas Villalba"];
-        
-        for (var i = 1; i <= 99; i++) {
-            var nro = (21998 + i).toString();
-            var bloque = Math.floor(i / 10);
-            var ant = 13 - bloque;
-            if (ant < 1) ant = 1;
-            
-            var c = "Bronce"; var p = 1;
-            if (ant >= 3 && ant < 6) { c = "Plata"; p = 2; }
-            else if (ant >= 6 && ant < 9) { c = "Oro"; p = 3; }
-            else if (ant >= 9 && ant < 12) { c = "Platinum A"; p = 5; }
-            else if (ant >= 12) { c = "Diamante"; p = 7; }
+        // Estado del sistema: Estructura de encuestas iniciales inventadas
+        let encuestas = [
+            {
+                id: 0,
+                titulo: "Elección de Jugador Destacado (Fichaje de Temporada)",
+                opciones: ["Julián Álvarez", "Lautaro Martínez", "Enzo Fernández"],
+                votos:,
+                registroVotosPorSocio: {} // Almacena qué socio votó para bloquear doble voto
+            },
+            {
+                id: 1,
+                titulo: "Director Técnico (Próximo Ciclo Institucional)",
+                opciones: ["Marcelo Gallardo", "Lionel Scaloni", "Diego Simeone"],
+                votos:,
+                registroVotosPorSocio: {}
+            },
+            {
+                id: 2,
+                titulo: "Modelo de Camiseta Oficial (Edición Especial 2026)",
+                opciones: ["Diseño Retro 1913 Lines", "Bastones Clásicos Modernizados", "Estilo Monocromático Urbano"],
+                votos:,
+                registroVotosPorSocio: {}
+            },
+            {
+                id: 3,
+                titulo: "Marca de Indumentaria Técnica (Sponsor de Ropa)",
+                opciones: ["Adidas Performance", "Nike Football", "Puma Teamwear"],
+                votos:,
+                registroVotosPorSocio: {}
+            },
+            {
+                id: 4,
+                titulo: "Main Sponsor (Patrocinador Principal de Pecho)",
+                opciones: ["Fly Emirates", "Crypto.com", "Mercado Libre"],
+                votos:,
+                registroVotosPorSocio: {}
+            }
+        ];
 
-            padron[nro] = { nombre: nombres[i % 10] + " (" + i + ")", ant: ant, cat: c, pts: p };
+        let socioActualLogueado = null;
+        // Sistema global de alertas en UI
+        function mostrarAlerta(mensaje, esError = false) {
+            const alertEl = document.getElementById('statusAlert');
+            alertEl.style.display = 'block';
+            alertEl.innerText = mensaje;
+            alertEl.className = `status-alert ${esError ? 'alert-danger' : 'alert-success'}`;
+            setTimeout(() => { alertEl.style.display = 'none'; }, 5000);
         }
 
-        window.addEventListener('DOMContentLoaded', function() {
-            var lista = document.getElementById('padronLista');
-            var html = '<div class="padron-item destacado"><span>N° 21998 - ' + padron["21998"].nombre + '</span><span>Ant: 13a | Votos: 7</span></div>';
-            for (var k in padron) {
-                if (k !== "21998" && padron.hasOwnProperty(k)) {
-                    html += '<div class="padron-item"><span>N° ' + k + ' - ' + padron[k].nombre + '</span><span>Ant: ' + padron[k].ant + 'a | Votos: ' + padron[k].pts + '</span></div>';
-                }
+        // Flujo del Administrador con credenciales estrictas
+        function intentarIngresoAdmin() {
+            const user = document.getElementById('adminUser').value;
+            const pass = document.getElementById('adminPass').value;
+
+            if (user === "admclubabierto" && pass === "1913") {
+                mostrarAlerta("Acceso concedido al Panel Directivo.");
+                document.getElementById('welcomeView').style.display = 'none';
+                document.getElementById('adminView').style.display = 'block';
+                renderizarPanelAdmin();
+            } else {
+                mostrarAlerta("Credenciales administrativas inválidas.", true);
             }
-            lista.innerHTML = html;
-        });
+        }
 
-        var login = null;
+        // Flujo del Socio con Simulación Biométrica de Huella y Rostro
+        function intentarIngresoSocio() {
+            const socioId = document.getElementById('socioId').value.trim();
 
-        function buscarSocio() {
-            var input = document.getElementById('inputNroSocio').value.toString().trim();
-            var socio = padron[input];
-            
-            if (!socio) {
-                alert("⚠️ Socio no localizado en el padrón consecutivo.");
+            if (!socioId) {
+                mostrarAlerta("Por favor, introduce un número de socio válido.", true);
                 return;
             }
 
-            login = socio;
-            document.getElementById('lblSocioNombre').innerText = socio.nombre;
-            document.getElementById('lblSocioNombre').style.color = "#34d399";
-            document.getElementById('lblCategoria').innerText = socio.cat + " (" + socio.ant + " años)";
-            document.getElementById('lblCategoria').style.color = "#34d399";
-            document.getElementById('lblPoderVoto').innerText = socio.pts + " Puntos de Voto";
-            document.getElementById('lblPoderVoto').style.color = "#34d399";
+            if (padronSociosValidos[socioId]) {
+                const loader = document.getElementById('biometricLoader');
+                loader.style.display = 'block'; // Activa animación de escaneo
+
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    socioActualLogueado = socioId;
+                    
+                    document.getElementById('welcomeView').style.display = 'none';
+                    document.getElementById('socioView').style.display = 'block';
+                    document.getElementById('socioBadge').innerText = padronSociosValidos[socioId];
+                    
+                    mostrarAlerta(`Identidad verificada en padrón biométrico. Bienvenido.`);
+                    renderizarPanelSocio();
+                }, 2500); // 2.5 segundos de retraso simulando la biometría
+            } else {
+                mostrarAlerta("El número de socio no coincide con ninguna huella en el padrón activo.", true);
+            }
+        }
+
+        function cerrarSesion() {
+            socioActualLogueado = null;
+            document.getElementById('adminUser').value = "";
+            document.getElementById('adminPass').value = "";
+            document.getElementById('socioId').value = "";
+            document.getElementById('adminView').style.display = 'none';
+            document.getElementById('socioView').style.display = 'none';
+            document.getElementById('welcomeView').style.display = 'block';
+        }
+        // Dibuja el panel administrativo con las opciones editables
+        function renderizarPanelAdmin() {
+            const container = document.getElementById('adminSurveysContainer');
+            container.innerHTML = "";
+
+            encuestas.forEach((encuesta, indexEncuesta) => {
+                let opcionesInputsHTML = "";
+                encuesta.opciones.forEach((opcion, indexOpcion) => {
+                    opcionesInputsHTML += `
+                        <div class="admin-edit-row">
+                            <input type="text" id="edit_${indexEncuesta}_${indexOpcion}" value="${opcion}">
+                        </div>
+                    `;
+                });
+
+                container.innerHTML += `
+                    <div class="survey-box">
+                        <h4>Configurar: ${encuesta.titulo}</h4>
+                        ${opcionesInputsHTML}
+                    </div>
+                `;
+            });
+        }
+
+        // Procesa y guarda los cambios de texto aplicados por el Admin
+        function guardarCambiosAdmin() {
+            encuestas.forEach((encuesta, indexEncuesta) => {
+                encuesta.opciones.forEach((opcion, indexOpcion) => {
+                    const inputVal = document.getElementById(`edit_${indexEncuesta}_${indexOpcion}`).value.trim();
+                    if (inputVal) {
+                        encuestas[indexEncuesta].opciones[indexOpcion] = inputVal;
+                    }
+                });
+            });
+            mostrarAlerta("Cambios aplicados con éxito. El padrón de socios ha sido actualizado.");
+        }
+
+        // Dibuja el panel de votación para el Socio activo conectado
+        function renderizarPanelSocio() {
+            const container = document.getElementById('socioSurveysContainer');
+            container.innerHTML = "";
+
+            encuestas.forEach((encuesta) => {
+                let opcionesHTML = "";
+                // Verifica si este socio en particular ya emitió su voto en esta encuesta
+                const yaVotoEstaEncuesta = encuesta.registroVotosPorSocio[socioActualLogueado] !== undefined;
+
+                encuesta.opciones.forEach((opcion, indexOpcion) => {
+                    const totalVotos = encuesta.votos[indexOpcion];
+                    // El botón se bloquea por completo a nivel UI si ya se registra un voto del socio
+                    const disabledStr = yaVotoEstaEncuesta ? "disabled style='background-color:#bbb; cursor:not-allowed;'" : "";
+                    
+                    opcionesHTML += `
+                        <div class="option-row">
+                            <span><strong>${opcion}</strong></span>
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <span style="font-size: 14px; color: #555;">${totalVotos} votos</span>
+                                <button onclick="registrarVotoSocio(${encuesta.id}, ${indexOpcion})" ${disabledStr} style="width:auto; padding: 6px 12px;">Votar</button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML += `
+                    <div class="survey-box">
+                        <h4>${encuesta.titulo}</h4>
+                        ${yaVotoEstaEncuesta ? `<p style="color:var(--danger); font-weight:bold; font-size:14px;">⚠️ Ya registramos tu voto para esta votación institucional.</p>` : ""}
+                        <div>${opcionesHTML}</div>
+                    </div>
+                `;
+            });
+        }
+
+        // Estructura de Control: Registra el voto e inhabilita inmediatamente segundas vueltas
+        function registrarVotoSocio(encuestaId, opcionId) {
+            const encuesta = encuestas.find(e => e.id === encuestaId);
             
-            var box = document.getElementById('statusBox');
-            box.style.background = "#14532d";
-            box.innerText = "✅ Acceso Concedido: " + socio.nombre;
+            // Validación de doble seguridad en lógica de backend simulada
+            if (encuesta.registroVotosPorSocio[socioActualLogueado] !== undefined) {
+                mostrarAlerta("Error de Validación: Tu firma digital ya votó en esta consulta.", true);
+                return;
+            }
 
-            document.getElementById('selTitular').disabled = false;
-            document.getElementById('selSuplente1').disabled = false;
-            document.getElementById('selSuplente2').disabled = false;
-            document.getElementById('btnVotarCamisetas').disabled = false;
-            
-            document.getElementById('selDT').disabled = false;
-            document.getElementById('btnVotarDT').disabled = false;
-            document.getElementById('selDefensor').disabled = false;
-            document.getElementById('selDelantero').disabled = false;
-            document.getElementById('btnVotarJugadores').disabled = false;
+            // Aplicación del voto y bloqueo irreversible del ID de socio en el objeto
+            encuesta.votos[opcionId] += 1;
+            encuesta.registroVotosPorSocio[socioActualLogueado] = opcionId;
 
-            alert("🏛️ Padrón verificado. Peso electoral activo de " + socio.pts + " puntos.");
-        }
-
-        function votar(tipo) {
-            if (!login) return;
-            alert("🎉 Transacción Web3 firmada. Has aportado " + login.pts + " puntos ponderados al registro contable de " + tipo + ".");
-        }
-
-        function modificarCamisetas() {
-            document.getElementById('optTitularA').text = document.getElementById('editCamisetaA').value;
-            document.getElementById('optSuplenteA').text = document.getElementById('editSuplenteA').value;
-            document.getElementById('optAlternativaA').text = document.getElementById('editAlternativaA').value;
-            alert("✅ ¡Opciones de Indumentaria actualizadas!");
-        }
-
-        function modificarDT() {
-            document.getElementById('optDtA').text = document.getElementById('editDtA').value;
-            document.getElementById('optDtB').text = document.getElementById('editDtB').value;
-            alert("✅ ¡Terna de Directores Técnicos actualizada!");
-        }
-
-        function modificarFichajes() {
-            document.getElementById('optDefA').text = document.getElementById('editDefA').value;
-            document.getElementById('optDelA').text = document.getElementById('editDelA').value;
-            alert("✅ ¡Opciones de Fichajes actualizadas!");
+            mostrarAlerta("¡Tu voto ha sido encriptado y enviado al padrón correctamente!");
+            renderizarPanelSocio(); // Actualiza visualmente los contadores y bloquea los botones
         }
     </script>
 </body>
