@@ -155,6 +155,7 @@
         @media(max-width: 600px) {
             .grid-metrics { grid-template-columns: 100%; }
         }
+        /* CONTENEDOR SEGURO FIJO PARA EVITAR EL COLAPSO DE CHART.JS */
         .chart-wrapper {
             border: 2px solid #000000;
             background-color: #ffffff;
@@ -162,6 +163,7 @@
             border-radius: 8px;
             margin-bottom: 16px;
             width: 100%;
+            position: relative;
         }
         .btn-secondary-dark {
             background-color: #475569;
@@ -329,7 +331,7 @@
             </div>
         </div>
 
-        <!-- --- VISTA INTERNA: RESULTADOS AVANZADOS COMPARTIDOS --- -->
+        <!-- --- VISTA INTERNA: RESULTADOS AVANZADOS COMPARTIDOS CON CONTENEDOR RELATIVO FIJO --- -->
         <div id="secResultados" class="sub-view full-width">
             <div class="dashboard-header">
                 <div class="wf-box" style="margin:0; padding:10px; font-size:16px;">Auditoría General de Escrutinio y Ponderación</div>
@@ -341,9 +343,12 @@
             </div>
             
             <div class="grid-metrics">
-                <div class="chart-wrapper" style="margin-bottom: 0;">
+                <!-- CONTENEDOR RELATIVO ABSOLUTO PARA EVITAR EL BUG DE ANCHO/ALTO CERO EN DISPLAY NONE -->
+                <div class="chart-wrapper" style="margin-bottom: 0; min-height: 260px; position: relative;">
                     <div style="font-size: 14px; font-weight: 700; margin-bottom: 12px; text-transform: uppercase; color: #002D62;">Tendencia de Votos Ponderados</div>
-                    <div style="height: 250px; position: relative;"><canvas id="chartResultadosTorta"></canvas></div>
+                    <div style="position: relative; width: 100%; height: 200px;">
+                        <canvas id="chartResultadosTorta"></canvas>
+                    </div>
                 </div>
                 <div class="wf-box text-left" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: center; gap: 12px;">
                     <div><span class="txt-info-red">Socios Participantes:</span><div id="lblResTotalVotos" style="font-size: 20px; font-weight: 800;">0</div></div>
@@ -464,7 +469,7 @@
             var d = obtenerDatosSocio(id);
             document.getElementById('lblSocioId').innerText = "#" + d.id;
             document.getElementById('lblSocioAntiguedad').innerText = d.antiguedad + " AÑOS";
-            document.getElementById('lblSocioPorcentual').innerText = d.porcentual.toFixed(3) + "% ASIGNADO";
+            document.getElementById('lblSocioPorcentual').innerText = d.procentual.toFixed(3) + "% ASIGNADO";
             document.getElementById('lblSocioPuntos').innerText = d.puntos + " PUNTOS EQUIVALENTES";
             document.getElementById('lblSocioDiasFaltantes').innerText = d.diasFaltantes > 0 ? d.diasFaltantes + " DÍAS" : "MÁXIMO RANGO ALCANZADO";
         }
@@ -489,11 +494,21 @@
             if(viewId === 'secPorcentuales') renderizarListaPorcentualesAdmin();
         }
 
+        /* INVOCACIÓN CON TRIGGER DE RETARDO SEGURO PARA REDIBUJAR EL CANVAS DESPUÉS DEL DISPLAY FLEX */
         function irAResultadosGenerales() {
             document.getElementById('socioDashboard').style.display = 'none';
             document.getElementById('adminDashboard').style.display = 'none';
             document.getElementById('secResultados').style.display = 'flex';
+            
             inicializarSelectorResultados();
+            
+            // Alternativa técnica definitiva: Forzar actualización tras render visual en pantalla
+            setTimeout(function() {
+                if(instChart) {
+                    instChart.resize();
+                    instChart.update();
+                }
+            }, 80);
         }
 
         function regresarAlPanelInterno() {
@@ -508,18 +523,17 @@
             document.getElementById('loginScreen').style.display = 'flex';
         }
 
-        /* --- ADICIÓN DINÁMICA DE CAMPOS INPUTS --- */
         function agregarCampoEntradaOpcion(containerId) {
             var p = document.getElementById(containerId);
             var n = p.getElementsByTagName('input').length;
-            var letra = String.fromCharCode(65 + n); // Genera automáticamente D, E, F...
+            var letra = String.fromCharCode(65 + n);
             var input = document.createElement('input');
             input.type = 'text';
-            input.className = 'wf-input opt-nueva-input';
+            input.className = containerId === 'containerCamposModificar' ? 'wf-input opt-mod-field' : 'wf-input opt-nueva-input';
             input.placeholder = 'Opción ' + letra;
             p.appendChild(input);
         }
-        /* --- SISTEMA OPERATIVO DE ESCREUTINIO Y ARREGLOS PLANOS --- */
+        /* --- SISTEMA OPERATIVO DE CONSULTAS CON EXTRACCIÓN VECTORIAL PURA --- */
         var instChart = null;
 
         function inicializarSelectorVotaciones() {
@@ -595,7 +609,6 @@
                 var val = inputs[i].value.trim();
                 if(val !== "") {
                     nuevasOpciones.push(val);
-                    // Si añadieron una opción nueva al final, inicializamos su contador en 0
                     nuevosVotosConteo.push(baseEncuestas[key].votos[i] || 0);
                 }
             }
@@ -605,7 +618,7 @@
             
             guardarDatosEnMemoriaLocal();
             alert('✓ Consulta y opciones guardadas con éxito.');
-            // FLUJO CONTINUO: No vuelve atrás, se queda en la pantalla actualizando los inputs reflejados
+            // FLUJO MODIFICACIÓN CONTINUO: Se queda estable en la pantalla para re-seleccionar o seguir operando
             cargarCamposModificar();
         }
 
@@ -648,21 +661,28 @@
             var ctx = document.getElementById('chartResultadosTorta').getContext('2d');
             if(instChart) instChart.destroy();
             
-            // MAPEO SEGURO Y COMPACTO DE ARREGLO DE UNA SOLA DIMENSIÓN PLANO PARA CHART.JS
-            var listaPlanaVotos = item.votos.map(function(num) { return Number(num); });
-            var coloresPastel = Array.of('#002D62', '#d91a1a', '#ffc107', '#28a745', '#9333ea', '#06b6d4');
+            // PROCESAMIENTO PLANO DEFINITIVO: Mapeamos los votos a números primitivos individuales
+            var listaPlanaVotos = [];
+            for(var i = 0; i < item.votos.length; i++) {
+                listaPlanaVotos.push(Number(item.votos[i]));
+            }
+
+            var coloresPastel = Array.of('#002D62', '#d91a1a', '#ffc107', '#28a745', '#9333ea', '#06b6d4', '#f97316');
 
             instChart = new Chart(ctx, {
                 type: 'pie',
                 data: {
                     labels: item.opts,
                     datasets: [{
-                        data: listaPlanaVotos, // Almacena datos vectoriales unidimensionales puros
+                        data: listaPlanaVotos, // Enviado como vector limpio unidimensional directo
                         backgroundColor: coloresPastel.slice(0, item.opts.length),
                         borderWidth: 1
                     }]
                 },
-                options: { responsive: true, maintainAspectRatio: false }
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false
+                }
             });
         }
 
