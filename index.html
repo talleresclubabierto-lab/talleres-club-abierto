@@ -199,6 +199,13 @@
             width: 0%;
             transition: width 0.4s ease;
         }
+        .mini-badge {
+            font-size: 11px;
+            background-color: #e2e8f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #475569;
+        }
     </style>
 </head>
 <body>
@@ -256,8 +263,8 @@
 
             <!-- FILA SIMÉTRICA INFORMATIVA (LETRAS ROJAS) -->
             <div class="grid-metrics">
-                <div class="wf-box text-left"><span class="txt-info-red">N° de Socio</span><div id="lblSocioId" style="font-size: 22px; font-weight: 800; margin-top: 4px;">-</div></div>
-                <div class="wf-box text-left"><span class="txt-info-red">Antigüedad del Socio</span><div id="lblSocioAntiguedad" style="font-size: 22px; font-weight: 800; margin-top: 4px;">-</div></div>
+                <div class="wf-box text-left"><span class="txt-info-red">N° de Socio y Nombre</span><div id="lblSocioId" style="font-size: 20px; font-weight: 800; margin-top: 4px;">-</div></div>
+                <div class="wf-box text-left"><span class="txt-info-red">Antigüedad del Socio</span><div id="lblSocioAntiguedad" style="font-size: 20px; font-weight: 800; margin-top: 4px;">-</div></div>
             </div>
 
             <!-- BOTONES DE ACCIÓN (ROJO / AMARILLO) -->
@@ -282,7 +289,7 @@
             <div class="grid-metrics">
                 <div class="wf-box text-left"><span class="txt-info-red">N° de Socio</span><div id="lblAdminSocioId" style="font-size: 18px; font-weight: 700; margin-top: 4px;">-</div></div>
                 <div class="wf-box text-left"><span class="txt-info-red">Antigüedad del Socio</span><div id="lblAdminAntiguedad" style="font-size: 18px; font-weight: 700; margin-top: 4px;">15 Años</div></div>
-                <div class="wf-box text-left"><span class="txt-info-red">Nombre y Apellido</span><div style="font-size: 18px; font-weight: 700; margin-top: 4px;">admclubabierto</div></div>
+                <div class="wf-box text-left"><span class="txt-info-red">Nombre y Apellido</span><div id="lblAdminNombreDirectivo" style="font-size: 18px; font-weight: 700; margin-top: 4px;">-</div></div>
                 <div class="wf-box text-left"><span class="txt-info-red">Cargo que ocupa en el Club</span><div style="font-size: 18px; font-weight: 700; margin-top: 4px;">Administrador General</div></div>
             </div>
             <div class="wf-box full-width text-left" style="margin-bottom: 20px;"><span class="txt-info-red">Desde cuándo ocupa el Cargo</span><div style="font-size: 16px; font-weight: 700; margin-top: 4px; color: #1e293b;">01/01/2026</div></div>
@@ -339,7 +346,7 @@
                 <button class="wf-button" style="width:auto; margin:0;" onclick="regresarAlPanelInterno()">Volver</button>
             </div>
             <div class="wf-box full-width" style="text-align: left;">
-                <label style="font-size: 13px; color: #64748b; display: block; margin-bottom: 6px;">SELECCIONAL ENCUESTA A MODIFICAR:</label>
+                <label style="font-size: 13px; color: #64748b; display: block; margin-bottom: 6px;">SELECCIONAR ENCUESTA A MODIFICAR:</label>
                 <select id="cmbModificarSelect" class="wf-input" onchange="cargarCamposModificar()"></select>
                 
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
@@ -352,57 +359,58 @@
             </div>
         </div>
 
-        <!-- --- VISTA INTERNA: RESULTADOS REEMPLAZADOS CON PANEL DE PROGRESO INMUNE A CAÍDAS --- -->
+        <!-- --- VISTA INTERNA: AUDITORÍA DE RESULTADOS DUALES (PUNTOS Y VOTOS) --- -->
         <div id="secResultados" class="sub-view full-width">
             <div class="dashboard-header">
                 <div class="wf-box" style="margin:0; padding:10px; font-size:16px;">Auditoría General de Escrutinio y Ponderación</div>
                 <button class="wf-button" style="width:auto; margin:0; background-color: #64748b;" onclick="regresarAlPanelInterno()">Volver</button>
             </div>
             <div class="wf-box full-width" style="text-align: left;">
-                <label style="font-size: 13px; color: #64748b; display: block; margin-bottom: 6px;">SELECCIONAL ENCUESTA ACTIVA:</label>
+                <label style="font-size: 13px; color: #64748b; display: block; margin-bottom: 6px;">SELECCIONAR ENCUESTA ACTIVA:</label>
                 <select id="cmbResultadosSelect" class="wf-input" onchange="actualizarReporteGrafico()"></select>
             </div>
             
             <div class="grid-metrics">
-                <!-- CONTENEDOR INTEGRAL DE BARRAS DE PROGRESO INTERACTIVAS -->
                 <div class="chart-wrapper" style="margin-bottom: 0; min-height: 260px;">
-                    <div style="font-size: 14px; font-weight: 700; margin-bottom: 16px; text-transform: uppercase; color: #002D62;">Tendencia de Votos Ponderados (Gráfico de Avance)</div>
-                    <div id="contenedorBarrasDinamicas" style="display: flex; flex-direction: column; gap: 4px;">
-                        <!-- Se inyecta dinámicamente vía JS -->
-                    </div>
+                    <div style="font-size: 14px; font-weight: 700; margin-bottom: 16px; text-transform: uppercase; color: #002D62;">Tendencia de Votos Ponderados</div>
+                    <div id="contenedorBarrasDinamicas" style="display: flex; flex-direction: column; gap: 4px;"></div>
                 </div>
                 <div class="wf-box text-left" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: center; gap: 12px;">
                     <div><span class="txt-info-red">Socios Participantes:</span><div id="lblResTotalVotos" style="font-size: 20px; font-weight: 800;">0</div></div>
                     <div><span class="txt-info-red">Socios Restantes por Votar:</span><div id="lblResRestantes" style="font-size: 20px; font-weight: 800;">0</div></div>
-                    <div><span class="txt-info-red">Puntos de Ponderación en Juego:</span><div id="lblResPuntosJuego" style="font-size: 20px; font-weight: 800; color: #28a745;">0 pts</div></div>
+                    <div><span class="txt-info-red">Puntos de Ponderación en Juego (Exacto):</span><div id="lblResPuntosJuego" style="font-size: 20px; font-weight: 800; color: #28a745;">0 pts</div></div>
                 </div>
             </div>
         </div>
-
-        <!-- --- VISTA INTERNA: % DE VOTACIÓN DE CADA ENCUESTA --- -->
+        <!-- --- VISTA INTERNA: TABLERO DE COMPORTAMIENTO POR ESCALAFÓN --- -->
         <div id="secPorcentuales" class="sub-view full-width">
             <div class="dashboard-header">
-                <div class="wf-box" style="margin:0; padding:10px; font-size:16px;">% Resumen de Participación Global</div>
-                <button class="wf-button" style="width:auto; margin:0;" onclick="regresarAlPanelInterno()">Volver</button>
+                <div class="wf-box" style="margin:0; padding:10px; font-size:16px;">Tablero de Comportamiento del Padrón Electoral</div>
+                <button class="wf-button" style="width:auto; margin:0; background-color:#64748b;" onclick="regresarAlPanelInterno()">Volver</button>
             </div>
-            <div id="wrapperListaPorcentuales" style="display: flex; flex-direction: column; gap: 12px; width: 100%;"></div>
+            <div class="wf-box full-width" style="text-align: left;">
+                <label style="font-size: 13px; color: #64748b; display: block; margin-bottom: 6px;">SELECCIONAR ENCUESTA PARA ANÁLISIS DE ESCALAFÓN:</label>
+                <select id="cmbPorcentualesSelect" class="wf-input" onchange="renderizarListaPorcentualesAdmin()"></select>
+            </div>
+            <div id="wrapperListaPorcentuales" style="display: flex; flex-direction: column; gap: 14px; width: 100%;"></div>
         </div>
     </div> <!-- Fin container -->
     <script>
-        /* --- CORE DE NEGOCIO CORREGIDO SIN CARACTERES VACÍOS --- */
+        /* --- CORE DE NEGOCIO Y PERSISTENCIA DE CONTROL --- */
         var TOTAL_SOCIOS = 10000;
         var ID_SOCIO_ACTIVO = 0;
         var ROL_ACTIVO = ''; 
 
-        // bypass seguro sin corchetes libres
+        // Definición de Administradores Oficiales
         var adminFijos = Array.of(10000, 9000, 8000);
 
+        // Estructura Inicial Limpia de Encuestas con Dualidad (Votos de Personas + Puntos de Peso)
         var encuestasInicialesLimpias = {
-            enc_1: { titulo: "Elección de Jugador Destacado (Fichaje/Premio)", opts: Array.of("Opción A - Santos Valoyes", "Opción B - Bruno Zapelli", "Opción C - Ramón Sosa"), votos: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0 },
-            enc_2: { titulo: "Elección de Director Técnico (Próximo Ciclo)", opts: Array.of("Opción A - Alexander Medina", "Opción B - Walter Ribonetto", "Opción C - Gabriel Heinze"), votos: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0 },
-            enc_3: { titulo: "Modelo de Camiseta Oficial (Diseño Alternativo)", opts: Array.of("Opción A - Azul Tradicional", "Opción B - Prematch Tecnológica", "Opción C - Blanca Minimalista"), votos: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0 },
-            enc_4: { titulo: "Marca de Indumentaria Técnica (Sponsor Técnico)", opts: Array.of("Opción A - Givova Premium", "Opción B - Adidas Performance", "Opción C - Puma Cat"), votos: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0 },
-            enc_5: { titulo: "Main Sponsor (Patrocinador Principal en Pecho)", opts: Array.of("Opción A - ICBC Corporativo", "Opción B - Betsson Sports", "Opción C - Flybondi Líneas Aéreas"), votos: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0 }
+            enc_1: { titulo: "Elección de Jugador Destacado (Fichaje/Premio)", opts: Array.of("Opción A - Santos Valoyes", "Opción B - Bruno Zapelli", "Opción C - Ramón Sosa"), votosPuntos: Array.of(0, 0, 0), votosPersonas: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0, rangoParticipantes: Array.of(0, 0, 0, 0) },
+            enc_2: { titulo: "Elección de Director Técnico (Próximo Ciclo)", opts: Array.of("Opción A - Alexander Medina", "Opción B - Walter Ribonetto", "Opción C - Gabriel Heinze"), votosPuntos: Array.of(0, 0, 0), votosPersonas: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0, rangoParticipantes: Array.of(0, 0, 0, 0) },
+            enc_3: { titulo: "Modelo de Camiseta Oficial (Diseño Alternativo)", opts: Array.of("Opción A - Azul Tradicional", "Opción B - Prematch Tecnológica", "Opción C - Blanca Minimalista"), votosPuntos: Array.of(0, 0, 0), votosPersonas: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0, rangoParticipantes: Array.of(0, 0, 0, 0) },
+            enc_4: { titulo: "Marca de Indumentaria Técnica (Sponsor Técnico)", opts: Array.of("Opción A - Givova Premium", "Opción B - Adidas Performance", "Opción C - Puma Cat"), votosPuntos: Array.of(0, 0, 0), votosPersonas: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0, rangoParticipantes: Array.of(0, 0, 0, 0) },
+            enc_5: { titulo: "Main Sponsor (Patrocinador Principal en Pecho)", opts: Array.of("Opción A - ICBC Corporativo", "Opción B - Betsson Sports", "Opción C - Flybondi Líneas Aéreas"), votosPuntos: Array.of(0, 0, 0), votosPersonas: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0, rangoParticipantes: Array.of(0, 0, 0, 0) }
         };
 
         if (!localStorage.getItem('TD_baseEncuestas')) {
@@ -465,22 +473,41 @@
                 }, 900);
             }, 1000);
         }
-        /* --- REGLAS MATEMÁTICAS EXACTAS DEL PADRÓN --- */
+        /* --- REGLAS MATEMÁTICAS EXACTAS DEL PADRÓN E IDENTIDADES (EXTRA) --- */
         function obtenerDatosSocio(id) {
-            var antiguedad = 0; var puntos = 0; var porcentual = 0; var diasFaltantes = 0;
+            var antiguedad = 0; var puntos = 0; var porcentual = 0; var diasFaltantes = 0; var indiceRango = 0;
+            var nombre = "Socio General del Club";
+
+            // Asignación de identidades específicas solicitadas para la Comisión Directiva
+            if (id === 8000) nombre = "Roman Huespe";
+            else if (id === 9000) nombre = "Adrian Gruppi";
+            else if (id === 10000) nombre = "Agustin Supicciatti";
+
             if (id <= 6000) {
                 antiguedad = 1 + ((id - 1) % 5); puntos = antiguedad; porcentual = 0.006;
-                diasFaltantes = (5 - antiguedad) * 365 + 120;
+                diasFaltantes = (5 - antiguedad) * 365 + 120; indiceRango = 0;
             } else if (id <= 8000) {
                 antiguedad = 5 + ((id - 6001) % 5); puntos = antiguedad; porcentual = 0.010;
-                diasFaltantes = (10 - antiguedad) * 365 + 45;
+                diasFaltantes = (10 - antiguedad) * 365 + 45; indiceRango = 1;
             } else if (id <= 9000) {
                 antiguedad = 10 + ((id - 8001) % 5); puntos = antiguedad; porcentual = 0.014;
-                diasFaltantes = (15 - antiguedad) * 365 + 15;
+                diasFaltantes = (15 - antiguedad) * 365 + 15; indiceRango = 2;
             } else {
-                antiguedad = 16; puntos = 20; porcentual = 0.025; diasFaltantes = 0;
+                antiguedad = 16; puntos = 20; porcentual = 0.025; diasFaltantes = 0; indiceRango = 3;
             }
-            return { id: id, antiguedad: antiguedad, puntos: puntos, porcentual: porcentual, diasFaltantes: diasFaltantes };
+            return { id: id, nombre: nombre, antiguedad: antiguedad, puntos: puntos, porcentual: porcentual, diasFaltantes: diasFaltantes, indiceRango: indiceRango };
+        }
+
+        /* --- PASO 1: MOTOR DE CONTEO EXACTO SOCIO POR SOCIO --- */
+        function calcularPuntosRestantesEnJuegoExacto(keyEncuesta) {
+            var puntosFaltantesReales = 0;
+            for (var id = 1; id <= TOTAL_SOCIOS; id++) {
+                if (!registroVotosEmitidos[id + '_' + keyEncuesta]) {
+                    var d = obtenerDatosSocio(id);
+                    puntosFaltantesReales += d.puntos;
+                }
+            }
+            return puntosFaltantesReales;
         }
 
         function loguearSocioInterno(id) {
@@ -489,19 +516,21 @@
             document.getElementById('socioDashboard').style.display = 'flex';
             
             var d = obtenerDatosSocio(id);
-            // SCRIPT LIMPIO: Renderizado de datos informativos bloqueado restaurado
-            document.getElementById('lblSocioId').innerText = "#" + d.id;
+            document.getElementById('lblSocioId').innerText = "#" + d.id + " - " + d.nombre;
             document.getElementById('lblSocioAntiguedad').innerText = d.antiguedad + " AÑOS";
             document.getElementById('lblSocioPorcentual').innerText = d.porcentual.toFixed(3) + "% ASIGNADO DEL TOTAL";
             document.getElementById('lblSocioPuntos').innerText = d.puntos + " PUNTOS POR VOTO OBTENIDOS";
-            document.getElementById('lblSocioDiasFaltantes').innerText = d.diasFaltantes > 0 ? d.diasFaltantes + " DÍAS RESTANTES" : "MÁXIMO ESCALAFÓN DEL RANGO";
+            document.getElementById('lblSocioDiasFaltantes').innerText = d.diasFaltantes > 0 ? d.diasFaltantes + " DÍAS" : "MÁXIMO ESCALAFÓN ALCANZADO";
         }
 
         function loguearAdminInterno(idAdmin) {
             ID_SOCIO_ACTIVO = idAdmin; ROL_ACTIVO = 'admin';
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('adminDashboard').style.display = 'flex';
+            
+            var d = obtenerDatosSocio(idAdmin);
             document.getElementById('lblAdminSocioId').innerText = "#" + idAdmin;
+            document.getElementById('lblAdminNombreDirectivo').innerText = d.nombre; // Inyecta Agustín, Adrián o Román
         }
 
         function mostrarSeccionSocio(viewId) {
@@ -514,7 +543,7 @@
             document.getElementById('adminDashboard').style.display = 'none';
             document.getElementById(viewId).style.display = 'flex';
             if(viewId === 'secModificar') inicializarSelectorModificaciones();
-            if(viewId === 'secPorcentuales') renderizarListaPorcentualesAdmin();
+            if(viewId === 'secPorcentuales') inicializarSelectorPorcentualesAdmin();
         }
 
         function irAResultadosGenerales() {
@@ -546,7 +575,7 @@
             input.placeholder = 'Opción ' + letra;
             p.appendChild(input);
         }
-        /* --- SISTEMA OPERATIVO DE CONSULTAS CON PONDERACIÓN COMPLETA DE BARRAS --- */
+        /* --- SISTEMA OPERATIVO DE CONSULTAS CON MÉTRICAS DUALES --- */
         function inicializarSelectorVotaciones() {
             var cmb = document.getElementById('cmbEncuestasDisponibles'); cmb.innerHTML = '';
             Object.keys(baseEncuestas).forEach(function(k) {
@@ -583,17 +612,23 @@
             var idx = parseInt(seleccionado.value);
             var socioDatos = obtenerDatosSocio(ID_SOCIO_ACTIVO);
 
-            // CORRECCIÓN MATEMÁTICA: Sumamos los puntos de antigüedad directamente al casillero de la opción elegida
-            baseEncuestas[key].votos[idx] += socioDatos.puntos; 
-            baseEncuestas[key].totalSocios += 1; // Mantiene el contador simple de personas que participaron
-            baseEncuestas[key].puntosPonderados += socioDatos.puntos; // Total de puntos acumulados en la encuesta
+            if(!baseEncuestas[key].votosPuntos) baseEncuestas[key].votosPuntos = Array.of(0, 0, 0);
+            if(!baseEncuestas[key].votosPersonas) baseEncuestas[key].votosPersonas = Array.of(0, 0, 0);
+            if(!baseEncuestas[key].rangoParticipantes) baseEncuestas[key].rangoParticipantes = Array.of(0, 0, 0, 0);
+
+            baseEncuestas[key].votosPuntos[idx] += socioDatos.puntos;
+            baseEncuestas[key].votosPersonas[idx] += 1;
+            
+            baseEncuestas[key].totalSocios += 1;
+            baseEncuestas[key].puntosPonderados += socioDatos.puntos;
+            baseEncuestas[key].rangoParticipantes[socioDatos.indiceRango] += 1;
+
             registroVotosEmitidos[ID_SOCIO_ACTIVO + '_' + key] = true;
 
             guardarDatosEnMemoriaLocal();
-            alert('✓ Voto Ponderado Registrado. Aportaste ' + socioDatos.puntos + ' puntos a esta opción.');
+            alert('✓ Voto Ponderado Emitido. Aportaste ' + socioDatos.puntos + ' puntos a la opción elegida.');
             cargarOpcionesParaVotar();
         }
-
         function inicializarSelectorModificaciones() {
             var cmb = document.getElementById('cmbModificarSelect'); cmb.innerHTML = '';
             Object.keys(baseEncuestas).forEach(function(k) {
@@ -617,16 +652,18 @@
             var key = document.getElementById('cmbModificarSelect').value;
             var inputs = document.getElementById('containerCamposModificar').getElementsByClassName('opt-mod-field');
             
-            var nuevasOpciones = []; var nuevosVotosConteo = [];
+            var nuevasOpciones = []; var nuevosVotosTxt = []; var nuevosVotosPers = [];
             for(var i = 0; i < inputs.length; i++) {
                 var val = inputs[i].value.trim();
                 if(val !== "") {
                     nuevasOpciones.push(val);
-                    nuevosVotosConteo.push(baseEncuestas[key].votos[i] || 0);
+                    nuevosVotosTxt.push(baseEncuestas[key].votosPuntos[i] || 0);
+                    nuevosVotosPers.push(baseEncuestas[key].votosPersonas[i] || 0);
                 }
             }
             baseEncuestas[key].opts = nuevasOpciones;
-            baseEncuestas[key].votos = nuevosVotosConteo;
+            baseEncuestas[key].votosPuntos = nuevosVotosTxt;
+            baseEncuestas[key].votosPersonas = nuevosVotosPers;
             
             guardarDatosEnMemoriaLocal();
             alert('✓ Consulta y opciones guardadas con éxito.');
@@ -637,15 +674,15 @@
             var tit = document.getElementById('txtNuevaEncuestaTitulo').value.trim();
             var inputs = document.getElementById('containerCamposNuevos').getElementsByClassName('opt-nueva-input');
             
-            var opcionesCreadas = []; var votosCreados = [];
+            var opcionesCreadas = []; var ceros = [];
             for(var i = 0; i < inputs.length; i++) {
                 var val = inputs[i].value.trim();
-                if(val !== "") { opcionesCreadas.push(val); votosCreados.push(0); }
+                if(val !== "") { opcionesCreadas.push(val); ceros.push(0); }
             }
             if(!tit || opcionesCreadas.length < 2) { alert('Complete el título y al menos 2 opciones.'); return; }
             
             var nextId = 'enc_' + (Object.keys(baseEncuestas).length + 1);
-            baseEncuestas[nextId] = { titulo: tit, opts: opcionesCreadas, votos: votosCreados, totalSocios: 0, puntosPonderados: 0 };
+            baseEncuestas[nextId] = { titulo: tit, opts: opcionesCreadas, votosPuntos: ceros, votosPersonas: JSON.parse(JSON.stringify(ceros)), totalSocios: 0, puntosPonderados: 0, rangoParticipantes: Array.of(0, 0, 0, 0) };
             
             guardarDatosEnMemoriaLocal();
             alert('✓ Nueva consulta agregada.');
@@ -659,8 +696,7 @@
             });
             actualizarReporteGrafico();
         }
-
-        /* --- LOGICA DE RENDERIZADO CORREGIDA EN BASE A PUNTOS --- */
+        /* --- REPORTE GRÁFICO CON DENSIDAD DUAL (PASO 1 + VOTOS REALES) --- */
         function actualizarReporteGrafico() {
             var key = document.getElementById('cmbResultadosSelect').value;
             var item = baseEncuestas[key];
@@ -669,19 +705,17 @@
             var restantes = TOTAL_SOCIOS - item.totalSocios;
             document.getElementById('lblResRestantes').innerText = restantes;
             
-            // Puntos en juego: Calculamos el peso de ponderación máximo estimado restante
-            var puntosFaltantesEstimados = restantes * 4;
-            document.getElementById('lblResPuntosJuego').innerText = puntosFaltantesEstimados + " PTS";
+            var puntosFaltantesReales = calcularPuntosRestantesEnJuegoExacto(key);
+            document.getElementById('lblResPuntosJuego').innerText = puntosFaltantesReales.toLocaleString() + " PTS";
 
             var contenedor = document.getElementById('contenedorBarrasDinamicas');
             contenedor.innerHTML = '';
-
             var colores = Array.of('#002D62', '#d91a1a', '#ffc107', '#28a745', '#9333ea', '#06b6d4');
 
             item.opts.forEach(function(opcionTexto, i) {
-                var puntosDeEstaOpcion = item.votos[i] || 0;
+                var puntosDeEstaOpcion = item.votosPuntos ? (item.votosPuntos[i] || 0) : 0;
+                var personasDeEstaOpcion = item.votosPersonas ? (item.votosPersonas[i] || 0) : 0;
                 
-                // CORRECCIÓN CLAVE: El porcentaje de la barra se calcula sobre el total de puntos ponderados emitidos, no sobre personas
                 var porcentaje = item.puntosPonderados > 0 ? ((puntosDeEstaOpcion / item.puntosPonderados) * 100).toFixed(1) : "0.0";
                 var colorAsignado = colores[i % colores.length];
 
@@ -689,7 +723,7 @@
                 wrapper.className = 'barra-resultado-contenedor';
                 wrapper.innerHTML = 
                     '<div class="barra-resultado-texto">' +
-                        '<span>' + opcionTexto + '</span>' +
+                        '<span>' + opcionTexto + ' <span style="font-weight:normal; font-size:11px; color:#64748b;">(' + personasDeEstaOpcion + ' votos reales)</span></span>' +
                         '<span>' + puntosDeEstaOpcion + ' pts (' + porcentaje + '%)</span>' +
                     '</div>' +
                     '<div class="barra-resultado-fondo">' +
@@ -699,12 +733,43 @@
             });
         }
 
-        function renderizarListaPorcentualesAdmin() {
-            var div = document.getElementById('wrapperListaPorcentuales'); div.innerHTML = '';
+        function inicializarSelectorPorcentualesAdmin() {
+            var cmb = document.getElementById('cmbPorcentualesSelect'); cmb.innerHTML = '';
             Object.keys(baseEncuestas).forEach(function(k) {
-                var pct = ((baseEncuestas[k].totalSocios / TOTAL_SOCIOS) * 100).toFixed(2);
-                var row = document.createElement('div'); row.className = 'wf-box text-left';
-                row.innerHTML = '<span class="txt-info-red">' + baseEncuestas[k].titulo + ':</span><div style="font-size:16px; font-weight:800; margin-top:4px; color:#28a745;">' + pct + '% PARTICIPACIÓN GLOBAL</div>';
+                var option = document.createElement('option'); option.value = k; option.text = baseEncuestas[k].titulo; cmb.appendChild(option);
+            });
+            renderizarListaPorcentualesAdmin();
+        }
+
+        /* --- PASO 2: RENDERIZADO DEL TABLERO DE ESCALAFÓN DEL PADRÓN --- */
+        function renderizarListaPorcentualesAdmin() {
+            var key = document.getElementById('cmbPorcentualesSelect').value;
+            var item = baseEncuestas[key];
+            var div = document.getElementById('wrapperListaPorcentuales'); div.innerHTML = '';
+            
+            if (!item.rangoParticipantes) { item.rangoParticipantes = Array.of(0, 0, 0, 0); }
+
+            var nombresRangos = Array.of("Socios Nuevos (1-5 años de antigüedad - Peso: 60%)", "Socios Medios (5-10 años de antigüedad - Peso: 20%)", "Socios Antiguos (10-15 años de antigüedad - Peso: 10%)", "Socios Vitalicios (>15 años de antigüedad - Peso: 10%)");
+            var totalesPorRango = Array.of(6000, 2000, 1000, 1000);
+            var coloresRangos = Array.of('#0284c7', '#f59e0b', '#10b981', '#6366f1');
+
+            nombresRangos.forEach(function(nombre, i) {
+                var votaronEnEsteRango = item.rangoParticipantes[i] || 0;
+                var totalDeEsteRango = totalesPorRango[i];
+                var pctParticipacion = ((votaronEnEsteRango / totalDeEsteRango) * 100).toFixed(2);
+
+                var row = document.createElement('div');
+                row.className = 'wf-box text-left';
+                row.style.padding = '12px 16px';
+                row.innerHTML = 
+                    '<div class="barra-resultado-texto">' +
+                        '<span style="color:#0f172a; font-size:13px;">' + nombre + '</span>' +
+                        '<span class="mini-badge">' + votaronEnEsteRango + ' de ' + totalDeEsteRango + ' participaron</span>' +
+                    '</div>' +
+                    '<div style="font-size:16px; font-weight:800; margin: 4px 0 8px 0; color:' + coloresRangos[i] + ';">' + pctParticipacion + '% DE PARTICIPACIÓN</div>' +
+                    '<div class="barra-resultado-fondo" style="height:10px;">' +
+                        '<div class="barra-resultado-lleno" style="width: ' + pctParticipacion + '%; background-color: ' + coloresRangos[i] + ';"></div>' +
+                    '</div>';
                 div.appendChild(row);
             });
         }
