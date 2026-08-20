@@ -12,6 +12,7 @@
             padding: 0;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
+
         body {
             background-color: #f4f6f9;
             color: #1e293b;
@@ -21,6 +22,7 @@
             align-items: flex-start;
             min-height: 100vh;
         }
+
         .container {
             width: 100%;
             max-width: 950px;
@@ -29,6 +31,7 @@
             flex-direction: column;
             align-items: center;
         }
+
         /* --- CONTENEDORES Y CAJAS MODERNIZADAS --- */
         .wf-box {
             border: 2px solid #000000;
@@ -39,9 +42,11 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.04);
         }
+
         .full-width {
             width: 100%;
         }
+
         /* --- ELEMENTOS DE TEXTO EN ROJO INFORMATIVO --- */
         .txt-info-red {
             color: #d91a1a;
@@ -50,7 +55,8 @@
             font-size: 14px;
             letter-spacing: 0.5px;
         }
-        /* --- BOTONES DEL PANEL PRINCIPAL (FONDO ROJO, LETRAS AMARILLAS) --- */
+
+        /* --- BOTONES DEL PANEL PRINCIPAL --- */
         .btn-action-red {
             background-color: #d91a1a;
             color: #ffeb3b;
@@ -64,10 +70,12 @@
             font-size: 13px;
             letter-spacing: 0.5px;
         }
+
         .btn-action-red:hover {
             background-color: #b71515;
             transform: translateY(-1px);
         }
+
         /* --- BOTONES COMPLEMENTARIOS --- */
         .wf-button {
             width: 100%;
@@ -81,9 +89,11 @@
             border-radius: 6px;
             transition: all 0.2s;
         }
+
         .wf-button:hover {
             background-color: #001f42;
         }
+
         /* --- FORMULARIOS Y DISPOSICIÓN --- */
         .columns-container {
             display: flex;
@@ -91,11 +101,13 @@
             gap: 24px;
             margin-top: 10px;
         }
+
         .column {
             flex: 1;
             display: flex;
             flex-direction: column;
         }
+
         .wf-input {
             width: 100%;
             border: 2px solid #cbd5e1;
@@ -107,10 +119,12 @@
             outline: none;
             transition: border-color 0.2s;
         }
+
         .wf-input:focus {
             border-color: #002D62;
             background-color: #f8fafc;
         }
+
         /* --- ESTADOS BIOMÉTRICOS --- */
         .biometric-box {
             border: 2px dashed #94a3b8;
@@ -124,18 +138,22 @@
             font-weight: 600;
             transition: all 0.3s ease;
         }
+
         .accent-blue {
             background-color: #e0f2fe !important;
             color: #0369a1 !important;
             border-color: #0369a1 !important;
             border-style: solid !important;
         }
-        /* --- PANELES GENERALES (DASHBOARDS) --- */
-        .dashboard, .sub-view {
+
+        /* --- PANELES GENERALES --- */
+        .dashboard,
+        .sub-view {
             display: none;
             width: 100%;
             flex-direction: column;
         }
+
         .dashboard-header {
             display: flex;
             justify-content: space-between;
@@ -143,6 +161,7 @@
             width: 100%;
             margin-bottom: 20px;
         }
+
         .grid-metrics {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -150,9 +169,13 @@
             width: 100%;
             margin-bottom: 16px;
         }
+
         @media(max-width: 600px) {
-            .grid-metrics { grid-template-columns: 100%; }
+            .grid-metrics {
+                grid-template-columns: 100%;
+            }
         }
+
         .chart-wrapper {
             border: 2px solid #000000;
             background-color: #ffffff;
@@ -161,6 +184,7 @@
             margin-bottom: 16px;
             width: 100%;
         }
+
         .btn-secondary-dark {
             background-color: #475569;
             color: #ffffff;
@@ -173,13 +197,17 @@
             margin-bottom: 12px;
             text-transform: uppercase;
         }
-        .btn-secondary-dark:hover { background-color: #334155; }
-        
-        /* --- ESTILOS DE BARRAS DE PROGRESO NATIVAS --- */
+
+        .btn-secondary-dark:hover {
+            background-color: #334155;
+        }
+
+        /* --- ESTILOS DE BARRAS DE PROGRESO --- */
         .barra-resultado-contenedor {
             margin-bottom: 14px;
             text-align: left;
         }
+
         .barra-resultado-texto {
             font-size: 13px;
             font-weight: 700;
@@ -187,6 +215,7 @@
             justify-content: space-between;
             margin-bottom: 4px;
         }
+
         .barra-resultado-fondo {
             background-color: #e2e8f0;
             height: 16px;
@@ -194,18 +223,60 @@
             overflow: hidden;
             border: 1px solid #94a3b8;
         }
+
         .barra-resultado-lleno {
             height: 100%;
             width: 0%;
             transition: width 0.4s ease;
         }
+
+        /* --- HERRAMIENTAS DE MAQUETACIÓN --- */
+        .maquetacion-box {
+            border: 2px solid #d91a1a;
+            background-color: #fff7f7;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+
+        .maquetacion-title {
+            color: #d91a1a;
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .maquetacion-description {
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.5;
+            margin-bottom: 14px;
+        }
+
+        .reset-button {
+            background-color: #7f1d1d;
+            color: #ffffff;
+            border: 2px solid #000000;
+            padding: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .reset-button:hover {
+            background-color: #991b1b;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- --- PANTALLA DE BIENVENIDA (ACCESO PRINCIPAL) --- -->
+
+        <!-- --- PANTALLA DE BIENVENIDA --- -->
         <div id="loginScreen" class="full-width" style="display: flex; flex-direction: column; align-items: center;">
-            
+
             <!-- LOGO INTEGRADO ELEGANTE -->
             <svg id="logoTalleres" viewBox="0 0 400 400" style="width: 120px; height: 120px; margin-bottom: 15px;">
                 <path d="M200 40 L310 110 L310 240 C310 310 200 370 200 370 C200 370 90 310 90 240 L90 110 Z" fill="#002D62" stroke="#001f42" stroke-width="4"/>
@@ -214,500 +285,2312 @@
                 <text x="200" y="395" font-size="12" font-weight="800" fill="#002D62" text-anchor="middle" letter-spacing="1">TALLERES DIGITAL</text>
             </svg>
 
-            <div class="wf-box full-width" style="font-size: 18px; font-weight: 800; background-color: #002D62; color: #ffffff; border: none;">CLUB ABIERTO - CLUB ATLETICO TALLERES</div>
-            <div class="wf-box full-width" style="font-size: 14px; font-weight: 600; color: #475569; border-color: #cbd5e1;">POR UN TALLERES DEMOCRÁTICO Y DIGITAL</div>
+            <div class="wf-box full-width" style="font-size: 18px; font-weight: 800; background-color: #002D62; color: #ffffff; border: none;">
+                CLUB ABIERTO - CLUB ATLETICO TALLERES
+            </div>
+
+            <div class="wf-box full-width" style="font-size: 14px; font-weight: 600; color: #475569; border-color: #cbd5e1;">
+                POR UN TALLERES DEMOCRÁTICO Y DIGITAL
+            </div>
 
             <div class="columns-container">
+
                 <!-- ACCESO SOCIOS -->
                 <div class="column">
-                    <div class="wf-box" style="background-color: #0f172a; color: #ffffff; border: none; font-weight: 700;">PANEL DE SOCIOS ACTIVOS</div>
-                    <div class="wf-box" style="font-size: 12px; color: #475569;">N° de socios activos actualmente: <span style="font-size: 16px; font-weight: 700; color: #002D62; display: block; margin-top: 4px;">10.000</span></div>
-                    
+                    <div class="wf-box" style="background-color: #0f172a; color: #ffffff; border: none; font-weight: 700;">
+                        PANEL DE SOCIOS ACTIVOS
+                    </div>
+
+                    <div class="wf-box" style="font-size: 12px; color: #475569;">
+                        N° de socios activos actualmente:
+                        <span style="font-size: 16px; font-weight: 700; color: #002D62; display: block; margin-top: 4px;">
+                            10.000
+                        </span>
+                    </div>
+
                     <div class="wf-box" style="border-color: #cbd5e1;">
                         <input type="text" id="socioUser" class="wf-input" placeholder="N° de Socio (1 a 10000)">
                         <input type="password" id="socioPass" class="wf-input" placeholder="Contraseña">
-                        <button type="button" class="wf-button" onclick="procesarIngreso('socio')">Ingresar Socio</button>
+                        <button type="button" class="wf-button" onclick="procesarIngreso('socio')">
+                            Ingresar Socio
+                        </button>
                     </div>
-                    <div id="socioBioFace" class="biometric-box">cartel de validación biométrica</div>
-                    <div id="socioBioFinger" class="biometric-box">cartel de validación huella digital</div>
+
+                    <div id="socioBioFace" class="biometric-box">
+                        cartel de validación biométrica
+                    </div>
+
+                    <div id="socioBioFinger" class="biometric-box">
+                        cartel de validación huella digital
+                    </div>
                 </div>
 
                 <!-- ACCESO ADMINISTRADORES -->
                 <div class="column">
-                    <div class="wf-box" style="background-color: #334155; color: #ffffff; border: none; font-weight: 700;">PANEL DE ADMINISTRADORES</div>
-                    <div class="wf-box" style="font-size: 12px; color: #475569;">Cantidad de Administradores: <span style="font-size: 16px; font-weight: 700; color: #334155; display: block; margin-top: 4px;">3</span></div>
-                    
+                    <div class="wf-box" style="background-color: #334155; color: #ffffff; border: none; font-weight: 700;">
+                        PANEL DE ADMINISTRADORES
+                    </div>
+
+                    <div class="wf-box" style="font-size: 12px; color: #475569;">
+                        Cantidad de Administradores:
+                        <span style="font-size: 16px; font-weight: 700; color: #334155; display: block; margin-top: 4px;">
+                            3
+                        </span>
+                    </div>
+
                     <div class="wf-box" style="border-color: #cbd5e1;">
                         <input type="text" id="adminUser" class="wf-input" placeholder="Usuario / ID Socio Administrador">
                         <input type="password" id="adminPass" class="wf-input" placeholder="Contraseña">
-                        <button type="button" class="wf-button" style="background-color: #334155;" onclick="procesarIngreso('admin')">Ingresar Admin</button>
+
+                        <button type="button" class="wf-button" style="background-color: #334155;" onclick="procesarIngreso('admin')">
+                            Ingresar Admin
+                        </button>
                     </div>
-                    <div id="adminBioFace" class="biometric-box">cartel de validación biométrica</div>
-                    <div id="adminBioFinger" class="biometric-box">cartel de validación huella digital</div>
+
+                    <div id="adminBioFace" class="biometric-box">
+                        cartel de validación biométrica
+                    </div>
+
+                    <div id="adminBioFinger" class="biometric-box">
+                        cartel de validación huella digital
+                    </div>
                 </div>
             </div>
         </div>
-        <!-- --- PANTALLA INTERNA: PANEL DEL SOCIO --- -->
+                <!-- --- PANTALLA INTERNA: PANEL DEL SOCIO --- -->
         <div id="socioDashboard" class="dashboard full-width">
+
             <div class="dashboard-header">
-                <div class="wf-box" style="margin: 0; padding: 10px 20px; background-color: #002D62; color: #ffffff; border: none;">PANEL DE SOCIOS ACTIVOS</div>
-                <button class="wf-button" style="width: auto; margin: 0; background-color: #64748b;" onclick="volverAlLogin()">Salir</button>
+                <div class="wf-box" style="margin: 0; padding: 10px 20px; background-color: #002D62; color: #ffffff; border: none;">
+                    PANEL DE SOCIOS ACTIVOS
+                </div>
+
+                <button class="wf-button" style="width: auto; margin: 0; background-color: #64748b;" onclick="volverAlLogin()">
+                    Salir
+                </button>
             </div>
 
-            <!-- FILA SIMÉTRICA INFORMATIVA (LETRAS ROJAS) -->
+            <!-- DATOS DEL SOCIO -->
             <div class="grid-metrics">
-                <div class="wf-box text-left"><span class="txt-info-red">N° de Socio</span><div id="lblSocioId" style="font-size: 22px; font-weight: 800; margin-top: 4px;">-</div></div>
-                <div class="wf-box text-left"><span class="txt-info-red">Antigüedad del Socio</span><div id="lblSocioAntiguedad" style="font-size: 22px; font-weight: 800; margin-top: 4px;">-</div></div>
+
+                <div class="wf-box text-left">
+                    <span class="txt-info-red">N° de Socio</span>
+                    <div id="lblSocioId" style="font-size: 22px; font-weight: 800; margin-top: 4px;">
+                        -
+                    </div>
+                </div>
+
+                <div class="wf-box text-left">
+                    <span class="txt-info-red">Antigüedad del Socio</span>
+                    <div id="lblSocioAntiguedad" style="font-size: 22px; font-weight: 800; margin-top: 4px;">
+                        -
+                    </div>
+                </div>
+
+                <div class="wf-box text-left">
+                    <span class="txt-info-red">Nombre y Apellido</span>
+                    <div id="lblSocioNombre" style="font-size: 22px; font-weight: 800; margin-top: 4px;">
+                        -
+                    </div>
+                </div>
             </div>
 
-            <!-- BOTONES DE ACCIÓN (ROJO / AMARILLO) -->
+            <!-- BOTONES DE ACCIÓN -->
             <div class="grid-metrics">
-                <button class="btn-action-red" onclick="mostrarSeccionSocio('secVotaciones')">Votaciones Activas</button>
-                <button class="btn-action-red" onclick="irAResultadosGenerales()">Resultados de Votaciones Activas</button>
+                <button class="btn-action-red" onclick="mostrarSeccionSocio('secVotaciones')">
+                    Votaciones Activas
+                </button>
+
+                <button class="btn-action-red" onclick="irAResultadosGenerales()">
+                    Resultados de Votaciones Activas
+                </button>
             </div>
 
-            <!-- INFORMACIÓN TÉCNICA INFERIOR (LETRAS ROJAS) -->
-            <div class="wf-box text-left"><span class="txt-info-red">Porcentual de Votación Respecto al Total de Votaciones:</span><div id="lblSocioPorcentual" style="font-size: 16px; margin-top: 4px; color: #1e293b; font-weight: 700;">-</div></div>
-            <div class="wf-box text-left"><span class="txt-info-red">Cantidad de Puntos por Cada Voto en Base a la Antigüedad:</span><div id="lblSocioPuntos" style="font-size: 16px; margin-top: 4px; color: #1e293b; font-weight: 700;">-</div></div>
-            <div class="wf-box text-left"><span class="txt-info-red">Antigüedad que falta para tener mayor cantidad de puntos por voto (en días):</span><div id="lblSocioDiasFaltantes" style="font-size: 16px; margin-top: 4px; color: #1e293b; font-weight: 700;">-</div></div>
+            <!-- INFORMACIÓN TÉCNICA -->
+            <div class="wf-box text-left">
+                <span class="txt-info-red">
+                    Porcentual de Votación Respecto al Total de Votaciones:
+                </span>
+
+                <div id="lblSocioPorcentual" style="font-size: 16px; margin-top: 4px; color: #1e293b; font-weight: 700;">
+                    -
+                </div>
+            </div>
+
+            <div class="wf-box text-left">
+                <span class="txt-info-red">
+                    Cantidad de Puntos por Cada Voto en Base a la Antigüedad:
+                </span>
+
+                <div id="lblSocioPuntos" style="font-size: 16px; margin-top: 4px; color: #1e293b; font-weight: 700;">
+                    -
+                </div>
+            </div>
+
+            <div class="wf-box text-left">
+                <span class="txt-info-red">
+                    Antigüedad que falta para tener mayor cantidad de puntos por voto (en días):
+                </span>
+
+                <div id="lblSocioDiasFaltantes" style="font-size: 16px; margin-top: 4px; color: #1e293b; font-weight: 700;">
+                    -
+                </div>
+            </div>
         </div>
+
+
         <!-- --- PANTALLA INTERNA: PANEL DEL ADMINISTRADOR --- -->
         <div id="adminDashboard" class="dashboard full-width">
-            <div class="dashboard-header">
-                <div class="wf-box" style="margin: 0; padding: 10px 20px; background-color: #334155; color: #ffffff; border: none;">PANEL DE ADMINISTRADORES</div>
-                <button class="wf-button" style="width: auto; margin: 0; background-color: #64748b;" onclick="volverAlLogin()">Salir</button>
-            </div>
 
-            <!-- DATOS INFORMATIVOS SUPERIORES (LETRAS ROJAS) -->
-            <div class="grid-metrics">
-                <div class="wf-box text-left"><span class="txt-info-red">N° de Socio</span><div id="lblAdminSocioId" style="font-size: 18px; font-weight: 700; margin-top: 4px;">-</div></div>
-                <div class="wf-box text-left"><span class="txt-info-red">Antigüedad del Socio</span><div id="lblAdminAntiguedad" style="font-size: 18px; font-weight: 700; margin-top: 4px;">15 Años</div></div>
-                <div class="wf-box text-left"><span class="txt-info-red">Nombre y Apellido</span><div style="font-size: 18px; font-weight: 700; margin-top: 4px;">admclubabierto</div></div>
-                <div class="wf-box text-left"><span class="txt-info-red">Cargo que ocupa en el Club</span><div style="font-size: 18px; font-weight: 700; margin-top: 4px;">Administrador General</div></div>
-            </div>
-            <div class="wf-box full-width text-left" style="margin-bottom: 20px;"><span class="txt-info-red">Desde cuándo ocupa el Cargo</span><div style="font-size: 16px; font-weight: 700; margin-top: 4px; color: #1e293b;">01/01/2026</div></div>
-
-            <!-- CUADRÍCULA DE NAVEGACIÓN DE BOTONES (ROJO / AMARILLO) -->
-            <div class="grid-metrics">
-                <button class="btn-action-red" onclick="mostrarSeccionAdmin('secModificar')">Modificación de Encuestas</button>
-                <button class="btn-action-red" onclick="mostrarSeccionAdmin('secAgregar')">Agregar Nueva Encuesta</button>
-                <button class="btn-action-red" onclick="irAResultadosGenerales()">Resultado de Encuestas</button>
-                <button class="btn-action-red" onclick="mostrarSeccionAdmin('secPorcentuales')">% de Votación de Cada Encuesta</button>
-            </div>
-        </div>
-        <!-- --- VISTA INTERNA: VOTACIONES ACTIVAS (SOCIO) --- -->
-        <div id="secVotaciones" class="sub-view full-width">
             <div class="dashboard-header">
-                <div class="wf-box" style="margin:0; padding:10px; font-size:16px;">Votaciones Activas en la Plataforma</div>
-                <button class="wf-button" style="width:auto; margin:0; background-color:#64748b;" onclick="regresarAlPanelInterno()">Volver al Panel</button>
-            </div>
-            <div class="wf-box full-width" style="text-align: left;">
-                <label style="font-size: 13px; color: #64748b; display: block; margin-bottom: 8px;">SELECCIONE LA CONSULTA ELECTORAL:</label>
-                <select id="cmbEncuestasDisponibles" class="wf-input" style="text-align: left;" onchange="cargarOpcionesParaVotar()"></select>
-                
-                <div id="wrapperOpcionesVoto" style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;"></div>
-                <button id="btnEjecutarVoto" class="wf-button" style="margin-top: 15px; display: none;" onclick="registrarVotoSocio()">Emitir Voto Único Oficial</button>
-            </div>
-        </div>
-
-        <!-- --- VISTA INTERNA: AGREGAR NUEVA ENCUESTA (ADMIN DINÁMICA) --- -->
-        <div id="secAgregar" class="sub-view full-width">
-            <div class="dashboard-header">
-                <div class="wf-box" style="margin:0; padding:10px; font-size:16px;">Crear Nueva Consulta al Padrón</div>
-                <button class="wf-button" style="width:auto; margin:0;" onclick="regresarAlPanelInterno()">Volver</button>
-            </div>
-            <div class="wf-box full-width" style="text-align: left;">
-                <input type="text" id="txtNuevaEncuestaTitulo" class="wf-input" placeholder="Título (Ej: Selección de Ubicación para nuevo Estadio)" style="border-color:#002D62;">
-                
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <span style="font-size:13px; font-weight:700; color:#475569;">OPCIONES DE RESPUESTA DISPONIBLES:</span>
-                    <button type="button" class="btn-secondary-dark" onclick="agregarCampoEntradaOpcion('containerCamposNuevos')">+ Añadir Opción</button>
+                <div class="wf-box" style="margin: 0; padding: 10px 20px; background-color: #334155; color: #ffffff; border: none;">
+                    PANEL DE ADMINISTRADORES
                 </div>
-                
+
+                <button class="wf-button" style="width: auto; margin: 0; background-color: #64748b;" onclick="volverAlLogin()">
+                    Salir
+                </button>
+            </div>
+
+            <!-- DATOS INFORMATIVOS DEL ADMINISTRADOR -->
+            <div class="grid-metrics">
+
+                <div class="wf-box text-left">
+                    <span class="txt-info-red">N° de Socio</span>
+                    <div id="lblAdminSocioId" style="font-size: 18px; font-weight: 700; margin-top: 4px;">
+                        -
+                    </div>
+                </div>
+
+                <div class="wf-box text-left">
+                    <span class="txt-info-red">Antigüedad del Socio</span>
+                    <div id="lblAdminAntiguedad" style="font-size: 18px; font-weight: 700; margin-top: 4px;">
+                        -
+                    </div>
+                </div>
+
+                <div class="wf-box text-left">
+                    <span class="txt-info-red">Nombre y Apellido</span>
+                    <div id="lblAdminNombre" style="font-size: 18px; font-weight: 700; margin-top: 4px;">
+                        -
+                    </div>
+                </div>
+
+                <div class="wf-box text-left">
+                    <span class="txt-info-red">Cargo que ocupa en el Club</span>
+                    <div style="font-size: 18px; font-weight: 700; margin-top: 4px;">
+                        Administrador General
+                    </div>
+                </div>
+            </div>
+
+            <div class="wf-box full-width text-left" style="margin-bottom: 20px;">
+                <span class="txt-info-red">Desde cuándo ocupa el Cargo</span>
+
+                <div style="font-size: 16px; font-weight: 700; margin-top: 4px; color: #1e293b;">
+                    01/01/2026
+                </div>
+            </div>
+
+            <!-- CUADRÍCULA DE NAVEGACIÓN -->
+            <div class="grid-metrics">
+
+                <button class="btn-action-red" onclick="mostrarSeccionAdmin('secModificar')">
+                    Modificación de Encuestas
+                </button>
+
+                <button class="btn-action-red" onclick="mostrarSeccionAdmin('secAgregar')">
+                    Agregar Nueva Encuesta
+                </button>
+
+                <button class="btn-action-red" onclick="irAResultadosGenerales()">
+                    Resultado de Encuestas
+                </button>
+
+                <button class="btn-action-red" onclick="mostrarSeccionAdmin('secPorcentuales')">
+                    % de Votación de Cada Encuesta
+                </button>
+            </div>
+
+            <!-- HERRAMIENTAS DE MAQUETACIÓN -->
+            <div class="maquetacion-box full-width">
+
+                <div class="maquetacion-title">
+                    ⚠ Herramientas de Maquetación
+                </div>
+
+                <div class="maquetacion-description">
+                    Estas herramientas existen exclusivamente para realizar pruebas
+                    durante el desarrollo de la plataforma.
+                    <br><br>
+                    Permiten reiniciar una encuesta individual o todas las encuestas
+                    y eliminar los registros de voto correspondientes.
+                    <br><br>
+                    <strong>Estas funciones serán eliminadas en la versión definitiva
+                    basada en blockchain.</strong>
+                </div>
+
+                <label style="font-size: 13px; color: #64748b; display: block; margin-bottom: 6px; font-weight: 700;">
+                    SELECCIONAR ENCUESTA A RESETEAR:
+                </label>
+
+                <select id="cmbResetEncuesta" class="wf-input" style="text-align: left;">
+                </select>
+
+                <div class="grid-metrics" style="margin-bottom: 0;">
+
+                    <button
+                        type="button"
+                        class="btn-action-red"
+                        onclick="resetearEncuestaSeleccionada()">
+                        Resetear Encuesta Seleccionada
+                    </button>
+
+                    <button
+                        type="button"
+                        class="reset-button"
+                        onclick="resetearTodasLasEncuestas()">
+                        Resetear TODAS las Encuestas
+                    </button>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- --- VISTA INTERNA: VOTACIONES ACTIVAS --- -->
+        <div id="secVotaciones" class="sub-view full-width">
+
+            <div class="dashboard-header">
+                <div class="wf-box" style="margin:0; padding:10px; font-size:16px;">
+                    Votaciones Activas en la Plataforma
+                </div>
+
+                <button class="wf-button" style="width:auto; margin:0; background-color:#64748b;" onclick="regresarAlPanelInterno()">
+                    Volver al Panel
+                </button>
+            </div>
+
+            <div class="wf-box full-width" style="text-align: left;">
+
+                <label style="font-size: 13px; color: #64748b; display: block; margin-bottom: 8px;">
+                    SELECCIONE LA CONSULTA ELECTORAL:
+                </label>
+
+                <select id="cmbEncuestasDisponibles" class="wf-input" style="text-align: left;" onchange="cargarOpcionesParaVotar()">
+                </select>
+
+                <div id="wrapperOpcionesVoto" style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;">
+                </div>
+
+                <button
+                    id="btnEjecutarVoto"
+                    class="wf-button"
+                    style="margin-top: 15px; display: none;"
+                    onclick="registrarVotoSocio()">
+                    Emitir Voto Único Oficial
+                </button>
+
+            </div>
+        </div>
+                <!-- --- VISTA INTERNA: AGREGAR NUEVA ENCUESTA --- -->
+        <div id="secAgregar" class="sub-view full-width">
+
+            <div class="dashboard-header">
+                <div class="wf-box" style="margin:0; padding:10px; font-size:16px;">
+                    Crear Nueva Consulta al Padrón
+                </div>
+
+                <button class="wf-button" style="width:auto; margin:0;" onclick="regresarAlPanelInterno()">
+                    Volver
+                </button>
+            </div>
+
+            <div class="wf-box full-width" style="text-align: left;">
+
+                <input
+                    type="text"
+                    id="txtNuevaEncuestaTitulo"
+                    class="wf-input"
+                    placeholder="Título (Ej: Selección de Ubicación para nuevo Estadio)"
+                    style="border-color:#002D62;">
+
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+
+                    <span style="font-size:13px; font-weight:700; color:#475569;">
+                        OPCIONES DE RESPUESTA DISPONIBLES:
+                    </span>
+
+                    <button
+                        type="button"
+                        class="btn-secondary-dark"
+                        onclick="agregarCampoEntradaOpcion('containerCamposNuevos')">
+                        + Añadir Opción
+                    </button>
+
+                </div>
+
                 <div id="containerCamposNuevos" style="display:flex; flex-direction:column;">
+
                     <input type="text" class="wf-input opt-nueva-input" placeholder="Opción A">
                     <input type="text" class="wf-input opt-nueva-input" placeholder="Opción B">
                     <input type="text" class="wf-input opt-nueva-input" placeholder="Opción C">
+
                 </div>
-                <button class="wf-button" onclick="guardarNuevaEncuestaAdmin()">Publicar Consulta en Padrón</button>
+
+                <button class="wf-button" onclick="guardarNuevaEncuestaAdmin()">
+                    Publicar Consulta en Padrón
+                </button>
+
             </div>
         </div>
-        <!-- --- VISTA INTERNA: MODIFICAR ENCUESTA CONTINUA (ADMIN) --- -->
+
+
+        <!-- --- VISTA INTERNA: MODIFICAR ENCUESTA --- -->
         <div id="secModificar" class="sub-view full-width">
+
             <div class="dashboard-header">
-                <div class="wf-box" style="margin:0; padding:10px; font-size:16px;">Modificación y Enmienda de Opciones</div>
-                <button class="wf-button" style="width:auto; margin:0;" onclick="regresarAlPanelInterno()">Volver</button>
+
+                <div class="wf-box" style="margin:0; padding:10px; font-size:16px;">
+                    Modificación y Enmienda de Opciones
+                </div>
+
+                <button class="wf-button" style="width:auto; margin:0;" onclick="regresarAlPanelInterno()">
+                    Volver
+                </button>
+
             </div>
+
             <div class="wf-box full-width" style="text-align: left;">
-                <label style="font-size: 13px; color: #64748b; display: block; margin-bottom: 6px;">SELECCIONAL ENCUESTA A MODIFICAR:</label>
-                <select id="cmbModificarSelect" class="wf-input" onchange="cargarCamposModificar()"></select>
-                
+
+                <label style="font-size: 13px; color: #64748b; display: block; margin-bottom: 6px;">
+                    SELECCIONE ENCUESTA A MODIFICAR:
+                </label>
+
+                <select id="cmbModificarSelect" class="wf-input" onchange="cargarCamposModificar()">
+                </select>
+
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <span style="font-size:13px; font-weight:700; color:#475569;">EDITAR O AGREGAR OPCIONES DE RESPUESTA:</span>
-                    <button type="button" class="btn-secondary-dark" onclick="agregarCampoEntradaOpcion('containerCamposModificar')">+ Añadir Opción</button>
+
+                    <span style="font-size:13px; font-weight:700; color:#475569;">
+                        EDITAR O AGREGAR OPCIONES DE RESPUESTA:
+                    </span>
+
+                    <button
+                        type="button"
+                        class="btn-secondary-dark"
+                        onclick="agregarCampoEntradaOpcion('containerCamposModificar')">
+                        + Añadir Opción
+                    </button>
+
                 </div>
 
-                <div id="containerCamposModificar" style="display:flex; flex-direction:column;"></div>
-                <button class="wf-button" style="background-color:#28a745;" onclick="guardarModificacionAdmin()">Guardar Cambios de Consulta</button>
+                <div id="containerCamposModificar" style="display:flex; flex-direction:column;">
+                </div>
+
+                <button
+                    class="wf-button"
+                    style="background-color:#28a745;"
+                    onclick="guardarModificacionAdmin()">
+                    Guardar Cambios de Consulta
+                </button>
+
             </div>
         </div>
 
-        <!-- --- VISTA INTERNA: RESULTADOS REEMPLAZADOS CON PANEL DE PROGRESO INMUNE A CAÍDAS --- -->
+
+        <!-- --- VISTA INTERNA: RESULTADOS --- -->
         <div id="secResultados" class="sub-view full-width">
+
             <div class="dashboard-header">
-                <div class="wf-box" style="margin:0; padding:10px; font-size:16px;">Auditoría General de Escrutinio y Ponderación</div>
-                <button class="wf-button" style="width:auto; margin:0; background-color: #64748b;" onclick="regresarAlPanelInterno()">Volver</button>
+
+                <div class="wf-box" style="margin:0; padding:10px; font-size:16px;">
+                    Auditoría General de Escrutinio y Ponderación
+                </div>
+
+                <button
+                    class="wf-button"
+                    style="width:auto; margin:0; background-color: #64748b;"
+                    onclick="regresarAlPanelInterno()">
+                    Volver
+                </button>
+
             </div>
+
             <div class="wf-box full-width" style="text-align: left;">
-                <label style="font-size: 13px; color: #64748b; display: block; margin-bottom: 6px;">SELECCIONAL ENCUESTA ACTIVA:</label>
-                <select id="cmbResultadosSelect" class="wf-input" onchange="actualizarReporteGrafico()"></select>
+
+                <label style="font-size: 13px; color: #64748b; display: block; margin-bottom: 6px;">
+                    SELECCIONE ENCUESTA ACTIVA:
+                </label>
+
+                <select
+                    id="cmbResultadosSelect"
+                    class="wf-input"
+                    onchange="actualizarReporteGrafico()">
+                </select>
+
             </div>
-            
+
             <div class="grid-metrics">
-                <!-- CONTENEDOR INTEGRAL DE BARRAS DE PROGRESO INTERACTIVAS -->
+
+                <!-- GRÁFICO -->
                 <div class="chart-wrapper" style="margin-bottom: 0; min-height: 260px;">
-                    <div style="font-size: 14px; font-weight: 700; margin-bottom: 16px; text-transform: uppercase; color: #002D62;">Tendencia de Votos Ponderados (Gráfico de Avance)</div>
-                    <div id="contenedorBarrasDinamicas" style="display: flex; flex-direction: column; gap: 4px;">
-                        <!-- Se inyecta dinámicamente vía JS -->
+
+                    <div style="font-size: 14px; font-weight: 700; margin-bottom: 16px; text-transform: uppercase; color: #002D62;">
+                        Tendencia de Votos Ponderados (Gráfico de Avance)
                     </div>
+
+                    <div
+                        id="contenedorBarrasDinamicas"
+                        style="display: flex; flex-direction: column; gap: 4px;">
+                    </div>
+
                 </div>
-                <div class="wf-box text-left" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: center; gap: 12px;">
-                    <div><span class="txt-info-red">Socios Participantes:</span><div id="lblResTotalVotos" style="font-size: 20px; font-weight: 800;">0</div></div>
-                    <div><span class="txt-info-red">Socios Restantes por Votar:</span><div id="lblResRestantes" style="font-size: 20px; font-weight: 800;">0</div></div>
-                    <div><span class="txt-info-red">Puntos de Ponderación en Juego:</span><div id="lblResPuntosJuego" style="font-size: 20px; font-weight: 800; color: #28a745;">0 pts</div></div>
+
+
+                <!-- INFORMACIÓN DE VOTOS -->
+                <div
+                    class="wf-box text-left"
+                    style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: center; gap: 12px;">
+
+                    <div>
+                        <span class="txt-info-red">
+                            Socios Participantes:
+                        </span>
+
+                        <div id="lblResTotalVotos" style="font-size: 20px; font-weight: 800;">
+                            0
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="txt-info-red">
+                            Votos Restantes Exactos:
+                        </span>
+
+                        <div id="lblResRestantes" style="font-size: 20px; font-weight: 800;">
+                            0
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="txt-info-red">
+                            Puntos de Ponderación Restantes Exactos:
+                        </span>
+
+                        <div id="lblResPuntosJuego" style="font-size: 20px; font-weight: 800; color: #28a745;">
+                            0 pts
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
 
-        <!-- --- VISTA INTERNA: % DE VOTACIÓN DE CADA ENCUESTA --- -->
+
+        <!-- --- VISTA INTERNA: % DE VOTACIÓN --- -->
         <div id="secPorcentuales" class="sub-view full-width">
+
             <div class="dashboard-header">
-                <div class="wf-box" style="margin:0; padding:10px; font-size:16px;">% Resumen de Participación Global</div>
-                <button class="wf-button" style="width:auto; margin:0;" onclick="regresarAlPanelInterno()">Volver</button>
+
+                <div class="wf-box" style="margin:0; padding:10px; font-size:16px;">
+                    % Resumen de Participación Global
+                </div>
+
+                <button class="wf-button" style="width:auto; margin:0;" onclick="regresarAlPanelInterno()">
+                    Volver
+                </button>
+
             </div>
-            <div id="wrapperListaPorcentuales" style="display: flex; flex-direction: column; gap: 12px; width: 100%;"></div>
+
+            <div
+                id="wrapperListaPorcentuales"
+                style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
+            </div>
+
         </div>
-    </div> <!-- Fin container -->
-    <script>
-        /* --- CORE DE NEGOCIO CORREGIDO SIN CARACTERES VACÍOS --- */
+
+    </div>
+        <script>
+
+        /* =========================================================
+           CORE DE NEGOCIO
+           ========================================================= */
+
         var TOTAL_SOCIOS = 10000;
+
         var ID_SOCIO_ACTIVO = 0;
-        var ROL_ACTIVO = ''; 
 
-        // bypass seguro sin corchetes libres
-        var adminFijos = Array.of(10000, 9000, 8000);
+        var ROL_ACTIVO = '';
 
-        var encuestasInicialesLimpias = {
-            enc_1: { titulo: "Elección de Jugador Destacado (Fichaje/Premio)", opts: Array.of("Opción A - Santos Valoyes", "Opción B - Bruno Zapelli", "Opción C - Ramón Sosa"), votos: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0 },
-            enc_2: { titulo: "Elección de Director Técnico (Próximo Ciclo)", opts: Array.of("Opción A - Alexander Medina", "Opción B - Walter Ribonetto", "Opción C - Gabriel Heinze"), votos: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0 },
-            enc_3: { titulo: "Modelo de Camiseta Oficial (Diseño Alternativo)", opts: Array.of("Opción A - Azul Tradicional", "Opción B - Prematch Tecnológica", "Opción C - Blanca Minimalista"), votos: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0 },
-            enc_4: { titulo: "Marca de Indumentaria Técnica (Sponsor Técnico)", opts: Array.of("Opción A - Givova Premium", "Opción B - Adidas Performance", "Opción C - Puma Cat"), votos: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0 },
-            enc_5: { titulo: "Main Sponsor (Patrocinador Principal en Pecho)", opts: Array.of("Opción A - ICBC Corporativo", "Opción B - Betsson Sports", "Opción C - Flybondi Líneas Aéreas"), votos: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0 }
+        /*
+         * Los únicos administradores habilitados actualmente
+         * son también socios del padrón.
+         */
+        var adminFijos = Array.of(
+            8000,
+            9000,
+            10000
+        );
+
+        /*
+         * Identidad de los tres administradores.
+         *
+         * Estos nombres se mostrarán tanto si ingresan
+         * por el panel de socio como por el panel admin.
+         */
+        var adminNombres = {
+            8000: "Román Huespe",
+            9000: "Adrian Gruppi",
+            10000: "Agustin Supicciatti"
         };
 
+
+        /* =========================================================
+           ENCUESTAS INICIALES
+           ========================================================= */
+
+        var encuestasInicialesLimpias = {
+
+            enc_1: {
+                titulo: "Elección de Jugador Destacado (Fichaje/Premio)",
+                opts: Array.of(
+                    "Opción A - Santos Valoyes",
+                    "Opción B - Bruno Zapelli",
+                    "Opción C - Ramón Sosa"
+                ),
+                votos: Array.of(0, 0, 0),
+                totalSocios: 0,
+                puntosPonderados: 0
+            },
+
+            enc_2: {
+                titulo: "Elección de Director Técnico (Próximo Ciclo)",
+                opts: Array.of(
+                    "Opción A - Alexander Medina",
+                    "Opción B - Walter Ribonetto",
+                    "Opción C - Gabriel Heinze"
+                ),
+                votos: Array.of(0, 0, 0),
+                totalSocios: 0,
+                puntosPonderados: 0
+            },
+
+            enc_3: {
+                titulo: "Modelo de Camiseta Oficial (Diseño Alternativo)",
+                opts: Array.of(
+                    "Opción A - Azul Tradicional",
+                    "Opción B - Prematch Tecnológica",
+                    "Opción C - Blanca Minimalista"
+                ),
+                votos: Array.of(0, 0, 0),
+                totalSocios: 0,
+                puntosPonderados: 0
+            },
+
+            enc_4: {
+                titulo: "Marca de Indumentaria Técnica (Sponsor Técnico)",
+                opts: Array.of(
+                    "Opción A - Givova Premium",
+                    "Opción B - Adidas Performance",
+                    "Opción C - Puma Cat"
+                ),
+                votos: Array.of(0, 0, 0),
+                totalSocios: 0,
+                puntosPonderados: 0
+            },
+
+            enc_5: {
+                titulo: "Main Sponsor (Patrocinador Principal en Pecho)",
+                opts: Array.of(
+                    "Opción A - ICBC Corporativo",
+                    "Opción B - Betsson Sports",
+                    "Opción C - Flybondi Líneas Aéreas"
+                ),
+                votos: Array.of(0, 0, 0),
+                totalSocios: 0,
+                puntosPonderados: 0
+            }
+        };
+
+
+        /* =========================================================
+           PERSISTENCIA LOCAL PARA MAQUETACIÓN
+           ========================================================= */
+
         if (!localStorage.getItem('TD_baseEncuestas')) {
-            localStorage.setItem('TD_baseEncuestas', JSON.stringify(encuestasInicialesLimpias));
-        }
-        if (!localStorage.getItem('TD_registroVotos')) {
-            localStorage.setItem('TD_registroVotos', JSON.stringify({}));
+
+            localStorage.setItem(
+                'TD_baseEncuestas',
+                JSON.stringify(encuestasInicialesLimpias)
+            );
         }
 
-        var baseEncuestas = JSON.parse(localStorage.getItem('TD_baseEncuestas'));
-        var registroVotosEmitidos = JSON.parse(localStorage.getItem('TD_registroVotos'));
+        if (!localStorage.getItem('TD_registroVotos')) {
+
+            localStorage.setItem(
+                'TD_registroVotos',
+                JSON.stringify({})
+            );
+        }
+
+
+        var baseEncuestas =
+            JSON.parse(
+                localStorage.getItem('TD_baseEncuestas')
+            );
+
+        var registroVotosEmitidos =
+            JSON.parse(
+                localStorage.getItem('TD_registroVotos')
+            );
+
 
         function guardarDatosEnMemoriaLocal() {
-            localStorage.setItem('TD_baseEncuestas', JSON.stringify(baseEncuestas));
-            localStorage.setItem('TD_registroVotos', JSON.stringify(registroVotosEmitidos));
+
+            localStorage.setItem(
+                'TD_baseEncuestas',
+                JSON.stringify(baseEncuestas)
+            );
+
+            localStorage.setItem(
+                'TD_registroVotos',
+                JSON.stringify(registroVotosEmitidos)
+            );
         }
 
-        /* --- CONTROL DE INGRESO BIOMÉTRICO --- */
+
+        /* =========================================================
+           CONTROL DE INGRESO
+           ========================================================= */
+
         function procesarIngreso(tipo) {
-            var userSocio = document.getElementById('socioUser').value.trim();
-            var passSocio = document.getElementById('socioPass').value;
-            var userAdmin = document.getElementById('adminUser').value.trim();
-            var passAdmin = document.getElementById('adminPass').value;
 
-            var faceBox = document.getElementById(tipo === 'socio' ? 'socioBioFace' : 'adminBioFace');
-            var fingerBox = document.getElementById(tipo === 'socio' ? 'socioBioFinger' : 'adminBioFinger');
+            var userSocio =
+                document.getElementById('socioUser').value.trim();
 
-            document.querySelectorAll('.biometric-box').forEach(function(b) {
-                b.classList.remove('accent-blue');
-                b.innerText = b.id.includes('Face') ? 'cartel de validación biométrica' : 'cartel de validación huella digital';
-            });
+            var passSocio =
+                document.getElementById('socioPass').value;
+
+            var userAdmin =
+                document.getElementById('adminUser').value.trim();
+
+            var passAdmin =
+                document.getElementById('adminPass').value;
+
+            var faceBox =
+                document.getElementById(
+                    tipo === 'socio'
+                        ? 'socioBioFace'
+                        : 'adminBioFace'
+                );
+
+            var fingerBox =
+                document.getElementById(
+                    tipo === 'socio'
+                        ? 'socioBioFinger'
+                        : 'adminBioFinger'
+                );
+
+
+            document
+                .querySelectorAll('.biometric-box')
+                .forEach(function(b) {
+
+                    b.classList.remove('accent-blue');
+
+                    b.innerText =
+                        b.id.includes('Face')
+                            ? 'cartel de validación biométrica'
+                            : 'cartel de validación huella digital';
+                });
+
 
             if (tipo === 'socio') {
+
                 var id = parseInt(userSocio);
-                if (isNaN(id) || id < 1 || id > TOTAL_SOCIOS || passSocio !== '1913') {
-                    alert('Acceso Denegado: ID fuera del padrón (1-10000) o clave incorrecta.');
+
+                if (
+                    isNaN(id) ||
+                    id < 1 ||
+                    id > TOTAL_SOCIOS ||
+                    passSocio !== '1913'
+                ) {
+
+                    alert(
+                        'Acceso Denegado: ID fuera del padrón (1-10000) o clave incorrecta.'
+                    );
+
                     return;
                 }
-                ejecutarAnimacion(faceBox, fingerBox, function() { loguearSocioInterno(id); });
+
+                ejecutarAnimacion(
+                    faceBox,
+                    fingerBox,
+                    function() {
+                        loguearSocioInterno(id);
+                    }
+                );
+
             } else {
+
                 var idAdmin = parseInt(userAdmin);
-                if (isNaN(idAdmin) || !adminFijos.includes(idAdmin) || passAdmin !== '1913') {
-                    alert('Acceso Denegado: Para ser administrador ingrese ID válido (10000, 9000 u 8000) y clave 1913.');
+
+                if (
+                    isNaN(idAdmin) ||
+                    !adminFijos.includes(idAdmin) ||
+                    passAdmin !== '1913'
+                ) {
+
+                    alert(
+                        'Acceso Denegado: Para ser administrador ingrese ID válido (10000, 9000 u 8000) y clave 1913.'
+                    );
+
                     return;
                 }
-                ejecutarAnimacion(faceBox, fingerBox, function() { loguearAdminInterno(idAdmin); });
+
+                ejecutarAnimacion(
+                    faceBox,
+                    fingerBox,
+                    function() {
+                        loguearAdminInterno(idAdmin);
+                    }
+                );
             }
         }
+                    /* =========================================================
+           ANIMACIÓN BIOMÉTRICA DE MAQUETACIÓN
+           ========================================================= */
 
         function ejecutarAnimacion(face, finger, callback) {
+
             face.classList.add('accent-blue');
-            face.innerText = "ESCANEANDO ROSTRO... RECONOCIENDO EXPRESIONES VIVAS";
+
+            face.innerText =
+                "ESCANEANDO ROSTRO... RECONOCIENDO EXPRESIONES VIVAS";
+
             setTimeout(function() {
-                face.innerText = "✓ VALIDACIÓN BIOMÉTRICA COMPLETADA";
+
+                face.innerText =
+                    "✓ VALIDACIÓN BIOMÉTRICA COMPLETADA";
+
                 finger.classList.add('accent-blue');
-                finger.innerText = "ESCANEANDO HUELLA... DETECTANDO PULSO DACTILAR";
+
+                finger.innerText =
+                    "ESCANEANDO HUELLA... DETECTANDO PULSO DACTILAR";
+
                 setTimeout(function() {
-                    finger.innerText = "✓ VALIDACIÓN DE HUELLA DIGITAL COMPLETADA";
-                    setTimeout(callback, 500);
+
+                    finger.innerText =
+                        "✓ VALIDACIÓN DE HUELLA DIGITAL COMPLETADA";
+
+                    setTimeout(
+                        callback,
+                        500
+                    );
+
                 }, 900);
+
             }, 1000);
         }
-        /* --- REGLAS MATEMÁTICAS EXACTAS DEL PADRÓN --- */
+
+
+        /* =========================================================
+           REGLAS MATEMÁTICAS EXACTAS DEL PADRÓN
+           ========================================================= */
+
         function obtenerDatosSocio(id) {
-            var antiguedad = 0; var puntos = 0; var porcentual = 0; var diasFaltantes = 0;
+
+            var antiguedad = 0;
+
+            var puntos = 0;
+
+            var porcentual = 0;
+
+            var diasFaltantes = 0;
+
+
             if (id <= 6000) {
-                antiguedad = 1 + ((id - 1) % 5); puntos = antiguedad; porcentual = 0.006;
-                diasFaltantes = (5 - antiguedad) * 365 + 120;
+
+                antiguedad =
+                    1 + ((id - 1) % 5);
+
+                puntos =
+                    antiguedad;
+
+                porcentual =
+                    0.006;
+
+                diasFaltantes =
+                    (5 - antiguedad) * 365 + 120;
+
+
             } else if (id <= 8000) {
-                antiguedad = 5 + ((id - 6001) % 5); puntos = antiguedad; porcentual = 0.010;
-                diasFaltantes = (10 - antiguedad) * 365 + 45;
+
+                antiguedad =
+                    5 + ((id - 6001) % 5);
+
+                puntos =
+                    antiguedad;
+
+                porcentual =
+                    0.010;
+
+                diasFaltantes =
+                    (10 - antiguedad) * 365 + 45;
+
+
             } else if (id <= 9000) {
-                antiguedad = 10 + ((id - 8001) % 5); puntos = antiguedad; porcentual = 0.014;
-                diasFaltantes = (15 - antiguedad) * 365 + 15;
+
+                antiguedad =
+                    10 + ((id - 8001) % 5);
+
+                puntos =
+                    antiguedad;
+
+                porcentual =
+                    0.014;
+
+                diasFaltantes =
+                    (15 - antiguedad) * 365 + 15;
+
+
             } else {
-                antiguedad = 16; puntos = 20; porcentual = 0.025; diasFaltantes = 0;
+
+                antiguedad =
+                    16;
+
+                puntos =
+                    20;
+
+                porcentual =
+                    0.025;
+
+                diasFaltantes =
+                    0;
             }
-            return { id: id, antiguedad: antiguedad, puntos: puntos, porcentual: porcentual, diasFaltantes: diasFaltantes };
+
+
+            return {
+                id: id,
+                antiguedad: antiguedad,
+                puntos: puntos,
+                porcentual: porcentual,
+                diasFaltantes: diasFaltantes
+            };
         }
+
+
+        /* =========================================================
+           INGRESO DEL SOCIO
+           ========================================================= */
 
         function loguearSocioInterno(id) {
-            ID_SOCIO_ACTIVO = id; ROL_ACTIVO = 'socio';
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('socioDashboard').style.display = 'flex';
-            
-            var d = obtenerDatosSocio(id);
-            // SCRIPT LIMPIO: Renderizado de datos informativos bloqueado restaurado
-            document.getElementById('lblSocioId').innerText = "#" + d.id;
-            document.getElementById('lblSocioAntiguedad').innerText = d.antiguedad + " AÑOS";
-            document.getElementById('lblSocioPorcentual').innerText = d.porcentual.toFixed(3) + "% ASIGNADO DEL TOTAL";
-            document.getElementById('lblSocioPuntos').innerText = d.puntos + " PUNTOS POR VOTO OBTENIDOS";
-            document.getElementById('lblSocioDiasFaltantes').innerText = d.diasFaltantes > 0 ? d.diasFaltantes + " DÍAS RESTANTES" : "MÁXIMO ESCALAFÓN DEL RANGO";
+
+            ID_SOCIO_ACTIVO =
+                id;
+
+            ROL_ACTIVO =
+                'socio';
+
+
+            document.getElementById('loginScreen').style.display =
+                'none';
+
+            document.getElementById('socioDashboard').style.display =
+                'flex';
+
+
+            var d =
+                obtenerDatosSocio(id);
+
+
+            document.getElementById('lblSocioId').innerText =
+                "#" + d.id;
+
+            document.getElementById('lblSocioAntiguedad').innerText =
+                d.antiguedad + " AÑOS";
+
+
+            /*
+             * Los administradores también pueden ingresar
+             * como socios. En ese caso se muestra su nombre.
+             */
+            document.getElementById('lblSocioNombre').innerText =
+                adminNombres[id] || "Nombre no informado";
+
+
+            document.getElementById('lblSocioPorcentual').innerText =
+                d.porcentual.toFixed(3) +
+                "% ASIGNADO DEL TOTAL";
+
+            document.getElementById('lblSocioPuntos').innerText =
+                d.puntos +
+                " PUNTOS POR VOTO OBTENIDOS";
+
+            document.getElementById('lblSocioDiasFaltantes').innerText =
+                d.diasFaltantes > 0
+                    ? d.diasFaltantes + " DÍAS RESTANTES"
+                    : "MÁXIMO ESCALAFÓN DEL RANGO";
         }
+
+
+        /* =========================================================
+           INGRESO DEL ADMINISTRADOR
+           ========================================================= */
 
         function loguearAdminInterno(idAdmin) {
-            ID_SOCIO_ACTIVO = idAdmin; ROL_ACTIVO = 'admin';
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('adminDashboard').style.display = 'flex';
-            document.getElementById('lblAdminSocioId').innerText = "#" + idAdmin;
+
+            ID_SOCIO_ACTIVO =
+                idAdmin;
+
+            ROL_ACTIVO =
+                'admin';
+
+
+            document.getElementById('loginScreen').style.display =
+                'none';
+
+            document.getElementById('adminDashboard').style.display =
+                'flex';
+
+
+            var d =
+                obtenerDatosSocio(idAdmin);
+
+
+            document.getElementById('lblAdminSocioId').innerText =
+                "#" + idAdmin;
+
+            document.getElementById('lblAdminAntiguedad').innerText =
+                d.antiguedad + " AÑOS";
+
+            document.getElementById('lblAdminNombre').innerText =
+                adminNombres[idAdmin] || "Nombre no informado";
+
+
+            /*
+             * Cada vez que entra un administrador,
+             * actualizamos el selector de reset.
+             */
+            inicializarSelectorReset();
         }
+
+
+        /* =========================================================
+           NAVEGACIÓN
+           ========================================================= */
 
         function mostrarSeccionSocio(viewId) {
-            document.getElementById('socioDashboard').style.display = 'none';
-            document.getElementById(viewId).style.display = 'flex';
-            if(viewId === 'secVotaciones') inicializarSelectorVotaciones();
+
+            document.getElementById('socioDashboard').style.display =
+                'none';
+
+            document.getElementById(viewId).style.display =
+                'flex';
+
+
+            if (viewId === 'secVotaciones') {
+
+                inicializarSelectorVotaciones();
+            }
         }
+
 
         function mostrarSeccionAdmin(viewId) {
-            document.getElementById('adminDashboard').style.display = 'none';
-            document.getElementById(viewId).style.display = 'flex';
-            if(viewId === 'secModificar') inicializarSelectorModificaciones();
-            if(viewId === 'secPorcentuales') renderizarListaPorcentualesAdmin();
+
+            document.getElementById('adminDashboard').style.display =
+                'none';
+
+            document.getElementById(viewId).style.display =
+                'flex';
+
+
+            if (viewId === 'secModificar') {
+
+                inicializarSelectorModificaciones();
+            }
+
+
+            if (viewId === 'secPorcentuales') {
+
+                renderizarListaPorcentualesAdmin();
+            }
         }
 
+
         function irAResultadosGenerales() {
-            document.getElementById('socioDashboard').style.display = 'none';
-            document.getElementById('adminDashboard').style.display = 'none';
-            document.getElementById('secResultados').style.display = 'flex';
+
+            document.getElementById('socioDashboard').style.display =
+                'none';
+
+            document.getElementById('adminDashboard').style.display =
+                'none';
+
+            document.getElementById('secResultados').style.display =
+                'flex';
+
+
             inicializarSelectorResultados();
         }
 
+
         function regresarAlPanelInterno() {
-            document.querySelectorAll('.sub-view').forEach(function(v) { v.style.display = 'none'; });
-            if(ROL_ACTIVO === 'socio') document.getElementById('socioDashboard').style.display = 'flex';
-            else document.getElementById('adminDashboard').style.display = 'flex';
+
+            document
+                .querySelectorAll('.sub-view')
+                .forEach(function(v) {
+
+                    v.style.display =
+                        'none';
+                });
+
+
+            if (ROL_ACTIVO === 'socio') {
+
+                document.getElementById('socioDashboard').style.display =
+                    'flex';
+
+            } else {
+
+                document.getElementById('adminDashboard').style.display =
+                    'flex';
+            }
         }
+
 
         function volverAlLogin() {
-            document.getElementById('socioDashboard').style.display = 'none';
-            document.getElementById('adminDashboard').style.display = 'none';
-            document.getElementById('loginScreen').style.display = 'flex';
+
+            document.getElementById('socioDashboard').style.display =
+                'none';
+
+            document.getElementById('adminDashboard').style.display =
+                'none';
+
+            document.getElementById('loginScreen').style.display =
+                'flex';
+
+            ID_SOCIO_ACTIVO = 0;
+
+            ROL_ACTIVO = '';
         }
+
+
+        /* =========================================================
+           CAMPOS DINÁMICOS DE OPCIONES
+           ========================================================= */
 
         function agregarCampoEntradaOpcion(containerId) {
-            var p = document.getElementById(containerId);
-            var n = p.getElementsByTagName('input').length;
-            var letra = String.fromCharCode(65 + n);
-            var input = document.createElement('input');
-            input.type = 'text';
-            input.className = containerId === 'containerCamposModificar' ? 'wf-input opt-mod-field' : 'wf-input opt-nueva-input';
-            input.placeholder = 'Opción ' + letra;
+
+            var p =
+                document.getElementById(containerId);
+
+            var n =
+                p.getElementsByTagName('input').length;
+
+            var letra =
+                String.fromCharCode(65 + n);
+
+
+            var input =
+                document.createElement('input');
+
+            input.type =
+                'text';
+
+            input.className =
+                containerId === 'containerCamposModificar'
+                    ? 'wf-input opt-mod-field'
+                    : 'wf-input opt-nueva-input';
+
+            input.placeholder =
+                'Opción ' + letra;
+
+
             p.appendChild(input);
         }
-        /* --- SISTEMA OPERATIVO DE CONSULTAS CON PONDERACIÓN COMPLETA DE BARRAS --- */
+                    /* =========================================================
+           SISTEMA DE VOTACIONES
+           ========================================================= */
+
         function inicializarSelectorVotaciones() {
-            var cmb = document.getElementById('cmbEncuestasDisponibles'); cmb.innerHTML = '';
+
+            var cmb =
+                document.getElementById('cmbEncuestasDisponibles');
+
+            cmb.innerHTML =
+                '';
+
+
             Object.keys(baseEncuestas).forEach(function(k) {
-                var option = document.createElement('option'); option.value = k; option.text = baseEncuestas[k].titulo; cmb.appendChild(option);
+
+                var option =
+                    document.createElement('option');
+
+                option.value =
+                    k;
+
+                option.text =
+                    baseEncuestas[k].titulo;
+
+                cmb.appendChild(option);
             });
+
+
             cargarOpcionesParaVotar();
         }
+
 
         function cargarOpcionesParaVotar() {
-            var key = document.getElementById('cmbEncuestasDisponibles').value;
-            var div = document.getElementById('wrapperOpcionesVoto'); div.innerHTML = '';
-            var btn = document.getElementById('btnEjecutarVoto');
 
-            if(registroVotosEmitidos[ID_SOCIO_ACTIVO + '_' + key]) {
-                div.innerHTML = '<div style="color:#d91a1a; font-weight:700; text-align:center; padding:10px;">⚠ YA EMITISTE TU VOTO EN ESTA CONSULTA ELECTORAL</div>';
-                btn.style.display = 'none'; return;
+            var key =
+                document.getElementById(
+                    'cmbEncuestasDisponibles'
+                ).value;
+
+
+            var div =
+                document.getElementById(
+                    'wrapperOpcionesVoto'
+                );
+
+            div.innerHTML =
+                '';
+
+
+            var btn =
+                document.getElementById(
+                    'btnEjecutarVoto'
+                );
+
+
+            if (
+                registroVotosEmitidos[
+                    ID_SOCIO_ACTIVO + '_' + key
+                ]
+            ) {
+
+                div.innerHTML =
+                    '<div style="color:#d91a1a; font-weight:700; text-align:center; padding:10px;">' +
+                    '⚠ YA EMITISTE TU VOTO EN ESTA CONSULTA ELECTORAL' +
+                    '</div>';
+
+                btn.style.display =
+                    'none';
+
+                return;
             }
-            
-            baseEncuestas[key].opts.forEach(function(o, index) {
-                var elementoLabel = document.createElement('label'); 
-                elementoLabel.style.display = 'block'; 
-                elementoLabel.style.margin = '6px 0';
-                elementoLabel.innerHTML = '<input type="radio" name="radOpt" value="' + index + '" style="margin-right:8px;"> ' + o;
-                div.appendChild(elementoLabel);
-            });
-            btn.style.display = 'block';
+
+
+            baseEncuestas[key].opts.forEach(
+                function(o, index) {
+
+                    var elementoLabel =
+                        document.createElement('label');
+
+                    elementoLabel.style.display =
+                        'block';
+
+                    elementoLabel.style.margin =
+                        '6px 0';
+
+                    elementoLabel.innerHTML =
+                        '<input type="radio" name="radOpt" value="' +
+                        index +
+                        '" style="margin-right:8px;"> ' +
+                        o;
+
+                    div.appendChild(
+                        elementoLabel
+                    );
+                }
+            );
+
+
+            btn.style.display =
+                'block';
         }
 
-        function registrarVotoSocio() {
-            var key = document.getElementById('cmbEncuestasDisponibles').value;
-            var seleccionado = document.querySelector('input[name="radOpt"]:checked');
-            if(!seleccionado) { alert('Debe elegir una de las opciones.'); return; }
-            
-            var idx = parseInt(seleccionado.value);
-            var socioDatos = obtenerDatosSocio(ID_SOCIO_ACTIVO);
 
-            // CORRECCIÓN MATEMÁTICA: Sumamos los puntos de antigüedad directamente al casillero de la opción elegida
-            baseEncuestas[key].votos[idx] += socioDatos.puntos; 
-            baseEncuestas[key].totalSocios += 1; // Mantiene el contador simple de personas que participaron
-            baseEncuestas[key].puntosPonderados += socioDatos.puntos; // Total de puntos acumulados en la encuesta
-            registroVotosEmitidos[ID_SOCIO_ACTIVO + '_' + key] = true;
+        function registrarVotoSocio() {
+
+            var key =
+                document.getElementById(
+                    'cmbEncuestasDisponibles'
+                ).value;
+
+
+            var seleccionado =
+                document.querySelector(
+                    'input[name="radOpt"]:checked'
+                );
+
+
+            if (!seleccionado) {
+
+                alert(
+                    'Debe elegir una de las opciones.'
+                );
+
+                return;
+            }
+
+
+            /*
+             * SEGURIDAD DE MAQUETACIÓN:
+             * si por alguna razón se intenta registrar
+             * nuevamente el mismo voto, se bloquea.
+             */
+            if (
+                registroVotosEmitidos[
+                    ID_SOCIO_ACTIVO + '_' + key
+                ]
+            ) {
+
+                alert(
+                    'Este socio ya emitió su voto en esta encuesta.'
+                );
+
+                return;
+            }
+
+
+            var idx =
+                parseInt(
+                    seleccionado.value
+                );
+
+
+            var socioDatos =
+                obtenerDatosSocio(
+                    ID_SOCIO_ACTIVO
+                );
+
+
+            /*
+             * PONDERACIÓN:
+             *
+             * Un socio = un voto.
+             *
+             * Pero el voto aporta tantos puntos como
+             * corresponden a su antigüedad.
+             */
+            baseEncuestas[key].votos[idx] +=
+                socioDatos.puntos;
+
+
+            /*
+             * Cantidad de personas que participaron.
+             */
+            baseEncuestas[key].totalSocios +=
+                1;
+
+
+            /*
+             * Total de puntos ponderados emitidos.
+             */
+            baseEncuestas[key].puntosPonderados +=
+                socioDatos.puntos;
+
+
+            /*
+             * Registro individual del voto.
+             */
+            registroVotosEmitidos[
+                ID_SOCIO_ACTIVO + '_' + key
+            ] =
+                true;
+
 
             guardarDatosEnMemoriaLocal();
-            alert('✓ Voto Ponderado Registrado. Aportaste ' + socioDatos.puntos + ' puntos a esta opción.');
+
+
+            alert(
+                '✓ Voto Ponderado Registrado. Aportaste ' +
+                socioDatos.puntos +
+                ' puntos a esta opción.'
+            );
+
+
             cargarOpcionesParaVotar();
         }
 
+
+        /* =========================================================
+           MODIFICACIÓN DE ENCUESTAS
+           ========================================================= */
+
         function inicializarSelectorModificaciones() {
-            var cmb = document.getElementById('cmbModificarSelect'); cmb.innerHTML = '';
-            Object.keys(baseEncuestas).forEach(function(k) {
-                var option = document.createElement('option'); option.value = k; option.text = baseEncuestas[k].titulo; cmb.appendChild(option);
-            });
+
+            var cmb =
+                document.getElementById(
+                    'cmbModificarSelect'
+                );
+
+            cmb.innerHTML =
+                '';
+
+
+            Object.keys(baseEncuestas).forEach(
+                function(k) {
+
+                    var option =
+                        document.createElement('option');
+
+                    option.value =
+                        k;
+
+                    option.text =
+                        baseEncuestas[k].titulo;
+
+                    cmb.appendChild(
+                        option
+                    );
+                }
+            );
+
+
             cargarCamposModificar();
         }
+
 
         function cargarCamposModificar() {
-            var key = document.getElementById('cmbModificarSelect').value;
-            var div = document.getElementById('containerCamposModificar'); div.innerHTML = '';
-            
-            baseEncuestas[key].opts.forEach(function(opcionText) {
-                var input = document.createElement('input');
-                input.type = 'text'; input.className = 'wf-input opt-mod-field'; input.value = opcionText;
-                div.appendChild(input);
-            });
+
+            var key =
+                document.getElementById(
+                    'cmbModificarSelect'
+                ).value;
+
+
+            if (!key || !baseEncuestas[key]) {
+
+                return;
+            }
+
+
+            var div =
+                document.getElementById(
+                    'containerCamposModificar'
+                );
+
+            div.innerHTML =
+                '';
+
+
+            baseEncuestas[key].opts.forEach(
+                function(opcionText) {
+
+                    var input =
+                        document.createElement('input');
+
+                    input.type =
+                        'text';
+
+                    input.className =
+                        'wf-input opt-mod-field';
+
+                    input.value =
+                        opcionText;
+
+                    div.appendChild(
+                        input
+                    );
+                }
+            );
         }
+
 
         function guardarModificacionAdmin() {
-            var key = document.getElementById('cmbModificarSelect').value;
-            var inputs = document.getElementById('containerCamposModificar').getElementsByClassName('opt-mod-field');
-            
-            var nuevasOpciones = []; var nuevosVotosConteo = [];
-            for(var i = 0; i < inputs.length; i++) {
-                var val = inputs[i].value.trim();
-                if(val !== "") {
-                    nuevasOpciones.push(val);
-                    nuevosVotosConteo.push(baseEncuestas[key].votos[i] || 0);
+
+            var key =
+                document.getElementById(
+                    'cmbModificarSelect'
+                ).value;
+
+
+            var inputs =
+                document
+                    .getElementById(
+                        'containerCamposModificar'
+                    )
+                    .getElementsByClassName(
+                        'opt-mod-field'
+                    );
+
+
+            var nuevasOpciones =
+                [];
+
+            var nuevosVotosConteo =
+                [];
+
+
+            for (
+                var i = 0;
+                i < inputs.length;
+                i++
+            ) {
+
+                var val =
+                    inputs[i].value.trim();
+
+
+                if (val !== "") {
+
+                    nuevasOpciones.push(
+                        val
+                    );
+
+                    nuevosVotosConteo.push(
+                        baseEncuestas[key].votos[i] || 0
+                    );
                 }
             }
-            baseEncuestas[key].opts = nuevasOpciones;
-            baseEncuestas[key].votos = nuevosVotosConteo;
-            
+
+
+            if (nuevasOpciones.length < 2) {
+
+                alert(
+                    'La encuesta debe conservar al menos 2 opciones.'
+                );
+
+                return;
+            }
+
+
+            baseEncuestas[key].opts =
+                nuevasOpciones;
+
+            baseEncuestas[key].votos =
+                nuevosVotosConteo;
+
+
             guardarDatosEnMemoriaLocal();
-            alert('✓ Consulta y opciones guardadas con éxito.');
+
+
+            alert(
+                '✓ Consulta y opciones guardadas con éxito.'
+            );
+
+
             cargarCamposModificar();
+
+            inicializarSelectorReset();
         }
+                    /* =========================================================
+           CREAR NUEVA ENCUESTA
+           ========================================================= */
 
         function guardarNuevaEncuestaAdmin() {
-            var tit = document.getElementById('txtNuevaEncuestaTitulo').value.trim();
-            var inputs = document.getElementById('containerCamposNuevos').getElementsByClassName('opt-nueva-input');
-            
-            var opcionesCreadas = []; var votosCreados = [];
-            for(var i = 0; i < inputs.length; i++) {
-                var val = inputs[i].value.trim();
-                if(val !== "") { opcionesCreadas.push(val); votosCreados.push(0); }
+
+            var tit =
+                document.getElementById(
+                    'txtNuevaEncuestaTitulo'
+                ).value.trim();
+
+
+            var inputs =
+                document
+                    .getElementById(
+                        'containerCamposNuevos'
+                    )
+                    .getElementsByClassName(
+                        'opt-nueva-input'
+                    );
+
+
+            var opcionesCreadas =
+                [];
+
+            var votosCreados =
+                [];
+
+
+            for (
+                var i = 0;
+                i < inputs.length;
+                i++
+            ) {
+
+                var val =
+                    inputs[i].value.trim();
+
+
+                if (val !== "") {
+
+                    opcionesCreadas.push(
+                        val
+                    );
+
+                    votosCreados.push(
+                        0
+                    );
+                }
             }
-            if(!tit || opcionesCreadas.length < 2) { alert('Complete el título y al menos 2 opciones.'); return; }
-            
-            var nextId = 'enc_' + (Object.keys(baseEncuestas).length + 1);
-            baseEncuestas[nextId] = { titulo: tit, opts: opcionesCreadas, votos: votosCreados, totalSocios: 0, puntosPonderados: 0 };
-            
+
+
+            if (
+                !tit ||
+                opcionesCreadas.length < 2
+            ) {
+
+                alert(
+                    'Complete el título y al menos 2 opciones.'
+                );
+
+                return;
+            }
+
+
+            var nextId =
+                'enc_' +
+                (
+                    Object.keys(baseEncuestas).length +
+                    1
+                );
+
+
+            baseEncuestas[nextId] = {
+
+                titulo:
+                    tit,
+
+                opts:
+                    opcionesCreadas,
+
+                votos:
+                    votosCreados,
+
+                totalSocios:
+                    0,
+
+                puntosPonderados:
+                    0
+            };
+
+
             guardarDatosEnMemoriaLocal();
-            alert('✓ Nueva consulta agregada.');
+
+
+            /*
+             * Actualizamos todos los selectores
+             * para que la nueva encuesta aparezca
+             * inmediatamente.
+             */
+            inicializarSelectorReset();
+
+
+            alert(
+                '✓ Nueva consulta agregada.'
+            );
+
+
             regresarAlPanelInterno();
         }
 
+
+        /* =========================================================
+           SELECTOR DE RESULTADOS
+           ========================================================= */
+
         function inicializarSelectorResultados() {
-            var cmb = document.getElementById('cmbResultadosSelect'); cmb.innerHTML = '';
-            Object.keys(baseEncuestas).forEach(function(k) {
-                var option = document.createElement('option'); option.value = k; option.text = baseEncuestas[k].titulo; cmb.appendChild(option);
-            });
+
+            var cmb =
+                document.getElementById(
+                    'cmbResultadosSelect'
+                );
+
+
+            cmb.innerHTML =
+                '';
+
+
+            Object.keys(baseEncuestas).forEach(
+                function(k) {
+
+                    var option =
+                        document.createElement('option');
+
+                    option.value =
+                        k;
+
+                    option.text =
+                        baseEncuestas[k].titulo;
+
+                    cmb.appendChild(
+                        option
+                    );
+                }
+            );
+
+
             actualizarReporteGrafico();
         }
 
-        /* --- LOGICA DE RENDERIZADO CORREGIDA EN BASE A PUNTOS --- */
-        function actualizarReporteGrafico() {
-            var key = document.getElementById('cmbResultadosSelect').value;
-            var item = baseEncuestas[key];
 
-            document.getElementById('lblResTotalVotos').innerText = item.totalSocios;
-            var restantes = TOTAL_SOCIOS - item.totalSocios;
-            document.getElementById('lblResRestantes').innerText = restantes;
-            
-            // Puntos en juego: Calculamos el peso de ponderación máximo estimado restante
-            var puntosFaltantesEstimados = restantes * 4;
-            document.getElementById('lblResPuntosJuego').innerText = puntosFaltantesEstimados + " PTS";
+        /* =========================================================
+           CÁLCULO EXACTO DE VOTOS Y PUNTOS RESTANTES
+           ========================================================= */
 
-            var contenedor = document.getElementById('contenedorBarrasDinamicas');
-            contenedor.innerHTML = '';
+        function calcularVotosYPuntosRestantes(key) {
 
-            var colores = Array.of('#002D62', '#d91a1a', '#ffc107', '#28a745', '#9333ea', '#06b6d4');
+            var votosRestantes =
+                0;
 
-            item.opts.forEach(function(opcionTexto, i) {
-                var puntosDeEstaOpcion = item.votos[i] || 0;
-                
-                // CORRECCIÓN CLAVE: El porcentaje de la barra se calcula sobre el total de puntos ponderados emitidos, no sobre personas
-                var porcentaje = item.puntosPonderados > 0 ? ((puntosDeEstaOpcion / item.puntosPonderados) * 100).toFixed(1) : "0.0";
-                var colorAsignado = colores[i % colores.length];
+            var puntosRestantes =
+                0;
 
-                var wrapper = document.createElement('div');
-                wrapper.className = 'barra-resultado-contenedor';
-                wrapper.innerHTML = 
-                    '<div class="barra-resultado-texto">' +
-                        '<span>' + opcionTexto + '</span>' +
-                        '<span>' + puntosDeEstaOpcion + ' pts (' + porcentaje + '%)</span>' +
-                    '</div>' +
-                    '<div class="barra-resultado-fondo">' +
-                        '<div class="barra-resultado-lleno" style="width: ' + porcentaje + '%; background-color: ' + colorAsignado + ';"></div>' +
-                    '</div>';
-                contenedor.appendChild(wrapper);
-            });
+
+            /*
+             * Recorremos el padrón completo.
+             *
+             * Para cada socio comprobamos si todavía
+             * NO votó esta encuesta.
+             *
+             * Si no votó:
+             *  - suma 1 voto restante
+             *  - suma sus puntos de ponderación
+             */
+            for (
+                var id = 1;
+                id <= TOTAL_SOCIOS;
+                id++
+            ) {
+
+                var registro =
+                    id + '_' + key;
+
+
+                if (
+                    !registroVotosEmitidos[registro]
+                ) {
+
+                    votosRestantes +=
+                        1;
+
+
+                    var datosSocio =
+                        obtenerDatosSocio(id);
+
+
+                    puntosRestantes +=
+                        datosSocio.puntos;
+                }
+            }
+
+
+            return {
+
+                votos:
+                    votosRestantes,
+
+                puntos:
+                    puntosRestantes
+            };
         }
+
+
+        /* =========================================================
+           RESULTADOS
+           ========================================================= */
+
+        function actualizarReporteGrafico() {
+
+            var selector =
+                document.getElementById(
+                    'cmbResultadosSelect'
+                );
+
+
+            if (!selector) {
+
+                return;
+            }
+
+
+            var key =
+                selector.value;
+
+
+            if (
+                !key ||
+                !baseEncuestas[key]
+            ) {
+
+                return;
+            }
+
+
+            var item =
+                baseEncuestas[key];
+
+
+            /*
+             * RESULTADOS ACUMULADOS
+             *
+             * Estos valores solamente vuelven a cero
+             * cuando un administrador utiliza las
+             * herramientas de maquetación.
+             */
+            document.getElementById(
+                'lblResTotalVotos'
+            ).innerText =
+                item.totalSocios;
+
+
+            /*
+             * VOTOS RESTANTES EXACTOS
+             *
+             * Ya no se calcula:
+             *
+             * TOTAL_SOCIOS - participantes
+             *
+             * porque el registro individual de votos
+             * es la fuente exacta.
+             */
+            var restantes =
+                calcularVotosYPuntosRestantes(
+                    key
+                );
+
+
+            document.getElementById(
+                'lblResRestantes'
+            ).innerText =
+                restantes.votos;
+
+
+            /*
+             * PUNTOS RESTANTES EXACTOS
+             */
+            document.getElementById(
+                'lblResPuntosJuego'
+            ).innerText =
+                restantes.puntos +
+                " PTS";
+
+
+            /*
+             * GRÁFICO
+             */
+            var contenedor =
+                document.getElementById(
+                    'contenedorBarrasDinamicas'
+                );
+
+
+            contenedor.innerHTML =
+                '';
+
+
+            var colores =
+                Array.of(
+                    '#002D62',
+                    '#d91a1a',
+                    '#ffc107',
+                    '#28a745',
+                    '#9333ea',
+                    '#06b6d4'
+                );
+
+
+            item.opts.forEach(
+                function(opcionTexto, i) {
+
+                    var puntosDeEstaOpcion =
+                        item.votos[i] || 0;
+
+
+                    /*
+                     * Porcentaje electoral:
+                     *
+                     * puntos de opción
+                     * -----------------
+                     * puntos totales emitidos
+                     */
+                    var porcentaje =
+                        item.puntosPonderados > 0
+                            ? (
+                                (
+                                    puntosDeEstaOpcion /
+                                    item.puntosPonderados
+                                ) * 100
+                              ).toFixed(1)
+                            : "0.0";
+
+
+                    var colorAsignado =
+                        colores[
+                            i % colores.length
+                        ];
+
+
+                    var wrapper =
+                        document.createElement(
+                            'div'
+                        );
+
+
+                    wrapper.className =
+                        'barra-resultado-contenedor';
+
+
+                    wrapper.innerHTML =
+
+                        '<div class="barra-resultado-texto">' +
+
+                            '<span>' +
+                                opcionTexto +
+                            '</span>' +
+
+                            '<span>' +
+                                puntosDeEstaOpcion +
+                                ' pts (' +
+                                porcentaje +
+                                '%)' +
+                            '</span>' +
+
+                        '</div>' +
+
+                        '<div class="barra-resultado-fondo">' +
+
+                            '<div class="barra-resultado-lleno" ' +
+                            'style="width: ' +
+                            porcentaje +
+                            '%; background-color: ' +
+                            colorAsignado +
+                            ';"></div>' +
+
+                        '</div>';
+
+
+                    contenedor.appendChild(
+                        wrapper
+                    );
+                }
+            );
+        }
+                    /* =========================================================
+           RESUMEN PORCENTUAL DE PARTICIPACIÓN
+           ========================================================= */
 
         function renderizarListaPorcentualesAdmin() {
-            var div = document.getElementById('wrapperListaPorcentuales'); div.innerHTML = '';
-            Object.keys(baseEncuestas).forEach(function(k) {
-                var pct = ((baseEncuestas[k].totalSocios / TOTAL_SOCIOS) * 100).toFixed(2);
-                var row = document.createElement('div'); row.className = 'wf-box text-left';
-                row.innerHTML = '<span class="txt-info-red">' + baseEncuestas[k].titulo + ':</span><div style="font-size:16px; font-weight:800; margin-top:4px; color:#28a745;">' + pct + '% PARTICIPACIÓN GLOBAL</div>';
-                div.appendChild(row);
-            });
+
+            var div =
+                document.getElementById(
+                    'wrapperListaPorcentuales'
+                );
+
+
+            if (!div) {
+
+                return;
+            }
+
+
+            div.innerHTML =
+                '';
+
+
+            Object.keys(baseEncuestas).forEach(
+                function(k) {
+
+                    var pct =
+                        (
+                            (
+                                baseEncuestas[k].totalSocios /
+                                TOTAL_SOCIOS
+                            ) * 100
+                        ).toFixed(2);
+
+
+                    var row =
+                        document.createElement(
+                            'div'
+                        );
+
+
+                    row.className =
+                        'wf-box text-left';
+
+
+                    row.innerHTML =
+
+                        '<span class="txt-info-red">' +
+                            baseEncuestas[k].titulo +
+                        ':</span>' +
+
+                        '<div style="font-size:16px; font-weight:800; margin-top:4px; color:#28a745;">' +
+                            pct +
+                            '% PARTICIPACIÓN GLOBAL' +
+                        '</div>';
+
+
+                    div.appendChild(
+                        row
+                    );
+                }
+            );
         }
+
+
+        /* =========================================================
+           SELECTOR PARA RESET DE MAQUETACIÓN
+           ========================================================= */
+
+        function inicializarSelectorReset() {
+
+            var cmb =
+                document.getElementById(
+                    'cmbResetEncuesta'
+                );
+
+
+            if (!cmb) {
+
+                return;
+            }
+
+
+            cmb.innerHTML =
+                '';
+
+
+            Object.keys(baseEncuestas).forEach(
+                function(k) {
+
+                    var option =
+                        document.createElement(
+                            'option'
+                        );
+
+
+                    option.value =
+                        k;
+
+
+                    option.text =
+                        baseEncuestas[k].titulo;
+
+
+                    cmb.appendChild(
+                        option
+                    );
+                }
+            );
+        }
+
+
+        /* =========================================================
+           VALIDACIÓN DE ADMINISTRADOR
+           ========================================================= */
+
+        function validarAdministradorParaReset() {
+
+            return (
+                ROL_ACTIVO === 'admin' &&
+                adminFijos.includes(
+                    ID_SOCIO_ACTIVO
+                )
+            );
+        }
+
+
+        /* =========================================================
+           ELIMINAR REGISTROS DE VOTO DE UNA ENCUESTA
+           ========================================================= */
+
+        function eliminarRegistrosDeEncuesta(key) {
+
+            var sufijo =
+                '_' + key;
+
+
+            Object.keys(
+                registroVotosEmitidos
+            ).forEach(
+                function(registro) {
+
+                    if (
+                        registro.endsWith(
+                            sufijo
+                        )
+                    ) {
+
+                        delete registroVotosEmitidos[
+                            registro
+                        ];
+                    }
+                }
+            );
+        }
+
+
+        /* =========================================================
+           RESET DE UNA ENCUESTA
+           ========================================================= */
+
+        function resetearEncuestaSeleccionada() {
+
+            if (
+                !validarAdministradorParaReset()
+            ) {
+
+                alert(
+                    'Acceso denegado. Esta función es exclusiva de los administradores.'
+                );
+
+                return;
+            }
+
+
+            var cmb =
+                document.getElementById(
+                    'cmbResetEncuesta'
+                );
+
+
+            if (
+                !cmb ||
+                !cmb.value
+            ) {
+
+                alert(
+                    'Debe seleccionar una encuesta.'
+                );
+
+                return;
+            }
+
+
+            var key =
+                cmb.value;
+
+
+            var encuesta =
+                baseEncuestas[key];
+
+
+            if (!encuesta) {
+
+                alert(
+                    'No se encontró la encuesta seleccionada.'
+                );
+
+                return;
+            }
+
+
+            var confirmar =
+                confirm(
+
+                    'ATENCIÓN\n\n' +
+
+                    'Se van a eliminar todos los votos y puntos acumulados de:\n\n' +
+
+                    encuesta.titulo +
+
+                    '\n\n' +
+
+                    'La encuesta continuará existiendo,\n' +
+                    'pero volverá completamente a cero.\n\n' +
+
+                    'También se eliminarán los registros de voto\n' +
+                    'para permitir nuevas pruebas.\n\n' +
+
+                    'Esta función existe únicamente para MAQUETACIÓN.\n\n' +
+
+                    '¿Desea continuar?'
+                );
+
+
+            if (!confirmar) {
+
+                return;
+            }
+
+
+            /*
+             * Reiniciar los puntos de cada opción.
+             */
+            encuesta.votos =
+                encuesta.opts.map(
+                    function() {
+                        return 0;
+                    }
+                );
+
+
+            /*
+             * Reiniciar cantidad de participantes.
+             */
+            encuesta.totalSocios =
+                0;
+
+
+            /*
+             * Reiniciar puntos ponderados.
+             */
+            encuesta.puntosPonderados =
+                0;
+
+
+            /*
+             * IMPORTANTE:
+             *
+             * También eliminamos todos los registros
+             * individuales de voto correspondientes
+             * a esta encuesta.
+             */
+            eliminarRegistrosDeEncuesta(
+                key
+            );
+
+
+            guardarDatosEnMemoriaLocal();
+
+
+            /*
+             * Actualizamos las interfaces.
+             */
+            inicializarSelectorReset();
+
+
+            if (
+                document.getElementById(
+                    'cmbResultadosSelect'
+                )
+            ) {
+
+                inicializarSelectorResultados();
+            }
+
+
+            renderizarListaPorcentualesAdmin();
+
+
+            alert(
+                '✓ La encuesta "' +
+                encuesta.titulo +
+                '" fue reiniciada completamente a 0.'
+            );
+        }
+                    /* =========================================================
+           RESET DE TODAS LAS ENCUESTAS
+           ========================================================= */
+
+        function resetearTodasLasEncuestas() {
+
+            if (
+                !validarAdministradorParaReset()
+            ) {
+
+                alert(
+                    'Acceso denegado. Esta función es exclusiva de los administradores.'
+                );
+
+                return;
+            }
+
+
+            var confirmar =
+                confirm(
+
+                    'ATENCIÓN\n\n' +
+
+                    'Se van a reiniciar TODAS las encuestas de la plataforma.\n\n' +
+
+                    'Todos los votos volverán a 0.\n' +
+                    'Todos los participantes volverán a 0.\n' +
+                    'Todos los puntos ponderados volverán a 0.\n' +
+
+                    '\nAdemás, se eliminarán todos los registros de voto\n' +
+                    'para poder volver a realizar las pruebas.\n\n' +
+
+                    'LAS ENCUESTAS NO SERÁN ELIMINADAS.\n\n' +
+
+                    'Esta función existe únicamente para MAQUETACIÓN.\n\n' +
+
+                    '¿Está seguro de continuar?'
+                );
+
+
+            if (!confirmar) {
+
+                return;
+            }
+
+
+            /*
+             * Reiniciamos cada encuesta.
+             */
+            Object.keys(
+                baseEncuestas
+            ).forEach(
+                function(key) {
+
+                    var encuesta =
+                        baseEncuestas[key];
+
+
+                    encuesta.votos =
+                        encuesta.opts.map(
+                            function() {
+                                return 0;
+                            }
+                        );
+
+
+                    encuesta.totalSocios =
+                        0;
+
+
+                    encuesta.puntosPonderados =
+                        0;
+                }
+            );
+
+
+            /*
+             * Reiniciamos completamente
+             * el registro individual de votos.
+             */
+            registroVotosEmitidos =
+                {};
+
+
+            guardarDatosEnMemoriaLocal();
+
+
+            /*
+             * Actualizamos interfaces.
+             */
+            inicializarSelectorReset();
+
+
+            if (
+                document.getElementById(
+                    'cmbResultadosSelect'
+                )
+            ) {
+
+                inicializarSelectorResultados();
+            }
+
+
+            renderizarListaPorcentualesAdmin();
+
+
+            alert(
+                '✓ TODAS las encuestas fueron reiniciadas completamente a 0.'
+            );
+        }
+
+
+        /* =========================================================
+           FIN DEL SISTEMA
+           ========================================================= */
+
     </script>
 </body>
 </html>
