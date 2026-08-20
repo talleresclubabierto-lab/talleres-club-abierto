@@ -29,7 +29,6 @@
             flex-direction: column;
             align-items: center;
         }
-        /* --- CONTENEDORES Y CAJAS MODERNIZADAS --- */
         .wf-box {
             border: 2px solid #000000;
             background-color: #ffffff;
@@ -39,10 +38,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.04);
         }
-        .full-width {
-            width: 100%;
-        }
-        /* --- ELEMENTOS DE TEXTO EN ROJO INFORMATIVO --- */
+        .full-width { width: 100%; }
         .txt-info-red {
             color: #d91a1a;
             font-weight: 700;
@@ -50,7 +46,6 @@
             font-size: 14px;
             letter-spacing: 0.5px;
         }
-        /* --- BOTONES DEL PANEL PRINCIPAL (FONDO ROJO, LETRAS AMARILLAS) --- */
         .btn-action-red {
             background-color: #d91a1a;
             color: #ffeb3b;
@@ -63,12 +58,9 @@
             transition: all 0.2s ease;
             font-size: 13px;
             letter-spacing: 0.5px;
+            width: 100%;
         }
-        .btn-action-red:hover {
-            background-color: #b71515;
-            transform: translateY(-1px);
-        }
-        /* --- BOTONES COMPLEMENTARIOS --- */
+        .btn-action-red:hover { background-color: #b71515; transform: translateY(-1px); }
         .wf-button {
             width: 100%;
             border: 2px solid #000000;
@@ -81,21 +73,9 @@
             border-radius: 6px;
             transition: all 0.2s;
         }
-        .wf-button:hover {
-            background-color: #001f42;
-        }
-        /* --- FORMULARIOS Y DISPOSICIÓN --- */
-        .columns-container {
-            display: flex;
-            width: 100%;
-            gap: 24px;
-            margin-top: 10px;
-        }
-        .column {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
+        .wf-button:hover { background-color: #001f42; }
+        .columns-container { display: flex; width: 100%; gap: 24px; margin-top: 10px; }
+        .column { flex: 1; display: flex; flex-direction: column; }
         .wf-input {
             width: 100%;
             border: 2px solid #cbd5e1;
@@ -105,13 +85,8 @@
             border-radius: 6px;
             font-size: 14px;
             outline: none;
-            transition: border-color 0.2s;
         }
-        .wf-input:focus {
-            border-color: #002D62;
-            background-color: #f8fafc;
-        }
-        /* --- ESTADOS BIOMÉTRICOS --- */
+        .wf-input:focus { border-color: #002D62; background-color: #f8fafc; }
         .biometric-box {
             border: 2px dashed #94a3b8;
             background-color: #ffffff;
@@ -122,131 +97,40 @@
             color: #64748b;
             text-transform: uppercase;
             font-weight: 600;
-            transition: all 0.3s ease;
         }
-        .accent-blue {
-            background-color: #e0f2fe !important;
-            color: #0369a1 !important;
-            border-color: #0369a1 !important;
-            border-style: solid !important;
-        }
-        /* --- PANELES GENERALES (DASHBOARDS) --- */
-        .dashboard, .sub-view {
-            display: none;
-            width: 100%;
-            flex-direction: column;
-        }
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            margin-bottom: 20px;
-        }
-        .grid-metrics {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            width: 100%;
-            margin-bottom: 16px;
-        }
-        @media(max-width: 600px) {
-            .grid-metrics { grid-template-columns: 100%; }
-        }
-        .chart-wrapper {
-            border: 2px solid #000000;
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            width: 100%;
-        }
-        .btn-secondary-dark {
-            background-color: #475569;
-            color: #ffffff;
-            border: 2px solid #000000;
-            padding: 8px 12px;
-            font-size: 12px;
-            font-weight: 700;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-        }
-        .btn-secondary-dark:hover { background-color: #334155; }
-        
-        /* --- ESTILOS DE BARRAS DE PROGRESO NATIVAS --- */
-        .barra-resultado-contenedor {
-            margin-bottom: 14px;
-            text-align: left;
-        }
-        .barra-resultado-texto {
-            font-size: 13px;
-            font-weight: 700;
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 4px;
-        }
-        .barra-resultado-fondo {
-            background-color: #e2e8f0;
-            height: 16px;
-            border-radius: 4px;
-            overflow: hidden;
-            border: 1px solid #94a3b8;
-        }
-        .barra-resultado-lleno {
-            height: 100%;
-            width: 0%;
-            transition: width 0.4s ease;
-        }
-        .mini-badge {
-            font-size: 11px;
-            background-color: #e2e8f0;
-            padding: 2px 6px;
-            border-radius: 4px;
-            color: #475569;
-        }
-        /* BOTÓN DE DESTRUCCIÓN CRÍTICA DE PRUEBA DE AGUSTÍN */
-        .btn-danger-reset {
-            background-color: #ffffff;
-            color: #d91a1a;
-            border: 2px solid #d91a1a;
-            padding: 10px 16px;
-            font-size: 12px;
-            font-weight: 800;
-            border-radius: 6px;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: all 0.2s;
-            margin-top: 10px;
-        }
-        .btn-danger-reset:hover {
-            background-color: #fee2e2;
-        }
+        .accent-blue { background-color: #e0f2fe !important; color: #0369a1 !important; border-color: #0369a1 !important; border-style: solid !important; }
+        .dashboard, .sub-view { display: none; width: 100%; flex-direction: column; }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 20px; }
+        .grid-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; width: 100%; margin-bottom: 16px; }
+        @media(max-width: 600px) { .grid-metrics { grid-template-columns: 100%; } }
+        .chart-wrapper { border: 2px solid #000000; background-color: #ffffff; padding: 20px; border-radius: 8px; margin-bottom: 16px; width: 100%; }
+        .btn-secondary-dark { background-color: #475569; color: #ffffff; border: 2px solid #000000; padding: 8px 12px; font-size: 12px; font-weight: 700; border-radius: 4px; cursor: pointer; margin-bottom: 12px; text-transform: uppercase; }
+        .barra-resultado-contenedor { margin-bottom: 14px; text-align: left; }
+        .barra-resultado-texto { font-size: 13px; font-weight: 700; display: flex; justify-content: space-between; margin-bottom: 4px; }
+        .barra-resultado-fondo { background-color: #e2e8f0; height: 16px; border-radius: 4px; overflow: hidden; border: 1px solid #94a3b8; }
+        .barra-resultado-lleno { height: 100%; width: 0%; transition: width 0.4s ease; }
+        .mini-badge { font-size: 11px; background-color: #e2e8f0; padding: 2px 6px; border-radius: 4px; color: #475569; }
+        .btn-danger-reset { background-color: #ffffff; color: #d91a1a; border: 2px solid #d91a1a; padding: 10px 16px; font-size: 12px; font-weight: 800; border-radius: 6px; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+        .btn-danger-reset:hover { background-color: #fee2e2; }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- --- PANTALLA DE BIENVENIDA (ACCESO PRINCIPAL) --- -->
+        <!-- --- PANTALLA DE BIENVENIDA --- -->
         <div id="loginScreen" class="full-width" style="display: flex; flex-direction: column; align-items: center;">
-            
-            <!-- LOGO INTEGRADO ELEGANTE -->
             <svg id="logoTalleres" viewBox="0 0 400 400" style="width: 120px; height: 120px; margin-bottom: 15px;">
                 <path d="M200 40 L310 110 L310 240 C310 310 200 370 200 370 C200 370 90 310 90 240 L90 110 Z" fill="#002D62" stroke="#001f42" stroke-width="4"/>
                 <path d="M200 48 L298 114 L298 236 C298 298 200 352 200 352 C200 352 102 298 102 236 L102 114 Z" fill="none" stroke="#ffffff" stroke-width="3"/>
                 <path d="M140 135 H260 M200 135 V310 M140 135 V190 H170 V310 M260 135 V190 H230 V310" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/>
                 <text x="200" y="395" font-size="12" font-weight="800" fill="#002D62" text-anchor="middle" letter-spacing="1">TALLERES DIGITAL</text>
             </svg>
-
             <div class="wf-box full-width" style="font-size: 18px; font-weight: 800; background-color: #002D62; color: #ffffff; border: none;">CLUB ABIERTO - CLUB ATLETICO TALLERES</div>
             <div class="wf-box full-width" style="font-size: 14px; font-weight: 600; color: #475569; border-color: #cbd5e1;">POR UN TALLERES DEMOCRÁTICO Y DIGITAL</div>
 
             <div class="columns-container">
-                <!-- ACCESO SOCIOS -->
                 <div class="column">
                     <div class="wf-box" style="background-color: #0f172a; color: #ffffff; border: none; font-weight: 700;">PANEL DE SOCIOS ACTIVOS</div>
                     <div class="wf-box" style="font-size: 12px; color: #475569;">N° de socios activos actualmente: <span style="font-size: 16px; font-weight: 700; color: #002D62; display: block; margin-top: 4px;">10.000</span></div>
-                    
                     <div class="wf-box" style="border-color: #cbd5e1;">
                         <input type="text" id="socioUser" class="wf-input" placeholder="N° de Socio (1 a 10000)">
                         <input type="password" id="socioPass" class="wf-input" placeholder="Contraseña">
@@ -255,12 +139,9 @@
                     <div id="socioBioFace" class="biometric-box">cartel de validación biométrica</div>
                     <div id="socioBioFinger" class="biometric-box">cartel de validación huella digital</div>
                 </div>
-
-                <!-- ACCESO ADMINISTRADORES -->
                 <div class="column">
                     <div class="wf-box" style="background-color: #334155; color: #ffffff; border: none; font-weight: 700;">PANEL DE ADMINISTRADORES</div>
                     <div class="wf-box" style="font-size: 12px; color: #475569;">Cantidad de Administradores: <span style="font-size: 16px; font-weight: 700; color: #334155; display: block; margin-top: 4px;">3</span></div>
-                    
                     <div class="wf-box" style="border-color: #cbd5e1;">
                         <input type="text" id="adminUser" class="wf-input" placeholder="Usuario / ID Socio Administrador">
                         <input type="password" id="adminPass" class="wf-input" placeholder="Contraseña">
@@ -271,60 +152,50 @@
                 </div>
             </div>
         </div>
-        <!-- --- PANTALLA INTERNA: PANEL DEL SOCIO --- -->
+
+        <!-- --- PANEL DEL SOCIO --- -->
         <div id="socioDashboard" class="dashboard full-width">
             <div class="dashboard-header">
                 <div class="wf-box" style="margin: 0; padding: 10px 20px; background-color: #002D62; color: #ffffff; border: none;">PANEL DE SOCIOS ACTIVOS</div>
                 <button class="wf-button" style="width: auto; margin: 0; background-color: #64748b;" onclick="volverAlLogin()">Salir</button>
             </div>
-
-            <!-- FILA SIMÉTRICA INFORMATIVA (LETRAS ROJAS) -->
             <div class="grid-metrics">
                 <div class="wf-box text-left"><span class="txt-info-red">N° de Socio y Nombre</span><div id="lblSocioId" style="font-size: 20px; font-weight: 800; margin-top: 4px;">-</div></div>
                 <div class="wf-box text-left"><span class="txt-info-red">Antigüedad del Socio</span><div id="lblSocioAntiguedad" style="font-size: 20px; font-weight: 800; margin-top: 4px;">-</div></div>
             </div>
-
-            <!-- BOTONES DE ACCIÓN (ROJO / AMARILLO) -->
             <div class="grid-metrics">
                 <button class="btn-action-red" onclick="mostrarSeccionSocio('secVotaciones')">Votaciones Activas</button>
                 <button class="btn-action-red" onclick="irAResultadosGenerales()">Resultados de Votaciones Activas</button>
             </div>
-
-            <!-- INFORMACIÓN TÉCNICA INFERIOR (LETRAS ROJAS) -->
-            <div class="wf-box text-left"><span class="txt-info-red">Porcentual de Votación Respecto al Total de Votaciones:</span><div id="lblSocioPorcentual" style="font-size: 16px; margin-top: 4px; color: #1e293b; font-weight: 700;">-</div></div>
-            <div class="wf-box text-left"><span class="txt-info-red">Cantidad de Puntos por Cada Voto en Base a la Antigüedad:</span><div id="lblSocioPuntos" style="font-size: 16px; margin-top: 4px; color: #1e293b; font-weight: 700;">-</div></div>
-            <div class="wf-box text-left"><span class="txt-info-red">Antigüedad que falta para tener mayor cantidad de puntos por voto (en días):</span><div id="lblSocioDiasFaltantes" style="font-size: 16px; margin-top: 4px; color: #1e293b; font-weight: 700;">-</div></div>
+            <div class="wf-box text-left"><span class="txt-info-red">Porcentual de Votación Respecto al Total:</span><div id="lblSocioPorcentual" style="font-size: 16px; margin-top: 4px; color: #1e293b; font-weight: 700;">-</div></div>
+            <div class="wf-box text-left"><span class="txt-info-red">Cantidad de Puntos por Cada Voto:</span><div id="lblSocioPuntos" style="font-size: 16px; margin-top: 4px; color: #1e293b; font-weight: 700;">-</div></div>
+            <div class="wf-box text-left"><span class="txt-info-red">Antigüedad que falta para cambiar de rango (en días):</span><div id="lblSocioDiasFaltantes" style="font-size: 16px; margin-top: 4px; color: #1e293b; font-weight: 700;">-</div></div>
         </div>
-        <!-- --- PANTALLA INTERNA: PANEL DEL ADMINISTRADOR --- -->
+
+        <!-- --- PANEL DEL ADMINISTRADOR --- -->
         <div id="adminDashboard" class="dashboard full-width">
             <div class="dashboard-header">
                 <div class="wf-box" style="margin: 0; padding: 10px 20px; background-color: #334155; color: #ffffff; border: none;">PANEL DE ADMINISTRADORES</div>
                 <button class="wf-button" style="width: auto; margin: 0; background-color: #64748b;" onclick="volverAlLogin()">Salir</button>
             </div>
-
-            <!-- DATOS INFORMATIVOS SUPERIORES (LETRAS ROJAS) -->
             <div class="grid-metrics">
                 <div class="wf-box text-left"><span class="txt-info-red">N° de Socio</span><div id="lblAdminSocioId" style="font-size: 18px; font-weight: 700; margin-top: 4px;">-</div></div>
-                <div class="wf-box text-left"><span class="txt-info-red">Antigüedad del Socio</span><div id="lblAdminAntiguedad" style="font-size: 18px; font-weight: 700; margin-top: 4px;">15 Años</div></div>
+                <div class="wf-box text-left"><span class="txt-info-red">Antigüedad del Socio</span><div style="font-size: 18px; font-weight: 700; margin-top: 4px;">15 Años</div></div>
                 <div class="wf-box text-left"><span class="txt-info-red">Nombre y Apellido</span><div id="lblAdminNombreDirectivo" style="font-size: 18px; font-weight: 700; margin-top: 4px;">-</div></div>
                 <div class="wf-box text-left"><span class="txt-info-red">Cargo que ocupa en el Club</span><div style="font-size: 18px; font-weight: 700; margin-top: 4px;">Administrador General</div></div>
             </div>
             <div class="wf-box full-width text-left" style="margin-bottom: 20px;"><span class="txt-info-red">Desde cuándo ocupa el Cargo</span><div style="font-size: 16px; font-weight: 700; margin-top: 4px; color: #1e293b;">01/01/2026</div></div>
-
-            <!-- CUADRÍCULA DE NAVEGACIÓN DE BOTONES (ROJO / AMARILLO) -->
             <div class="grid-metrics">
                 <button class="btn-action-red" onclick="mostrarSeccionAdmin('secModificar')">Modificación de Encuestas</button>
                 <button class="btn-action-red" onclick="mostrarSeccionAdmin('secAgregar')">Agregar Nueva Encuesta</button>
                 <button class="btn-action-red" onclick="irAResultadosGenerales()">Resultado de Encuestas</button>
                 <button class="btn-action-red" onclick="mostrarSeccionAdmin('secPorcentuales')">% de Votación de Cada Encuesta</button>
             </div>
-
-            <!-- PANEL EXCEPCIONAL DE RESETEO: Sólo visible para Agustín Supicciatti (ID 10000) -->
             <div id="panelAgustinResetExcepcional" class="full-width" style="display:none; text-align:center; margin-top:10px;">
                 <button type="button" class="btn-danger-reset" onclick="ejecutarResetElectoralAbsolutoA0()">⚠ Resetear Padrón y Encuestas a Cero (Modo Prueba)</button>
             </div>
         </div>
-        <!-- --- VISTA INTERNA: VOTACIONES ACTIVAS (SOCIOS) --- -->
+        <!-- --- VISTA INTERNA: VOTACIONES ACTIVAS --- -->
         <div id="secVotaciones" class="sub-view full-width">
             <div class="dashboard-header">
                 <div class="wf-box" style="margin:0; padding:10px; font-size:16px;">Votaciones Activas en la Plataforma</div>
@@ -333,72 +204,62 @@
             <div class="wf-box full-width" style="text-align: left;">
                 <label style="font-size: 13px; color: #64748b; display: block; margin-bottom: 8px;">SELECCIONE LA CONSULTA ELECTORAL:</label>
                 <select id="cmbEncuestasDisponibles" class="wf-input" style="text-align: left;" onchange="cargarOpcionesParaVotar()"></select>
-                
                 <div id="wrapperOpcionesVoto" style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;"></div>
                 <button id="btnEjecutarVoto" class="wf-button" style="margin-top: 15px; display: none;" onclick="registrarVotoSocio()">Emitir Voto Único Oficial</button>
-                
-                <!-- RECUADRO DE COMPROBANTE CRIPTOGRÁFICO DE VOTO EMITIDO -->
                 <div id="panelComprobanteHash" class="wf-box" style="display:none; margin-top:20px; background-color:#f0fff4; border-color:#28a745; text-align:left;">
-                    <span style="color:#28a745; font-weight:700; font-size:12px; display:block; margin-bottom:4px;">✓ COMPROBANTE CRIPTOGRÁFICO GENERADO SEGURAMENTE:</span>
+                    <span style="color:#28a745; font-weight:700; font-size:12px; display:block; margin-bottom:4px;">✓ COMPROBANTE CRIPTOGRÁFICO NOMINAL GENERADO:</span>
                     <div id="lblCodigoHashGenerado" style="font-family:monospace; font-size:16px; font-weight:700; color:#1e293b; background:#ffffff; padding:10px; border:1px solid #cbd5e1; border-radius:4px; text-align:center;">-</div>
-                    <span style="font-size:11px; color:#475569; display:block; margin-top:6px;">Copie este código. Podrá usarlo en la sección de Resultados para auditar anónimamente que su voto y sus puntos fueron computados correctamente.</span>
                 </div>
             </div>
         </div>
 
-        <!-- --- VISTA INTERNA: AGREGAR NUEVA ENCUESTA --- -->
+        <!-- --- VISTA INTERNA: AGREGAR ENCUESTA --- -->
         <div id="secAgregar" class="sub-view full-width">
             <div class="dashboard-header">
                 <div class="wf-box" style="margin:0; padding:10px; font-size:16px;">Crear Nueva Consulta al Padrón</div>
                 <button class="wf-button" style="width:auto; margin:0;" onclick="regresarAlPanelInterno()">Volver</button>
             </div>
             <div class="wf-box full-width" style="text-align: left;">
-                <input type="text" id="txtNuevaEncuestaTitulo" class="wf-input" placeholder="Título (Ej: Selección de Ubicación para nuevo Estadio)" style="border-color:#002D62;">
-                
+                <input type="text" id="txtNuevaEncuestaTitulo" class="wf-input" placeholder="Título de la Encuesta">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <span style="font-size:13px; font-weight:700; color:#475569;">OPCIONES DE RESPUESTA DISPONIBLES:</span>
+                    <span style="font-size:13px; font-weight:700; color:#475569;">OPCIONES:</span>
                     <button type="button" class="btn-secondary-dark" onclick="agregarCampoEntradaOpcion('containerCamposNuevos')">+ Añadir Opción</button>
                 </div>
-                
                 <div id="containerCamposNuevos" style="display:flex; flex-direction:column;">
                     <input type="text" class="wf-input opt-nueva-input" placeholder="Opción A">
                     <input type="text" class="wf-input opt-nueva-input" placeholder="Opción B">
                     <input type="text" class="wf-input opt-nueva-input" placeholder="Opción C">
                 </div>
-                <button class="wf-button" onclick="guardarNuevaEncuestaAdmin()">Publicar Consulta en Padrón</button>
+                <button class="wf-button" onclick="guardarNuevaEncuestaAdmin()">Publicar Consulta</button>
             </div>
         </div>
-        <!-- --- VISTA INTERNA: MODIFICAR ENCUESTA CONTINUA (ADMIN) --- -->
+
+        <!-- --- VISTA INTERNA: MODIFICAR ENCUESTA --- -->
         <div id="secModificar" class="sub-view full-width">
             <div class="dashboard-header">
-                <div class="wf-box" style="margin:0; padding:10px; font-size:16px;">Modificación y Enmienda de Opciones</div>
+                <div class="wf-box" style="margin:0; padding:10px; font-size:16px;">Modificación de Opciones</div>
                 <button class="wf-button" style="width:auto; margin:0;" onclick="regresarAlPanelInterno()">Volver</button>
             </div>
             <div class="wf-box full-width" style="text-align: left;">
-                <label style="font-size: 13px; color: #64748b; display: block; margin-bottom: 6px;">SELECCIONAL ENCUESTA A MODIFICAR:</label>
                 <select id="cmbModificarSelect" class="wf-input" onchange="cargarCamposModificar()"></select>
-                
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <span style="font-size:13px; font-weight:700; color:#475569;">EDITAR O AGREGAR OPCIONES DE RESPUESTA:</span>
+                    <span style="font-size:13px; font-weight:700; color:#475569;">EDITAR OPCIONES:</span>
                     <button type="button" class="btn-secondary-dark" onclick="agregarCampoEntradaOpcion('containerCamposModificar')">+ Añadir Opción</button>
                 </div>
-
                 <div id="containerCamposModificar" style="display:flex; flex-direction:column;"></div>
-                <button class="wf-button" style="background-color:#28a745;" onclick="guardarModificacionAdmin()">Guardar Cambios de Consulta</button>
+                <button class="wf-button" style="background-color:#28a745;" onclick="guardarModificacionAdmin()">Guardar Cambios</button>
             </div>
         </div>
 
-        <!-- --- VISTA INTERNA: AUDITORÍA DE RESULTADOS Y VERIFICACIÓN CRIPTOGRÁFICA --- -->
+        <!-- --- VISTA INTERNA: AUDITORÍA DE RESULTADOS DUALES --- -->
         <div id="secResultados" class="sub-view full-width">
             <div class="dashboard-header">
-                <div class="wf-box" style="margin:0; padding:10px; font-size:16px;">Auditoría General de Escrutinio y Ponderación</div>
+                <div class="wf-box" style="margin:0; padding:10px; font-size:16px;">Escrutinio Ponderado Oficial</div>
                 <button class="wf-button" style="width:auto; margin:0; background-color: #64748b;" onclick="regresarAlPanelInterno()">Volver</button>
             </div>
             <div class="wf-box full-width" style="text-align: left;">
-                <label style="font-size: 13px; color: #64748b; display: block; margin-bottom: 6px;">SELECCIONAR ENCUESTA ACTIVA:</label>
                 <select id="cmbResultadosSelect" class="wf-input" onchange="actualizarReporteGrafico()"></select>
             </div>
-            
             <div class="grid-metrics">
                 <div class="chart-wrapper" style="margin-bottom: 0; min-height: 260px;">
                     <div style="font-size: 14px; font-weight: 700; margin-bottom: 16px; text-transform: uppercase; color: #002D62;">Tendencia de Votos Ponderados</div>
@@ -406,62 +267,79 @@
                 </div>
                 <div class="wf-box text-left" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: center; gap: 12px;">
                     <div><span class="txt-info-red">Socios Participantes:</span><div id="lblResTotalVotos" style="font-size: 20px; font-weight: 800;">0</div></div>
-                    <div><span class="txt-info-red">Socios Restantes por Votar:</span><div id="lblResRestantes" style="font-size: 20px; font-weight: 800;">0</div></div>
-                    <div><span class="txt-info-red">Puntos de Ponderación en Juego (Exacto):</span><div id="lblResPuntosJuego" style="font-size: 20px; font-weight: 800; color: #28a745;">0 pts</div></div>
+                    <div><span class="txt-info-red">Socios Restantes:</span><div id="lblResRestantes" style="font-size: 20px; font-weight: 800;">0</div></div>
+                    <div><span class="txt-info-red">Puntos en Juego (Exacto):</span><div id="lblResPuntosJuego" style="font-size: 20px; font-weight: 800; color: #28a745;">0 pts</div></div>
                 </div>
             </div>
-
-            <!-- BUSCADOR CRIPTOGRÁFICO DE PAPELETAS ANÓNIMAS -->
             <div class="wf-box full-width" style="margin-top:20px; text-align:left;">
-                <span class="txt-info-red" style="display:block; margin-bottom:10px;">🔍 Auditoría de Voto Único - Verificación de Papeleta Digital</span>
+                <span class="txt-info-red" style="display:block; margin-bottom:10px;">🔍 Auditoría Pública Nominal - Verificación de Papeleta Digital</span>
                 <div style="display:flex; gap:12px;">
-                    <input type="text" id="txtHashAuditoriaBuscar" class="wf-input" placeholder="Pegue su comprobante criptográfico aquí (Ej: TX-10000S-4821)" style="margin-bottom:0;">
+                    <input type="text" id="txtHashAuditoriaBuscar" class="wf-input" placeholder="Pegue su comprobante criptográfico aquí" style="margin-bottom:0;">
                     <button type="button" class="wf-button" style="width:auto; white-space:nowrap; background-color:#475569;" onclick="auditarHashCriptograficoPapeleta()">Verificar Papeleta</button>
                 </div>
                 <div id="wrapperResultadoAuditoriaHash" style="margin-top:12px; font-size:13px; font-weight:700; display:none; padding:10px; border-radius:4px;"></div>
             </div>
         </div>
-        <!-- --- VISTA INTERNA: TABLERO DE COMPORTAMIENTO POR ESCALAFÓN --- -->
+
+        <!-- --- VISTA INTERNA: TABLERO DE COMPORTAMIENTO DEL PADRÓN --- -->
         <div id="secPorcentuales" class="sub-view full-width">
             <div class="dashboard-header">
                 <div class="wf-box" style="margin:0; padding:10px; font-size:16px;">Tablero de Comportamiento del Padrón Electoral</div>
                 <button class="wf-button" style="width:auto; margin:0; background-color:#64748b;" onclick="regresarAlPanelInterno()">Volver</button>
             </div>
             <div class="wf-box full-width" style="text-align: left;">
-                <label style="font-size: 13px; color: #64748b; display: block; margin-bottom: 6px;">SELECCIONAR ENCUESTA PARA ANÁLISIS DE ESCALAFÓN:</label>
                 <select id="cmbPorcentualesSelect" class="wf-input" onchange="renderizarListaPorcentualesAdmin()"></select>
             </div>
             <div id="wrapperListaPorcentuales" style="display: flex; flex-direction: column; gap: 14px; width: 100%;"></div>
         </div>
     </div> <!-- Fin container -->
     <script>
-    <script>
-        /* --- CORE DE NEGOCIO Y MEMORIA RESILIENTE ENTRE ACTUALIZACIONES --- */
+        /* --- CORE DE NEGOCIO Y PERSISTENCIA DE CONTROL --- */
         var TOTAL_SOCIOS = 10000;
         var ID_SOCIO_ACTIVO = 0;
         var ROL_ACTIVO = ''; 
 
-        // Definición de Administradores Oficiales usando Array.of() seguro sin corchetes
-        var adminFijos = Array.of(10000, 9000, 8000);
+        function verificarSiEsAdminOficial(id) {
+            return (id === 10000 || id === 9000 || id === 8000);
+        }
 
-        // Estructura limpia por defecto para simulación de base de datos
-        var encuestasInicialesLimpias = {
-            enc_1: { titulo: "Elección de Jugador Destacado (Fichaje/Premio)", opts: Array.of("Opción A - Santos Valoyes", "Opción B - Bruno Zapelli", "Opción C - Ramón Sosa"), votosPuntos: Array.of(0, 0, 0), votosPersonas: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0, rangoParticipantes: Array.of(0, 0, 0, 0) },
-            enc_2: { titulo: "Elección de Director Técnico (Próximo Ciclo)", opts: Array.of("Opción A - Alexander Medina", "Opción B - Walter Ribonetto", "Opción C - Gabriel Heinze"), votosPuntos: Array.of(0, 0, 0), votosPersonas: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0, rangoParticipantes: Array.of(0, 0, 0, 0) },
-            enc_3: { titulo: "Modelo de Camiseta Oficial (Diseño Alternativo)", opts: Array.of("Opción A - Azul Tradicional", "Opción B - Prematch Tecnológica", "Opción C - Blanca Minimalista"), votosPuntos: Array.of(0, 0, 0), votosPersonas: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0, rangoParticipantes: Array.of(0, 0, 0, 0) },
-            enc_4: { titulo: "Marca de Indumentaria Técnica (Sponsor Técnico)", opts: Array.of("Opción A - Givova Premium", "Opción B - Adidas Performance", "Opción C - Puma Cat"), votosPuntos: Array.of(0, 0, 0), votosPersonas: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0, rangoParticipantes: Array.of(0, 0, 0, 0) },
-            enc_5: { titulo: "Main Sponsor (Patrocinador Principal en Pecho)", opts: Array.of("Opción A - ICBC Corporativo", "Opción B - Betsson Sports", "Opción C - Flybondi Líneas Aéreas"), votosPuntos: Array.of(0, 0, 0), votosPersonas: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0, rangoParticipantes: Array.of(0, 0, 0, 0) }
-        };
+        // Función blindada de generación estructural: Elimina corchetes vacíos propensos a cortes
+        function obtenerEstructuraBaseLimpia() {
+            var bd = {};
+            var titulos = Array.of(
+                "Elección de Jugador Destacado (Fichaje/Premio)",
+                "Elección de Director Técnico (Próximo Ciclo)",
+                "Modelo de Camiseta Oficial (Diseño Alternativo)",
+                "Marca de Indumentaria Técnica (Sponsor Técnico)",
+                "Main Sponsor (Patrocinador Principal en Pecho)"
+            );
+            var opciones = Array.of(
+                ["Opción A - Santos Valoyes", "Opción B - Bruno Zapelli", "Opción C - Ramón Sosa"],
+                ["Opción A - Alexander Medina", "Opción B - Walter Ribonetto", "Opción C - Gabriel Heinze"],
+                ["Opción A - Azul Tradicional", "Opción B - Prematch Tecnológica", "Opción C - Blanca Minimalista"],
+                ["Opción A - Givova Premium", "Opción B - Adidas Performance", "Opción C - Puma Cat"],
+                ["Opción A - ICBC Corporativo", "Opción B - Betsson Sports", "Opción C - Flybondi Líneas Aéreas"]
+            );
+
+            for (var i = 1; i <= 5; i++) {
+                bd["enc_" + i] = {
+                    titulo: titulos[i-1],
+                    opts: opciones[i-1],
+                    votosPuntos: Array.of(0, 0, 0, 0, 0, 0, 0, 0),
+                    votosPersonas: Array.of(0, 0, 0, 0, 0, 0, 0, 0),
+                    rangoParticipantes: Array.of(0, 0, 0, 0),
+                    totalSocios: 0,
+                    puntosPonderados: 0
+                };
+            }
+            return bd;
+        }
 
         if (!localStorage.getItem('TD_baseEncuestas')) {
-            localStorage.setItem('TD_baseEncuestas', JSON.stringify(encuestasInicialesLimpias));
+            localStorage.setItem('TD_baseEncuestas', JSON.stringify(obtenerEstructuraBaseLimpia()));
         }
-        if (!localStorage.getItem('TD_registroVotos')) {
-            localStorage.setItem('TD_registroVotos', JSON.stringify({}));
-        }
-        if (!localStorage.getItem('TD_libroActasBlockchain')) {
-            localStorage.setItem('TD_libroActasBlockchain', JSON.stringify({}));
-        }
+        if (!localStorage.getItem('TD_registroVotos')) localStorage.setItem('TD_registroVotos', '{}');
+        if (!localStorage.getItem('TD_libroActasBlockchain')) localStorage.setItem('TD_libroActasBlockchain', '{}');
 
         var baseEncuestas = JSON.parse(localStorage.getItem('TD_baseEncuestas'));
         var registroVotosEmitidos = JSON.parse(localStorage.getItem('TD_registroVotos'));
@@ -474,27 +352,25 @@
         }
 
         function ejecutarResetElectoralAbsolutoA0() {
-            if (confirm('¿Confirma que desea resetear todas las encuestas y votos a cero para iniciar un muestreo limpio?')) {
-                localStorage.removeItem('TD_baseEncuestas');
-                localStorage.removeItem('TD_registroVotos');
-                localStorage.removeItem('TD_libroActasBlockchain');
-                baseEncuestas = JSON.parse(JSON.stringify(encuestasInicialesLimpias));
+            if (confirm('¿Confirma que desea resetear todo a cero?')) {
+                localStorage.clear();
+                baseEncuestas = obtenerEstructuraBaseLimpia();
                 registroVotosEmitidos = {};
                 libroActasBlockchain = {};
                 guardarDatosEnMemoriaLocal();
-                alert('✓ Base de datos electoral completamente reseteada a 0.00%');
+                alert('✓ Reseteado correctamente.');
                 volverAlLogin();
             }
         }
-        /* --- CONTROL DE INGRESO BIOMÉTRICO --- */
-        function procesarIngreso(tipo) {
-            var userSocio = document.getElementById('socioUser').value.trim();
-            var passSocio = document.getElementById('socioPass').value;
-            var userAdmin = document.getElementById('adminUser').value.trim();
-            var passAdmin = document.getElementById('adminPass').value;
 
-            var faceBox = document.getElementById(tipo === 'socio' ? 'socioBioFace' : 'adminBioFace');
-            var fingerBox = document.getElementById(tipo === 'socio' ? 'socioBioFinger' : 'adminBioFinger');
+        function procesarIngreso(tipo) {
+            var uS = document.getElementById('socioUser').value.trim();
+            var pS = document.getElementById('socioPass').value;
+            var uA = document.getElementById('adminUser').value.trim();
+            var pA = document.getElementById('adminPass').value;
+
+            var fBox = document.getElementById(tipo === 'socio' ? 'socioBioFace' : 'adminBioFace');
+            var gBox = document.getElementById(tipo === 'socio' ? 'socioBioFinger' : 'adminBioFinger');
 
             document.querySelectorAll('.biometric-box').forEach(function(b) {
                 b.classList.remove('accent-blue');
@@ -502,29 +378,25 @@
             });
 
             if (tipo === 'socio') {
-                var id = parseInt(userSocio);
-                if (isNaN(id) || id < 1 || id > TOTAL_SOCIOS || passSocio !== '1913') {
-                    alert('Acceso Denegado: ID fuera del padrón (1-10000) o clave incorrecta.');
-                    return;
+                var id = parseInt(uS);
+                if (isNaN(id) || id < 1 || id > TOTAL_SOCIOS || pS !== '1913') {
+                    alert('Credenciales de Socio incorrectas.'); return;
                 }
-                ejecutarAnimacion(faceBox, fingerBox, function() { loguearSocioInterno(id); });
+                ejecutarAnimacion(fBox, gBox, function() { loguearSocioInterno(id); });
             } else {
-                var idAdmin = parseInt(userAdmin);
-                if (isNaN(idAdmin) || !adminFijos.includes(idAdmin) || passAdmin !== '1913') {
-                    alert('Acceso Denegado: Para ser administrador ingrese ID válido (10000, 9000 u 8000) y clave 1913.');
-                    return;
+                var idA = parseInt(uA);
+                if (isNaN(idA) || !verificarSiEsAdminOficial(idA) || pA !== '1913') {
+                    alert('Credenciales de Admin incorrectas.'); return;
                 }
-                ejecutarAnimacion(faceBox, fingerBox, function() { loguearAdminInterno(idAdmin); });
+                ejecutarAnimacion(fBox, gBox, function() { loguearAdminInterno(idA); });
             }
         }
 
         function ejecutarAnimacion(face, finger, callback) {
-            face.classList.add('accent-blue');
-            face.innerText = "ESCANEANDO ROSTRO... RECONOCIENDO EXPRESIONES VIVAS";
+            face.classList.add('accent-blue'); face.innerText = "ESCANEANDO ROSTRO... RECONOCIENDO EXPRESIONES VIVAS";
             setTimeout(function() {
                 face.innerText = "✓ VALIDACIÓN BIOMÉTRICA COMPLETADA";
-                finger.classList.add('accent-blue');
-                finger.innerText = "ESCANEANDO HUELLA... DETECTANDO PULSO DACTILAR";
+                finger.classList.add('accent-blue'); finger.innerText = "ESCANEANDO HUELLA... DETECTANDO PULSO DACTILAR";
                 setTimeout(function() {
                     finger.innerText = "✓ VALIDACIÓN DE HUELLA DIGITAL COMPLETADA";
                     setTimeout(callback, 500);
@@ -533,351 +405,161 @@
         }
         /* --- REGLAS MATEMÁTICAS EXACTAS DEL PADRÓN E IDENTIDADES --- */
         function obtenerDatosSocio(id) {
-            var antiguedad = 0; var puntos = 0; var porcentual = 0; var diasFaltantes = 0; var indiceRango = 0;
-            var nombre = "Socio General del Club";
+            var ant = 0; var pts = 0; var por = 0; var dias = 0; var idxR = 0;
+            var nom = "Socio General del Club";
 
-            if (id === 8000) nombre = "Roman Huespe";
-            else if (id === 9000) nombre = "Adrian Gruppi";
-            else if (id === 10000) nombre = "Agustin Supicciatti";
+            if (id === 8000) nom = "Roman Huespe";
+            else if (id === 9000) nom = "Adrian Gruppi";
+            else if (id === 10000) nom = "Agustin Supicciatti";
 
             if (id <= 6000) {
-                antiguedad = 1 + ((id - 1) % 5); puntos = antiguedad; porcentual = 0.006;
-                diasFaltantes = (5 - antiguedad) * 365 + 120; indiceRango = 0;
+                ant = 1 + ((id - 1) % 5); pts = ant; por = 0.006; dias = (5 - ant) * 365 + 120; idxR = 0;
             } else if (id <= 8000) {
-                antiguedad = 5 + ((id - 6001) % 5); puntos = antiguedad; porcentual = 0.010;
-                diasFaltantes = (10 - antiguedad) * 365 + 45; indiceRango = 1;
+                ant = 5 + ((id - 6001) % 5); pts = ant; por = 0.010; dias = (10 - ant) * 365 + 45; idxR = 1;
             } else if (id <= 9000) {
-                antiguedad = 10 + ((id - 8001) % 5); puntos = antiguedad; porcentual = 0.014;
-                diasFaltantes = (15 - antiguedad) * 365 + 15; indiceRango = 2;
+                ant = 10 + ((id - 8001) % 5); pts = ant; por = 0.014; dias = (15 - ant) * 365 + 15; idxR = 2;
             } else {
-                antiguedad = 16; puntos = 20; porcentual = 0.025; diasFaltantes = 0; indiceRango = 3;
+                ant = 16; pts = 20; por = 0.025; dias = 0; idxR = 3;
             }
-            return { id: id, nombre: nombre, antiguedad: antiguedad, puntos: puntos, porcentual: porcentual, diasFaltantes: diasFaltantes, indiceRango: indiceRango };
+            return { id: id, nombre: nom, antiguedad: ant, puntos: pts, porcentual: por, diasFaltantes: dias, indiceRango: idxR };
         }
 
-        function calcularPuntosRestantesEnJuegoExacto(keyEncuesta) {
-            var puntosFaltantesReales = 0;
-            for (var id = 1; id <= TOTAL_SOCIOS; id++) {
-                if (!registroVotosEmitidos[id + '_' + keyEncuesta]) {
-                    var d = obtenerDatosSocio(id);
-                    puntosFaltantesReales += d.puntos;
-                }
+        function calcularPuntosRestantesEnJuegoExacto(key) {
+            var sum = 0;
+            for (var i = 1; i <= TOTAL_SOCIOS; i++) {
+                if (!registroVotosEmitidos[i + '_' + key]) { sum += obtenerDatosSocio(i).puntos; }
             }
-            return puntosFaltantesReales;
+            return sum;
         }
 
         function loguearSocioInterno(id) {
             ID_SOCIO_ACTIVO = id; ROL_ACTIVO = 'socio';
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('socioDashboard').style.display = 'flex';
-            
             var d = obtenerDatosSocio(id);
             document.getElementById('lblSocioId').innerText = "#" + d.id + " - " + d.nombre;
             document.getElementById('lblSocioAntiguedad').innerText = d.antiguedad + " AÑOS";
-            document.getElementById('lblSocioPorcentual').innerText = d.porcentual.toFixed(3) + "% ASIGNADO DEL TOTAL";
-            document.getElementById('lblSocioPuntos').innerText = d.puntos + " PUNTOS POR VOTO OBTENIDOS";
-            document.getElementById('lblSocioDiasFaltantes').innerText = d.diasFaltantes > 0 ? d.diasFaltantes + " DÍAS" : "MÁXIMO ESCALAFÓN ALCANZADO";
+            document.getElementById('lblSocioPorcentual').innerText = d.porcentual.toFixed(3) + "% ASIGNADO";
+            document.getElementById('lblSocioPuntos').innerText = d.puntos + " PTS POR VOTO";
+            document.getElementById('lblSocioDiasFaltantes').innerText = d.diasFaltantes > 0 ? d.diasFaltantes + " DÍAS" : "MÁXIMO ESCALAFÓN";
         }
 
-        function loguearAdminInterno(idAdmin) {
-            ID_SOCIO_ACTIVO = idAdmin; ROL_ACTIVO = 'admin';
+        function loguearAdminInterno(idA) {
+            ID_SOCIO_ACTIVO = idA; ROL_ACTIVO = 'admin';
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('adminDashboard').style.display = 'flex';
-            
-            var d = obtenerDatosSocio(idAdmin);
-            document.getElementById('lblAdminSocioId').innerText = "#" + idAdmin;
+            var d = obtenerDatosSocio(idA);
+            document.getElementById('lblAdminSocioId').innerText = "#" + idA;
             document.getElementById('lblAdminNombreDirectivo').innerText = d.nombre;
-
-            if (idAdmin === 10000) {
-                document.getElementById('panelAgustinResetExcepcional').style.display = 'block';
-            } else {
-                document.getElementById('panelAgustinResetExcepcional').style.display = 'none';
-            }
+            document.getElementById('panelAgustinResetExcepcional').style.display = (idA === 10000) ? 'block' : 'none';
         }
 
-        function mostrarSeccionSocio(viewId) {
-            document.getElementById('socioDashboard').style.display = 'none';
-            document.getElementById(viewId).style.display = 'flex';
-            if(viewId === 'secVotaciones') inicializarSelectorVotaciones();
-        }
-
-        function mostrarSeccionAdmin(viewId) {
-            document.getElementById('adminDashboard').style.display = 'none';
-            document.getElementById(viewId).style.display = 'flex';
-            if(viewId === 'secModificar') inicializarSelectorModificaciones();
-            if(viewId === 'secPorcentuales') inicializarSelectorPorcentualesAdmin();
-        }
-
-        function irAResultadosGenerales() {
-            document.getElementById('socioDashboard').style.display = 'none';
-            document.getElementById('adminDashboard').style.display = 'none';
-            document.getElementById('secResultados').style.display = 'flex';
-            inicializarSelectorResultados();
-        }
-
-        function regresarAlPanelInterno() {
-            document.querySelectorAll('.sub-view').forEach(function(v) { v.style.display = 'none'; });
-            if(ROL_ACTIVO === 'socio') document.getElementById('socioDashboard').style.display = 'flex';
-            else document.getElementById('adminDashboard').style.display = 'flex';
-        }
-
-        function volverAlLogin() {
-            document.getElementById('socioDashboard').style.display = 'none';
-            document.getElementById('adminDashboard').style.display = 'none';
-            document.getElementById('loginScreen').style.display = 'flex';
-        }
-
-        function agregarCampoEntradaOpcion(containerId) {
-            var p = document.getElementById(containerId);
-            var n = p.getElementsByTagName('input').length;
-            var letra = String.fromCharCode(65 + n);
-            var input = document.createElement('input');
-            input.type = 'text';
-            input.className = containerId === 'containerCamposModificar' ? 'wf-input opt-mod-field' : 'wf-input opt-nueva-input';
-            input.placeholder = 'Opción ' + letra;
-            p.appendChild(input);
-        }
-        /* --- SISTEMA OPERATIVO DE CONSULTAS CON MÉTRICAS DUALES --- */
-        function inicializarSelectorVotaciones() {
-            var cmb = document.getElementById('cmbEncuestasDisponibles'); cmb.innerHTML = '';
-            Object.keys(baseEncuestas).forEach(function(k) {
-                var option = document.createElement('option'); option.value = k; option.text = baseEncuestas[k].titulo; cmb.appendChild(option);
-            });
-            document.getElementById('panelComprobanteHash').style.display = 'none';
-            cargarOpcionesParaVotar();
-        }
-
-        function cargarOpcionesParaVotar() {
-            var key = document.getElementById('cmbEncuestasDisponibles').value;
-            var div = document.getElementById('wrapperOpcionesVoto'); div.innerHTML = '';
-            var btn = document.getElementById('btnEjecutarVoto');
-
-            if(registroVotosEmitidos[ID_SOCIO_ACTIVO + '_' + key]) {
-                div.innerHTML = '<div style="color:#d91a1a; font-weight:700; text-align:center; padding:10px;">⚠ YA EMITISTE TU VOTO EN ESTA CONSULTA ELECTORAL</div>';
-                btn.style.display = 'none'; return;
-            }
-            
-            baseEncuestas[key].opts.forEach(function(o, index) {
-                var elementoLabel = document.createElement('label'); 
-                elementoLabel.style.display = 'block'; elementoLabel.style.margin = '6px 0';
-                elementoLabel.innerHTML = '<input type="radio" name="radOpt" value="' + index + '" style="margin-right:8px;"> ' + o;
-                div.appendChild(elementoLabel);
-            });
-            btn.style.display = 'block';
-        }
+        function mostrarSeccionSocio(vId) { document.getElementById('socioDashboard').style.display = 'none'; document.getElementById(vId).style.display = 'flex'; if(vId === 'secVotaciones') inicializarSelectorVotaciones(); }
+        function mostrarSeccionAdmin(vId) { document.getElementById('adminDashboard').style.display = 'none'; document.getElementById(vId).style.display = 'flex'; if(vId === 'secModificar') inicializarSelectorModificaciones(); if(vId === 'secPorcentuales') inicializarSelectorPorcentualesAdmin(); }
+        function irAResultadosGenerales() { document.getElementById('socioDashboard').style.display = 'none'; document.getElementById('adminDashboard').style.display = 'none'; document.getElementById('secResultados').style.display = 'flex'; inicializarSelectorResultados(); }
+        function regresarAlPanelInterno() { document.querySelectorAll('.sub-view').forEach(function(v){v.style.display='none';}); if(ROL_ACTIVO === 'socio') document.getElementById('socioDashboard').style.display = 'flex'; else document.getElementById('adminDashboard').style.display = 'flex'; }
+        function volverAlLogin() { document.getElementById('socioDashboard').style.display = 'none'; document.getElementById('adminDashboard').style.display = 'none'; document.getElementById('loginScreen').style.display = 'flex'; }
+        function agregarCampoEntradaOpcion(cId) { var p = document.getElementById(cId); var n = p.getElementsByTagName('input').length; var letra = String.fromCharCode(65 + n); var input = document.createElement('input'); input.type = 'text'; input.className = cId === 'containerCamposModificar' ? 'wf-input opt-mod-field' : 'wf-input opt-nueva-input'; input.placeholder = 'Opción ' + letra; p.appendChild(input); }
+        function inicializarSelectorVotaciones() { var cmb = document.getElementById('cmbEncuestasDisponibles'); cmb.innerHTML = ''; Object.keys(baseEncuestas).forEach(function(k){ var o = document.createElement('option'); o.value = k; o.text = baseEncuestas[k].titulo; cmb.appendChild(o); }); document.getElementById('panelComprobanteHash').style.display = 'none'; cargarOpcionesParaVotar(); }
+        function cargarOpcionesParaVotar() { var key = document.getElementById('cmbEncuestasDisponibles').value; var div = document.getElementById('wrapperOpcionesVoto'); div.innerHTML = ''; var btn = document.getElementById('btnEjecutarVoto'); if(registroVotosEmitidos[ID_SOCIO_ACTIVO + '_' + key]) { div.innerHTML = '<div style="color:#d91a1a; font-weight:700; text-align:center; padding:10px;">⚠ YA VOTASTE ESTA ENCUESTA</div>'; btn.style.display = 'none'; return; } baseEncuestas[key].opts.forEach(function(o, index){ var lbl = document.createElement('label'); lbl.style.display = 'block'; lbl.style.margin = '6px 0'; lbl.innerHTML = '<input type="radio" name="radOpt" value="' + index + '" style="margin-right:8px;"> ' + o; div.appendChild(lbl); }); btn.style.display = 'block'; }
 
         function registrarVotoSocio() {
             var key = document.getElementById('cmbEncuestasDisponibles').value;
-            var seleccionado = document.querySelector('input[name="radOpt"]:checked');
-            if(!seleccionado) { alert('Debe elegir una de las opciones.'); return; }
+            var sel = document.querySelector('input[name="radOpt"]:checked');
+            if(!sel) { alert('Debe elegir una opción.'); return; }
             
-            var idx = parseInt(seleccionado.value);
-            var socioDatos = obtenerDatosSocio(ID_SOCIO_ACTIVO);
+            var idx = parseInt(sel.value);
+            var sD = obtenerDatosSocio(ID_SOCIO_ACTIVO);
 
-            if(!baseEncuestas[key].votosPuntos) baseEncuestas[key].votosPuntos = Array.of(0, 0, 0);
-            if(!baseEncuestas[key].votosPersonas) baseEncuestas[key].votosPersonas = Array.of(0, 0, 0);
-            if(!baseEncuestas[key].rangoParticipantes) baseEncuestas[key].rangoParticipantes = Array.of(0, 0, 0, 0);
-
-            baseEncuestas[key].votosPuntos[idx] += socioDatos.puntos;
+            baseEncuestas[key].votosPuntos[idx] += sD.puntos;
             baseEncuestas[key].votosPersonas[idx] += 1;
             baseEncuestas[key].totalSocios += 1;
-            baseEncuestas[key].puntosPonderados += socioDatos.puntos;
-            baseEncuestas[key].rangoParticipantes[socioDatos.indiceRango] += 1;
+            baseEncuestas[key].puntosPonderados += sD.puntos;
+            baseEncuestas[key].rangoParticipantes[sD.indiceRango] += 1;
 
-            var codigoHash = "TX-" + socioDatos.id + "S-" + Math.floor(Math.random() * 9000 + 1000);
-            
-            libroActasBlockchain[codigoHash] = {
-                socioId: socioDatos.id,
-                socioNombre: socioDatos.nombre,
-                encuestaTitulo: baseEncuestas[key].titulo,
-                opcionElegida: baseEncuestas[key].opts[idx],
-                puntosAportados: socioDatos.puntos
-            };
+            var h = "TX-" + sD.id + "S-" + Math.floor(Math.random() * 9000 + 1000);
+            libroActasBlockchain[h] = { socioId: sD.id, socioNombre: sD.nombre, encuestaTitulo: baseEncuestas[key].titulo, opcionElegida: baseEncuestas[key].opts[idx], puntosAportados: sD.puntos };
 
             registroVotosEmitidos[ID_SOCIO_ACTIVO + '_' + key] = true;
             guardarDatosEnMemoriaLocal();
 
-            document.getElementById('lblCodigoHashGenerado').innerText = codigoHash;
+            document.getElementById('lblCodigoHashGenerado').innerText = h;
             document.getElementById('panelComprobanteHash').style.display = 'block';
-
-            alert('✓ Voto registrado nominalmente en el libro de actas.');
-            cargarOpcionesParaVotar();
-        }
-        function inicializarSelectorModificaciones() {
-            var cmb = document.getElementById('cmbModificarSelect'); cmb.innerHTML = '';
-            Object.keys(baseEncuestas).forEach(function(k) {
-                var option = document.createElement('option'); option.value = k; option.text = baseEncuestas[k].titulo; cmb.appendChild(option);
-            });
-            cargarCamposModificar();
+            alert('✓ Voto guardado.'); cargarOpcionesParaVotar();
         }
 
-        function cargarCamposModificar() {
-            var key = document.getElementById('cmbModificarSelect').value;
-            var div = document.getElementById('containerCamposModificar'); div.innerHTML = '';
-            
-            baseEncuestas[key].opts.forEach(function(opcionText) {
-                var input = document.createElement('input');
-                input.type = 'text'; input.className = 'wf-input opt-mod-field'; input.value = opcionText;
-                div.appendChild(input);
-            });
-        }
+        function inicializarSelectorModificaciones() { var cmb = document.getElementById('cmbModificarSelect'); cmb.innerHTML = ''; Object.keys(baseEncuestas).forEach(function(k){ var o = document.createElement('option'); o.value = k; o.text = baseEncuestas[k].titulo; cmb.appendChild(o); }); cargarCamposModificar(); }
+        function cargarCamposModificar() { var key = document.getElementById('cmbModificarSelect').value; var div = document.getElementById('containerCamposModificar'); div.innerHTML = ''; baseEncuestas[key].opts.forEach(function(opText){ var input = document.createElement('input'); input.type = 'text'; input.className = 'wf-input opt-mod-field'; input.value = opText; div.appendChild(input); }); }
 
         function guardarModificacionAdmin() {
             var key = document.getElementById('cmbModificarSelect').value;
             var inputs = document.getElementById('containerCamposModificar').getElementsByClassName('opt-mod-field');
-            
-            var nuevasOpciones = []; var nuevosVotosPts = []; var nuevosVotosPers = [];
+            var nO = Array.of(); var nVPt = Array.of(); var nVPe = Array.of();
             for(var i = 0; i < inputs.length; i++) {
                 var val = inputs[i].value.trim();
-                if(val !== "") {
-                    nuevasOpciones.push(val);
-                    nuevosVotosPts.push(baseEncuestas[key].votosPuntos[i] || 0);
-                    nuevosVotosPers.push(baseEncuestas[key].votosPersonas[i] || 0);
-                }
+                if(val !== "") { nO.push(val); nVPt.push(baseEncuestas[key].votosPuntos[i] || 0); nVPe.push(baseEncuestas[key].votosPersonas[i] || 0); }
             }
-            baseEncuestas[key].opts = nuevasOpciones;
-            baseEncuestas[key].votosPuntos = nuevosVotosPts;
-            baseEncuestas[key].votosPersonas = nuevosVotosPers;
-            
-            guardarDatosEnMemoriaLocal();
-            alert('✓ Consulta y opciones guardadas con éxito.');
-            cargarCamposModificar();
+            baseEncuestas[key].opts = nO; baseEncuestas[key].votosPuntos = nVPt; baseEncuestas[key].votosPersonas = nVPe;
+            guardarDatosEnMemoriaLocal(); alert('✓ Enmienda guardada.'); cargarCamposModificar();
         }
 
         function guardarNuevaEncuestaAdmin() {
             var tit = document.getElementById('txtNuevaEncuestaTitulo').value.trim();
             var inputs = document.getElementById('containerCamposNuevos').getElementsByClassName('opt-nueva-input');
-            
-            var opcionesCreadas = []; var ceros = [];
+            var nO = Array.of(); var ceros = Array.of();
             for(var i = 0; i < inputs.length; i++) {
-                var val = inputs[i].value.trim();
-                if(val !== "") { opcionesCreadas.push(val); ceros.push(0); }
+                var val = inputs[i].value.trim(); if(val !== "") { nO.push(val); ceros.push(0); }
             }
-            if(!tit || opcionesCreadas.length < 2) { alert('Complete el título y al menos 2 opciones.'); return; }
-            
-            var nextId = 'enc_' + (Object.keys(baseEncuestas).length + 1);
-            baseEncuestas[nextId] = { titulo: tit, opts: opcionesCreadas, votosPuntos: ceros, votosPersonas: JSON.parse(JSON.stringify(ceros)), totalSocios: 0, puntosPonderados: 0, rangoParticipantes: Array.of(0, 0, 0, 0) };
-            
-            guardarDatosEnMemoriaLocal();
-            alert('✓ Nueva consulta agregada.');
-            regresarAlPanelInterno();
+            if(!tit || nO.length < 2) { alert('Complete los campos.'); return; }
+            var nId = 'enc_' + (Object.keys(baseEncuestas).length + 1);
+            baseEncuestas[nId] = { titulo: tit, opts: nO, votosPuntos: ceros, votosPersonas: JSON.parse(JSON.stringify(ceros)), totalSocios: 0, puntosPonderados: 0, rangoParticipantes: Array.of(0,0,0,0) };
+            guardarDatosEnMemoriaLocal(); alert('✓ Encuesta creada.'); regresarAlPanelInterno();
         }
-
-        function inicializarSelectorResultados() {
-            var cmb = document.getElementById('cmbResultadosSelect'); cmb.innerHTML = '';
-            Object.keys(baseEncuestas).forEach(function(k) {
-                var option = document.createElement('option'); option.value = k; option.text = baseEncuestas[k].titulo; cmb.appendChild(option);
-            });
-            document.getElementById('wrapperResultadoAuditoriaHash').style.display = 'none';
-            document.getElementById('txtHashAuditoriaBuscar').value = '';
-            actualizarReporteGrafico();
-        }
+        function inicializarSelectorResultados() { var cmb = document.getElementById('cmbResultadosSelect'); cmb.innerHTML = ''; Object.keys(baseEncuestas).forEach(function(k){ var o = document.createElement('option'); o.value = k; o.text = baseEncuestas[k].titulo; cmb.appendChild(o); }); document.getElementById('wrapperResultadoAuditoriaHash').style.display = 'none'; document.getElementById('txtHashAuditoriaBuscar').value = ''; actualizarReporteGrafico(); }
         function actualizarReporteGrafico() {
-            var key = document.getElementById('cmbResultadosSelect').value;
-            var item = baseEncuestas[key];
-
+            var key = document.getElementById('cmbResultadosSelect').value; var item = baseEncuestas[key];
             document.getElementById('lblResTotalVotos').innerText = item.totalSocios;
-            var restantes = TOTAL_SOCIOS - item.totalSocios;
-            document.getElementById('lblResRestantes').innerText = restantes;
-            
-            var puntosFaltantesReales = calcularPuntosRestantesEnJuegoExacto(key);
-            document.getElementById('lblResPuntosJuego').innerText = puntosFaltantesReales.toLocaleString() + " PTS";
+            var rest = TOTAL_SOCIOS - item.totalSocios; document.getElementById('lblResRestantes').innerText = rest;
+            document.getElementById('lblResPuntosJuego').innerText = calcularPuntosRestantesEnJuegoExacto(key).toLocaleString() + " PTS";
 
-            var contenedor = document.getElementById('contenedorBarrasDinamicas');
-            contenedor.innerHTML = '';
+            var cont = document.getElementById('contenedorBarrasDinamicas'); cont.innerHTML = '';
             var colores = Array.of('#002D62', '#d91a1a', '#ffc107', '#28a745', '#9333ea', '#06b6d4');
 
-            item.opts.forEach(function(opcionTexto, i) {
-                var puntosDeEstaOpcion = item.votosPuntos ? (item.votosPuntos[i] || 0) : 0;
-                var personasDeEstaOpcion = item.votosPersonas ? (item.votosPersonas[i] || 0) : 0;
-                
-                var porcentaje = item.puntosPonderados > 0 ? ((puntosDeEstaOpcion / item.puntosPonderados) * 100).toFixed(1) : "0.0";
-                var colorAsignado = colores[i % colores.length];
-
-                var wrapper = document.createElement('div');
-                wrapper.className = 'barra-resultado-contenedor';
-                wrapper.innerHTML = 
-                    '<div class="barra-resultado-texto">' +
-                        '<span>' + opcionTexto + ' <span style="font-weight:normal; font-size:11px; color:#64748b;">(' + personasDeEstaOpcion + ' votos reales)</span></span>' +
-                        '<span>' + puntosDeEstaOpcion + ' pts (' + porcentaje + '%)</span>' +
-                    '</div>' +
-                    '<div class="barra-resultado-fondo">' +
-                        '<div class="barra-resultado-lleno" style="width: ' + porcentaje + '%; background-color: ' + colorAsignado + ';"></div>' +
-                    '</div>';
-                contenedor.appendChild(wrapper);
+            item.opts.forEach(function(opTexto, i){
+                var pts = item.votosPuntos[i] || 0; var pers = item.votosPersonas[i] || 0;
+                var por = item.puntosPonderados > 0 ? ((pts / item.puntosPonderados) * 100).toFixed(1) : "0.0";
+                var wrap = document.createElement('div'); wrap.className = 'barra-resultado-contenedor';
+                wrap.innerHTML = '<div class="barra-resultado-texto"><span>' + opTexto + ' <span style="font-weight:normal; font-size:11px; color:#64748b;">(' + pers + ' votos reales)</span></span><span>' + pts + ' pts (' + por + '%)</span></div><div class="barra-resultado-fondo"><div class="barra-resultado-lleno" style="width: ' + por + '%; background-color: ' + colores[i % colores.length] + ';"></div></div>';
+                cont.appendChild(wrap);
             });
         }
 
         function auditarHashCriptograficoPapeleta() {
-            var hashBuscado = document.getElementById('txtHashAuditoriaBuscar').value.trim();
-            var divResultado = document.getElementById('wrapperResultadoAuditoriaHash');
-            
-            if(!hashBuscado) { alert('Ingrese un código de comprobante para buscar.'); return; }
-            divResultado.style.display = 'block';
-            
-            if(libroActasBlockchain[hashBuscado]) {
-                var registro = libroActasBlockchain[hashBuscado];
-                divResultado.style.backgroundColor = '#e0f2fe';
-                divResultado.style.color = '#0369a1';
-                divResultado.style.border = '1px solid #0369a1';
-                divResultado.innerHTML = 
-                    '<div style="margin-bottom:4px;"><b>PAPELETA NOMINAL DETECTADA CON ÉXITO</b></div>' +
-                    '<div>• <b>Socio Votante:</b> ID #' + registro.socioId + ' - ' + registro.socioNombre + '</div>' +
-                    '<div>• <b>Consulta Electoral:</b> ' + registro.encuestaTitulo + '</div>' +
-                    '<div>• <b>Opción Registrada:</b> ' + registro.opcionElegida + '</div>' +
-                    '<div>• <b>Impacto en Escrutinio:</b> ' + registro.puntosAportados + ' Puntos Ponderados</div>';
+            var hB = document.getElementById('txtHashAuditoriaBuscar').value.trim();
+            var divR = document.getElementById('wrapperResultadoAuditoriaHash'); if(!hB) { alert('Ingrese un código.'); return; }
+            divR.style.display = 'block';
+            if(libroActasBlockchain[hB]) {
+                var r = libroActasBlockchain[hB]; divR.style.backgroundColor = '#e0f2fe'; divR.style.color = '#0369a1'; divR.style.border = '1px solid #0369a1';
+                divR.innerHTML = '<div><b>PAPELETA NOMINAL DETECTADA</b></div><div>• <b>Socio:</b> #' + r.socioId + ' - ' + r.socioNombre + '</div><div>• <b>Consulta:</b> ' + r.encuestaTitulo + '</div><div>• <b>Opción:</b> ' + r.opcionElegida + '</div><div>• <b>Impacto:</b> ' + r.puntosAportados + ' Puntos Ponderados</div>';
             } else {
-                divResultado.style.backgroundColor = '#fee2e2';
-                divResultado.style.color = '#991b1b';
-                divResultado.style.border = '1px solid #991b1b';
-                divResultado.innerHTML = '⚠ <b>ERROR DE AUDITORÍA:</b> El código ingresado no existe en el libro de actas oficial del padrón.';
+                divR.style.backgroundColor = '#fee2e2'; divR.style.color = '#991b1b'; divR.style.border = '1px solid #991b1b'; divR.innerHTML = '⚠ El código ingresado no existe.';
             }
         }
 
-        function inicializarSelectorPorcentualesAdmin() {
-            var cmb = document.getElementById('cmbPorcentualesSelect'); cmb.innerHTML = '';
-            Object.keys(baseEncuestas).forEach(function(k) {
-                var option = document.createElement('option'); option.value = k; option.text = baseEncuestas[k].titulo; cmb.appendChild(option);
-            });
-            renderizarListaPorcentualesAdmin();
-        }
-
+        function inicializarSelectorPorcentualesAdmin() { var cmb = document.getElementById('cmbPorcentualesSelect'); cmb.innerHTML = ''; Object.keys(baseEncuestas).forEach(function(k){ var o = document.createElement('option'); o.value = k; o.text = baseEncuestas[k].titulo; cmb.appendChild(o); }); renderizarListaPorcentualesAdmin(); }
         function renderizarListaPorcentualesAdmin() {
-            var key = document.getElementById('cmbPorcentualesSelect').value;
-            var item = baseEncuestas[key];
+            var key = document.getElementById('cmbPorcentualesSelect').value; var item = baseEncuestas[key];
             var div = document.getElementById('wrapperListaPorcentuales'); div.innerHTML = '';
-            
-            if (!item.rangoParticipantes) { item.rangoParticipantes = Array.of(0, 0, 0, 0); }
+            var nR = Array.of("Socios Nuevos (1-5 años - Peso: 60%)", "Socios Medios (5-10 años - Peso: 20%)", "Socios Antiguos (10-15 años - Peso: 10%)", "Socios Vitalicios (>15 años - Peso: 10%)");
+            var tR = Array.of(6000, 2000, 1000, 1000); var cR = Array.of('#0284c7', '#f59e0b', '#10b981', '#6366f1');
 
-            var nombresRangos = Array.of("Socios Nuevos (1-5 años de antigüedad - Peso: 60%)", "Socios Medios (5-10 años de antigüedad - Peso: 20%)", "Socios Antiguos (10-15 años de antigüedad - Peso: 10%)", "Socios Vitalicios (>15 años de antigüedad - Peso: 10%)");
-            var totalesPorRango = Array.of(6000, 2000, 1000, 1000);
-            var coloresRangos = Array.of('#0284c7', '#f59e0b', '#10b981', '#6366f1');
-
-            nombresRangos.forEach(function(nombre, i) {
-                // CORRECCIÓN SINTAXIS: Unión de la variable que estaba separada con un espacio accidental
-                var votaronEnEsteRango = item.rangoParticipantes[i] || 0;
-                var totalDeEsteRango = totalesPorRango[i];
-                var pctParticipacion = ((votaronEnEsteRango / totalDeEsteRango) * 100).toFixed(2);
-
-                var row = document.createElement('div');
-                row.className = 'wf-box text-left';
-                row.style.padding = '12px 16px';
-                row.innerHTML = 
-                    '<div class="barra-resultado-texto">' +
-                        '<span style="color:#0f172a; font-size:13px;">' + nombre + '</span>' +
-                        '<span class="mini-badge">' + votaronEnEsteRango + ' de ' + totalDeEsteRango + ' participaron</span>' +
-                    '</div>' +
-                    '<div style="font-size:16px; font-weight:800; margin: 4px 0 8px 0; color:' + coloresRangos[i] + ';">' + pctParticipacion + '% DE PARTICIPACIÓN</div>' +
-                    '<div class="barra-resultado-fondo" style="height:10px;">' +
-                        '<div class="barra-resultado-lleno" style="width: ' + pctParticipacion + '%; background-color: ' + coloresRangos[i] + ';"></div>' +
-                    '</div>';
+            nR.forEach(function(nombre, i){
+                var vR = item.rangoParticipantes[i] || 0; var pP = ((vR / tR[i]) * 100).toFixed(2);
+                var row = document.createElement('div'); row.className = 'wf-box text-left'; row.style.padding = '12px 16px';
+                row.innerHTML = '<div class="barra-resultado-texto"><span style="color:#0f172a; font-size:13px;">' + nombre + '</span><span class="mini-badge">' + vR + ' de ' + tR[i] + ' participaron</span></div><div style="font-size:16px; font-weight:800; margin: 4px 0 8px 0; color:' + cR[i] + ';">' + pP + '% DE PARTICIPACIÓN</div><div class="barra-resultado-fondo" style="height:10px;"><div class="barra-resultado-lleno" style="width: ' + pP + '%; background-color: ' + cR[i] + ';"></div></div>';
                 div.appendChild(row);
             });
         }
-    </script>
-</body>
-</html>
-
     </script>
 </body>
 </html>
