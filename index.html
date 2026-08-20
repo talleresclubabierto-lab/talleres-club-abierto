@@ -517,52 +517,37 @@
         }
         function inicializarSelectorResultados() { var cmb = document.getElementById('cmbResultadosSelect'); cmb.innerHTML = ''; Object.keys(baseEncuestas).forEach(function(k){ var o = document.createElement('option'); o.value = k; o.text = baseEncuestas[k].titulo; cmb.appendChild(o); }); document.getElementById('wrapperResultadoAuditoriaHash').style.display = 'none'; document.getElementById('txtHashAuditoriaBuscar').value = ''; actualizarReporteGrafico(); }
         function actualizarReporteGrafico() {
-            var key = document.getElementById('cmbResultadosSelect').value; var item = baseEncuestas[key];
+            var key = document.getElementById('cmbResultadosSelect').value; 
+            var item = baseEncuestas[key];
+            
             document.getElementById('lblResTotalVotos').innerText = item.totalSocios;
-            var rest = TOTAL_SOCIOS - item.totalSocios; document.getElementById('lblResRestantes').innerText = rest;
+            var rest = TOTAL_SOCIOS - item.totalSocios; 
+            document.getElementById('lblResRestantes').innerText = rest;
             document.getElementById('lblResPuntosJuego').innerText = calcularPuntosRestantesEnJuegoExacto(key).toLocaleString() + " PTS";
 
-            var cont = document.getElementById('contenedorBarrasDinamicas'); cont.innerHTML = '';
+            // Buscamos el recuadro blanco de la izquierda de forma directa
+            var cont = document.getElementById('contenedorBarrasDinamicas');
+            if (!cont) {
+                var wrapperGrafico = document.querySelector('.chart-wrapper');
+                if (!wrapperGrafico) return;
+                cont = document.createElement('div');
+                cont.id = 'contenedorBarrasDinamicas';
+                cont.style.display = 'flex';
+                cont.style.flexDirection = 'column';
+                cont.style.gap = '4px';
+                wrapperGrafico.appendChild(cont);
+            }
+            cont.innerHTML = '';
+            
             var colores = Array.of('#002D62', '#d91a1a', '#ffc107', '#28a745', '#9333ea', '#06b6d4');
 
             item.opts.forEach(function(opTexto, i){
-                var pts = item.votosPuntos[i] || 0; var pers = item.votosPersonas[i] || 0;
+                var pts = item.votosPuntos[i] || 0; 
+                var pers = item.votosPersonas[i] || 0;
                 var por = item.puntosPonderados > 0 ? ((pts / item.puntosPonderados) * 100).toFixed(1) : "0.0";
                 
-                // CORRECCIÓN VISUAL: Variable unificada como 'wrap' de principio a fin
-                var wrap = document.createElement('div'); 
-                wrap.className = 'barra-resultado-contenedor';
-                wrap.innerHTML = '<div class="barra-resultado-texto"><span>' + opTexto + ' <span style="font-weight:normal; font-size:11px; color:#64748b;">(' + pers + ' votos reales)</span></span><span>' + pts + ' pts (' + por + '%)</span></div><div class="barra-resultado-fondo"><div class="barra-resultado-lleno" style="width: ' + por + '%; background-color: ' + colores[i % colores.length] + ';"></div></div>';
-                cont.appendChild(wrap);
+                // INYECCIÓN DIRECTA SEGURA: Elimina las variables redundantes propensas a errores de tipeo
+                var bloqueBarraHtml = '<div class="barra-resultado-contenedor"><div class="barra-resultado-texto"><span>' + opTexto + ' <span style="font-weight:normal; font-size:11px; color:#64748b;">(' + pers + ' votos reales)</span></span><span>' + pts + ' pts (' + por + '%)</span></div><div class="barra-resultado-fondo"><div class="barra-resultado-lleno" style="width: ' + por + '%; background-color: ' + colores[i % colores.length] + ';"></div></div></div>';
+                cont.insertAdjacentHTML('beforeend', bloqueBarraHtml);
             });
         }
-
-        function auditarHashCriptograficoPapeleta() {
-            var hB = document.getElementById('txtHashAuditoriaBuscar').value.trim();
-            var divR = document.getElementById('wrapperResultadoAuditoriaHash'); if(!hB) { alert('Ingrese un código.'); return; }
-            divR.style.display = 'block';
-            if(libroActasBlockchain[hB]) {
-                var r = libroActasBlockchain[hB]; divR.style.backgroundColor = '#e0f2fe'; divR.style.color = '#0369a1'; divR.style.border = '1px solid #0369a1';
-                divR.innerHTML = '<div><b>PAPELETA NOMINAL DETECTADA</b></div><div>• <b>Socio:</b> #' + r.socioId + ' - ' + r.socioNombre + '</div><div>• <b>Consulta:</b> ' + r.encuestaTitulo + '</div><div>• <b>Opción:</b> ' + r.opcionElegida + '</div><div>• <b>Impacto:</b> ' + r.puntosAportados + ' Puntos Ponderados</div>';
-            } else {
-                divR.style.backgroundColor = '#fee2e2'; divR.style.color = '#991b1b'; divR.style.border = '1px solid #991b1b'; divR.innerHTML = '⚠ El código ingresado no existe.';
-            }
-        }
-
-        function inicializarSelectorPorcentualesAdmin() { var cmb = document.getElementById('cmbPorcentualesSelect'); cmb.innerHTML = ''; Object.keys(baseEncuestas).forEach(function(k){ var o = document.createElement('option'); o.value = k; o.text = baseEncuestas[k].titulo; cmb.appendChild(o); }); renderizarListaPorcentualesAdmin(); }
-        function renderizarListaPorcentualesAdmin() {
-            var key = document.getElementById('cmbPorcentualesSelect').value; var item = baseEncuestas[key];
-            var div = document.getElementById('wrapperListaPorcentuales'); div.innerHTML = '';
-            var nR = Array.of("Socios Nuevos (1-5 años - Peso: 60%)", "Socios Medios (5-10 años - Peso: 20%)", "Socios Antiguos (10-15 años - Peso: 10%)", "Socios Vitalicios (>15 años - Peso: 10%)");
-            var tR = Array.of(6000, 2000, 1000, 1000); var cR = Array.of('#0284c7', '#f59e0b', '#10b981', '#6366f1');
-
-            nR.forEach(function(nombre, i){
-                var vR = item.rangoParticipantes[i] || 0; var pP = ((vR / tR[i]) * 100).toFixed(2);
-                var row = document.createElement('div'); row.className = 'wf-box text-left'; row.style.padding = '12px 16px';
-                row.innerHTML = '<div class="barra-resultado-texto"><span style="color:#0f172a; font-size:13px;">' + nombre + '</span><span class="mini-badge">' + vR + ' de ' + tR[i] + ' participaron</span></div><div style="font-size:16px; font-weight:800; margin: 4px 0 8px 0; color:' + cR[i] + ';">' + pP + '% DE PARTICIPACIÓN</div><div class="barra-resultado-fondo" style="height:10px;"><div class="barra-resultado-lleno" style="width: ' + pP + '%; background-color: ' + cR[i] + ';"></div></div>';
-                div.appendChild(row);
-            });
-        }
-    </script>
-</body>
-</html>
