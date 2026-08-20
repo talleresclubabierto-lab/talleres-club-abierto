@@ -525,7 +525,6 @@
             document.getElementById('lblResRestantes').innerText = rest;
             document.getElementById('lblResPuntosJuego').innerText = calcularPuntosRestantesEnJuegoExacto(key).toLocaleString() + " PTS";
 
-            // Buscamos el recuadro blanco de la izquierda de forma directa
             var cont = document.getElementById('contenedorBarrasDinamicas');
             if (!cont) {
                 var wrapperGrafico = document.querySelector('.chart-wrapper');
@@ -542,11 +541,11 @@
             var colores = Array.of('#002D62', '#d91a1a', '#ffc107', '#28a745', '#9333ea', '#06b6d4');
 
             item.opts.forEach(function(opTexto, i){
+                // CORRECCIÓN MATEMÁTICA: Cambiado el número 1 por la variable i del bucle
                 var pts = item.votosPuntos[i] || 0; 
                 var pers = item.votosPersonas[i] || 0;
                 var por = item.puntosPonderados > 0 ? ((pts / item.puntosPonderados) * 100).toFixed(1) : "0.0";
                 
-                // INYECCIÓN DIRECTA SEGURA: Elimina las variables redundantes propensas a errores de tipeo
                 var bloqueBarraHtml = '<div class="barra-resultado-contenedor"><div class="barra-resultado-texto"><span>' + opTexto + ' <span style="font-weight:normal; font-size:11px; color:#64748b;">(' + pers + ' votos reales)</span></span><span>' + pts + ' pts (' + por + '%)</span></div><div class="barra-resultado-fondo"><div class="barra-resultado-lleno" style="width: ' + por + '%; background-color: ' + colores[i % colores.length] + ';"></div></div></div>';
                 cont.insertAdjacentHTML('beforeend', bloqueBarraHtml);
             });
