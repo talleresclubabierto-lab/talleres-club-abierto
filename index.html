@@ -206,6 +206,23 @@
             border-radius: 4px;
             color: #475569;
         }
+        /* BOTÓN DE DESTRUCCIÓN CRÍTICA DE PRUEBA DE AGUSTÍN */
+        .btn-danger-reset {
+            background-color: #ffffff;
+            color: #d91a1a;
+            border: 2px solid #d91a1a;
+            padding: 10px 16px;
+            font-size: 12px;
+            font-weight: 800;
+            border-radius: 6px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+        .btn-danger-reset:hover {
+            background-color: #fee2e2;
+        }
     </style>
 </head>
 <body>
@@ -301,6 +318,11 @@
                 <button class="btn-action-red" onclick="irAResultadosGenerales()">Resultado de Encuestas</button>
                 <button class="btn-action-red" onclick="mostrarSeccionAdmin('secPorcentuales')">% de Votación de Cada Encuesta</button>
             </div>
+
+            <!-- PANEL EXCEPCIONAL DE RESETEO: Sólo visible para Agustín Supicciatti (ID 10000) -->
+            <div id="panelAgustinResetExcepcional" class="full-width" style="display:none; text-align:center; margin-top:10px;">
+                <button type="button" class="btn-danger-reset" onclick="ejecutarResetElectoralAbsolutoA0()">⚠ Resetear Padrón y Encuestas a Cero (Modo Prueba)</button>
+            </div>
         </div>
         <!-- --- VISTA INTERNA: VOTACIONES ACTIVAS (SOCIOS) --- -->
         <div id="secVotaciones" class="sub-view full-width">
@@ -353,7 +375,7 @@
                 <button class="wf-button" style="width:auto; margin:0;" onclick="regresarAlPanelInterno()">Volver</button>
             </div>
             <div class="wf-box full-width" style="text-align: left;">
-                <label style="font-size: 13px; color: #64748b; display: block; margin-bottom: 6px;">SELECCIONAR ENCUESTA A MODIFICAR:</label>
+                <label style="font-size: 13px; color: #64748b; display: block; margin-bottom: 6px;">SELECCIONAL ENCUESTA A MODIFICAR:</label>
                 <select id="cmbModificarSelect" class="wf-input" onchange="cargarCamposModificar()"></select>
                 
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
@@ -393,7 +415,7 @@
             <div class="wf-box full-width" style="margin-top:20px; text-align:left;">
                 <span class="txt-info-red" style="display:block; margin-bottom:10px;">🔍 Auditoría de Voto Único - Verificación de Papeleta Digital</span>
                 <div style="display:flex; gap:12px;">
-                    <input type="text" id="txtHashAuditoriaBuscar" class="wf-input" placeholder="Pegue su comprobante criptográfico aquí (Ej: TX-5D8A2-1913)" style="margin-bottom:0;">
+                    <input type="text" id="txtHashAuditoriaBuscar" class="wf-input" placeholder="Pegue su comprobante criptográfico aquí (Ej: TX-10000S-4821)" style="margin-bottom:0;">
                     <button type="button" class="wf-button" style="width:auto; white-space:nowrap; background-color:#475569;" onclick="auditarHashCriptograficoPapeleta()">Verificar Papeleta</button>
                 </div>
                 <div id="wrapperResultadoAuditoriaHash" style="margin-top:12px; font-size:13px; font-weight:700; display:none; padding:10px; border-radius:4px;"></div>
@@ -413,13 +435,14 @@
         </div>
     </div> <!-- Fin container -->
     <script>
-        /* --- CORE DE NEGOCIO Y PERSISTENCIA DE CONTROL --- */
+        /* --- CORE DE NEGOCIO Y MEMORIA RESILIENTE ENTRE ACTUALIZACIONES --- */
         var TOTAL_SOCIOS = 10000;
         var ID_SOCIO_ACTIVO = 0;
         var ROL_ACTIVO = ''; 
 
         var adminFijos = Array.of(10000, 9000, 8000);
 
+        // Estructura limpia por defecto
         var encuestasInicialesLimpias = {
             enc_1: { titulo: "Elección de Jugador Destacado (Fichaje/Premio)", opts: Array.of("Opción A - Santos Valoyes", "Opción B - Bruno Zapelli", "Opción C - Ramón Sosa"), votosPuntos: Array.of(0, 0, 0), votosPersonas: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0, rangoParticipantes: Array.of(0, 0, 0, 0) },
             enc_2: { titulo: "Elección de Director Técnico (Próximo Ciclo)", opts: Array.of("Opción A - Alexander Medina", "Opción B - Walter Ribonetto", "Opción C - Gabriel Heinze"), votosPuntos: Array.of(0, 0, 0), votosPersonas: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0, rangoParticipantes: Array.of(0, 0, 0, 0) },
@@ -428,17 +451,18 @@
             enc_5: { titulo: "Main Sponsor (Patrocinador Principal en Pecho)", opts: Array.of("Opción A - ICBC Corporativo", "Opción B - Betsson Sports", "Opción C - Flybondi Líneas Aéreas"), votosPuntos: Array.of(0, 0, 0), votosPersonas: Array.of(0, 0, 0), totalSocios: 0, puntosPonderados: 0, rangoParticipantes: Array.of(0, 0, 0, 0) }
         };
 
+        // CORRECCIÓN PROTECCIÓN DE DATOS: Si ya existen votos en el navegador, NO los pisa al cambiar tu código
         if (!localStorage.getItem('TD_baseEncuestas')) {
             localStorage.setItem('TD_baseEncuestas', JSON.stringify(encuestasInicialesLimpias));
         }
         if (!localStorage.getItem('TD_registroVotos')) {
             localStorage.setItem('TD_registroVotos', JSON.stringify({}));
         }
-        // NUEVO: Libro de actas de papeletas criptográficas descentralizadas en memoria
         if (!localStorage.getItem('TD_libroActasBlockchain')) {
             localStorage.setItem('TD_libroActasBlockchain', JSON.stringify({}));
         }
 
+        // Cargamos las variables globales de forma resiliente desde la memoria local estable
         var baseEncuestas = JSON.parse(localStorage.getItem('TD_baseEncuestas'));
         var registroVotosEmitidos = JSON.parse(localStorage.getItem('TD_registroVotos'));
         var libroActasBlockchain = JSON.parse(localStorage.getItem('TD_libroActasBlockchain'));
@@ -449,50 +473,22 @@
             localStorage.setItem('TD_libroActasBlockchain', JSON.stringify(libroActasBlockchain));
         }
 
-        /* --- CONTROL DE INGRESO BIOMÉTRICO --- */
-        function procesarIngreso(tipo) {
-            var userSocio = document.getElementById('socioUser').value.trim();
-            var passSocio = document.getElementById('socioPass').value;
-            var userAdmin = document.getElementById('adminUser').value.trim();
-            var passAdmin = document.getElementById('adminPass').value;
-
-            var faceBox = document.getElementById(tipo === 'socio' ? 'socioBioFace' : 'adminBioFace');
-            var fingerBox = document.getElementById(tipo === 'socio' ? 'socioBioFinger' : 'adminBioFinger');
-
-            document.querySelectorAll('.biometric-box').forEach(function(b) {
-                b.classList.remove('accent-blue');
-                b.innerText = b.id.includes('Face') ? 'cartel de validación biométrica' : 'cartel de validación huella digital';
-            });
-
-            if (tipo === 'socio') {
-                var id = parseInt(userSocio);
-                if (isNaN(id) || id < 1 || id > TOTAL_SOCIOS || passSocio !== '1913') {
-                    alert('Acceso Denegado: ID fuera del padrón (1-10000) o clave incorrecta.');
-                    return;
-                }
-                ejecutarAnimacion(faceBox, fingerBox, function() { loguearSocioInterno(id); });
-            } else {
-                var idAdmin = parseInt(userAdmin);
-                if (isNaN(idAdmin) || !adminFijos.includes(idAdmin) || passAdmin !== '1913') {
-                    alert('Acceso Denegado: Para ser administrador ingrese ID válido (10000, 9000 u 8000) y clave 1913.');
-                    return;
-                }
-                ejecutarAnimacion(faceBox, fingerBox, function() { loguearAdminInterno(idAdmin); });
+        /* --- EXCEPCIONAL: BOTÓN DE DESTRUCCIÓN TOTAL PARA AGUSTÍN (ID 10000) --- */
+        function ejecutarResetElectoralAbsolutoA0() {
+            if (confirm('¿Confirma que desea resetear y borrar de forma permanente todas las encuestas y votos acumulados a cero para iniciar un muestreo limpio?')) {
+                localStorage.removeItem('TD_baseEncuestas');
+                localStorage.removeItem('TD_registroVotos');
+                localStorage.removeItem('TD_libroActasBlockchain');
+                
+                // Forzamos la re-inicialización limpia inmediata en el navegador
+                baseEncuestas = JSON.parse(JSON.stringify(encuestasInicialesLimpias));
+                registroVotosEmitidos = {};
+                libroActasBlockchain = {};
+                guardarDatosEnMemoriaLocal();
+                
+                alert('✓ Base de datos electoral completamente reseteada a 0.00% de forma exitosa.');
+                volverAlLogin();
             }
-        }
-
-        function ejecutarAnimacion(face, finger, callback) {
-            face.classList.add('accent-blue');
-            face.innerText = "ESCANEANDO ROSTRO... RECONOCIENDO EXPRESIONES VIVAS";
-            setTimeout(function() {
-                face.innerText = "✓ VALIDACIÓN BIOMÉTRICA COMPLETADA";
-                finger.classList.add('accent-blue');
-                finger.innerText = "ESCANEANDO HUELLA... DETECTANDO PULSO DACTILAR";
-                setTimeout(function() {
-                    finger.innerText = "✓ VALIDACIÓN DE HUELLA DIGITAL COMPLETADA";
-                    setTimeout(callback, 500);
-                }, 900);
-            }, 1000);
         }
         /* --- REGLAS MATEMÁTICAS EXACTAS DEL PADRÓN E IDENTIDADES --- */
         function obtenerDatosSocio(id) {
@@ -551,6 +547,13 @@
             var d = obtenerDatosSocio(idAdmin);
             document.getElementById('lblAdminSocioId').innerText = "#" + idAdmin;
             document.getElementById('lblAdminNombreDirectivo').innerText = d.nombre;
+
+            // PROTECCIÓN EXCLUSIVA: Activa el botón de reset a cero de forma única para Agustín Supicciatti (ID 10000)
+            if (idAdmin === 10000) {
+                document.getElementById('panelAgustinResetExcepcional').style.display = 'block';
+            } else {
+                document.getElementById('panelAgustinResetExcepcional').style.display = 'none';
+            }
         }
 
         function mostrarSeccionSocio(viewId) {
@@ -595,7 +598,7 @@
             input.placeholder = 'Opción ' + letra;
             p.appendChild(input);
         }
-        /* --- SISTEMA OPERATIVO DE CONSULTAS CON MÉTRICAS DUALES --- */
+        /* --- SISTEMA OPERATIVO DE CONSULTAS CON MÉTRICAS DUALES PONDERADAS --- */
         function inicializarSelectorVotaciones() {
             var cmb = document.getElementById('cmbEncuestasDisponibles'); cmb.innerHTML = '';
             Object.keys(baseEncuestas).forEach(function(k) {
@@ -637,17 +640,17 @@
             if(!baseEncuestas[key].votosPersonas) baseEncuestas[key].votosPersonas = Array.of(0, 0, 0);
             if(!baseEncuestas[key].rangoParticipantes) baseEncuestas[key].rangoParticipantes = Array.of(0, 0, 0, 0);
 
-            // Computo de datos electorales duales
+            // Registro dual del escrutinio
             baseEncuestas[key].votosPuntos[idx] += socioDatos.puntos;
             baseEncuestas[key].votosPersonas[idx] += 1;
+            
             baseEncuestas[key].totalSocios += 1;
             baseEncuestas[key].puntosPonderados += socioDatos.puntos;
             baseEncuestas[key].rangoParticipantes[socioDatos.indiceRango] += 1;
 
-            // GENERACIÓN DEL HASH CRIPTOGRÁFICO DE PAPELETA NOMINAL
+            // Generación del Hash Nominal Público
             var codigoHash = "TX-" + socioDatos.id + "S-" + Math.floor(Math.random() * 9000 + 1000);
             
-            // Guardamos en el acta el rastro completo visible solicitado
             libroActasBlockchain[codigoHash] = {
                 socioId: socioDatos.id,
                 socioNombre: socioDatos.nombre,
@@ -657,14 +660,12 @@
             };
 
             registroVotosEmitidos[ID_SOCIO_ACTIVO + '_' + key] = true;
-
             guardarDatosEnMemoriaLocal();
 
-            // Mostramos el comprobante en pantalla
             document.getElementById('lblCodigoHashGenerado').innerText = codigoHash;
             document.getElementById('panelComprobanteHash').style.display = 'block';
 
-            alert('✓ Voto registrado de forma nominal en el acta digital.');
+            alert('✓ Voto registrado nominalmente en el acta digital.');
             cargarOpcionesParaVotar();
         }
         function inicializarSelectorModificaciones() {
@@ -772,22 +773,18 @@
             });
         }
 
-        /* --- MOTOR DE AUDITORÍA CRIPTOGRÁFICA NOMINAL PÚBLICA --- */
         function auditarHashCriptograficoPapeleta() {
             var hashBuscado = document.getElementById('txtHashAuditoriaBuscar').value.trim();
             var divResultado = document.getElementById('wrapperResultadoAuditoriaHash');
             
             if(!hashBuscado) { alert('Ingrese un código de comprobante para buscar.'); return; }
-            
             divResultado.style.display = 'block';
             
-            // Verificamos si el Hash existe en el libro de actas
             if(libroActasBlockchain[hashBuscado]) {
                 var registro = libroActasBlockchain[hashBuscado];
                 divResultado.style.backgroundColor = '#e0f2fe';
                 divResultado.style.color = '#0369a1';
                 divResultado.style.border = '1px solid #0369a1';
-                // REGLA NUEVA EXTRA: Expone de forma pública la identidad nominal detrás de la papeleta
                 divResultado.innerHTML = 
                     '<div style="margin-bottom:4px;"><b>PAPELETA NOMINAL DETECTADA CON ÉXITO</b></div>' +
                     '<div>• <b>Socio Votante:</b> ID #' + registro.socioId + ' - ' + registro.socioNombre + '</div>' +
