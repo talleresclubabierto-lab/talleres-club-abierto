@@ -528,7 +528,10 @@
             item.opts.forEach(function(opTexto, i){
                 var pts = item.votosPuntos[i] || 0; var pers = item.votosPersonas[i] || 0;
                 var por = item.puntosPonderados > 0 ? ((pts / item.puntosPonderados) * 100).toFixed(1) : "0.0";
-                var wrap = document.createElement('div'); wrap.className = 'barra-resultado-contenedor';
+                
+                // CORRECCIÓN VISUAL: Variable unificada como 'wrap' de principio a fin
+                var wrap = document.createElement('div'); 
+                wrap.className = 'barra-resultado-contenedor';
                 wrap.innerHTML = '<div class="barra-resultado-texto"><span>' + opTexto + ' <span style="font-weight:normal; font-size:11px; color:#64748b;">(' + pers + ' votos reales)</span></span><span>' + pts + ' pts (' + por + '%)</span></div><div class="barra-resultado-fondo"><div class="barra-resultado-lleno" style="width: ' + por + '%; background-color: ' + colores[i % colores.length] + ';"></div></div>';
                 cont.appendChild(wrap);
             });
