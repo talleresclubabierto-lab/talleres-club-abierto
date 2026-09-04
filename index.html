@@ -800,10 +800,10 @@ body{
 
       <section class="management-block">
         <h3>Resetear contraseña de un socio</h3>
-        <p class="muted">El socio volverá a ingresar con la contraseña inicial de maqueta: <strong>1913</strong>.</p>
+        <p class="muted">El socio recibirá por un canal privado la contraseña temporal definida por la administración.</p>
         <label class="form-label">N° de socio</label>
         <input id="txtResetClaveSocio" type="number" min="1" class="wf-input">
-        <button class="reset-button" style="width:100%" onclick="resetearClaveSocioAdmin()">Restablecer a 1913</button>
+        <button class="reset-button" style="width:100%" onclick="resetearClaveSocioAdmin()">Restablecer contraseña temporal</button>
       </section>
 
       <section id="panelPerfilInstitucionalPadron" class="management-block management-block-wide">
@@ -2466,10 +2466,8 @@ if(CREDENCIALES_FUENTE==='supabase'&&supabaseClient){
     }
 }
 
-/* Respaldo temporal mientras dure la maqueta. */
-var guardada=PASSWORD_HASHES[id];
-if(!guardada)return String(clave)==='1913';
-return (await hashClave(clave))===guardada || hashClaveFallback(clave)===guardada;
+/* No existe ninguna contraseña válida ni predeterminada en el navegador. */
+return false;
 }
 
 async function procesarIngreso(tipo){
@@ -2580,13 +2578,13 @@ if(isNaN(id)||!PADRON_SOCIOS[id]){
     return;
 }
 var nombre=PADRON_SOCIOS[id][0]||('Socio #'+id);
-if(!confirm('¿Restablecer la contraseña de '+nombre+' (Socio #'+id.toLocaleString('es-AR')+') a 1913?'))return;
+if(!confirm('¿Restablecer la contraseña temporal de '+nombre+' (Socio #'+id.toLocaleString('es-AR')+')? La nueva clave deberá comunicarse por un canal privado.'))return;
 
 try{
     if(CREDENCIALES_FUENTE!=='supabase')throw new Error('Servicio de credenciales no disponible');
     await resetearClaveEnSupabase(id);
     document.getElementById('txtResetClaveSocio').value='';
-    alert('✓ Contraseña restablecida a 1913 en Supabase.');
+    alert('✓ Contraseña temporal restablecida. Comunicala únicamente por un canal privado.');
 }catch(e){
     console.error(e);
     alert('No se pudo resetear la contraseña. La credencial anterior continúa vigente.');
