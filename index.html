@@ -979,6 +979,64 @@ async function loginSeguroClub(numeroSocio,password){
     return data;
 }
 
+async function cargarEstadoInicialAutenticado(){
+    var token=obtenerTokenSesionClub();
+    if(!token)throw new Error('Sesión segura requerida');
+
+    var data=await llamarClubAbiertoApi({accion:'estado_inicial'},token);
+    if(!data||data.ok!==true)throw new Error('La API no devolvió el estado autenticado');
+
+    PADRON_SOCIOS={};
+    (Array.isArray(data.socios)?data.socios:[]).forEach(function(s){
+        var id=Number(s.numero_socio);
+        if(Number.isInteger(id)&&id>0)PADRON_SOCIOS[id]=[String(s.nombre||('Socio #'+id)),s.fecha_alta||''];
+    });
+
+    ADMIN_IDS=(Array.isArray(data.administradores)?data.administradores:[])
+        .map(function(a){return Number(a.numero_socio)})
+        .filter(function(id){return Number.isInteger(id)&&id>0});
+
+    var opcionesPorEncuesta={};
+    (Array.isArray(data.opciones)?data.opciones:[]).forEach(function(o){
+        var encuestaId=Number(o.encuesta_id),pos=Number(o.posicion);
+        if(!opcionesPorEncuesta[encuestaId])opcionesPorEncuesta[encuestaId]=[];
+        if(Number.isInteger(pos)&&pos>=0)opcionesPorEncuesta[encuestaId][pos]=String(o.texto||'');
+    });
+
+    baseEncuestas={};
+    (Array.isArray(data.encuestas)?data.encuestas:[]).forEach(function(e){
+        var key=String(e.clave||('enc_'+e.id));
+        var opts=(opcionesPorEncuesta[Number(e.id)]||[]).filter(function(v){return v!==undefined});
+        baseEncuestas[key]={
+            supabaseId:Number(e.id),titulo:String(e.titulo||key),opts:opts,
+            votos:opts.map(function(){return 0}),totalSocios:0,puntosPonderados:0,
+            estado:e.estado||'abierta',fechaApertura:e.fecha_apertura||'',fechaCierre:e.fecha_cierre||''
+        };
+    });
+
+    registroVotosEmitidos={};
+    (Array.isArray(data.votos)?data.votos:[]).forEach(function(v){
+        var key=claveEncuestaDesdeId(v.encuesta_id),id=Number(v.numero_socio);
+        if(!key||!baseEncuestas[key]||!Number.isInteger(id))return;
+        var e=baseEncuestas[key],op=v.opcion_posicion===null?null:Number(v.opcion_posicion);
+        var pts=v.puntos_ponderacion===null?null:Number(v.puntos_ponderacion);
+        registroVotosEmitidos[id+'_'+key]=v.es_historico_incompleto===true?true:{opcion:op,puntos:pts,fecha:v.fecha_voto||null,fuente:'api-segura'};
+        e.totalSocios++;
+        if(Number.isFinite(pts)){
+            e.puntosPonderados+=pts;
+            if(Number.isInteger(op)&&op>=0&&op<e.votos.length)e.votos[op]+=pts;
+        }
+    });
+
+    PADRON_FUENTE='api-segura'; ADMINS_FUENTE='api-segura';
+    ENCUESTAS_FUENTE='api-segura'; VOTOS_FUENTE='api-segura'; CREDENCIALES_FUENTE='api-segura';
+    SINCRONIZACION_INICIAL_COMPLETA=true;
+    recalcularPadronRuntime();
+    refrescarVistasTrasSincronizacion();
+    actualizarEstadoSync('Sesión validada · información cargada mediante API segura',true);
+    return data;
+}
+
 async function validarSesionSeguraClub(){
     var token=obtenerTokenSesionClub();
     if(!token)return null;
@@ -1693,8 +1751,10 @@ var HISTORIAL_ADMIN_DATOS=[];
  * Se incluyen únicamente N° de socio, nombre y fecha de afiliación.
  * DNI, domicilio y demás datos personales NO se incorporan a la web.
  */
-/* Cierre de seguridad 6C-9.0: ningún dato operativo puede persistir ni cargarse antes de que club-abierto-api valide una sesión. */
-['TD_padronSocios','TD_baseEncuestas','TD_registroVotos','TD_administradores_padron_v1','TD_password_hashes_v1'].forEach(function(clave){ localStorage.removeItem(clave); });
+/* Cierre de seguridad 6C-9.0: ningún dato operativo puede persistir ni cargarse
+   antes de que club-abierto-api valide una sesión. */
+['TD_padronSocios','TD_baseEncuestas','TD_registroVotos','TD_administradores_padron_v1','TD_password_hashes_v1']
+    .forEach(function(clave){ localStorage.removeItem(clave); });
 var PADRON_SOCIOS={}; // Se cargará exclusivamente vía API tras autenticar.
 
 /*
@@ -2435,6 +2495,8 @@ try{
         alert('Acceso Denegado: el socio no está habilitado actualmente como administrador.');
         return;
     }
+
+    await cargarEstadoInicialAutenticado();
 
     /* Mantener el padrón runtime alineado para las vistas existentes. */
     if(!PADRON_SOCIOS[id]){
