@@ -1028,12 +1028,21 @@ async function cargarEstadoInicialAutenticado(){
         }
     });
 
+    var totalSociosApi=Number(data.total_socios_activos);
+    var totalVotosApi=Number(data.total_votos);
+    if(Number.isFinite(totalSociosApi)&&Object.keys(PADRON_SOCIOS).length!==totalSociosApi){
+        throw new Error('La API devolvió un padrón incompleto');
+    }
+    if(Number.isFinite(totalVotosApi)&&Object.keys(registroVotosEmitidos).length!==totalVotosApi){
+        throw new Error('La API devolvió una auditoría de votos incompleta');
+    }
+
     PADRON_FUENTE='api-segura'; ADMINS_FUENTE='api-segura';
     ENCUESTAS_FUENTE='api-segura'; VOTOS_FUENTE='api-segura'; CREDENCIALES_FUENTE='api-segura';
     SINCRONIZACION_INICIAL_COMPLETA=true;
     recalcularPadronRuntime();
     refrescarVistasTrasSincronizacion();
-    actualizarEstadoSync('Sesión validada · información cargada mediante API segura',true);
+    actualizarEstadoSync('Sesión validada · '+TOTAL_SOCIOS.toLocaleString('es-AR')+' socios · '+Object.keys(registroVotosEmitidos).length.toLocaleString('es-AR')+' votos cargados mediante API segura',true);
     return data;
 }
 
@@ -1771,18 +1780,17 @@ var SUPER_ADMIN_ID=21998;
 var ADMIN_STORAGE_KEY='TD_administradores_padron_v1';
 var PASSWORD_STORAGE_KEY='TD_password_hashes_v1';
 
+/* No reutilizar copias históricas antes del login. La información se
+   carga exclusivamente desde la API después de validar la sesión. */
 try{
-    var padronCache=JSON.parse(localStorage.getItem('TD_padronSocios')||'null');
-    if(padronCache && typeof padronCache==='object' && Object.keys(padronCache).length){
-        PADRON_SOCIOS=padronCache;
-    }
+    localStorage.removeItem('TD_padronSocios');
+    localStorage.removeItem(PASSWORD_STORAGE_KEY);
+    localStorage.removeItem('TD_baseEncuestas');
+    localStorage.removeItem('TD_registroVotos');
+    localStorage.removeItem(ADMIN_STORAGE_KEY);
 }catch(e){}
 
 var PASSWORD_HASHES={};
-try{
-    var passCache=JSON.parse(localStorage.getItem(PASSWORD_STORAGE_KEY)||'{}');
-    if(passCache && typeof passCache==='object')PASSWORD_HASHES=passCache;
-}catch(e){PASSWORD_HASHES={};}
 
 var SOCIOS_HABILITADOS=Object.keys(PADRON_SOCIOS).map(Number).sort(function(a,b){return a-b});
 var TOTAL_SOCIOS=SOCIOS_HABILITADOS.length;
@@ -1811,8 +1819,11 @@ function recalcularPadronRuntime(){
         if(!PADRON_SOCIOS[id])delete PASSWORD_HASHES[id];
     });
 
-    localStorage.setItem('TD_padronSocios',JSON.stringify(PADRON_SOCIOS));
-    localStorage.setItem(PASSWORD_STORAGE_KEY,JSON.stringify(PASSWORD_HASHES));
+    /* El padrón y las credenciales nunca se persisten en el navegador. */
+    try{
+        localStorage.removeItem('TD_padronSocios');
+        localStorage.removeItem(PASSWORD_STORAGE_KEY);
+    }catch(e){}
 
     var totalLogin=document.getElementById('lblTotalSociosLogin');
     if(totalLogin)totalLogin.innerText=TOTAL_SOCIOS.toLocaleString('es-AR');
@@ -1824,21 +1835,9 @@ function recalcularPadronRuntime(){
 }
 
 function cargarAdministradores(){
-    var lista=[];
-    try{
-        var guardados=JSON.parse(localStorage.getItem(ADMIN_STORAGE_KEY)||'[]');
-        if(Array.isArray(guardados)) lista=guardados.map(Number).filter(function(id){return !!PADRON_SOCIOS[id]});
-    }catch(e){
-        lista=[];
-    }
-
-    if(!lista.includes(SUPER_ADMIN_ID) && PADRON_SOCIOS[SUPER_ADMIN_ID]){
-        lista.unshift(SUPER_ADMIN_ID);
-    }
-
-    lista=Array.from(new Set(lista));
-    localStorage.setItem(ADMIN_STORAGE_KEY,JSON.stringify(lista));
-    return lista;
+    /* La lista real se recibe desde la API después de autenticar. */
+    try{localStorage.removeItem(ADMIN_STORAGE_KEY)}catch(e){}
+    return [];
 }
 
 var ADMIN_IDS=cargarAdministradores();
@@ -1860,10 +1859,11 @@ function esSuperAdministrador(id){
 }
 
 function actualizarCantidadAdministradores(){
+    var sesionVisible=!!obtenerTokenSesionClub();
     var el=document.getElementById('lblCantidadAdminsLogin');
-    if(el) el.innerText=ADMIN_IDS.length.toLocaleString('es-AR');
+    if(el) el.innerText=sesionVisible?ADMIN_IDS.length.toLocaleString('es-AR'):'-';
     var fuente=document.getElementById('lblFuenteAdmins');
-    if(fuente)fuente.innerText='Fuente: '+(ADMINS_FUENTE==='supabase'?'Supabase':'respaldo');
+    if(fuente)fuente.innerText=sesionVisible?'Fuente: API segura':'Acceso restringido';
 }
 
 var encuestasInicialesLimpias={
@@ -3639,7 +3639,7 @@ obtenerTokenSesionClub();
 
 normalizarDatos();
 recalcularPadronRuntime();
-document.getElementById('lblTotalSociosLogin').innerText=TOTAL_SOCIOS.toLocaleString('es-AR');
+document.getElementById('lblTotalSociosLogin').innerText='-';
 document.getElementById('txtAuditoriaSocio').max=MAX_SOCIO;
 actualizarCantidadAdministradores();
 actualizarEstadoSync('Acceso protegido · iniciá sesión para consultar información',true);
