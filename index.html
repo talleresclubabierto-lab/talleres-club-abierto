@@ -1262,7 +1262,8 @@ async function resetearClaveEnSupabase(id){
     if(!token)throw new Error('Sesión segura requerida');
     var r=await llamarClubAbiertoApi({accion:'resetear_password_admin',numero_socio_objetivo:Number(id)},token);
     if(!r||r.ok!==true||r.password_reseteado!==true)throw new Error((r&&r.mensaje)||'El backend no confirmó el reset');
-    return true;
+    if(!r.password_temporal)throw new Error('El backend no devolvió la contraseña temporal');
+    return String(r.password_temporal);
 }
 
 async function cargarVotosDesdeTabla(){
@@ -2582,9 +2583,9 @@ if(!confirm('¿Restablecer la contraseña temporal de '+nombre+' (Socio #'+id.to
 
 try{
     if(CREDENCIALES_FUENTE!=='supabase')throw new Error('Servicio de credenciales no disponible');
-    await resetearClaveEnSupabase(id);
+    var passwordTemporal=await resetearClaveEnSupabase(id);
     document.getElementById('txtResetClaveSocio').value='';
-    alert('✓ Contraseña temporal restablecida. Comunicala únicamente por un canal privado.');
+    alert('✓ Contraseña temporal restablecida para el socio #'+id.toLocaleString('es-AR')+'.\n\nCLAVE TEMPORAL: '+passwordTemporal+'\n\nCopiala ahora y comunicala únicamente por un canal privado. No volverá a mostrarse.');
 }catch(e){
     console.error(e);
     alert('No se pudo resetear la contraseña. La credencial anterior continúa vigente.');
