@@ -1314,62 +1314,8 @@ async function resetearTodosLosVotosSupabase(){
 }
 
 async function cargarEncuestasDesdeTablas(){
-    if(!supabaseClient)throw new Error('Cliente Supabase no inicializado');
-
-    var re=await supabaseClient
-        .from('encuestas')
-        .select('id,clave,titulo,estado,fecha_apertura,fecha_cierre,habilitada')
-        .eq('habilitada',true)
-        .order('id',{ascending:true});
-    if(re.error)throw re.error;
-
-    var encuestas=re.data||[];
-    if(!encuestas.length)throw new Error('No hay encuestas habilitadas en public.encuestas');
-
-    var ids=encuestas.map(function(e){return e.id});
-    var ro=await supabaseClient
-        .from('opciones_encuesta')
-        .select('id,encuesta_id,posicion,texto,habilitada')
-        .in('encuesta_id',ids)
-        .eq('habilitada',true)
-        .order('encuesta_id',{ascending:true})
-        .order('posicion',{ascending:true});
-    if(ro.error)throw ro.error;
-
-    var porEncuesta={};
-    (ro.data||[]).forEach(function(o){
-        if(!porEncuesta[o.encuesta_id])porEncuesta[o.encuesta_id]=[];
-        porEncuesta[o.encuesta_id][Number(o.posicion)]=String(o.texto);
-    });
-
-    var anterior=baseEncuestas||{};
-    var nuevo={};
-
-    encuestas.forEach(function(e){
-        var previa=anterior[e.clave]||{};
-        var opts=(porEncuesta[e.id]||[]).filter(function(v){return v!==undefined});
-        var votos=Array.isArray(previa.votos)?previa.votos.slice(0,opts.length):[];
-        while(votos.length<opts.length)votos.push(0);
-
-        nuevo[e.clave]={
-            titulo:String(e.titulo),
-            opts:opts,
-            votos:votos,
-            totalSocios:Number(previa.totalSocios)||0,
-            puntosPonderados:Number(previa.puntosPonderados)||0,
-            estado:String(e.estado||'borrador'),
-            fechaApertura:e.fecha_apertura||'',
-            fechaCierre:e.fecha_cierre||'',
-            supabaseId:e.id
-        };
-    });
-
-    baseEncuestas=nuevo;
-    ENCUESTAS_FUENTE='supabase';
-    ENCUESTAS_ULTIMA_CARGA=new Date();
-    localStorage.setItem('TD_baseEncuestas',JSON.stringify(baseEncuestas));
-
-    return {encuestas:encuestas.length,opciones:(ro.data||[]).length};
+    var data=await cargarEstadoInicialAutenticado();
+    return {encuestas:Number(data.total_encuestas)||0,opciones:Array.isArray(data.opciones)?data.opciones.length:0};
 }
 
 async function recargarEncuestasSupabase(){
@@ -1379,90 +1325,19 @@ async function recargarEncuestasSupabase(){
 }
 
 async function guardarEncuestaSupabase(clave){
-    if(!supabaseClient)throw new Error('Supabase no está conectado');
     var e=baseEncuestas[clave];
     if(!e)throw new Error('Encuesta inexistente');
-
-    var payload={
-        clave:clave,
-        titulo:e.titulo,
-        estado:e.estado||'borrador',
-        fecha_apertura:e.fechaApertura||null,
-        fecha_cierre:e.fechaCierre||null,
-        habilitada:true,
-        creado_por:ID_SOCIO_ACTIVO||null
-    };
-
-    var r=await supabaseClient
-        .from('encuestas')
-        .upsert(payload,{onConflict:'clave'})
-        .select('id')
-        .single();
-    if(r.error)throw r.error;
-
-    var encuestaId=r.data.id;
-
-    var actuales=await supabaseClient
-        .from('opciones_encuesta')
-        .select('id,posicion')
-        .eq('encuesta_id',encuestaId);
-    if(actuales.error)throw actuales.error;
-
-    var activas=e.opts.map(function(_,i){return i});
-    var quitar=(actuales.data||[])
-        .filter(function(o){return !activas.includes(Number(o.posicion))})
-        .map(function(o){return o.id});
-
-    if(quitar.length){
-        var rd=await supabaseClient
-            .from('opciones_encuesta')
-            .update({habilitada:false})
-            .in('id',quitar);
-        if(rd.error)throw rd.error;
-    }
-
-    var filas=e.opts.map(function(texto,i){
-        return {encuesta_id:encuestaId,posicion:i,texto:texto,habilitada:true};
-    });
-
-    if(filas.length){
-        var ru=await supabaseClient
-            .from('opciones_encuesta')
-            .upsert(filas,{onConflict:'encuesta_id,posicion'});
-        if(ru.error)throw ru.error;
-    }
-
-    await cargarEncuestasDesdeTablas();
+    await llamarClubAbiertoApi({
+        accion:'guardar_encuesta',clave:String(clave),titulo:String(e.titulo||''),
+        estado:String(e.estado||'borrador'),fecha_apertura:e.fechaApertura||null,
+        fecha_cierre:e.fechaCierre||null,opciones:(e.opts||[]).slice()
+    },obtenerTokenSesionClub());
+    await cargarEstadoInicialAutenticado();
 }
 
 async function cargarAdministradoresDesdeTabla(){
-    if(!supabaseClient)throw new Error('Cliente Supabase no inicializado');
-
-    var resultado=await supabaseClient
-        .from('administradores')
-        .select('numero_socio,es_principal,habilitado')
-        .eq('habilitado',true)
-        .order('es_principal',{ascending:false})
-        .order('numero_socio',{ascending:true});
-
-    if(resultado.error)throw resultado.error;
-
-    var filas=resultado.data||[];
-    var ids=filas
-        .map(function(r){return Number(r.numero_socio)})
-        .filter(function(id){return Number.isFinite(id)&&!!PADRON_SOCIOS[id]});
-
-    if(!ids.includes(SUPER_ADMIN_ID)){
-        throw new Error('La tabla administradores no contiene habilitado al socio 21.998');
-    }
-
-    ADMIN_IDS=Array.from(new Set(ids));
-    ADMINS_FUENTE='supabase';
-    ADMINS_ULTIMA_CARGA=new Date();
-    localStorage.setItem(ADMIN_STORAGE_KEY,JSON.stringify(ADMIN_IDS));
-    actualizarCantidadAdministradores();
-
-    return ADMIN_IDS.length;
+    var data=await cargarEstadoInicialAutenticado();
+    return Array.isArray(data.administradores)?data.administradores.length:0;
 }
 
 async function recargarAdministradoresSupabase(){
@@ -1477,46 +1352,8 @@ async function recargarAdministradoresSupabase(){
 }
 
 async function cargarPadronDesdeTablaSocios(){
-    if(!supabaseClient)throw new Error('Cliente Supabase no inicializado');
-
-    var nuevoPadron={};
-    var desde=0;
-    var lote=1000;
-    var recibidos=0;
-
-    while(true){
-        var resultado=await supabaseClient
-            .from('socios')
-            .select('numero_socio,nombre,fecha_alta')
-            .eq('habilitado',true)
-            .order('numero_socio',{ascending:true})
-            .range(desde,desde+lote-1);
-
-        if(resultado.error)throw resultado.error;
-
-        var filas=resultado.data||[];
-        filas.forEach(function(s){
-            var id=Number(s.numero_socio);
-            if(!Number.isFinite(id)||!s.nombre||!s.fecha_alta)return;
-            nuevoPadron[id]=[String(s.nombre),String(s.fecha_alta)];
-        });
-
-        recibidos+=filas.length;
-        if(filas.length<lote)break;
-        desde+=lote;
-        if(desde>250000)throw new Error('Paginación de padrón fuera de rango');
-    }
-
-    if(!Object.keys(nuevoPadron).length)throw new Error('public.socios no devolvió socios habilitados');
-    if(!nuevoPadron[SUPER_ADMIN_ID])throw new Error('El padrón remoto no contiene al socio 21.998');
-
-    PADRON_SOCIOS=nuevoPadron;
-    PADRON_FUENTE='supabase';
-    PADRON_ULTIMA_CARGA=new Date();
-    localStorage.setItem('TD_padronSocios',JSON.stringify(PADRON_SOCIOS));
-    recalcularPadronRuntime();
-
-    return recibidos;
+    var data=await cargarEstadoInicialAutenticado();
+    return Number(data.total_socios_activos)||0;
 }
 
 async function recargarPadronSupabase(){
@@ -3055,23 +2892,14 @@ var id=parseInt(document.getElementById('txtPadronNuevoNumero').value);
 var nombre=document.getElementById('txtPadronNuevoNombre').value.trim().replace(/\s+/g,' ');
 var fecha=document.getElementById('txtPadronNuevaFecha').value;
 if(isNaN(id)||id<1){alert('Ingresá un N° de socio válido.');return}
-if(PADRON_SOCIOS[id]){alert('Ese N° de socio ya existe en el padrón. Para corregir su nombre utilizá la sección Modificar nombre.');return}
-if(!nombre){alert('Ingresá nombre y apellido.');return}
-if(!/^\d{4}-\d{2}-\d{2}$/.test(fecha)){alert('Ingresá una fecha de alta válida.');return}
+if(PADRON_SOCIOS[id]){alert('Ese N° de socio ya existe en el padrón.');return}
+if(!nombre||!/^\d{4}-\d{2}-\d{2}$/.test(fecha)){alert('Completá nombre y fecha de alta válidos.');return}
 try{
-var r=await supabaseClient.from('socios').insert({
-numero_socio:id,nombre:nombre,fecha_alta:fecha,habilitado:true,datos_extra:{}
-});
-if(r.error)throw r.error;
-await recargarPadronSupabase();
-document.getElementById('txtPadronNuevoNumero').value='';
-document.getElementById('txtPadronNuevoNombre').value='';
-document.getElementById('txtPadronNuevaFecha').value='';
-alert('✓ Socio #'+id.toLocaleString('es-AR')+' agregado al padrón de Supabase.');
-}catch(e){
-console.error(e);
-alert('No se pudo agregar el socio en Supabase. No se realizó ningún cambio.');
-}
+await llamarClubAbiertoApi({accion:'agregar_socio',numero_socio:id,nombre:nombre,fecha_alta:fecha},obtenerTokenSesionClub());
+await cargarEstadoInicialAutenticado();
+document.getElementById('txtPadronNuevoNumero').value='';document.getElementById('txtPadronNuevoNombre').value='';document.getElementById('txtPadronNuevaFecha').value='';
+alert('✓ Socio agregado al padrón.');
+}catch(e){console.error(e);alert(e.message||'No se pudo agregar el socio.')}
 }
 
 function cargarSocioParaEditar(){
@@ -3090,18 +2918,13 @@ async function guardarNombreSocio(){
 if(ROL_ACTIVO!=='admin'||!esAdministrador(ID_SOCIO_ACTIVO)){alert('Acceso exclusivo de administradores.');return}
 var id=parseInt(document.getElementById('txtPadronEditarNumero').value);
 var nombre=document.getElementById('txtPadronEditarNombre').value.trim().replace(/\s+/g,' ');
-if(isNaN(id)||!PADRON_SOCIOS[id]){alert('Primero buscá un socio válido.');return}
-if(!nombre){alert('El nombre no puede quedar vacío.');return}
+if(isNaN(id)||!PADRON_SOCIOS[id]||!nombre){alert('Primero buscá un socio válido e ingresá un nombre.');return}
 try{
-var r=await supabaseClient.from('socios').update({nombre:nombre}).eq('numero_socio',id);
-if(r.error)throw r.error;
-await recargarPadronSupabase();
-document.getElementById('lblPadronEditarInfo').innerText='Nombre actualizado correctamente en Supabase.';
+await llamarClubAbiertoApi({accion:'actualizar_nombre_socio',numero_socio:id,nombre:nombre},obtenerTokenSesionClub());
+await cargarEstadoInicialAutenticado();
+document.getElementById('lblPadronEditarInfo').innerText='Nombre actualizado correctamente.';
 alert('✓ Nombre del socio actualizado.');
-}catch(e){
-console.error(e);
-alert('No se pudo modificar el nombre en Supabase.');
-}
+}catch(e){console.error(e);alert(e.message||'No se pudo modificar el nombre.')}
 }
 
 function formatoFechaPadron(v){
@@ -3259,49 +3082,29 @@ alert('La importación no pudo completarse en Supabase. Revisá el archivo o la 
 }
 
 async function agregarAdministrador(){
-if(!esSuperAdministrador(ID_SOCIO_ACTIVO)){alert('Sólo el socio 21.998 puede modificar los permisos administrativos.');return;}
-var input=document.getElementById('txtNuevoAdministrador');
-var id=parseInt(input.value);
-if(isNaN(id)||!PADRON_SOCIOS[id]){alert('El N° de socio ingresado no existe en el padrón habilitado.');return;}
-if(esAdministrador(id)){alert('Ese socio ya tiene permiso de administrador.');return;}
+if(!esSuperAdministrador(ID_SOCIO_ACTIVO)){alert('Sólo el socio 21.998 puede modificar los permisos administrativos.');return}
+var input=document.getElementById('txtNuevoAdministrador'),id=parseInt(input.value);
+if(isNaN(id)||!PADRON_SOCIOS[id]){alert('El N° de socio no existe en el padrón habilitado.');return}
+if(esAdministrador(id)){alert('Ese socio ya es administrador.');return}
 try{
-var r=await supabaseClient.from('administradores').upsert({
-numero_socio:id,
-es_principal:false,
-habilitado:true,
-creado_por:ID_SOCIO_ACTIVO
-},{onConflict:'numero_socio'});
-if(r.error)throw r.error;
-await recargarAdministradoresSupabase();
-input.value='';
-renderizarAdministradores();
-alert('✓ El socio #'+id.toLocaleString('es-AR')+' fue habilitado como administrador en Supabase.');
-}catch(e){
-console.error(e);
-alert('No se pudo habilitar el administrador en Supabase.');
-}
+await llamarClubAbiertoApi({accion:'habilitar_administrador',numero_socio:id},obtenerTokenSesionClub());
+await cargarEstadoInicialAutenticado();input.value='';renderizarAdministradores();
+alert('✓ Administrador habilitado.');
+}catch(e){console.error(e);alert(e.message||'No se pudo habilitar el administrador.')}
 }
 
 async function quitarAdministrador(id){
 id=Number(id);
-if(!esSuperAdministrador(ID_SOCIO_ACTIVO)){alert('Sólo el socio 21.998 puede modificar los permisos administrativos.');return;}
-if(id===SUPER_ADMIN_ID){alert('El socio 21.998 es el administrador principal y no puede ser removido.');return;}
+if(!esSuperAdministrador(ID_SOCIO_ACTIVO)){alert('Sólo el socio 21.998 puede modificar los permisos administrativos.');return}
+if(id===SUPER_ADMIN_ID){alert('El administrador principal no puede ser removido.');return}
 if(!esAdministrador(id))return;
-var ficha=PADRON_SOCIOS[id];
-var nombre=ficha?ficha[0]:('Socio #'+id);
-if(!confirm('¿Quitar el permiso de administrador a '+nombre+' (Socio #'+id.toLocaleString('es-AR')+')?'))return;
+var ficha=PADRON_SOCIOS[id],nombre=ficha?ficha[0]:('Socio #'+id);
+if(!confirm('¿Quitar el permiso de administrador a '+nombre+'?'))return;
 try{
-var r=await supabaseClient.from('administradores').update({
-habilitado:false
-}).eq('numero_socio',id);
-if(r.error)throw r.error;
-await recargarAdministradoresSupabase();
-renderizarAdministradores();
-alert('✓ Permiso de administrador deshabilitado en Supabase.');
-}catch(e){
-console.error(e);
-alert('No se pudo quitar el permiso en Supabase.');
-}
+await llamarClubAbiertoApi({accion:'deshabilitar_administrador',numero_socio:id},obtenerTokenSesionClub());
+await cargarEstadoInicialAutenticado();renderizarAdministradores();
+alert('✓ Permiso de administrador deshabilitado.');
+}catch(e){console.error(e);alert(e.message||'No se pudo quitar el permiso.')}
 }
 
 function renderizarAdministradores(){
