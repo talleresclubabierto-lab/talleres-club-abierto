@@ -1369,13 +1369,7 @@ async function recargarPadronSupabase(){
 }
 
 async function upsertSociosEnTabla(filas){
-    if(!supabaseClient)throw new Error('Supabase no está conectado');
-    var tam=400;
-    for(var i=0;i<filas.length;i+=tam){
-        var lote=filas.slice(i,i+tam);
-        var r=await supabaseClient.from('socios').upsert(lote,{onConflict:'numero_socio'});
-        if(r.error)throw r.error;
-    }
+    throw new Error('La importación directa fue deshabilitada. Utilizá la importación atómica mediante la API segura.');
 }
 
 async function cargarEstadoGlobalRemoto(){
@@ -3026,51 +3020,48 @@ var p=IMPORTACION_PADRON_PENDIENTE;
 if(!p||!p.total)return;
 if(p.faltaSuper){alert('El padrón de reemplazo debe incluir al socio 21.998.');return}
 
-try{
-if(p.modo==='agregar'){
-if(!confirm('Se agregarán '+p.nuevos.toLocaleString('es-AR')+' socios nuevos. Los socios ya existentes no serán modificados. ¿Continuar?'))return;
 var filas=[];
 Object.keys(p.padron).forEach(function(id){
-if(!PADRON_SOCIOS[id]){
-filas.push({
-numero_socio:Number(id),
-nombre:p.padron[id][0],
-fecha_alta:p.padron[id][1],
-habilitado:true,
-datos_extra:{}
+    if(p.modo==='reemplazar'||!PADRON_SOCIOS[id]){
+        filas.push({numero_socio:Number(id),nombre:p.padron[id][0],fecha_alta:p.padron[id][1]});
+    }
 });
-}
-});
-if(filas.length)await upsertSociosEnTabla(filas);
-}else{
-if(!confirm('ATENCIÓN: se reemplazará el padrón habilitado actual por '+p.total.toLocaleString('es-AR')+' socios del archivo. ¿Continuar?'))return;
+if(!filas.length){alert('No hay socios nuevos para agregar.');return}
 
-/*
- * En esta maqueta el reemplazo no borra físicamente registros históricos:
- * primero deshabilita el padrón actual y luego hace upsert del nuevo.
- */
-var des=await supabaseClient.from('socios').update({habilitado:false}).eq('habilitado',true);
-if(des.error)throw des.error;
+var mensaje=p.modo==='agregar'
+    ?'Se agregarán '+filas.length.toLocaleString('es-AR')+' socios nuevos. Los existentes no serán modificados.'
+    :'ATENCIÓN: se reemplazará el padrón habilitado por '+filas.length.toLocaleString('es-AR')+' socios. La aplicación será atómica y conservará los registros históricos.';
+if(!confirm(mensaje+' ¿Continuar?'))return;
 
-var filasReemplazo=Object.keys(p.padron).map(function(id){
-return {
-numero_socio:Number(id),
-nombre:p.padron[id][0],
-fecha_alta:p.padron[id][1],
-habilitado:true,
-datos_extra:{}
-};
-});
-await upsertSociosEnTabla(filasReemplazo);
-}
-
-await recargarPadronSupabase();
-limpiarPreviewImportacion();
-document.getElementById('filePadronExcel').value='';
-alert('✓ Importación aplicada al padrón de Supabase.');
+var btn=document.getElementById('btnConfirmarImportacionPadron');
+var prev=document.getElementById('previewImportacionPadron');
+if(btn)btn.disabled=true;
+try{
+    var inicio=await llamarClubAbiertoApi({
+        accion:'iniciar_importacion_padron',modo:p.modo,total:filas.length,invalidos:p.invalidos||0
+    },obtenerTokenSesionClub());
+    var importacionId=inicio.importacion_id;
+    var tam=400;
+    for(var i=0;i<filas.length;i+=tam){
+        var lote=filas.slice(i,i+tam);
+        var avance=await llamarClubAbiertoApi({
+            accion:'cargar_lote_importacion_padron',importacion_id:importacionId,filas:lote
+        },obtenerTokenSesionClub());
+        if(prev)prev.innerHTML='<strong>Carga segura en preparación</strong><br>'+Number(avance.recibidos||0).toLocaleString('es-AR')+' de '+filas.length.toLocaleString('es-AR')+' socios validados. El padrón vigente todavía no fue modificado.';
+    }
+    var fin=await llamarClubAbiertoApi({
+        accion:'finalizar_importacion_padron',importacion_id:importacionId
+    },obtenerTokenSesionClub());
+    await cargarEstadoInicialAutenticado();
+    limpiarPreviewImportacion();
+    document.getElementById('filePadronExcel').value='';
+    var r=fin.resultado||{};
+    alert('✓ Importación aplicada atómicamente. Insertados: '+Number(r.insertados||0).toLocaleString('es-AR')+' · Actualizados: '+Number(r.actualizados||0).toLocaleString('es-AR')+' · Deshabilitados: '+Number(r.deshabilitados||0).toLocaleString('es-AR'));
 }catch(e){
-console.error(e);
-alert('La importación no pudo completarse en Supabase. Revisá el archivo o la conexión.');
+    console.error(e);
+    alert((e&&e.message?e.message:'La importación no pudo completarse')+'. El padrón vigente no se modifica hasta completar la transacción final.');
+}finally{
+    if(btn)btn.disabled=false;
 }
 }
 
