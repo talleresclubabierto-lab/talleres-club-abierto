@@ -1276,68 +1276,8 @@ async function resetearClaveEnSupabase(id){
 }
 
 async function cargarVotosDesdeTabla(){
-    if(!supabaseClient)throw new Error('Cliente Supabase no inicializado');
-
-    limpiarAcumuladosVotosRuntime();
-
-    var desde=0,lote=1000,total=0;
-    while(true){
-        var r=await supabaseClient
-            .from('votos')
-            .select('numero_socio,encuesta_id,opcion_posicion,puntos_ponderacion,fecha_voto,es_historico_incompleto,activo')
-            .eq('activo',true)
-            .order('id',{ascending:true})
-            .range(desde,desde+lote-1);
-
-        if(r.error)throw r.error;
-        var filas=r.data||[];
-
-        filas.forEach(function(v){
-            var key=claveEncuestaDesdeId(v.encuesta_id);
-            if(!key||!baseEncuestas[key])return;
-
-            var id=Number(v.numero_socio);
-            var e=baseEncuestas[key];
-            var op=v.opcion_posicion===null?null:Number(v.opcion_posicion);
-            var pts=v.puntos_ponderacion===null?null:Number(v.puntos_ponderacion);
-            var fecha=v.fecha_voto||null;
-
-            if(!Number.isFinite(id))return;
-
-            if(v.es_historico_incompleto){
-                registroVotosEmitidos[id+'_'+key]=true;
-            }else{
-                registroVotosEmitidos[id+'_'+key]={
-                    opcion:op,
-                    puntos:pts,
-                    fecha:fecha,
-                    fuente:'supabase'
-                };
-            }
-
-            e.totalSocios=(Number(e.totalSocios)||0)+1;
-
-            if(Number.isFinite(pts)){
-                e.puntosPonderados=(Number(e.puntosPonderados)||0)+pts;
-                if(Number.isInteger(op)&&op>=0&&op<e.votos.length){
-                    e.votos[op]=(Number(e.votos[op])||0)+pts;
-                }
-            }
-        });
-
-        total+=filas.length;
-        if(filas.length<lote)break;
-        desde+=lote;
-        if(desde>1000000)throw new Error('Paginación de votos fuera de rango');
-    }
-
-    VOTOS_FUENTE='supabase';
-    VOTOS_ULTIMA_CARGA=new Date();
-
-    localStorage.setItem('TD_baseEncuestas',JSON.stringify(baseEncuestas));
-    localStorage.setItem('TD_registroVotos',JSON.stringify(registroVotosEmitidos));
-
-    return total;
+    var data=await cargarEstadoInicialAutenticado();
+    return Number(data.total_votos)||0;
 }
 
 async function recargarVotosSupabase(){
@@ -1349,50 +1289,28 @@ async function recargarVotosSupabase(){
 async function guardarVotoEnSupabase(key,opcion,puntos){
     var e=baseEncuestas[key];
     if(!e||!e.supabaseId)throw new Error('La encuesta no tiene ID de Supabase');
-
-    var fecha=new Date().toISOString();
-    var fila={
-        numero_socio:ID_SOCIO_ACTIVO,
-        encuesta_id:e.supabaseId,
-        opcion_posicion:Number(opcion),
-        puntos_ponderacion:Number(puntos),
-        fecha_voto:fecha,
-        es_historico_incompleto:false,
-        activo:true,
-        origen:'web'
-    };
-
-    var r=await supabaseClient
-        .from('votos')
-        .upsert(fila,{onConflict:'numero_socio,encuesta_id'});
-    if(r.error)throw r.error;
-
-    await cargarVotosDesdeTabla();
-    return fecha;
+    var r=await llamarClubAbiertoApi({
+        accion:'emitir_voto',
+        encuesta_id:Number(e.supabaseId),
+        opcion_posicion:Number(opcion)
+    },obtenerTokenSesionClub());
+    await cargarEstadoInicialAutenticado();
+    return r.fecha_voto||new Date().toISOString();
 }
 
 async function resetearVotosEncuestaSupabase(key){
     var e=baseEncuestas[key];
     if(!e||!e.supabaseId)throw new Error('Encuesta sin ID Supabase');
-
-    var r=await supabaseClient
-        .from('votos')
-        .update({activo:false})
-        .eq('encuesta_id',e.supabaseId)
-        .eq('activo',true);
-
-    if(r.error)throw r.error;
-    await cargarVotosDesdeTabla();
+    await llamarClubAbiertoApi({
+        accion:'resetear_votos_encuesta',
+        encuesta_id:Number(e.supabaseId)
+    },obtenerTokenSesionClub());
+    await cargarEstadoInicialAutenticado();
 }
 
 async function resetearTodosLosVotosSupabase(){
-    var r=await supabaseClient
-        .from('votos')
-        .update({activo:false})
-        .eq('activo',true);
-
-    if(r.error)throw r.error;
-    await cargarVotosDesdeTabla();
+    await llamarClubAbiertoApi({accion:'resetear_todos_votos'},obtenerTokenSesionClub());
+    await cargarEstadoInicialAutenticado();
 }
 
 async function cargarEncuestasDesdeTablas(){
