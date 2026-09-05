@@ -1746,11 +1746,9 @@ async function llamarWebAuthn(body){
 }
 
 async function consultarEstadoPasskey(){
-    if(!ID_SOCIO_ACTIVO||!supabaseClient)return null;
-    var r=await supabaseClient.rpc('estado_passkey_socio',{p_numero_socio:Number(ID_SOCIO_ACTIVO)});
-    if(r.error)throw r.error;
-    var data=Array.isArray(r.data)?r.data[0]:r.data;
-    PASSKEY_ESTADO_ACTUAL=data||null;
+    if(!ID_SOCIO_ACTIVO)return null;
+    var r=await llamarClubAbiertoApi({accion:'estado_passkey'},obtenerTokenSesionClub());
+    PASSKEY_ESTADO_ACTUAL=r.estado||null;
     return PASSKEY_ESTADO_ACTUAL;
 }
 
@@ -2045,20 +2043,15 @@ async function cargarHistorialAdministrativo(){
     }
 
     try{
-        var r=await supabaseClient.rpc('consultar_historial_admin_seguro',{
-            p_actor:Number(ID_SOCIO_ACTIVO),
-            p_verification_id:HISTORIAL_ADMIN_VERIFICACION.verificationId,
-            p_limite:limite,
-            p_desde:null,
-            p_hasta:null,
-            p_actor_filtro:Number.isFinite(actorFiltro)?actorFiltro:null,
-            p_entidad:entidad||null,
-            p_accion:null
-        });
+        var r=await llamarClubAbiertoApi({
+            accion:'historial_administrativo',
+            verification_id:HISTORIAL_ADMIN_VERIFICACION.verificationId,
+            limite:limite,
+            actor_filtro:Number.isFinite(actorFiltro)?actorFiltro:null,
+            entidad:entidad||null
+        },obtenerTokenSesionClub());
 
-        if(r.error)throw r.error;
-
-        HISTORIAL_ADMIN_DATOS=Array.isArray(r.data)?r.data:[];
+        HISTORIAL_ADMIN_DATOS=Array.isArray(r.eventos)?r.eventos:[];
         renderizarHistorialAdministrativo(HISTORIAL_ADMIN_DATOS);
 
         estado=document.getElementById('estadoHistorialAdmin');
