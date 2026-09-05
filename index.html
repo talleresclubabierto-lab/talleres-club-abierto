@@ -2799,9 +2799,9 @@ function regresarAlPanelInterno(){ocultarTodo();document.getElementById(ROL_ACTI
 async function volverAlLogin(){
 await cerrarSesionSeguraClub();
 ocultarTodo();
-document.getElementById('loginScreen').style.display='flex';
 ID_SOCIO_ACTIVO=0;
 ROL_ACTIVO='';
+CLUB_SESSION_INFO=null;
 PASSKEY_VERIFICACION_TEMPORAL=null;
 PASSKEY_ESTADO_ACTUAL=null;
 HISTORIAL_ADMIN_VERIFICACION=null;
@@ -2809,6 +2809,28 @@ HISTORIAL_ADMIN_DATOS=[];
 PERFIL_AUDITORIA_ECONOMICA=null;
 BALANCE_CONTABLE_2025=null;
 PARTIDAS_BALANCE_2025=[];
+PADRON_SOCIOS={};
+SOCIOS_HABILITADOS=[];
+TOTAL_SOCIOS=0;
+ADMIN_IDS=[];
+PASSWORD_HASHES={};
+baseEncuestas={};
+registroVotosEmitidos={};
+PADRON_FUENTE='bloqueado';
+ADMINS_FUENTE='bloqueado';
+ENCUESTAS_FUENTE='bloqueado';
+VOTOS_FUENTE='bloqueado';
+CREDENCIALES_FUENTE='bloqueado';
+SINCRONIZACION_INICIAL_COMPLETA=false;
+['TD_padronSocios','TD_baseEncuestas','TD_registroVotos',ADMIN_STORAGE_KEY,PASSWORD_STORAGE_KEY]
+    .forEach(function(clave){try{localStorage.removeItem(clave)}catch(_){}});
+['socioUser','socioPass','adminUser','adminPass'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.value='';
+});
+var totalSociosEl=document.getElementById('lblTotalSociosLogin');if(totalSociosEl)totalSociosEl.innerText='-';
+var totalAdminsEl=document.getElementById('lblTotalAdminsLogin');if(totalAdminsEl)totalAdminsEl.innerText='-';
+actualizarEstadoSync('Acceso protegido · iniciá sesión para consultar información',true);
+document.getElementById('loginScreen').style.display='flex';
 }
 
 function agregarCampoEntradaOpcion(containerId){
