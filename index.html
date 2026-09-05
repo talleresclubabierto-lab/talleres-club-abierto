@@ -1009,43 +1009,64 @@ async function cargarEstadoInicialAutenticado(){
         var opts=(opcionesPorEncuesta[Number(e.id)]||[]).filter(function(v){return v!==undefined});
         baseEncuestas[key]={
             supabaseId:Number(e.id),titulo:String(e.titulo||key),opts:opts,
-            votos:opts.map(function(){return 0}),totalSocios:0,puntosPonderados:0,
+            votos:opts.map(function(){return 0}),votantesPorOpcion:opts.map(function(){return 0}),
+            totalSocios:0,puntosPonderados:0,
             estado:e.estado||'abierta',fechaApertura:e.fecha_apertura||'',fechaCierre:e.fecha_cierre||''
         };
+    });
+
+    (Array.isArray(data.resumen_votos)?data.resumen_votos:[]).forEach(function(r){
+        var key=claveEncuestaDesdeId(r.encuesta_id);
+        if(!key||!baseEncuestas[key])return;
+        var e=baseEncuestas[key],op=r.opcion_posicion===null?null:Number(r.opcion_posicion);
+        var votantes=Number(r.votantes)||0,puntos=Number(r.puntos)||0;
+        e.totalSocios+=votantes;
+        e.puntosPonderados+=puntos;
+        if(Number.isInteger(op)&&op>=0&&op<e.votos.length){
+            e.votos[op]+=puntos;
+            e.votantesPorOpcion[op]+=votantes;
+        }
     });
 
     registroVotosEmitidos={};
     (Array.isArray(data.votos)?data.votos:[]).forEach(function(v){
         var key=claveEncuestaDesdeId(v.encuesta_id),id=Number(v.numero_socio);
         if(!key||!baseEncuestas[key]||!Number.isInteger(id))return;
-        var e=baseEncuestas[key],op=v.opcion_posicion===null?null:Number(v.opcion_posicion);
+        var op=v.opcion_posicion===null?null:Number(v.opcion_posicion);
         var pts=v.puntos_ponderacion===null?null:Number(v.puntos_ponderacion);
         registroVotosEmitidos[id+'_'+key]=v.es_historico_incompleto===true?true:{opcion:op,puntos:pts,fecha:v.fecha_voto||null,fuente:'api-segura'};
-        e.totalSocios++;
-        if(Number.isFinite(pts)){
-            e.puntosPonderados+=pts;
-            if(Number.isInteger(op)&&op>=0&&op<e.votos.length)e.votos[op]+=pts;
-        }
     });
 
     var totalSociosApi=Number(data.total_socios_activos);
     var totalVotosApi=Number(data.total_votos);
-    if(Number.isFinite(totalSociosApi)&&Object.keys(PADRON_SOCIOS).length!==totalSociosApi){
-        throw new Error('La API devolvió un padrón incompleto');
+    var esAlcanceAdmin=data.alcance_datos==='administrador';
+    if(esAlcanceAdmin&&Number.isFinite(totalSociosApi)&&Object.keys(PADRON_SOCIOS).length!==totalSociosApi){
+        throw new Error('La API devolvió un padrón administrativo incompleto');
     }
-    if(Number.isFinite(totalVotosApi)&&Object.keys(registroVotosEmitidos).length!==totalVotosApi){
-        throw new Error('La API devolvió una auditoría de votos incompleta');
+    if(esAlcanceAdmin&&Number.isFinite(totalVotosApi)&&Object.keys(registroVotosEmitidos).length!==totalVotosApi){
+        throw new Error('La API devolvió una auditoría administrativa incompleta');
     }
 
     PADRON_FUENTE='api-segura'; ADMINS_FUENTE='api-segura';
     ENCUESTAS_FUENTE='api-segura'; VOTOS_FUENTE='api-segura'; CREDENCIALES_FUENTE='api-segura';
     SINCRONIZACION_INICIAL_COMPLETA=true;
     recalcularPadronRuntime();
+
+    if(Number.isFinite(totalSociosApi)&&totalSociosApi>=0)TOTAL_SOCIOS=totalSociosApi;
+    var totalPuntosApi=Number(data.total_puntos_padron);
+    if(Number.isFinite(totalPuntosApi)&&totalPuntosApi>=0)TOTAL_PUNTOS_PADRON=totalPuntosApi;
+    var totalLogin=document.getElementById('lblTotalSociosLogin');
+    if(totalLogin)totalLogin.innerText=TOTAL_SOCIOS.toLocaleString('es-AR');
+    var gest=document.getElementById('lblPadronGestionTotal');
+    if(gest)gest.innerText=esAlcanceAdmin?TOTAL_SOCIOS.toLocaleString('es-AR')+' habilitados':'Información protegida';
+
     refrescarVistasTrasSincronizacion();
-    actualizarEstadoSync('Sesión validada · '+TOTAL_SOCIOS.toLocaleString('es-AR')+' socios · '+Object.keys(registroVotosEmitidos).length.toLocaleString('es-AR')+' votos cargados mediante API segura',true);
+    var detalle=esAlcanceAdmin
+        ? TOTAL_SOCIOS.toLocaleString('es-AR')+' socios · '+totalVotosApi.toLocaleString('es-AR')+' votos con acceso administrativo'
+        : 'resultados agregados · identidad y voto propio protegidos';
+    actualizarEstadoSync('Sesión validada · '+detalle,true);
     return data;
 }
-
 async function validarSesionSeguraClub(){
     var token=obtenerTokenSesionClub();
     if(!token)return null;
@@ -3250,7 +3271,7 @@ if(actual&&baseEncuestas[actual])cmb.value=actual;actualizarReporteGrafico();
 }
 function obtenerResumenExactoEncuesta(key){
 var votantesEmitidos=0,puntosEmitidos=0,votantesRestantes=0,puntosRestantes=0;
-var votantesPorOpcion=(baseEncuestas[key].opts||[]).map(function(){return 0});
+var votantesPorOpcion=Array.isArray(baseEncuestas[key].votantesPorOpcion)?baseEncuestas[key].votantesPorOpcion.slice():(baseEncuestas[key].opts||[]).map(function(){return 0});
 var puntosPorOpcion=(baseEncuestas[key].votos||[]).slice();
 SOCIOS_HABILITADOS.forEach(function(id){
 var reg=registroVotosEmitidos[id+'_'+key],d=obtenerDatosSocio(id);
@@ -3269,6 +3290,8 @@ var acumulado=Number(baseEncuestas[key].puntosPonderados)||0;
 if(acumulado>puntosEmitidos)puntosEmitidos=acumulado;
 var participantesGuardados=Number(baseEncuestas[key].totalSocios)||0;
 if(participantesGuardados>votantesEmitidos)votantesEmitidos=participantesGuardados;
+votantesRestantes=Math.max(0,TOTAL_SOCIOS-votantesEmitidos);
+puntosRestantes=Math.max(0,TOTAL_PUNTOS_PADRON-puntosEmitidos);
 return{votantesEmitidos:votantesEmitidos,puntosEmitidos:puntosEmitidos,votantesRestantes:votantesRestantes,puntosRestantes:puntosRestantes,votantesPorOpcion:votantesPorOpcion,puntosPorOpcion:puntosPorOpcion};
 }
 function calcularVotosYPuntosRestantes(key){var r=obtenerResumenExactoEncuesta(key);return{votos:r.votantesRestantes,puntos:r.puntosRestantes}}
