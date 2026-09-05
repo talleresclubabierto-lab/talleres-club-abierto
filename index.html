@@ -1063,7 +1063,7 @@ async function cargarEstadoInicialAutenticado(){
     refrescarVistasTrasSincronizacion();
     var detalle=esAlcanceAdmin
         ? TOTAL_SOCIOS.toLocaleString('es-AR')+' socios · '+totalVotosApi.toLocaleString('es-AR')+' votos con acceso administrativo'
-        : 'resultados agregados · identidad y voto propio protegidos';
+        : 'auditoría de votos habilitada para socios activos · padrón general protegido';
     actualizarEstadoSync('Sesión validada · '+detalle,true);
     return data;
 }
