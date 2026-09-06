@@ -891,6 +891,7 @@ var SUPABASE_TABLE='club_abierto_state';
 var SUPABASE_ROW_ID='global';
 var supabaseClient=null;
 var SINCRONIZACION_INICIAL_COMPLETA=false;
+var PADRON_ADMIN_COMPLETO=false;
 var GUARDADO_REMOTO_PENDIENTE=null;
 var APLICANDO_ESTADO_REMOTO=false;
 var PADRON_FUENTE='fallback';
@@ -1039,12 +1040,10 @@ async function cargarEstadoInicialAutenticado(){
 
     var totalSociosApi=Number(data.total_socios_activos);
     var totalVotosApi=Number(data.total_votos);
-    var esAlcanceAdmin=data.alcance_datos==='administrador';
-    if(esAlcanceAdmin&&Number.isFinite(totalSociosApi)&&Object.keys(PADRON_SOCIOS).length!==totalSociosApi){
-        throw new Error('La API devolvió un padrón administrativo incompleto');
-    }
-    if(esAlcanceAdmin&&Number.isFinite(totalVotosApi)&&Object.keys(registroVotosEmitidos).length!==totalVotosApi){
-        throw new Error('La API devolvió una auditoría administrativa incompleta');
+    var esAdministradorMinimo=data.alcance_datos==='administrador_minimo';
+    PADRON_ADMIN_COMPLETO=false;
+    if(Number.isFinite(totalVotosApi)&&Object.keys(registroVotosEmitidos).length!==totalVotosApi){
+        throw new Error('La API devolvió una auditoría de votos incompleta');
     }
 
     PADRON_FUENTE='api-segura'; ADMINS_FUENTE='api-segura';
@@ -1058,15 +1057,38 @@ async function cargarEstadoInicialAutenticado(){
     var totalLogin=document.getElementById('lblTotalSociosLogin');
     if(totalLogin)totalLogin.innerText=TOTAL_SOCIOS.toLocaleString('es-AR');
     var gest=document.getElementById('lblPadronGestionTotal');
-    if(gest)gest.innerText=esAlcanceAdmin?TOTAL_SOCIOS.toLocaleString('es-AR')+' habilitados':'Información protegida';
+    if(gest)gest.innerText=esAdministradorMinimo?'Carga bajo demanda':'Información protegida';
 
     refrescarVistasTrasSincronizacion();
-    var detalle=esAlcanceAdmin
-        ? TOTAL_SOCIOS.toLocaleString('es-AR')+' socios · '+totalVotosApi.toLocaleString('es-AR')+' votos con acceso administrativo'
+    var detalle=esAdministradorMinimo
+        ? 'acceso administrativo validado · padrón disponible bajo demanda'
         : 'auditoría de votos habilitada para socios activos · padrón general protegido';
     actualizarEstadoSync('Sesión validada · '+detalle,true);
     return data;
 }
+async function cargarPadronAdminBajoDemanda(){
+    if(PADRON_ADMIN_COMPLETO)return true;
+    var token=obtenerTokenSesionClub();
+    if(!token)throw new Error('Sesión segura requerida');
+    actualizarEstadoSync('Cargando padrón administrativo…',true);
+    var data=await llamarClubAbiertoApi({accion:'padron_admin'},token);
+    if(!data||data.ok!==true||!Array.isArray(data.socios)){
+        throw new Error('La API no devolvió el padrón administrativo');
+    }
+    data.socios.forEach(function(s){
+        var id=Number(s.numero_socio);
+        if(Number.isInteger(id)&&id>0)PADRON_SOCIOS[id]=[String(s.nombre||('Socio #'+id)),s.fecha_alta||''];
+    });
+    PADRON_ADMIN_COMPLETO=true;
+    recalcularPadronRuntime();
+    var total=Number(data.total_socios_activos);
+    if(Number.isFinite(total)&&total>=0)TOTAL_SOCIOS=total;
+    var gest=document.getElementById('lblPadronGestionTotal');
+    if(gest)gest.innerText=TOTAL_SOCIOS.toLocaleString('es-AR')+' habilitados';
+    actualizarEstadoSync('Padrón administrativo cargado de forma segura',true);
+    return true;
+}
+
 async function validarSesionSeguraClub(){
     var token=obtenerTokenSesionClub();
     if(!token)return null;
@@ -2356,9 +2378,9 @@ try{
 }
 
 function ejecutarAnimacion(face,finger,callback){
-face.classList.add('accent-blue');face.innerText="ESCANEANDO ROSTRO... RECONOCIENDO EXPRESIONES VIVAS";
-setTimeout(function(){face.innerText="✓ VALIDACIÓN BIOMÉTRICA COMPLETADA";finger.classList.add('accent-blue');finger.innerText="ESCANEANDO HUELLA... DETECTANDO PULSO DACTILAR";
-setTimeout(function(){finger.innerText="✓ VALIDACIÓN DE HUELLA DIGITAL COMPLETADA";setTimeout(callback,500)},900)},1000);
+face.classList.add('accent-blue');face.innerText="✓ IDENTIDAD SOCIETARIA VALIDADA POR SERVIDOR";
+finger.classList.remove('accent-blue');finger.innerText="PASSKEY OPCIONAL · NO REQUERIDA EN ESTE INGRESO";
+callback();
 }
 function parseFechaPadron(v){
 if(!v)return null;
@@ -2449,9 +2471,13 @@ if(id==='secVotaciones'){
     }
 }
 }
-function mostrarSeccionAdmin(id){
+async function mostrarSeccionAdmin(id){
 if(id==='secGestionAdmins'&&!esSuperAdministrador(ID_SOCIO_ACTIVO)){alert('Sólo el socio 21.998 puede administrar permisos de administradores.');return}
 if(id==='secHistorialAdmin'){irAHistorialAdministrativo();return}
+if((id==='secGestionPadron'||id==='secGestionAdmins')&&!PADRON_ADMIN_COMPLETO){
+    try{await cargarPadronAdminBajoDemanda()}
+    catch(e){console.error('Carga diferida del padrón rechazada:',e);alert('No se pudo cargar el padrón administrativo. Intentá nuevamente.');return}
+}
 ocultarTodo();document.getElementById(id).style.display='flex';
 if(id==='secModificar')inicializarSelectorModificaciones();
 if(id==='secPorcentuales')renderizarListaPorcentualesAdmin();
@@ -2843,6 +2869,7 @@ ENCUESTAS_FUENTE='bloqueado';
 VOTOS_FUENTE='bloqueado';
 CREDENCIALES_FUENTE='bloqueado';
 SINCRONIZACION_INICIAL_COMPLETA=false;
+PADRON_ADMIN_COMPLETO=false;
 ['TD_padronSocios','TD_baseEncuestas','TD_registroVotos',ADMIN_STORAGE_KEY,PASSWORD_STORAGE_KEY]
     .forEach(function(clave){try{localStorage.removeItem(clave)}catch(_){}});
 ['socioUser','socioPass','adminUser','adminPass'].forEach(function(id){
