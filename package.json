@@ -4,6 +4,7 @@
   "private": true,
   "description": "PWA y aplicaciones móviles de Talleres Club Abierto",
   "scripts": {
+    "postinstall": "node scripts/build-cloudflare.mjs",
     "build:web": "node scripts/build-cloudflare.mjs",
     "mobile:prepare": "node scripts/build-mobile.mjs",
     "cap:sync": "npm run mobile:prepare && cap sync",
@@ -16,7 +17,8 @@
   "devDependencies": {
     "@capacitor/android": "^8.0.0",
     "@capacitor/cli": "^8.0.0",
-    "@capacitor/ios": "^8.0.0"
+    "@capacitor/ios": "^8.0.0",
+    "wrangler": "^4.0.0"
   },
   "engines": {
     "node": ">=22.0.0"
