@@ -468,6 +468,15 @@ body{
       <div class="card-title">Versiones registradas</div>
       <p class="card-note">La versión vigente determina los puntos de voto y el alcance de auditoría. Las anteriores permanecen conservadas y una reversión siempre crea una versión nueva.</p>
       <div class="gov-actions"><button class="wf-button" onclick="cargarGobernanzaInstitucional()">Actualizar historial</button></div>
+      <div class="gov-form-grid" style="margin-top:16px">
+        <div><label class="form-label">Desde</label><input id="govFiltroDesde" type="date" class="wf-input" oninput="renderizarVersionesGobernanza()"></div>
+        <div><label class="form-label">Hasta</label><input id="govFiltroHasta" type="date" class="wf-input" oninput="renderizarVersionesGobernanza()"></div>
+        <div><label class="form-label">Administrador interviniente</label><input id="govFiltroAdmin" type="number" min="1" step="1" class="wf-input" placeholder="Ej.: 21998" oninput="renderizarVersionesGobernanza()"></div>
+        <div><label class="form-label">Estado</label><select id="govFiltroEstado" class="wf-input" onchange="renderizarVersionesGobernanza()"><option value="">Todos</option><option value="vigente">Vigente</option><option value="borrador">Borrador</option><option value="descartada">Descartada</option><option value="reemplazada">Reemplazada</option></select></div>
+        <div><label class="form-label">Tipo de cambio</label><select id="govFiltroTipo" class="wf-input" onchange="renderizarVersionesGobernanza()"><option value="">Todos</option><option value="inicial">Inicial</option><option value="modificacion">Modificación</option><option value="reversion">Reversión</option></select></div>
+        <div><label class="form-label">Buscar en el historial</label><input id="govFiltroTexto" class="wf-input" placeholder="Versión, nombre, motivo o hash" oninput="renderizarVersionesGobernanza()"></div>
+      </div>
+      <div class="gov-actions" style="margin-top:12px"><button class="btn-secondary-dark" type="button" onclick="limpiarFiltrosGobernanza()">Limpiar filtros</button><span id="govConteoFiltros" class="card-note" style="align-self:center;margin:0"></span></div>
       <div id="listaVersionesGobernanza" style="margin-top:16px"><div class="admin-history-empty">Cargando versiones...</div></div>
     </section>
 
@@ -2594,10 +2603,33 @@ if(lista)lista.innerHTML='<div class="admin-history-empty">No fue posible recupe
 }
 }
 
+function limpiarFiltrosGobernanza(){
+['govFiltroDesde','govFiltroHasta','govFiltroAdmin','govFiltroEstado','govFiltroTipo','govFiltroTexto'].forEach(function(id){var el=document.getElementById(id);if(el)el.value=''});
+renderizarVersionesGobernanza();
+}
+function fechaReglaDentroDeFiltro(r,desde,hasta){
+var fechas=[r.created_at,r.activada_en,r.descartada_en].filter(Boolean).map(function(v){return new Date(v)}).filter(function(d){return !isNaN(d.getTime())});
+if(!desde&&!hasta)return true;
+return fechas.some(function(d){
+var dia=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+return(!desde||dia>=desde)&&(!hasta||dia<=hasta);
+});
+}
 function renderizarVersionesGobernanza(){
 var lista=document.getElementById('listaVersionesGobernanza');if(!lista)return;
 if(!REGLAS_GOBERNANZA_ADMIN.length){lista.innerHTML='<div class="admin-history-empty">No hay versiones registradas.</div>';return}
-var ordenadas=REGLAS_GOBERNANZA_ADMIN.slice().sort(function(a,b){return Number(b.version||0)-Number(a.version||0)});
+var valor=function(id){var el=document.getElementById(id);return el?String(el.value||'').trim():''};
+var desde=valor('govFiltroDesde'),hasta=valor('govFiltroHasta'),admin=valor('govFiltroAdmin'),estadoFiltro=valor('govFiltroEstado'),tipoFiltro=valor('govFiltroTipo'),texto=valor('govFiltroTexto').toLowerCase();
+var ordenadas=REGLAS_GOBERNANZA_ADMIN.filter(function(r){
+if(!fechaReglaDentroDeFiltro(r,desde,hasta))return false;
+if(admin&&![r.creada_por,r.activada_por,r.descartada_por].some(function(v){return String(v||'')===admin}))return false;
+if(estadoFiltro&&String(r.estado||'')!==estadoFiltro)return false;
+if(tipoFiltro&&String(r.tipo_version||'')!==tipoFiltro)return false;
+if(texto){var bolsa=[r.version,r.nombre,r.codigo,r.descripcion,r.motivo_cambio,r.hash_configuracion,r.prev_hash_configuracion].join(' ').toLowerCase();if(bolsa.indexOf(texto)<0)return false}
+return true;
+}).sort(function(a,b){return Number(b.version||0)-Number(a.version||0)});
+var conteo=document.getElementById('govConteoFiltros');if(conteo)conteo.innerText=ordenadas.length+' de '+REGLAS_GOBERNANZA_ADMIN.length+' versión/es';
+if(!ordenadas.length){lista.innerHTML='<div class="admin-history-empty">No hay versiones que coincidan con los filtros seleccionados.</div>';return}
 lista.innerHTML=ordenadas.map(function(r){
 var id=idReglaGobernanza(r),estado=String(r.estado||''),niveles=nivelesReglaGobernanza(r),perfiles=perfilesReglaGobernanza(r),hash=String(r.hash_configuracion||''),prev=String(r.prev_hash_configuracion||'');
 var clase=estado==='vigente'?'active':estado==='borrador'?'draft':estado==='descartada'?'discarded':'';
@@ -2606,7 +2638,7 @@ if(esSuperAdministrador(ID_SOCIO_ACTIVO)&&estado==='borrador'){acciones+='<butto
 if(esSuperAdministrador(ID_SOCIO_ACTIVO)&&estado!=='vigente')acciones+='<button class="btn-secondary-dark" onclick="crearReversionGobernanza('+id+')">Crear reversión desde esta versión</button>';
 var nivelesHtml=niveles.map(function(n){var max=n.antiguedad_max===null||n.antiguedad_max===undefined?'en adelante':n.antiguedad_max+' años';return '<div class="gov-level"><strong>'+escaparGobernanza(n.nombre||('Nivel '+n.nivel))+'</strong><span>'+escaparGobernanza(n.antiguedad_min)+' a '+escaparGobernanza(max)+'</span></div>'}).join('');
 var perfilesHtml=perfiles.length?'<div class="gov-summary"><strong>Perfiles especiales:</strong> '+perfiles.map(function(p){return escaparGobernanza(p.nombre||p.codigo||('Perfil '+idPerfilGobernanza(p)))+' · '+escaparGobernanza(p.puntos_voto||p.puntos_ponderados)+' puntos · nivel '+escaparGobernanza(p.nivel_auditoria)}).join(' · ')+'</div>':'<div class="gov-summary"><strong>Perfiles especiales:</strong> ninguno configurado en esta versión.</div>';
-return '<article class="gov-version '+clase+'"><div class="gov-version-head"><div><div class="gov-version-title">Versión '+escaparGobernanza(r.version)+' · '+escaparGobernanza(r.nombre||r.codigo)+'</div><div class="gov-version-meta">ID '+id+' · Tipo '+escaparGobernanza(r.tipo_version||'-')+' · Vigente desde '+escaparGobernanza(fechaGobernanza(r.vigente_desde))+'<br>Origen '+escaparGobernanza(r.version_origen_id||'-')+' · HASH '+escaparGobernanza(hash?hash.slice(0,16)+'…':'pendiente')+' · PREV '+escaparGobernanza(prev?prev.slice(0,16)+'…':'inicio de cadena')+'</div></div><span class="gov-badge '+escaparGobernanza(estado)+'">'+escaparGobernanza(estado||'sin estado')+'</span></div><p class="card-note" style="margin-top:12px">'+escaparGobernanza(r.motivo_cambio||r.descripcion||'Sin motivo informado')+'</p><div class="gov-levels">'+nivelesHtml+'</div>'+perfilesHtml+(acciones?'<div class="gov-actions">'+acciones+'</div>':'')+'</article>';
+return '<article class="gov-version '+clase+'"><div class="gov-version-head"><div><div class="gov-version-title">Versión '+escaparGobernanza(r.version)+' · '+escaparGobernanza(r.nombre||r.codigo)+'</div><div class="gov-version-meta">ID '+id+' · Tipo '+escaparGobernanza(r.tipo_version||'-')+' · Registrada '+escaparGobernanza(fechaGobernanza(r.created_at))+' · Creada por socio '+escaparGobernanza(r.creada_por||'-')+'<br>Vigente desde '+escaparGobernanza(fechaGobernanza(r.vigente_desde))+(r.activada_en?' · Activada '+escaparGobernanza(fechaGobernanza(r.activada_en))+' por socio '+escaparGobernanza(r.activada_por||'-'):'')+(r.descartada_en?' · Descartada '+escaparGobernanza(fechaGobernanza(r.descartada_en))+' por socio '+escaparGobernanza(r.descartada_por||'-'):'')+'<br>Origen '+escaparGobernanza(r.version_origen_id||'-')+' · HASH '+escaparGobernanza(hash?hash.slice(0,16)+'…':'pendiente')+' · PREV '+escaparGobernanza(prev?prev.slice(0,16)+'…':'inicio de cadena')+'</div></div><span class="gov-badge '+escaparGobernanza(estado)+'">'+escaparGobernanza(estado||'sin estado')+'</span></div><p class="card-note" style="margin-top:12px">'+escaparGobernanza(r.motivo_cambio||r.descripcion||'Sin motivo informado')+'</p><div class="gov-levels">'+nivelesHtml+'</div>'+perfilesHtml+(acciones?'<div class="gov-actions">'+acciones+'</div>':'')+'</article>';
 }).join('');
 }
 
