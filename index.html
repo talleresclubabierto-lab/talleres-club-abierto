@@ -2261,7 +2261,7 @@ var userSocio=document.getElementById('socioUser').value.trim(),passSocio=docume
 var userAdmin=document.getElementById('adminUser').value.trim(),passAdmin=document.getElementById('adminPass').value;
 var face=document.getElementById(tipo==='socio'?'socioBioFace':'adminBioFace');
 var finger=document.getElementById(tipo==='socio'?'socioBioFinger':'adminBioFinger');
-document.querySelectorAll('.biometric-box').forEach(function(b){b.classList.remove('accent-blue');b.innerText=b.id.includes('Face')?'indicador biométrico de maqueta':'indicador de huella de maqueta'});
+document.querySelectorAll('.biometric-box').forEach(function(b){b.classList.remove('accent-blue');b.innerText=b.id.includes('Face')?'IDENTIDAD SEGURA':'PROTECCIÓN DE SESIÓN'});
 
 var id=parseInt(tipo==='socio'?userSocio:userAdmin);
 var clave=tipo==='socio'?passSocio:passAdmin;
@@ -2270,8 +2270,15 @@ if(isNaN(id)||id<1||!clave){
     return;
 }
 
+face.classList.add('accent-blue');
+face.innerText='◌ VERIFICANDO IDENTIDAD DEL SOCIO…';
+finger.classList.add('accent-blue');
+finger.innerText='◌ ESTABLECIENDO CONEXIÓN SEGURA…';
+
 try{
     var sesion=await loginSeguroClub(id,clave);
+    face.innerText='✓ CREDENCIALES VALIDADAS';
+    finger.innerText='◌ CARGANDO SESIÓN PROTEGIDA…';
 
     /* El backend es la autoridad sobre la identidad y el rol. */
     if(tipo==='admin'&&sesion.es_administrador!==true){
@@ -2299,6 +2306,10 @@ try{
 
 }catch(e){
     console.error('Login seguro rechazado:',e);
+    face.classList.remove('accent-blue');
+    finger.classList.remove('accent-blue');
+    face.innerText='✕ IDENTIDAD NO VALIDADA';
+    finger.innerText='SESIÓN NO INICIADA';
     limpiarTokenSesionClub();
     if(e&&e.status===401){
         alert('Acceso Denegado: el N° de socio o la contraseña son incorrectos, o el socio no está habilitado.');
@@ -2379,7 +2390,7 @@ try{
 
 function ejecutarAnimacion(face,finger,callback){
 face.classList.add('accent-blue');face.innerText="✓ IDENTIDAD SOCIETARIA VALIDADA POR SERVIDOR";
-finger.classList.remove('accent-blue');finger.innerText="PASSKEY OPCIONAL · NO REQUERIDA EN ESTE INGRESO";
+finger.classList.add('accent-blue');finger.innerText="✓ SESIÓN SEGURA Y CIFRADA";
 callback();
 }
 function parseFechaPadron(v){
