@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><meta name="theme-color" content="#021739"><title>Talleres Digital · Club Abierto</title><style>
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><meta name="theme-color" content="#021739"><meta name="application-name" content="Talleres Club Abierto"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Club Abierto"><link rel="manifest" href="./manifest.webmanifest"><link rel="icon" href="./icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="./icon.svg"><title>Talleres Digital · Club Abierto</title><style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
 :root{--navy:#001b35;--navy2:#003057;--blue:#3d608a;--paper:#f7fafc;--card:#fff;--soft:#f1f4f6;--line:#d9e0e6;--muted:#64748b;--text:#181c1e;--green:#1fa968;--green-bg:#e8f8ef;--gold:#d4af37;--red:#b42318;--red-bg:#fff1f0;--shadow:0 10px 30px rgba(0,27,53,.06)}
 *{box-sizing:border-box}html{background:var(--paper)}body{margin:0;background:var(--paper);color:var(--text);font-family:Inter,system-ui,sans-serif;min-height:100vh}.mono{font-family:'JetBrains Mono',monospace}.container{width:100%;max-width:1440px;margin:0 auto;padding:0 48px 56px}.full-width{width:100%}.text-left{text-align:left}.dashboard,.sub-view{display:none;width:100%;flex-direction:column}.screen{width:100%}
@@ -3471,5 +3471,12 @@ document.getElementById('lblTotalSociosLogin').innerText='-';
 document.getElementById('txtAuditoriaSocio').max=MAX_SOCIO;
 actualizarCantidadAdministradores();
 actualizarEstadoSync('Acceso protegido · iniciá sesión para consultar información',true);
+</script>
+<script>
+if('serviceWorker' in navigator){
+window.addEventListener('load',function(){
+navigator.serviceWorker.register('./service-worker.js').catch(function(e){console.warn('PWA no disponible:',e)});
+});
+}
 </script>
 </body>
