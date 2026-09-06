@@ -3,7 +3,7 @@
   "name": "talleres-club-abierto",
   "compatibility_date": "2026-09-06",
   "assets": {
-    "directory": "./dist",
+    "directory": ".",
     "not_found_handling": "single-page-application"
   }
 }
