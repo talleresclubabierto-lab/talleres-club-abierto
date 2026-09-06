@@ -1,0 +1,30 @@
+{
+  "name": "Talleres Club Abierto",
+  "short_name": "Club Abierto",
+  "description": "Gobernanza, auditoría y votación para socios activos.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#021739",
+  "theme_color": "#021739",
+  "orientation": "portrait-primary",
+  "lang": "es-AR",
+  "categories": [
+    "social",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
