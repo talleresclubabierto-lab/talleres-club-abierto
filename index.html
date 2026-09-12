@@ -3351,7 +3351,7 @@ votantesEmitidos++;
 /* Si el registro es nuevo, conocemos exactamente opción y puntos. */
 if(typeof reg==='object'&&reg!==null){
 var p=Number(reg.puntos);puntosEmitidos+=isNaN(p)?d.puntos:p;
-var op=Number(reg.opcion);if(Number.isInteger(op)&&op>=0&&op<votantesPorOpcion.length)votantesPorOpcion[op]++;
+var op=Number(reg.opcion);
 }
 }else{votantesRestantes++;puntosRestantes+=d.puntos}
 });
