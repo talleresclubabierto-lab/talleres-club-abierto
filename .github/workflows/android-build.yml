@@ -1,0 +1,63 @@
+name: Android build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - mobile/android
+    paths:
+      - 'android/**'
+      - 'capacitor.config.ts'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'scripts/build-mobile.mjs'
+      - 'index.html'
+      - 'manifest.webmanifest'
+      - 'service-worker.js'
+      - 'icon.svg'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Synchronize Android project
+        run: npm run cap:sync -- android
+
+      - name: Build debug APK and unsigned release bundle
+        working-directory: android
+        run: |
+          ./gradlew assembleDebug
+          ./gradlew bundleRelease
+
+      - name: Upload Android artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: talleres-club-abierto-android
+          if-no-files-found: error
+          retention-days: 14
+          path: |
+            android/app/build/outputs/apk/debug/app-debug.apk
+            android/app/build/outputs/bundle/release/app-release.aab

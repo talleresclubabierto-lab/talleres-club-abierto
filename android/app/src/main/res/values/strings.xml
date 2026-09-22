@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Talleres Club Abierto</string>
+    <string name="title_activity_main">Talleres Club Abierto</string>
+    <string name="package_name">com.talleresclubabierto.app</string>
+    <string name="custom_url_scheme">com.talleresclubabierto.app</string>
+</resources>
