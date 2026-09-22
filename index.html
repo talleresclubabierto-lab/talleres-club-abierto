@@ -832,13 +832,6 @@ body{
     <div class="page-head"><div><div class="eyebrow">Administración societaria · 6C-8.5</div><h1 class="page-title">Padrón habilitado</h1><p class="page-sub">Altas manuales, corrección de nombres, perfiles institucionales especiales, reset de contraseña e importación futura desde Excel.</p></div><span id="lblPadronGestionTotal" class="status-chip">-</span></div>
 
     <div class="management-grid">
-      <section class="management-block management-block-wide">
-        <h3>Consultar socio</h3>
-        <p class="muted">Buscá por número para consultar nombre, número de socio y fecha de alta.</p>
-        <div style="display:flex;gap:8px;max-width:560px"><input id="txtConsultaPadronNumero" type="number" min="1" class="wf-input" style="margin-bottom:10px" placeholder="N° de socio" onkeydown="if(event.key==='Enter')consultarSocioPadron()"><button id="btnConsultaPadron" class="btn-secondary-dark" style="height:42px;white-space:nowrap" onclick="consultarSocioPadron()">Consultar</button></div>
-        <div id="estadoCargaPadron" class="padron-loading">Preparando padrón para consultas…</div>
-        <div id="resultadoConsultaPadron" class="profile-admin-result" style="display:none"></div>
-      </section>
       <section class="management-block">
         <h3>Agregar socio manualmente</h3>
         <p class="muted">La fecha de alta es necesaria para calcular su antigüedad y ponderación.</p>
@@ -868,6 +861,14 @@ body{
         <label class="form-label">N° de socio</label>
         <input id="txtResetClaveSocio" type="number" min="1" class="wf-input">
         <button class="reset-button" style="width:100%" onclick="resetearClaveSocioAdmin()">Restablecer contraseña temporal</button>
+      </section>
+
+      <section class="management-block">
+        <h3>Consultar socio</h3>
+        <p class="muted">Buscá por número para consultar nombre, número de socio y fecha de alta.</p>
+        <div style="display:flex;gap:8px"><input id="txtConsultaPadronNumero" type="number" min="1" class="wf-input" style="margin-bottom:10px" placeholder="N° de socio" onkeydown="if(event.key==='Enter')consultarSocioPadron()"><button id="btnConsultaPadron" class="btn-secondary-dark" style="height:42px;white-space:nowrap" onclick="consultarSocioPadron()">Consultar</button></div>
+        <div id="estadoCargaPadron" class="padron-loading">Preparando padrón para consultas…</div>
+        <div id="resultadoConsultaPadron" class="profile-admin-result" style="display:none"></div>
       </section>
 
       <section id="panelPerfilInstitucionalPadron" class="management-block management-block-wide">
