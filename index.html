@@ -381,6 +381,10 @@ body{
 .history-date{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase}
 .history-rival{font-weight:800;color:var(--navy)}
 .history-detail{font-size:12px;color:#64748b;margin-top:3px}
+.history-rival-line{display:flex;align-items:center;gap:10px;min-width:0}
+.history-crests{display:flex;align-items:center;gap:4px;flex:0 0 auto}
+.history-crest{width:31px;height:31px;object-fit:contain;background:#fff;border:1px solid #d7e1e9;border-radius:50%;padding:3px}
+.history-score{display:inline-flex;align-items:center;border-radius:7px;background:#072a55;color:#fff;font-weight:900;font-size:13px;letter-spacing:.04em;padding:5px 8px;margin-left:2px;white-space:nowrap}
 .history-status{font-size:11px;font-weight:900;border-radius:999px;padding:7px 10px;white-space:nowrap}
 .history-status.ok{background:#e8f8ef;color:#16734a}.history-status.absent{background:#f3f4f6;color:#667085}
 .history-disclaimer{border:1px solid rgba(117,217,248,.28);background:rgba(3,31,62,.78);color:#dcebf5;border-radius:11px;padding:13px 15px;font-size:12px;line-height:1.5}
@@ -802,7 +806,7 @@ body{
   <main class="section-shell">
     <div class="dashboard-header"><div class="wf-box">Tu historia con Talleres</div><button class="wf-button" onclick="regresarAlPanelInterno()">Volver</button></div>
     <div class="page-head"><div><div class="eyebrow">Cada partido cuenta</div><h1 class="page-title">Mi asistencia</h1><p class="page-sub">Consultá tus partidos, la fecha y el horario de cada ingreso.</p></div><span id="historiaRango" class="status-chip">Datos demostrativos</span></div>
-    <div class="history-disclaimer"><strong>Modo ejemplo:</strong> esta sección simula el historial con los partidos habilitados de 2025 y 2026. Cuando se conecte con los registros reales de acceso, cada socio verá aquí su recorrido verificable.</div>
+    <div class="history-disclaimer"><strong>Resultados reales · asistencia demostrativa:</strong> se muestran únicamente los partidos que Talleres disputó como local y que ya finalizaron. Los resultados y escudos son reales; la asistencia y el momento de ingreso continúan simulados hasta conectar los registros de acceso del club.</div>
     <div class="history-summary">
       <div class="history-stat"><div class="history-stat-label">Partidos habilitados</div><div id="historiaHabilitados" class="history-stat-value">-</div></div>
       <div class="history-stat"><div class="history-stat-label">Asistencia total</div><div id="historiaAsistidos" class="history-stat-value">-</div></div>
@@ -818,7 +822,7 @@ body{
       </div>
     </section>
     <section class="card" style="margin-top:16px">
-      <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap"><div><div class="card-title">Historial de partidos</div><p class="card-note">La demostración se genera siempre igual para cada número de socio.</p></div><select id="filtroAnioHistoria" class="wf-input" style="width:auto;margin:0" onchange="renderizarTuHistoria()"><option value="todos">2025 y 2026</option><option value="2026">2026</option><option value="2025">2025</option></select></div>
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap"><div><div class="card-title">Historial de partidos locales</div><p id="historiaFuente" class="card-note">Resultados reales actualizados · asistencia demostrativa por número de socio.</p></div><select id="filtroAnioHistoria" class="wf-input" style="width:auto;margin:0" onchange="renderizarTuHistoria()"><option value="todos">2025 y 2026</option><option value="2026">2026</option><option value="2025">2025</option></select></div>
       <div id="listaTuHistoria" class="history-list"></div>
     </section>
   </main>
@@ -2518,15 +2522,31 @@ d.porcentual=TOTAL_PUNTOS_PADRON>0?(d.puntos/TOTAL_PUNTOS_PADRON)*100:0;
 return d;
 }
 
-var PARTIDOS_HISTORIA=[
-['2025-02-09','Lanús','20:30'],['2025-02-23','Tigre','21:30'],['2025-03-09','Rosario Central','19:15'],['2025-03-30','Gimnasia LP','16:00'],['2025-04-13','San Lorenzo','18:00'],['2025-04-27','Instituto','19:30'],['2025-05-11','Godoy Cruz','16:30'],['2025-06-15','Newell’s','18:15'],['2025-07-06','Vélez','20:00'],['2025-07-20','Independiente','18:45'],['2025-08-03','Huracán','20:15'],['2025-08-17','Banfield','16:00'],['2025-08-31','Racing Club','21:00'],['2025-09-14','Estudiantes LP','19:30'],['2025-09-28','Defensa y Justicia','17:00'],['2025-10-12','Argentinos Juniors','20:00'],['2025-10-26','River Plate','18:30'],['2025-11-09','Platense','17:00'],
-['2026-02-01','Sarmiento','19:00'],['2026-02-15','Independiente Rivadavia','21:00'],['2026-03-01','Atlético Tucumán','18:30'],['2026-03-15','Unión','20:15'],['2026-03-29','Barracas Central','17:00'],['2026-04-12','Belgrano','16:00'],['2026-04-26','Boca Juniors','20:30'],['2026-05-10','Central Córdoba','18:00'],['2026-06-07','Aldosivi','17:30'],['2026-07-05','Lanús','19:00'],['2026-07-19','Tigre','20:00'],['2026-08-02','Rosario Central','18:15'],['2026-08-16','Gimnasia LP','16:30'],['2026-08-30','San Lorenzo','20:30'],['2026-09-13','Instituto','19:00'],['2026-09-27','Godoy Cruz','17:00'],['2026-10-11','Newell’s','18:30'],['2026-10-25','Vélez','20:00']
+var PARTIDOS_HISTORIA_BASE=[
+['2025-01-29','Independiente','2–3','Liga Profesional',11],['2025-02-09','Lanús','0–1','Liga Profesional',12],['2025-02-16','Atlético Tucumán','1–1','Liga Profesional',9785],['2025-03-01','Tigre','1–2','Liga Profesional',7767],['2025-03-10','Rosario Central','0–0','Liga Profesional',17],['2025-03-19','Deportivo Armenio','3–3 (4–5 pen.)','Copa Argentina',17701],['2025-04-02','São Paulo','0–1','CONMEBOL Libertadores',2026],['2025-04-05','Gimnasia La Plata','2–0','Liga Profesional',9],['2025-04-18','Vélez Sarsfield','0–1','Liga Profesional',21],['2025-05-03','Instituto','1–2','Liga Profesional',2975],['2025-05-08','Libertad','0–0','CONMEBOL Libertadores',2670],['2025-05-15','Alianza Lima','2–0','CONMEBOL Libertadores',2680],['2025-07-11','San Lorenzo','1–2','Liga Profesional',18],['2025-07-27','Godoy Cruz','0–0','Liga Profesional',6756],['2025-08-18','San Martín de San Juan','0–0','Liga Profesional',7845],['2025-08-31','Deportivo Riestra','0–1','Liga Profesional',17702],['2025-09-27','Sarmiento','1–0','Liga Profesional',10158],['2025-10-05','Belgrano','0–0','Liga Profesional',4],['2025-10-18','River Plate','0–2','Liga Profesional',16],['2025-11-08','Platense','1–0','Liga Profesional',7764],
+['2026-01-23','Newell’s Old Boys','2–1','Liga Profesional',14],['2026-01-31','Platense','1–2','Liga Profesional',7764],['2026-02-04','Argentino de Merlo','2–0','Copa Argentina',17700],['2026-02-14','Gimnasia de Mendoza','2–1','Liga Profesional',11972],['2026-02-28','San Lorenzo','0–0','Liga Profesional',18],['2026-03-12','Instituto','2–0','Liga Profesional',2975],['2026-04-02','Boca Juniors','0–1','Liga Profesional',5],['2026-04-19','Deportivo Riestra','2–0','Liga Profesional',17702],['2026-05-09','Belgrano','0–1','Liga Profesional',4],['2026-05-20','Atlético Tucumán','0–3','Copa Argentina',9785],['2026-07-30','Vélez Sarsfield','1–3','Liga Profesional',21],['2026-08-11','Lanús','0–3','Liga Profesional',12],['2026-08-24','Rosario Central','2–2','Liga Profesional',17],['2026-08-29','Central Córdoba','0–0','Liga Profesional',11989],['2026-09-12','Unión','2–1','Liga Profesional',20]
 ];
+var PARTIDOS_HISTORIA=PARTIDOS_HISTORIA_BASE.slice();
+var HISTORIA_ACTUALIZACION_INTENTADA=false;
 function hashHistoria(texto){var h=2166136261;for(var i=0;i<texto.length;i++){h^=texto.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
 function minutosHoraHistoria(hora,delta){var p=hora.split(':').map(Number),total=p[0]*60+p[1]+delta;while(total<0)total+=1440;total%=1440;return String(Math.floor(total/60)).padStart(2,'0')+':'+String(total%60).padStart(2,'0')}
+function fechaHoyHistoria(){try{return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Argentina/Cordoba',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())}catch(_){return new Date().toISOString().slice(0,10)}}
+function logoEquipoHistoria(id){return 'https://a.espncdn.com/i/teamlogos/soccer/500/'+Number(id||0)+'.png'}
+async function actualizarPartidosHistoriaDesdeFuente(){
+ if(HISTORIA_ACTUALIZACION_INTENTADA)return;HISTORIA_ACTUALIZACION_INTENTADA=true;
+ var fuente=document.getElementById('historiaFuente');if(fuente)fuente.innerText='Comprobando resultados reales actualizados…';
+ try{
+  var urls=[2025,2026].map(function(anio){return 'https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/teams/19/schedule?season='+anio});
+  var respuestas=await Promise.all(urls.map(function(url){return fetch(url,{headers:{Accept:'application/json'}}).then(function(r){if(!r.ok)throw new Error('Fuente deportiva no disponible');return r.json()})}));
+  var dinamicos=[];
+  respuestas.forEach(function(data){var competencia=data&&data.leagues&&data.leagues[0]&&data.leagues[0].name||'Liga Profesional';(data&&Array.isArray(data.events)?data.events:[]).forEach(function(e){var c=e.competitions&&e.competitions[0],equipos=c&&c.competitors||[],local=equipos.find(function(x){return x.homeAway==='home'}),visitante=equipos.find(function(x){return x.homeAway==='away'});if(!c||!c.status||!c.status.type||c.status.type.completed!==true||!local||!visitante)return;var localId=Number(local.team&&local.team.id),localNombre=String(local.team&&local.team.displayName||'');if(localId!==19&&!localNombre.includes('Talleres'))return;var fecha=new Date(e.date).toLocaleDateString('en-CA',{timeZone:'America/Argentina/Cordoba'}),resultado=String(local.score&&local.score.displayValue!==undefined?local.score.displayValue:local.score)+'–'+String(visitante.score&&visitante.score.displayValue!==undefined?visitante.score.displayValue:visitante.score);dinamicos.push([fecha,String(visitante.team&&visitante.team.displayName||'Rival'),resultado,competencia,Number(visitante.team&&visitante.team.id)||0])})});
+  var mapa={};PARTIDOS_HISTORIA_BASE.concat(dinamicos).forEach(function(p){mapa[p[0]+'|'+p[1].toLowerCase()]=p});PARTIDOS_HISTORIA=Object.keys(mapa).map(function(k){return mapa[k]});
+  if(fuente)fuente.innerText='Resultados reales actualizados automáticamente · asistencia demostrativa.';renderizarTuHistoria();
+ }catch(e){console.warn('Se conserva la última base de resultados validada:',e);if(fuente)fuente.innerText='Resultados reales validados al 21/09/2026 · asistencia demostrativa.'}
+}
 function datosTuHistoria(){
  var socio=obtenerDatosSocio(ID_SOCIO_ACTIVO),ant=socio?socio.antiguedad:0,tasa=ant>15?.95:(ant>=10?.90:.80);
- var partidos=PARTIDOS_HISTORIA.map(function(p,i){return {fecha:p[0],rival:p[1],hora:p[2],orden:hashHistoria(String(ID_SOCIO_ACTIVO)+'|'+p[0]+'|'+p[1]),indice:i}}).sort(function(a,b){return a.orden-b.orden});
+ var hoy=fechaHoyHistoria(),partidos=PARTIDOS_HISTORIA.filter(function(p){return p[0]<=hoy}).map(function(p,i){return {fecha:p[0],rival:p[1],resultado:p[2],competencia:p[3],logoId:p[4],hora:'20:00',orden:hashHistoria(String(ID_SOCIO_ACTIVO)+'|'+p[0]+'|'+p[1]),indice:i}}).sort(function(a,b){return a.orden-b.orden});
  var cantidad=Math.round(partidos.length*tasa);partidos.forEach(function(p,i){p.asistio=i<cantidad});
  partidos.filter(function(p){return p.asistio}).sort(function(a,b){return a.fecha.localeCompare(b.fecha)}).forEach(function(p,i){var tipo=i%3;p.tipoIngreso=tipo;p.horaIngreso=minutosHoraHistoria(p.hora,tipo===0?-(35+(p.orden%36)):(tipo===1?-(5+(p.orden%25)):(1+(p.orden%18))))});
  return {socio:socio,tasa:tasa,partidos:partidos.sort(function(a,b){return b.fecha.localeCompare(a.fecha)})};
@@ -2534,11 +2554,11 @@ function datosTuHistoria(){
 function renderizarTuHistoria(){
  var datos=datosTuHistoria(),filtro=document.getElementById('filtroAnioHistoria').value,lista=filtro==='todos'?datos.partidos:datos.partidos.filter(function(p){return p.fecha.slice(0,4)===filtro}),asistidos=lista.filter(function(p){return p.asistio}),ausentes=lista.length-asistidos.length;
  document.getElementById('historiaHabilitados').innerText=lista.length;document.getElementById('historiaAsistidos').innerText=asistidos.length+' de '+lista.length;document.getElementById('historiaPorcentaje').innerText=(lista.length?Math.round(asistidos.length/lista.length*100):0)+'%';document.getElementById('historiaAusentes').innerText=ausentes;
- document.getElementById('historiaRango').innerText=(filtro==='todos'?'2025 · 2026':filtro)+' · datos demostrativos';
+ document.getElementById('historiaRango').innerText=(filtro==='todos'?'2025 · 2026':filtro)+' · sólo partidos locales finalizados';
  ['historiaTemprano','historiaJusto','historiaTarde'].forEach(function(id){document.getElementById(id).innerText='33%'});
- document.getElementById('listaTuHistoria').innerHTML=lista.map(function(p){var fecha=new Date(p.fecha+'T12:00:00').toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'});var detalle=p.asistio?('Partido '+p.hora+' h · Ingreso '+p.horaIngreso+' h · '+(p.tipoIngreso===0?'más de 30 min antes':p.tipoIngreso===1?'menos de 30 min antes':'partido comenzado')):('Partido '+p.hora+' h · Sin ingreso registrado');return '<div class="history-match"><div class="history-date">'+fecha+'</div><div><div class="history-rival">Talleres vs. '+p.rival+'</div><div class="history-detail">'+detalle+'</div></div><span class="history-status '+(p.asistio?'ok':'absent')+'">'+(p.asistio?'✓ ASISTIÓ':'AUSENTE')+'</span></div>'}).join('');
+ document.getElementById('listaTuHistoria').innerHTML=lista.map(function(p){var fecha=new Date(p.fecha+'T12:00:00').toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'}),categoria=p.tipoIngreso===0?'más de 30 min antes':p.tipoIngreso===1?'menos de 30 min antes':'con el partido comenzado',detalle=p.asistio?('Ingreso simulado '+p.horaIngreso+' h · '+categoria):'Sin ingreso registrado en la simulación';return '<div class="history-match"><div class="history-date">'+fecha+'</div><div><div class="history-rival-line"><span class="history-crests"><img class="history-crest" src="'+logoEquipoHistoria(19)+'" alt="Talleres"><img class="history-crest" src="'+logoEquipoHistoria(p.logoId)+'" alt="'+escaparGobernanza(p.rival)+'"></span><span class="history-rival">Talleres vs. '+escaparGobernanza(p.rival)+'</span><span class="history-score">'+escaparGobernanza(p.resultado)+'</span></div><div class="history-detail">'+escaparGobernanza(p.competencia)+' · '+detalle+'</div></div><span class="history-status '+(p.asistio?'ok':'absent')+'">'+(p.asistio?'✓ ASISTIÓ':'AUSENTE')+'</span></div>'}).join('');
 }
-function irATuHistoria(){ocultarTodo();document.getElementById('secTuHistoria').style.display='flex';renderizarTuHistoria()}
+function irATuHistoria(){ocultarTodo();document.getElementById('secTuHistoria').style.display='flex';renderizarTuHistoria();actualizarPartidosHistoriaDesdeFuente()}
 
 function loguearSocioInterno(id){
 ID_SOCIO_ACTIVO=id;ROL_ACTIVO='socio';actualizarCabeceraSegunRol();ocultarTodo();document.getElementById('socioDashboard').style.display='flex';
