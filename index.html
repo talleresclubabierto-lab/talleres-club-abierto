@@ -369,6 +369,24 @@ body{
   .app-logo-mark{width:44px!important;height:39px!important;background-size:47px auto!important}
   .brand-role-label{font-size:12px;line-height:1.25;max-width:210px}
 }
+.history-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0}
+.history-stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:var(--shadow)}
+.history-stat-label{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.history-stat-value{font-size:27px;font-weight:900;color:var(--navy);margin-top:6px}
+.history-timing{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+.history-timing-item{border-radius:10px;padding:13px;background:#f5f9fc;border:1px solid var(--line)}
+.history-timing-item strong{display:block;color:var(--navy);font-size:20px;margin-bottom:3px}
+.history-list{display:grid;gap:9px;margin-top:14px}
+.history-match{display:grid;grid-template-columns:82px minmax(0,1fr) auto;gap:14px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:11px;padding:13px 15px}
+.history-date{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase}
+.history-rival{font-weight:800;color:var(--navy)}
+.history-detail{font-size:12px;color:#64748b;margin-top:3px}
+.history-status{font-size:11px;font-weight:900;border-radius:999px;padding:7px 10px;white-space:nowrap}
+.history-status.ok{background:#e8f8ef;color:#16734a}.history-status.absent{background:#f3f4f6;color:#667085}
+.history-disclaimer{border:1px solid rgba(117,217,248,.28);background:rgba(3,31,62,.78);color:#dcebf5;border-radius:11px;padding:13px 15px;font-size:12px;line-height:1.5}
+.padron-loading{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:#496174}.padron-loading:before{content:'';width:9px;height:9px;border-radius:50%;background:#62dcff;box-shadow:0 0 9px rgba(98,220,255,.7)}
+@media(max-width:850px){.history-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.history-timing{grid-template-columns:1fr}.history-match{grid-template-columns:68px minmax(0,1fr)}.history-status{grid-column:2;justify-self:start}.history-stat-value{font-size:23px}}
 </style><script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -412,6 +430,7 @@ body{
       <button class="btn-action-red" onclick="irAResultadosGenerales()"><span class="action-icon">▥</span>Resultados<br><small style="font-weight:500;color:#64748b">Votantes y ponderación en tiempo real</small></button>
       <button class="btn-action-red" onclick="irAAuditoriaPublica()"><span class="action-icon">◎</span>Auditoría pública<br><small style="font-weight:500;color:#64748b">Consultá qué votó cada socio</small></button>
       <button class="btn-action-red" onclick="irAParedesDeCristal()"><span class="action-icon">▦</span>Paredes de Cristal<br><small style="font-weight:500;color:#64748b">Balance y auditoría económica ponderada</small></button>
+      <button class="btn-action-red" onclick="irATuHistoria()"><span class="action-icon">✓</span>Tu historia con Talleres<br><small style="font-weight:500;color:#64748b">Partidos, asistencia y horarios de ingreso</small></button>
       <button class="btn-action-red" onclick="irACambioClave()"><span class="action-icon">⌨</span>Cambiar contraseña<br><small style="font-weight:500;color:#64748b">Administrá tu clave personal</small></button>
       <button class="btn-action-red" onclick="irAPasskey()"><span class="action-icon">◎</span>Identidad biométrica / Passkey<br><small style="font-weight:500;color:#64748b">Registrá huella, Face ID o Windows Hello</small></button>
     </div>
@@ -777,6 +796,35 @@ body{
   <nav class="bottom-nav"><button class="active" onclick="regresarAlPanelInterno()"><span class="mini-icon">▦</span>Dashboard</button><button onclick="irAResultadosGenerales()"><span class="mini-icon">▥</span>Resultados</button><button onclick="irAAuditoriaPublica()"><span class="mini-icon">◎</span>Auditoría</button><button onclick="irACambioClave()"><span class="mini-icon">⌨</span>Clave</button></nav>
 </div>
 
+
+<div id="secTuHistoria" class="sub-view full-width">
+  <div class="topbar"><div class="brand"><span class="app-logo-mark" role="img" aria-label="Escudo Talleres Club Abierto"></span><span class="brand-role-label">TALLERES CLUB ABIERTO</span></div><div class="top-actions"><span class="navlink"><span class="network-dot"></span>Tu recorrido en el club</span><button onclick="volverAlLogin()">Salir</button></div></div>
+  <main class="section-shell">
+    <div class="dashboard-header"><div class="wf-box">Tu historia con Talleres</div><button class="wf-button" onclick="regresarAlPanelInterno()">Volver</button></div>
+    <div class="page-head"><div><div class="eyebrow">Cada partido cuenta</div><h1 class="page-title">Mi asistencia</h1><p class="page-sub">Consultá tus partidos, la fecha y el horario de cada ingreso.</p></div><span id="historiaRango" class="status-chip">Datos demostrativos</span></div>
+    <div class="history-disclaimer"><strong>Modo ejemplo:</strong> esta sección simula el historial con los partidos habilitados de 2025 y 2026. Cuando se conecte con los registros reales de acceso, cada socio verá aquí su recorrido verificable.</div>
+    <div class="history-summary">
+      <div class="history-stat"><div class="history-stat-label">Partidos habilitados</div><div id="historiaHabilitados" class="history-stat-value">-</div></div>
+      <div class="history-stat"><div class="history-stat-label">Asistencia total</div><div id="historiaAsistidos" class="history-stat-value">-</div></div>
+      <div class="history-stat"><div class="history-stat-label">Porcentaje</div><div id="historiaPorcentaje" class="history-stat-value">-</div></div>
+      <div class="history-stat"><div class="history-stat-label">Partidos ausentes</div><div id="historiaAusentes" class="history-stat-value">-</div></div>
+    </div>
+    <section class="card">
+      <div class="card-title">¿Con cuánta anticipación ingresaste?</div>
+      <div class="history-timing">
+        <div class="history-timing-item"><strong id="historiaTemprano">33%</strong>Más de 30 minutos antes</div>
+        <div class="history-timing-item"><strong id="historiaJusto">33%</strong>Menos de 30 minutos antes</div>
+        <div class="history-timing-item"><strong id="historiaTarde">33%</strong>Con el partido comenzado</div>
+      </div>
+    </section>
+    <section class="card" style="margin-top:16px">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap"><div><div class="card-title">Historial de partidos</div><p class="card-note">La demostración se genera siempre igual para cada número de socio.</p></div><select id="filtroAnioHistoria" class="wf-input" style="width:auto;margin:0" onchange="renderizarTuHistoria()"><option value="todos">2025 y 2026</option><option value="2026">2026</option><option value="2025">2025</option></select></div>
+      <div id="listaTuHistoria" class="history-list"></div>
+    </section>
+  </main>
+  <nav class="bottom-nav"><button onclick="regresarAlPanelInterno()"><span class="mini-icon">▦</span>Dashboard</button><button class="active" onclick="irATuHistoria()"><span class="mini-icon">✓</span>Tu historia</button><button onclick="irAResultadosGenerales()"><span class="mini-icon">▥</span>Resultados</button><button onclick="irAAuditoriaPublica()"><span class="mini-icon">◎</span>Auditoría</button></nav>
+</div>
+
 <div id="secGestionPadron" class="sub-view full-width">
   <div class="topbar"><div class="brand"><span class="app-logo-mark" role="img" aria-label="Escudo Talleres Club Abierto"></span><span class="brand-role-label">TALLERES CLUB ABIERTO</span></div><div class="top-actions"><span class="navlink"><span class="network-dot"></span>Padrón compartido</span><button onclick="volverAlLogin()">Salir</button></div></div>
   <main class="section-shell">
@@ -784,6 +832,13 @@ body{
     <div class="page-head"><div><div class="eyebrow">Administración societaria · 6C-8.5</div><h1 class="page-title">Padrón habilitado</h1><p class="page-sub">Altas manuales, corrección de nombres, perfiles institucionales especiales, reset de contraseña e importación futura desde Excel.</p></div><span id="lblPadronGestionTotal" class="status-chip">-</span></div>
 
     <div class="management-grid">
+      <section class="management-block management-block-wide">
+        <h3>Consultar socio</h3>
+        <p class="muted">Buscá por número para consultar nombre, número de socio y fecha de alta.</p>
+        <div style="display:flex;gap:8px;max-width:560px"><input id="txtConsultaPadronNumero" type="number" min="1" class="wf-input" style="margin-bottom:10px" placeholder="N° de socio" onkeydown="if(event.key==='Enter')consultarSocioPadron()"><button id="btnConsultaPadron" class="btn-secondary-dark" style="height:42px;white-space:nowrap" onclick="consultarSocioPadron()">Consultar</button></div>
+        <div id="estadoCargaPadron" class="padron-loading">Preparando padrón para consultas…</div>
+        <div id="resultadoConsultaPadron" class="profile-admin-result" style="display:none"></div>
+      </section>
       <section class="management-block">
         <h3>Agregar socio manualmente</h3>
         <p class="muted">La fecha de alta es necesaria para calcular su antigüedad y ponderación.</p>
@@ -901,6 +956,7 @@ var SUPABASE_ROW_ID='global';
 var supabaseClient=null;
 var SINCRONIZACION_INICIAL_COMPLETA=false;
 var PADRON_ADMIN_COMPLETO=false;
+var PADRON_ADMIN_CARGA_PROMESA=null;
 var GUARDADO_REMOTO_PENDIENTE=null;
 var APLICANDO_ESTADO_REMOTO=false;
 var PADRON_FUENTE='fallback';
@@ -1077,6 +1133,8 @@ async function cargarEstadoInicialAutenticado(){
 }
 async function cargarPadronAdminBajoDemanda(){
     if(PADRON_ADMIN_COMPLETO)return true;
+    if(PADRON_ADMIN_CARGA_PROMESA)return PADRON_ADMIN_CARGA_PROMESA;
+    PADRON_ADMIN_CARGA_PROMESA=(async function(){
     var token=obtenerTokenSesionClub();
     if(!token)throw new Error('Sesión segura requerida');
     actualizarEstadoSync('Cargando padrón administrativo…',true);
@@ -1096,6 +1154,9 @@ async function cargarPadronAdminBajoDemanda(){
     if(gest)gest.innerText=TOTAL_SOCIOS.toLocaleString('es-AR')+' habilitados';
     actualizarEstadoSync('Padrón administrativo cargado de forma segura',true);
     return true;
+    })();
+    try{return await PADRON_ADMIN_CARGA_PROMESA}
+    finally{PADRON_ADMIN_CARGA_PROMESA=null}
 }
 
 async function validarSesionSeguraClub(){
@@ -2455,6 +2516,29 @@ if(!d)return null;
 d.porcentual=TOTAL_PUNTOS_PADRON>0?(d.puntos/TOTAL_PUNTOS_PADRON)*100:0;
 return d;
 }
+
+var PARTIDOS_HISTORIA=[
+['2025-02-09','Lanús','20:30'],['2025-02-23','Tigre','21:30'],['2025-03-09','Rosario Central','19:15'],['2025-03-30','Gimnasia LP','16:00'],['2025-04-13','San Lorenzo','18:00'],['2025-04-27','Instituto','19:30'],['2025-05-11','Godoy Cruz','16:30'],['2025-06-15','Newell’s','18:15'],['2025-07-06','Vélez','20:00'],['2025-07-20','Independiente','18:45'],['2025-08-03','Huracán','20:15'],['2025-08-17','Banfield','16:00'],['2025-08-31','Racing Club','21:00'],['2025-09-14','Estudiantes LP','19:30'],['2025-09-28','Defensa y Justicia','17:00'],['2025-10-12','Argentinos Juniors','20:00'],['2025-10-26','River Plate','18:30'],['2025-11-09','Platense','17:00'],
+['2026-02-01','Sarmiento','19:00'],['2026-02-15','Independiente Rivadavia','21:00'],['2026-03-01','Atlético Tucumán','18:30'],['2026-03-15','Unión','20:15'],['2026-03-29','Barracas Central','17:00'],['2026-04-12','Belgrano','16:00'],['2026-04-26','Boca Juniors','20:30'],['2026-05-10','Central Córdoba','18:00'],['2026-06-07','Aldosivi','17:30'],['2026-07-05','Lanús','19:00'],['2026-07-19','Tigre','20:00'],['2026-08-02','Rosario Central','18:15'],['2026-08-16','Gimnasia LP','16:30'],['2026-08-30','San Lorenzo','20:30'],['2026-09-13','Instituto','19:00'],['2026-09-27','Godoy Cruz','17:00'],['2026-10-11','Newell’s','18:30'],['2026-10-25','Vélez','20:00']
+];
+function hashHistoria(texto){var h=2166136261;for(var i=0;i<texto.length;i++){h^=texto.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function minutosHoraHistoria(hora,delta){var p=hora.split(':').map(Number),total=p[0]*60+p[1]+delta;while(total<0)total+=1440;total%=1440;return String(Math.floor(total/60)).padStart(2,'0')+':'+String(total%60).padStart(2,'0')}
+function datosTuHistoria(){
+ var socio=obtenerDatosSocio(ID_SOCIO_ACTIVO),ant=socio?socio.antiguedad:0,tasa=ant>15?.95:(ant>=10?.90:.80);
+ var partidos=PARTIDOS_HISTORIA.map(function(p,i){return {fecha:p[0],rival:p[1],hora:p[2],orden:hashHistoria(String(ID_SOCIO_ACTIVO)+'|'+p[0]+'|'+p[1]),indice:i}}).sort(function(a,b){return a.orden-b.orden});
+ var cantidad=Math.round(partidos.length*tasa);partidos.forEach(function(p,i){p.asistio=i<cantidad});
+ partidos.filter(function(p){return p.asistio}).sort(function(a,b){return a.fecha.localeCompare(b.fecha)}).forEach(function(p,i){var tipo=i%3;p.tipoIngreso=tipo;p.horaIngreso=minutosHoraHistoria(p.hora,tipo===0?-(35+(p.orden%36)):(tipo===1?-(5+(p.orden%25)):(1+(p.orden%18))))});
+ return {socio:socio,tasa:tasa,partidos:partidos.sort(function(a,b){return b.fecha.localeCompare(a.fecha)})};
+}
+function renderizarTuHistoria(){
+ var datos=datosTuHistoria(),filtro=document.getElementById('filtroAnioHistoria').value,lista=filtro==='todos'?datos.partidos:datos.partidos.filter(function(p){return p.fecha.slice(0,4)===filtro}),asistidos=lista.filter(function(p){return p.asistio}),ausentes=lista.length-asistidos.length;
+ document.getElementById('historiaHabilitados').innerText=lista.length;document.getElementById('historiaAsistidos').innerText=asistidos.length+' de '+lista.length;document.getElementById('historiaPorcentaje').innerText=(lista.length?Math.round(asistidos.length/lista.length*100):0)+'%';document.getElementById('historiaAusentes').innerText=ausentes;
+ document.getElementById('historiaRango').innerText=(filtro==='todos'?'2025 · 2026':filtro)+' · datos demostrativos';
+ ['historiaTemprano','historiaJusto','historiaTarde'].forEach(function(id){document.getElementById(id).innerText='33%'});
+ document.getElementById('listaTuHistoria').innerHTML=lista.map(function(p){var fecha=new Date(p.fecha+'T12:00:00').toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'});var detalle=p.asistio?('Partido '+p.hora+' h · Ingreso '+p.horaIngreso+' h · '+(p.tipoIngreso===0?'más de 30 min antes':p.tipoIngreso===1?'menos de 30 min antes':'partido comenzado')):('Partido '+p.hora+' h · Sin ingreso registrado');return '<div class="history-match"><div class="history-date">'+fecha+'</div><div><div class="history-rival">Talleres vs. '+p.rival+'</div><div class="history-detail">'+detalle+'</div></div><span class="history-status '+(p.asistio?'ok':'absent')+'">'+(p.asistio?'✓ ASISTIÓ':'AUSENTE')+'</span></div>'}).join('');
+}
+function irATuHistoria(){ocultarTodo();document.getElementById('secTuHistoria').style.display='flex';renderizarTuHistoria()}
+
 function loguearSocioInterno(id){
 ID_SOCIO_ACTIVO=id;ROL_ACTIVO='socio';actualizarCabeceraSegunRol();ocultarTodo();document.getElementById('socioDashboard').style.display='flex';
 var d=obtenerDatosSocio(id);
@@ -2494,7 +2578,12 @@ if(id==='secVotaciones'){
 async function mostrarSeccionAdmin(id){
 if(id==='secGestionAdmins'&&!esSuperAdministrador(ID_SOCIO_ACTIVO)){alert('Sólo el socio 21.998 puede administrar permisos de administradores.');return}
 if(id==='secHistorialAdmin'){irAHistorialAdministrativo();return}
-if((id==='secGestionPadron'||id==='secGestionAdmins')&&!PADRON_ADMIN_COMPLETO){
+if(id==='secGestionPadron'){
+    ocultarTodo();document.getElementById(id).style.display='flex';
+    prepararGestionPadron();
+    return;
+}
+if(id==='secGestionAdmins'&&!PADRON_ADMIN_COMPLETO){
     try{await cargarPadronAdminBajoDemanda()}
     catch(e){console.error('Carga diferida del padrón rechazada:',e);alert('No se pudo cargar el padrón administrativo. Intentá nuevamente.');return}
 }
@@ -2503,7 +2592,6 @@ if(id==='secModificar')inicializarSelectorModificaciones();
 if(id==='secPorcentuales')renderizarListaPorcentualesAdmin();
 if(id==='secCicloAdmin')inicializarCicloEncuestas();
 if(id==='secGestionAdmins')renderizarAdministradores();
-if(id==='secGestionPadron'){recalcularPadronRuntime();limpiarPreviewImportacion();inicializarPerfilesInstitucionalesPadron();}
 }
 function irAResultadosGenerales(){ocultarTodo();document.getElementById('secResultados').style.display='flex';inicializarSelectorResultados()}
 function irAAuditoriaPublica(){ocultarTodo();document.getElementById('secAuditoria').style.display='flex';inicializarAuditoriaPublica()}
@@ -2986,6 +3074,23 @@ recalcularPadronRuntime();
 refrescarVistasTrasSincronizacion();
 }
 
+async function prepararGestionPadron(){
+ var estado=document.getElementById('estadoCargaPadron');
+ limpiarPreviewImportacion();
+ if(PADRON_ADMIN_COMPLETO){if(estado){estado.className='muted';estado.innerText='Padrón listo para consultas.'}inicializarPerfilesInstitucionalesPadron();return}
+ if(estado){estado.className='padron-loading';estado.innerText='Cargando el padrón una sola vez en segundo plano…'}
+ try{await cargarPadronAdminBajoDemanda();if(estado){estado.className='muted';estado.innerText='Padrón listo: '+TOTAL_SOCIOS.toLocaleString('es-AR')+' socios habilitados.'}inicializarPerfilesInstitucionalesPadron()}
+ catch(e){console.error(e);if(estado){estado.className='profile-admin-result warn';estado.innerText='No se pudo cargar el padrón. Podés volver a intentar desde una consulta.'}}
+}
+async function consultarSocioPadron(){
+ var numero=Number(document.getElementById('txtConsultaPadronNumero').value),resultado=document.getElementById('resultadoConsultaPadron'),btn=document.getElementById('btnConsultaPadron');
+ if(!Number.isInteger(numero)||numero<=0){resultado.style.display='block';resultado.className='profile-admin-result warn';resultado.innerText='Ingresá un número de socio válido.';return}
+ btn.disabled=true;
+ try{if(!PADRON_ADMIN_COMPLETO)await cargarPadronAdminBajoDemanda();var ficha=PADRON_SOCIOS[numero];resultado.style.display='block';if(!ficha){resultado.className='profile-admin-result warn';resultado.innerText='No se encontró el socio #'+numero.toLocaleString('es-AR')+' en el padrón habilitado.';return}resultado.className='profile-admin-result ok';resultado.innerHTML='<strong>'+escaparGobernanza(ficha[0])+'</strong><br>Número de socio: <strong>#'+numero.toLocaleString('es-AR')+'</strong><br>Fecha de alta: <strong>'+escaparGobernanza(formatoFechaPadron(ficha[1]))+'</strong>'}
+ catch(e){resultado.style.display='block';resultado.className='profile-admin-result warn';resultado.innerText=e.message||'No pudo realizarse la consulta.'}
+ finally{btn.disabled=false}
+}
+
 async function agregarSocioManual(){
 if(ROL_ACTIVO!=='admin'||!esAdministrador(ID_SOCIO_ACTIVO)){alert('Acceso exclusivo de administradores.');return}
 var id=parseInt(document.getElementById('txtPadronNuevoNumero').value);
@@ -2996,8 +3101,10 @@ if(PADRON_SOCIOS[id]){alert('Ese N° de socio ya existe en el padrón.');return}
 if(!nombre||!/^\d{4}-\d{2}-\d{2}$/.test(fecha)){alert('Completá nombre y fecha de alta válidos.');return}
 try{
 await llamarClubAbiertoApi({accion:'agregar_socio',numero_socio:id,nombre:nombre,fecha_alta:fecha},obtenerTokenSesionClub());
-await cargarEstadoInicialAutenticado();
+PADRON_SOCIOS[id]=[nombre,fecha];PADRON_ADMIN_COMPLETO=true;recalcularPadronRuntime();
+var totalEl=document.getElementById('lblPadronGestionTotal');if(totalEl)totalEl.innerText=TOTAL_SOCIOS.toLocaleString('es-AR')+' habilitados';
 document.getElementById('txtPadronNuevoNumero').value='';document.getElementById('txtPadronNuevoNombre').value='';document.getElementById('txtPadronNuevaFecha').value='';
+document.getElementById('txtConsultaPadronNumero').value=id;consultarSocioPadron();
 alert('✓ Socio agregado al padrón.');
 }catch(e){console.error(e);alert(e.message||'No se pudo agregar el socio.')}
 }
@@ -3021,8 +3128,9 @@ var nombre=document.getElementById('txtPadronEditarNombre').value.trim().replace
 if(isNaN(id)||!PADRON_SOCIOS[id]||!nombre){alert('Primero buscá un socio válido e ingresá un nombre.');return}
 try{
 await llamarClubAbiertoApi({accion:'actualizar_nombre_socio',numero_socio:id,nombre:nombre},obtenerTokenSesionClub());
-await cargarEstadoInicialAutenticado();
+PADRON_SOCIOS[id][0]=nombre;PADRON_ADMIN_COMPLETO=true;
 document.getElementById('lblPadronEditarInfo').innerText='Nombre actualizado correctamente.';
+if(Number(document.getElementById('txtConsultaPadronNumero').value)===id)consultarSocioPadron();
 alert('✓ Nombre del socio actualizado.');
 }catch(e){console.error(e);alert(e.message||'No se pudo modificar el nombre.')}
 }
@@ -3341,10 +3449,7 @@ if(actual&&baseEncuestas[actual])cmb.value=actual;actualizarReporteGrafico();
 }
 function obtenerResumenExactoEncuesta(key){
 var votantesEmitidos=0,puntosEmitidos=0,votantesRestantes=0,puntosRestantes=0;
-/* El resumen agregado de la API ya contiene el conteo por opción. Sólo se
-   reconstruye desde el detalle de votos cuando ese resumen no está disponible. */
-var tieneConteoOficialPorOpcion=Array.isArray(baseEncuestas[key].votantesPorOpcion);
-var votantesPorOpcion=tieneConteoOficialPorOpcion?baseEncuestas[key].votantesPorOpcion.slice():(baseEncuestas[key].opts||[]).map(function(){return 0});
+var votantesPorOpcion=Array.isArray(baseEncuestas[key].votantesPorOpcion)?baseEncuestas[key].votantesPorOpcion.slice():(baseEncuestas[key].opts||[]).map(function(){return 0});
 var puntosPorOpcion=(baseEncuestas[key].votos||[]).slice();
 SOCIOS_HABILITADOS.forEach(function(id){
 var reg=registroVotosEmitidos[id+'_'+key],d=obtenerDatosSocio(id);
@@ -3354,7 +3459,7 @@ votantesEmitidos++;
 /* Si el registro es nuevo, conocemos exactamente opción y puntos. */
 if(typeof reg==='object'&&reg!==null){
 var p=Number(reg.puntos);puntosEmitidos+=isNaN(p)?d.puntos:p;
-var op=Number(reg.opcion);if(!tieneConteoOficialPorOpcion&&Number.isInteger(op)&&op>=0&&op<votantesPorOpcion.length)votantesPorOpcion[op]++;
+var op=Number(reg.opcion);
 }
 }else{votantesRestantes++;puntosRestantes+=d.puntos}
 });
