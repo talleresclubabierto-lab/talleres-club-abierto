@@ -435,6 +435,7 @@ body{
       <button class="btn-action-red" onclick="irAAuditoriaPublica()"><span class="action-icon">◎</span>Auditoría pública<br><small style="font-weight:500;color:#64748b">Consultá qué votó cada socio</small></button>
       <button class="btn-action-red" onclick="irAParedesDeCristal()"><span class="action-icon">▦</span>Paredes de Cristal<br><small style="font-weight:500;color:#64748b">Balance y auditoría económica ponderada</small></button>
       <button class="btn-action-red" onclick="irATuHistoria()"><span class="action-icon">✓</span>Tu historia con Talleres<br><small style="font-weight:500;color:#64748b">Partidos, asistencia y horarios de ingreso</small></button>
+      <button class="btn-action-red" onclick="irAHistorialAdministrativo()"><span class="action-icon">▤</span>Historial de cambios<br><small style="font-weight:500;color:#64748b">Consultá el registro protegido de cambios</small></button>
       <button class="btn-action-red" onclick="irACambioClave()"><span class="action-icon">⌨</span>Cambiar contraseña<br><small style="font-weight:500;color:#64748b">Administrá tu clave personal</small></button>
       <button class="btn-action-red" onclick="irAPasskey()"><span class="action-icon">◎</span>Identidad biométrica / Passkey<br><small style="font-weight:500;color:#64748b">Registrá huella, Face ID o Windows Hello</small></button>
     </div>
@@ -644,20 +645,20 @@ body{
       <div>
         <div class="eyebrow">Ledger administrativo · 5D</div>
         <h1 class="page-title">Historial administrativo</h1>
-        <p class="page-sub">Registro append-only de cambios relevantes. La lectura requiere validación biométrica administrativa vigente.</p>
+        <p class="page-sub">Registro append-only de cambios relevantes. La lectura está disponible para socios activos con validación biométrica vigente.</p>
       </div>
       <span id="chipHistorialAdmin" class="status-chip">● Protegido</span>
     </div>
 
     <div id="estadoHistorialAdmin" class="admin-history-status warn">
-      Para consultar el historial verificá primero tu identidad administrativa con tu Passkey.
+      Para consultar el historial verificá primero tu identidad con tu Passkey.
     </div>
 
     <section class="card">
       <div class="card-title">Acceso seguro</div>
-      <p class="card-note">La validación usa WebAuthn con propósito <strong>accion_admin</strong>. Conocer el número de socio administrador no es suficiente para acceder.</p>
+      <p class="card-note">La validación usa WebAuthn/Passkey. El historial está disponible para socios activos autenticados y requiere una verificación biométrica vigente.</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
-        <button id="btnVerificarHistorialAdmin" class="wf-button" onclick="verificarAccesoHistorialAdmin()">Verificar identidad administrativa</button>
+        <button id="btnVerificarHistorialAdmin" class="wf-button" onclick="verificarAccesoHistorialAdmin()">Verificar identidad</button>
         <button id="btnRecargarHistorialAdmin" class="btn-secondary-dark" onclick="cargarHistorialAdministrativo()" disabled>Recargar historial</button>
       </div>
     </section>
@@ -702,7 +703,7 @@ body{
     </div>
 
     <div id="listaHistorialAdmin">
-      <div class="admin-history-empty">Validá tu identidad administrativa para consultar el historial.</div>
+      <div class="admin-history-empty">Validá tu identidad para consultar el historial.</div>
     </div>
   </main>
 
@@ -1841,7 +1842,6 @@ function serializarCredencialAutenticacion(cred){
 }
 
 async function llamarWebAuthn(body){
-    if(!supabaseClient)throw new Error('Supabase no está conectado');
     var url=SUPABASE_URL.replace(/\/$/,'')+'/functions/v1/webauthn';
     var res=await fetch(url,{
         method:'POST',
@@ -2038,7 +2038,7 @@ function historialAdminVerificacionVigente(){
     return !!(
         p &&
         p.verificationId &&
-        p.proposito==='accion_admin' &&
+        p.proposito==='autenticacion' &&
         new Date(p.expiresAt).getTime()>Date.now()
     );
 }
@@ -2052,20 +2052,20 @@ function actualizarEstadoHistorialAdmin(){
 
     if(historialAdminVerificacionVigente()){
         estado.className='admin-history-status ok';
-        estado.innerHTML='<strong>✓ Identidad administrativa verificada.</strong> Acceso válido hasta '+new Date(HISTORIAL_ADMIN_VERIFICACION.expiresAt).toLocaleString('es-AR')+'.';
+        estado.innerHTML='<strong>✓ Identidad verificada.</strong> Acceso válido hasta '+new Date(HISTORIAL_ADMIN_VERIFICACION.expiresAt).toLocaleString('es-AR')+'.';
         if(recargar)recargar.disabled=false;
-        if(verificar)verificar.innerText='Renovar validación administrativa';
+        if(verificar)verificar.innerText='Renovar validación de identidad';
     }else{
         estado.className='admin-history-status warn';
-        estado.innerHTML='Para consultar el historial verificá primero tu identidad administrativa con tu Passkey.';
+        estado.innerHTML='Para consultar el historial verificá primero tu identidad con tu Passkey.';
         if(recargar)recargar.disabled=true;
-        if(verificar)verificar.innerText='Verificar identidad administrativa';
+        if(verificar)verificar.innerText='Verificar identidad';
     }
 }
 
 async function irAHistorialAdministrativo(){
-    if(ROL_ACTIVO!=='admin'||!esAdministrador(ID_SOCIO_ACTIVO)){
-        alert('Acceso exclusivo de administradores.');
+    if(!ID_SOCIO_ACTIVO||!PADRON_SOCIOS[ID_SOCIO_ACTIVO]){
+        alert('Acceso exclusivo de socios activos habilitados.');
         return;
     }
 
@@ -2084,8 +2084,8 @@ async function irAHistorialAdministrativo(){
 }
 
 async function verificarAccesoHistorialAdmin(){
-    if(ROL_ACTIVO!=='admin'||!esAdministrador(ID_SOCIO_ACTIVO)){
-        alert('Acceso exclusivo de administradores.');
+    if(!ID_SOCIO_ACTIVO||!PADRON_SOCIOS[ID_SOCIO_ACTIVO]){
+        alert('Acceso exclusivo de socios activos habilitados.');
         return;
     }
 
@@ -2096,7 +2096,7 @@ async function verificarAccesoHistorialAdmin(){
     }
 
     try{
-        var prueba=await verificarPasskeyActual('accion_admin');
+        var prueba=await verificarPasskeyActual('autenticacion');
 
         if(!prueba){
             HISTORIAL_ADMIN_VERIFICACION=null;
@@ -2107,7 +2107,7 @@ async function verificarAccesoHistorialAdmin(){
         HISTORIAL_ADMIN_VERIFICACION={
             verificationId:prueba.verificationId,
             expiresAt:prueba.expiresAt,
-            proposito:'accion_admin'
+            proposito:'autenticacion'
         };
 
         actualizarEstadoHistorialAdmin();
@@ -2116,21 +2116,21 @@ async function verificarAccesoHistorialAdmin(){
     }finally{
         if(btn){
             btn.disabled=false;
-            btn.innerText=historialAdminVerificacionVigente()?'Renovar validación administrativa':'Verificar identidad administrativa';
+            btn.innerText=historialAdminVerificacionVigente()?'Renovar validación de identidad':'Verificar identidad';
         }
     }
 }
 
 async function cargarHistorialAdministrativo(){
-    if(ROL_ACTIVO!=='admin'||!esAdministrador(ID_SOCIO_ACTIVO)){
-        alert('Acceso exclusivo de administradores.');
+    if(!ID_SOCIO_ACTIVO||!PADRON_SOCIOS[ID_SOCIO_ACTIVO]){
+        alert('Acceso exclusivo de socios activos habilitados.');
         return;
     }
 
     if(!historialAdminVerificacionVigente()){
         HISTORIAL_ADMIN_VERIFICACION=null;
         actualizarEstadoHistorialAdmin();
-        alert('La validación biométrica administrativa no existe o venció. Volvé a verificar tu identidad.');
+        alert('La validación biométrica no existe o venció. Volvé a verificar tu identidad.');
         return;
     }
 
