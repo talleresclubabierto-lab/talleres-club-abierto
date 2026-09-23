@@ -2056,7 +2056,7 @@ async function verificarPasskeyActual(proposito){
             PASSKEY_VERIFICACION_TEMPORAL=pruebaNativa;
             var elNativo=document.getElementById('lblUltimaVerificacionPasskey');
             if(elNativo){
-                elNativo.innerHTML='<strong>✓ Identidad verificada con biometría Android</strong><br>Propósito: '+proposito+'<br>Válida hasta: '+new Date(pruebaNativa.expiresAt).toLocaleString('es-AR');
+                elNativo.innerHTML='<strong>✓ Identidad verificada con biometría Android</strong><br>Propósito: '+proposito+'<br>Válida hasta: '+new Date(pruebaNativa.expiresAt).toLocaleString('es-AR',{timeZone:'America/Argentina/Cordoba',hour12:false});
             }
             return pruebaNativa;
         }
@@ -2090,7 +2090,7 @@ async function verificarPasskeyActual(proposito){
 
         var el=document.getElementById('lblUltimaVerificacionPasskey');
         if(el){
-            el.innerHTML='<strong>✓ Identidad verificada</strong><br>Propósito: '+proposito+'<br>Válida hasta: '+new Date(fin.expiresAt).toLocaleString('es-AR');
+            el.innerHTML='<strong>✓ Identidad verificada</strong><br>Propósito: '+proposito+'<br>Válida hasta: '+new Date(fin.expiresAt).toLocaleString('es-AR',{timeZone:'America/Argentina/Cordoba',hour12:false});
         }
 
         return PASSKEY_VERIFICACION_TEMPORAL;
@@ -2134,7 +2134,7 @@ function actualizarEstadoHistorialAdmin(){
 
     if(historialAdminVerificacionVigente()){
         estado.className='admin-history-status ok';
-        estado.innerHTML='<strong>✓ Identidad verificada.</strong> Acceso válido hasta '+new Date(HISTORIAL_ADMIN_VERIFICACION.expiresAt).toLocaleString('es-AR')+'.';
+        estado.innerHTML='<strong>✓ Identidad verificada.</strong> Acceso válido hasta '+new Date(HISTORIAL_ADMIN_VERIFICACION.expiresAt).toLocaleString('es-AR',{timeZone:'America/Argentina/Cordoba',hour12:false})+'.';
         if(recargar)recargar.disabled=false;
         if(verificar)verificar.innerText='Renovar validación';
     }else{
