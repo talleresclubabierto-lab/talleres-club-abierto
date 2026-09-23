@@ -435,6 +435,7 @@ body{
       <button class="btn-action-red" onclick="irAAuditoriaPublica()"><span class="action-icon">◎</span>Auditoría pública<br><small style="font-weight:500;color:#64748b">Consultá qué votó cada socio</small></button>
       <button class="btn-action-red" onclick="irAParedesDeCristal()"><span class="action-icon">▦</span>Paredes de Cristal<br><small style="font-weight:500;color:#64748b">Balance y auditoría económica ponderada</small></button>
       <button class="btn-action-red" onclick="irATuHistoria()"><span class="action-icon">✓</span>Tu historia con Talleres<br><small style="font-weight:500;color:#64748b">Partidos, asistencia y horarios de ingreso</small></button>
+      <button class="btn-action-red" onclick="irAHistorialAdministrativo()"><span class="action-icon">≡</span>Historial de cambios<br><small style="font-weight:500;color:#64748b">Consultá el registro protegido de cambios</small></button>
       <button class="btn-action-red" onclick="irACambioClave()"><span class="action-icon">⌨</span>Cambiar contraseña<br><small style="font-weight:500;color:#64748b">Administrá tu clave personal</small></button>
       <button class="btn-action-red" onclick="irAPasskey()"><span class="action-icon">◎</span>Identidad biométrica / Passkey<br><small style="font-weight:500;color:#64748b">Registrá huella, Face ID o Windows Hello</small></button>
     </div>
@@ -650,14 +651,14 @@ body{
     </div>
 
     <div id="estadoHistorialAdmin" class="admin-history-status warn">
-      Para consultar el historial verificá primero tu identidad administrativa con tu Passkey.
+      Para consultar el historial verificá primero tu identidad con biometría / Passkey.
     </div>
 
     <section class="card">
       <div class="card-title">Acceso seguro</div>
       <p class="card-note">La validación usa WebAuthn con propósito <strong>accion_admin</strong>. Conocer el número de socio administrador no es suficiente para acceder.</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
-        <button id="btnVerificarHistorialAdmin" class="wf-button" onclick="verificarAccesoHistorialAdmin()">Verificar identidad administrativa</button>
+        <button id="btnVerificarHistorialAdmin" class="wf-button" onclick="verificarAccesoHistorialAdmin()">Verificar identidad</button>
         <button id="btnRecargarHistorialAdmin" class="btn-secondary-dark" onclick="cargarHistorialAdministrativo()" disabled>Recargar historial</button>
       </div>
     </section>
@@ -1938,7 +1939,8 @@ function renderizarEstadoPasskey(){
     }
 
     var cantidad=Number(s.cantidad_passkeys)||0;
-    var registrada=!!s.biometria_registrada&&cantidad>0;
+    var cantidadNativa=Number(s.cantidad_biometria_nativa)||0;
+    var registrada=(!!s.biometria_registrada&&cantidad>0)||cantidadNativa>0;
 
     chip.innerText=registrada?'● Passkey registrada':'○ Sin Passkey';
     detalle.innerHTML=
@@ -2118,7 +2120,7 @@ function historialAdminVerificacionVigente(){
     return !!(
         p &&
         p.verificationId &&
-        p.proposito==='accion_admin' &&
+        p.proposito==='autenticacion' &&
         new Date(p.expiresAt).getTime()>Date.now()
     );
 }
@@ -2132,20 +2134,20 @@ function actualizarEstadoHistorialAdmin(){
 
     if(historialAdminVerificacionVigente()){
         estado.className='admin-history-status ok';
-        estado.innerHTML='<strong>✓ Identidad administrativa verificada.</strong> Acceso válido hasta '+new Date(HISTORIAL_ADMIN_VERIFICACION.expiresAt).toLocaleString('es-AR')+'.';
+        estado.innerHTML='<strong>✓ Identidad verificada.</strong> Acceso válido hasta '+new Date(HISTORIAL_ADMIN_VERIFICACION.expiresAt).toLocaleString('es-AR')+'.';
         if(recargar)recargar.disabled=false;
-        if(verificar)verificar.innerText='Renovar validación administrativa';
+        if(verificar)verificar.innerText='Renovar validación';
     }else{
         estado.className='admin-history-status warn';
-        estado.innerHTML='Para consultar el historial verificá primero tu identidad administrativa con tu Passkey.';
+        estado.innerHTML='Para consultar el historial verificá primero tu identidad con biometría / Passkey.';
         if(recargar)recargar.disabled=true;
-        if(verificar)verificar.innerText='Verificar identidad administrativa';
+        if(verificar)verificar.innerText='Verificar identidad';
     }
 }
 
 async function irAHistorialAdministrativo(){
-    if(ROL_ACTIVO!=='admin'||!esAdministrador(ID_SOCIO_ACTIVO)){
-        alert('Acceso exclusivo de administradores.');
+    if(!ID_SOCIO_ACTIVO||!PADRON_SOCIOS[ID_SOCIO_ACTIVO]){
+        alert('Acceso exclusivo de socios activos.');
         return;
     }
 
@@ -2164,8 +2166,8 @@ async function irAHistorialAdministrativo(){
 }
 
 async function verificarAccesoHistorialAdmin(){
-    if(ROL_ACTIVO!=='admin'||!esAdministrador(ID_SOCIO_ACTIVO)){
-        alert('Acceso exclusivo de administradores.');
+    if(!ID_SOCIO_ACTIVO||!PADRON_SOCIOS[ID_SOCIO_ACTIVO]){
+        alert('Acceso exclusivo de socios activos.');
         return;
     }
 
@@ -2176,7 +2178,7 @@ async function verificarAccesoHistorialAdmin(){
     }
 
     try{
-        var prueba=await verificarPasskeyActual('accion_admin');
+        var prueba=await verificarPasskeyActual('autenticacion');
 
         if(!prueba){
             HISTORIAL_ADMIN_VERIFICACION=null;
@@ -2187,7 +2189,7 @@ async function verificarAccesoHistorialAdmin(){
         HISTORIAL_ADMIN_VERIFICACION={
             verificationId:prueba.verificationId,
             expiresAt:prueba.expiresAt,
-            proposito:'accion_admin'
+            proposito:'autenticacion'
         };
 
         actualizarEstadoHistorialAdmin();
@@ -2196,30 +2198,25 @@ async function verificarAccesoHistorialAdmin(){
     }finally{
         if(btn){
             btn.disabled=false;
-            btn.innerText=historialAdminVerificacionVigente()?'Renovar validación administrativa':'Verificar identidad administrativa';
+            btn.innerText=historialAdminVerificacionVigente()?'Renovar validación':'Verificar identidad';
         }
     }
 }
 
 async function cargarHistorialAdministrativo(){
-    if(ROL_ACTIVO!=='admin'||!esAdministrador(ID_SOCIO_ACTIVO)){
-        alert('Acceso exclusivo de administradores.');
+    if(!ID_SOCIO_ACTIVO||!PADRON_SOCIOS[ID_SOCIO_ACTIVO]){
+        alert('Acceso exclusivo de socios activos.');
         return;
     }
 
     if(!historialAdminVerificacionVigente()){
         HISTORIAL_ADMIN_VERIFICACION=null;
         actualizarEstadoHistorialAdmin();
-        alert('La validación biométrica administrativa no existe o venció. Volvé a verificar tu identidad.');
+        alert('La validación biométrica no existe o venció. Volvé a verificar tu identidad.');
         return;
     }
 
-    if(!supabaseClient){
-        alert('Supabase todavía no está conectado.');
-        return;
-    }
-
-    var entidadEl=document.getElementById('filtroHistorialEntidad');
+     var entidadEl=document.getElementById('filtroHistorialEntidad');
     var actorEl=document.getElementById('filtroHistorialActor');
     var limiteEl=document.getElementById('filtroHistorialLimite');
 
@@ -2520,8 +2517,8 @@ try{
 }
 
 async function resetearClaveSocioAdmin(){
-if(ROL_ACTIVO!=='admin'||!esAdministrador(ID_SOCIO_ACTIVO)){
-    alert('Acceso exclusivo de administradores.');
+if(!ID_SOCIO_ACTIVO||!PADRON_SOCIOS[ID_SOCIO_ACTIVO]){
+    alert('Acceso exclusivo de socios activos.');
     return;
 }
 var id=parseInt(document.getElementById('txtResetClaveSocio').value);
@@ -2755,7 +2752,7 @@ if(estado)estado.innerText='✓ Permisos del Nivel '+nivel+' aplicados: '+cantid
 }
 
 function irAGobernanzaInstitucional(){
-if(ROL_ACTIVO!=='admin'||!esAdministrador(ID_SOCIO_ACTIVO)){alert('Acceso exclusivo de administradores.');return}
+if(!ID_SOCIO_ACTIVO||!PADRON_SOCIOS[ID_SOCIO_ACTIVO]){alert('Acceso exclusivo de socios activos.');return}
 ocultarTodo();document.getElementById('secGobernanzaInstitucional').style.display='flex';
 var panel=document.getElementById('panelCrearBorradorGobernanza');
 if(panel)panel.style.display=esSuperAdministrador(ID_SOCIO_ACTIVO)?'block':'none';
@@ -3193,7 +3190,7 @@ async function consultarSocioPadron(){
 }
 
 async function agregarSocioManual(){
-if(ROL_ACTIVO!=='admin'||!esAdministrador(ID_SOCIO_ACTIVO)){alert('Acceso exclusivo de administradores.');return}
+if(!ID_SOCIO_ACTIVO||!PADRON_SOCIOS[ID_SOCIO_ACTIVO]){alert('Acceso exclusivo de socios activos.');return}
 var id=parseInt(document.getElementById('txtPadronNuevoNumero').value);
 var nombre=document.getElementById('txtPadronNuevoNombre').value.trim().replace(/\s+/g,' ');
 var fecha=document.getElementById('txtPadronNuevaFecha').value;
@@ -3223,7 +3220,7 @@ info.innerText='Alta registrada: '+formatoFechaPadron(PADRON_SOCIOS[id][1])+' ·
 }
 
 async function guardarNombreSocio(){
-if(ROL_ACTIVO!=='admin'||!esAdministrador(ID_SOCIO_ACTIVO)){alert('Acceso exclusivo de administradores.');return}
+if(!ID_SOCIO_ACTIVO||!PADRON_SOCIOS[ID_SOCIO_ACTIVO]){alert('Acceso exclusivo de socios activos.');return}
 var id=parseInt(document.getElementById('txtPadronEditarNumero').value);
 var nombre=document.getElementById('txtPadronEditarNombre').value.trim().replace(/\s+/g,' ');
 if(isNaN(id)||!PADRON_SOCIOS[id]||!nombre){alert('Primero buscá un socio válido e ingresá un nombre.');return}
@@ -3298,7 +3295,7 @@ if(btn)btn.disabled=true;
 }
 
 async function previsualizarImportacionPadron(){
-if(ROL_ACTIVO!=='admin'||!esAdministrador(ID_SOCIO_ACTIVO)){alert('Acceso exclusivo de administradores.');return}
+if(!ID_SOCIO_ACTIVO||!PADRON_SOCIOS[ID_SOCIO_ACTIVO]){alert('Acceso exclusivo de socios activos.');return}
 var input=document.getElementById('filePadronExcel');
 var prev=document.getElementById('previewImportacionPadron');
 var btn=document.getElementById('btnConfirmarImportacionPadron');
@@ -3337,7 +3334,7 @@ prev.innerText='No se pudo interpretar el archivo. Verificá que sea Excel/CSV y
 }
 
 async function confirmarImportacionPadron(){
-if(ROL_ACTIVO!=='admin'||!esAdministrador(ID_SOCIO_ACTIVO)){alert('Acceso exclusivo de administradores.');return}
+if(!ID_SOCIO_ACTIVO||!PADRON_SOCIOS[ID_SOCIO_ACTIVO]){alert('Acceso exclusivo de socios activos.');return}
 var p=IMPORTACION_PADRON_PENDIENTE;
 if(!p||!p.total)return;
 if(p.faltaSuper){alert('El padrón de reemplazo debe incluir al socio 21.998.');return}
