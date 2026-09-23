@@ -1841,7 +1841,6 @@ function serializarCredencialAutenticacion(cred){
 }
 
 async function llamarWebAuthn(body){
-    if(!supabaseClient)throw new Error('Supabase no está conectado');
     var url=SUPABASE_URL.replace(/\/$/,'')+'/functions/v1/webauthn';
     var res=await fetch(url,{
         method:'POST',
@@ -1857,6 +1856,62 @@ async function llamarWebAuthn(body){
     return data;
 }
 
+function obtenerPluginBiometricoNativo(){
+    try{
+        return window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.NativeBiometric
+            ?window.Capacitor.Plugins.NativeBiometric:null;
+    }catch(_){return null}
+}
+
+function esBiometriaNativaAndroid(){
+    try{
+        return !!(obtenerPluginBiometricoNativo()&&window.Capacitor&&
+            typeof window.Capacitor.isNativePlatform==='function'&&window.Capacitor.isNativePlatform());
+    }catch(_){return false}
+}
+
+async function registrarBiometriaNativaAndroid(password,nombreDispositivo){
+    var plugin=obtenerPluginBiometricoNativo();
+    if(!plugin)throw new Error('Biometría nativa no disponible');
+    var disponibilidad=await plugin.isAvailable();
+    if(!disponibilidad||!disponibilidad.available){
+        throw new Error('Configurá huella, rostro o bloqueo seguro en Android antes de continuar');
+    }
+    var clave=await plugin.createKey({keyAlias:'club_abierto_identity_v1'});
+    var r=await llamarClubAbiertoApi({
+        accion:'native_biometric_register',
+        password:password,
+        key_alias:clave.keyAlias,
+        public_key_spki_b64:clave.publicKeySpkiB64,
+        device_name:nombreDispositivo||'Android'
+    },obtenerTokenSesionClub());
+    return r;
+}
+
+async function verificarBiometriaNativaAndroid(proposito){
+    var plugin=obtenerPluginBiometricoNativo();
+    if(!plugin)throw new Error('Biometría nativa no disponible');
+    var inicio=await llamarClubAbiertoApi({
+        accion:'native_biometric_begin',
+        proposito:proposito||'autenticacion'
+    },obtenerTokenSesionClub());
+    var firma=await plugin.signChallenge({
+        challenge:inicio.challenge,
+        keyAlias:inicio.key_alias||'club_abierto_identity_v1'
+    });
+    var fin=await llamarClubAbiertoApi({
+        accion:'native_biometric_finish',
+        challenge_id:inicio.challenge_id,
+        signature_b64:firma.signatureB64
+    },obtenerTokenSesionClub());
+    if(!fin.verified)throw new Error('La identidad no pudo ser verificada');
+    return {
+        verificationId:fin.verificationId,
+        expiresAt:fin.expiresAt,
+        proposito:fin.proposito||proposito||'autenticacion'
+    };
+}
+
 async function consultarEstadoPasskey(){
     if(!ID_SOCIO_ACTIVO)return null;
     var r=await llamarClubAbiertoApi({accion:'estado_passkey'},obtenerTokenSesionClub());
@@ -1870,9 +1925,9 @@ function renderizarEstadoPasskey(){
     var s=PASSKEY_ESTADO_ACTUAL;
     if(!chip||!detalle)return;
 
-    if(!window.PublicKeyCredential){
+    if(!window.PublicKeyCredential&&!esBiometriaNativaAndroid()){
         chip.innerText='No compatible';
-        detalle.innerHTML='<strong>Este navegador no soporta WebAuthn.</strong><br>Probá con una versión actual de Chrome, Edge, Safari o Firefox en un dispositivo compatible.';
+        detalle.innerHTML='<strong>Este navegador o dispositivo no soporta validación biométrica segura.</strong>';
         return;
     }
 
@@ -1912,8 +1967,8 @@ async function irAPasskey(){
 }
 
 async function registrarPasskeyActual(){
-    if(!window.PublicKeyCredential||!navigator.credentials){
-        alert('Este navegador o dispositivo no soporta WebAuthn/Passkeys.');
+    if((!window.PublicKeyCredential||!navigator.credentials)&&!esBiometriaNativaAndroid()){
+        alert('Este navegador o dispositivo no soporta validación biométrica segura.');
         return;
     }
 
@@ -1929,6 +1984,21 @@ async function registrarPasskeyActual(){
     btn.innerText='Preparando registro...';
 
     try{
+        if(esBiometriaNativaAndroid()){
+            btn.innerText='Esperando huella / biometría...';
+            await registrarBiometriaNativaAndroid(password,nombreDispositivo);
+            document.getElementById('txtPasskeyPassword').value='';
+            PASSKEY_ESTADO_ACTUAL={
+                cantidad_passkeys:1,
+                biometria_registrada:true,
+                requiere_para_login:PASSKEY_ESTADO_ACTUAL&&PASSKEY_ESTADO_ACTUAL.requiere_para_login,
+                requiere_para_voto:PASSKEY_ESTADO_ACTUAL&&PASSKEY_ESTADO_ACTUAL.requiere_para_voto
+            };
+            renderizarEstadoPasskey();
+            alert('✓ Identidad biométrica registrada correctamente en Android. La clave privada permanece protegida por el dispositivo.');
+            return;
+        }
+
         var inicio=await llamarWebAuthn({
             action:'begin-registration',
             numeroSocio:Number(ID_SOCIO_ACTIVO),
@@ -1973,12 +2043,22 @@ async function registrarPasskeyActual(){
 
 async function verificarPasskeyActual(proposito){
     proposito=proposito||'autenticacion';
-    if(!window.PublicKeyCredential||!navigator.credentials){
-        alert('Este navegador o dispositivo no soporta WebAuthn/Passkeys.');
+    if((!window.PublicKeyCredential||!navigator.credentials)&&!esBiometriaNativaAndroid()){
+        alert('Este navegador o dispositivo no soporta validación biométrica segura.');
         return null;
     }
 
     try{
+        if(esBiometriaNativaAndroid()){
+            var pruebaNativa=await verificarBiometriaNativaAndroid(proposito);
+            PASSKEY_VERIFICACION_TEMPORAL=pruebaNativa;
+            var elNativo=document.getElementById('lblUltimaVerificacionPasskey');
+            if(elNativo){
+                elNativo.innerHTML='<strong>✓ Identidad verificada con biometría Android</strong><br>Propósito: '+proposito+'<br>Válida hasta: '+new Date(pruebaNativa.expiresAt).toLocaleString('es-AR');
+            }
+            return pruebaNativa;
+        }
+
         var inicio=await llamarWebAuthn({
             action:'begin-authentication',
             numeroSocio:Number(ID_SOCIO_ACTIVO),
