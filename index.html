@@ -2267,16 +2267,28 @@ function nombreAccionHistorial(ev){
     var mapa={
       CLAVE_MODIFICADA:esMigracionCredencialHistorica(ev)?'Actualización automática de seguridad':'Cambió su contraseña',
       CLAVE_RESETEADA:'Se reseteó una contraseña',
+      CLAVE_RESETEADA_A_DEFAULT:'Se reseteó una contraseña',
       CREDENCIAL_MIGRADA:'Se actualizó la seguridad de una credencial',
       IDENTIDAD_SEGURA_MODIFICADA:'Se actualizó la identidad segura',
+      SOCIO_ALTA:'Se incorporó un socio',
+      SOCIO_NOMBRE_MODIFICADO:'Se modificó el nombre de un socio',
+      SOCIO_DATOS_MODIFICADOS:'Se modificaron datos de un socio',
+      ADMIN_HABILITADO:'Se habilitó un administrador',
+      ADMIN_DESHABILITADO:'Se deshabilitó un administrador',
+      SOCIO_PERFIL_INSTITUCIONAL_ASIGNADO:'Se asignó un perfil institucional',
+      SOCIO_PERFIL_INSTITUCIONAL_REVOCADO:'Se revocó un perfil institucional',
+      PERFIL_INSTITUCIONAL_CREADO:'Se creó un perfil institucional',
+      PERFIL_AGREGADO_A_VERSION_GOBERNANZA:'Se incorporó un perfil a una versión de gobernanza',
+      CREAR_BORRADOR_GOBERNANZA_CON_PERFILES:'Se creó un borrador de gobernanza',
+      ACTIVAR_VERSION_REGLA_GOBERNANZA:'Se activó una versión de gobernanza',
+      DESCARTAR_BORRADOR_GOBERNANZA:'Se descartó un borrador de gobernanza',
+      CREAR_REVERSION_GOBERNANZA_CON_PERFILES:'Se creó una reversión de gobernanza',
+      ENCUESTA_CREADA:'Se creó una encuesta',
       ENCUESTA_ESTADO_MODIFICADO:'Cambió el estado de una encuesta',
       ENCUESTA_TITULO_MODIFICADO:'Cambió el título de una encuesta',
       ENCUESTA_FECHAS_MODIFICADAS:'Cambió el período de una encuesta',
-      ASIGNAR_PERFIL_INSTITUCIONAL:'Asignó un perfil institucional',
-      REVOCAR_PERFIL_INSTITUCIONAL:'Revocó un perfil institucional',
-      ACTIVAR_VERSION_REGLA_GOBERNANZA:'Activó una versión de gobernanza',
-      CREAR_BORRADOR_GOBERNANZA_CON_PERFILES:'Creó un borrador de gobernanza',
-      CREAR_REVERSION_GOBERNANZA_CON_PERFILES:'Creó una reversión de gobernanza'
+      OPCION_ENCUESTA_CREADA:'Se agregó una opción a una encuesta',
+      OPCION_TEXTO_MODIFICADO:'Se modificó una opción de encuesta'
     };
     if(mapa[a])return mapa[a];
     return a.toLowerCase().replace(/_/g,' ').replace(/^./,function(x){return x.toUpperCase()});
@@ -2286,37 +2298,103 @@ function esEventoCredencialSensible(ev){
     return String(ev.entidad||'')==='credenciales_socios';
 }
 
+function fechaLegibleHistorial(v){
+    return v?formatoFechaHistorial(v):'sin definir';
+}
+
+function nombreSocioObjetivoHistorial(ev){
+    var l=ev&&ev.lectura||{};
+    var n=l.socio_objetivo_nombre;
+    var id=l.socio_objetivo_numero;
+    if(n&&id)return n+' · Socio #'+Number(id).toLocaleString('es-AR');
+    if(id)return 'Socio #'+Number(id).toLocaleString('es-AR');
+    if(ev&&ev.entidad_id&&['socios','administradores','credenciales_socios'].includes(String(ev.entidad||''))){
+        return 'Socio #'+Number(ev.entidad_id).toLocaleString('es-AR');
+    }
+    return '';
+}
+
 function resumenEventoHistorial(ev){
     var accion=String(ev.accion||'');
     var objetivo=ev.entidad_id?String(ev.entidad_id):'';
     var nuevos=ev.datos_nuevos||{};
     var anteriores=ev.datos_anteriores||{};
     var contexto=ev.contexto||{};
+    var lectura=ev.lectura||{};
+    var socioObjetivo=nombreSocioObjetivoHistorial(ev);
 
     if(accion==='CLAVE_MODIFICADA'){
         if(esMigracionCredencialHistorica(ev)){
-            return 'Se actualizó automáticamente la seguridad de acceso del socio #'+escaparHtmlHistorial(objetivo)+'. No implica un cambio manual de contraseña.';
+            return 'Se actualizó automáticamente la seguridad de acceso de '+(socioObjetivo||('Socio #'+escaparHtmlHistorial(objetivo)))+'. No implica un cambio manual de contraseña.';
         }
-        return 'Socio #'+escaparHtmlHistorial(objetivo)+' modificó su contraseña.';
+        return (socioObjetivo||('Socio #'+escaparHtmlHistorial(objetivo)))+' modificó su contraseña.';
     }
-    if(accion==='CLAVE_RESETEADA'){
-        return 'Se reseteó la contraseña del socio #'+escaparHtmlHistorial(objetivo)+'.';
+    if(accion==='CLAVE_RESETEADA'||accion==='CLAVE_RESETEADA_A_DEFAULT'){
+        return 'Se reseteó la contraseña de '+(socioObjetivo||('Socio #'+escaparHtmlHistorial(objetivo)))+'.';
     }
     if(accion==='CREDENCIAL_MIGRADA'){
-        return 'Se actualizó la seguridad de acceso del socio #'+escaparHtmlHistorial(objetivo)+'.';
+        return 'Se actualizó la seguridad de acceso de '+(socioObjetivo||('Socio #'+escaparHtmlHistorial(objetivo)))+'.';
     }
     if(accion==='IDENTIDAD_SEGURA_MODIFICADA'){
-        return 'Se actualizó la identidad segura del socio #'+escaparHtmlHistorial(objetivo)+'.';
+        return 'Se actualizó la identidad segura de '+(socioObjetivo||('Socio #'+escaparHtmlHistorial(objetivo)))+'.';
     }
 
-    var perfilId=nuevos.perfil_id||contexto.perfil_id||anteriores.perfil_id;
-    var socioObjetivo=nuevos.numero_socio||contexto.numero_socio||anteriores.numero_socio||objetivo;
-    if(accion.toLowerCase().includes('perfil')&&perfilId){
-        return 'Se modificó el perfil institucional del socio #'+escaparHtmlHistorial(socioObjetivo)+'. Perfil ID: '+escaparHtmlHistorial(perfilId)+'.';
+    if(accion==='SOCIO_ALTA'){
+        return 'Se incorporó '+(socioObjetivo||('el socio #'+escaparHtmlHistorial(nuevos.numero_socio||objetivo)))+(nuevos.fecha_alta?' con fecha de alta '+fechaLegibleHistorial(nuevos.fecha_alta):'')+'.';
+    }
+    if(accion==='SOCIO_NOMBRE_MODIFICADO'){
+        return 'El nombre de '+(socioObjetivo||('Socio #'+escaparHtmlHistorial(objetivo)))+' cambió de “'+escaparHtmlHistorial(anteriores.nombre||'-')+'” a “'+escaparHtmlHistorial(nuevos.nombre||'-')+'”.';
+    }
+    if(accion==='SOCIO_DATOS_MODIFICADOS'){
+        var cambios=[];
+        ['nombre','tipo_socio','provincia','fecha_alta','habilitado'].forEach(function(k){
+            if(anteriores[k]!==nuevos[k]){
+                var etiquetas={nombre:'nombre',tipo_socio:'tipo de socio',provincia:'provincia',fecha_alta:'fecha de alta',habilitado:'estado de habilitación'};
+                cambios.push(etiquetas[k]+': “'+escaparHtmlHistorial(anteriores[k]===null||anteriores[k]===undefined?'-':anteriores[k])+'” → “'+escaparHtmlHistorial(nuevos[k]===null||nuevos[k]===undefined?'-':nuevos[k])+'”');
+            }
+        });
+        return 'Se modificaron datos de '+(socioObjetivo||('Socio #'+escaparHtmlHistorial(objetivo)))+(cambios.length?' · '+cambios.join(' · '):'')+'.';
+    }
+
+    if(accion==='ADMIN_HABILITADO'){
+        return (socioObjetivo||('Socio #'+escaparHtmlHistorial(objetivo)))+' fue habilitado como administrador.';
+    }
+    if(accion==='ADMIN_DESHABILITADO'){
+        return (socioObjetivo||('Socio #'+escaparHtmlHistorial(objetivo)))+' dejó de estar habilitado como administrador.';
+    }
+
+    if(accion==='SOCIO_PERFIL_INSTITUCIONAL_ASIGNADO'){
+        var perfilNombre=lectura.perfil_nombre||('Perfil #'+(lectura.perfil_id||nuevos.perfil_id||'-'));
+        var motivo=nuevos.motivo_asignacion||contexto.motivo;
+        return 'Se asignó el perfil “'+escaparHtmlHistorial(perfilNombre)+'” a '+(socioObjetivo||('Socio #'+escaparHtmlHistorial(nuevos.numero_socio||'-')))+(motivo?' · Motivo: '+escaparHtmlHistorial(motivo):'')+'.';
+    }
+    if(accion==='SOCIO_PERFIL_INSTITUCIONAL_REVOCADO'){
+        var perfilRev=lectura.perfil_nombre||('Perfil #'+(lectura.perfil_id||anteriores.perfil_id||'-'));
+        return 'Se revocó el perfil “'+escaparHtmlHistorial(perfilRev)+'” de '+(socioObjetivo||('Socio #'+escaparHtmlHistorial(nuevos.numero_socio||anteriores.numero_socio||'-')))+'.';
+    }
+    if(accion==='PERFIL_INSTITUCIONAL_CREADO'){
+        return 'Se creó el perfil institucional “'+escaparHtmlHistorial(nuevos.nombre||lectura.perfil_nombre||'-')+'”.';
+    }
+    if(accion==='PERFIL_AGREGADO_A_VERSION_GOBERNANZA'){
+        var perfilGov=lectura.perfil_nombre||('Perfil #'+(lectura.perfil_id||nuevos.perfil_id||'-'));
+        return 'El perfil “'+escaparHtmlHistorial(perfilGov)+'” fue incorporado a la versión de gobernanza #'+escaparHtmlHistorial(nuevos.regla_id||contexto.regla_id||'-')+' con '+escaparHtmlHistorial(nuevos.puntos_voto||'-')+' puntos por voto y nivel de auditoría '+escaparHtmlHistorial(nuevos.nivel_auditoria||'-')+'.';
+    }
+
+    if(accion==='ACTIVAR_VERSION_REGLA_GOBERNANZA'){
+        return 'La versión de gobernanza '+escaparHtmlHistorial(anteriores.version_anterior||'-')+' fue reemplazada por la versión '+escaparHtmlHistorial(nuevos.nueva_version||'-')+(contexto.motivo?' · Motivo: '+escaparHtmlHistorial(contexto.motivo):'')+'.';
+    }
+    if(accion==='CREAR_BORRADOR_GOBERNANZA_CON_PERFILES'){
+        return 'Se creó el borrador de gobernanza versión '+escaparHtmlHistorial(nuevos.nueva_version||'-')+' con vigencia prevista desde '+fechaLegibleHistorial(nuevos.vigente_desde)+(contexto.motivo?' · Motivo: '+escaparHtmlHistorial(contexto.motivo):'')+'.';
+    }
+    if(accion==='DESCARTAR_BORRADOR_GOBERNANZA'){
+        return 'Se descartó el borrador de gobernanza versión '+escaparHtmlHistorial(nuevos.version||anteriores.version||'-')+(nuevos.motivo?' · Motivo: '+escaparHtmlHistorial(nuevos.motivo):'')+'.';
+    }
+    if(accion==='CREAR_REVERSION_GOBERNANZA_CON_PERFILES'){
+        return 'Se creó una reversión de gobernanza hacia la versión '+escaparHtmlHistorial(anteriores.version_objetivo||'-')+' mediante una nueva versión '+escaparHtmlHistorial(nuevos.nueva_version||'-')+'.';
     }
 
     if(String(ev.entidad||'').includes('encuesta')){
-        var tituloNuevo=nuevos.titulo||anteriores.titulo||'Encuesta sin título';
+        var tituloNuevo=nuevos.titulo||anteriores.titulo||lectura.encuesta_titulo||'Encuesta sin título';
         var tituloAnterior=anteriores.titulo;
         var estadoAnterior=anteriores.estado;
         var estadoNuevo=nuevos.estado;
@@ -2324,6 +2402,10 @@ function resumenEventoHistorial(ev){
         var aperturaNueva=nuevos.fecha_apertura;
         var cierreAnterior=anteriores.fecha_cierre;
         var cierreNuevo=nuevos.fecha_cierre;
+
+        if(accion==='ENCUESTA_CREADA'){
+            return 'Se creó la encuesta “'+escaparHtmlHistorial(tituloNuevo)+'” en estado '+escaparHtmlHistorial(estadoNuevo||'borrador')+'.';
+        }
 
         if(estadoAnterior&&estadoNuevo&&estadoAnterior!==estadoNuevo){
             var estadoAmigable=function(v){
@@ -2335,10 +2417,10 @@ function resumenEventoHistorial(ev){
                 return s||'-';
             };
             var periodo=[];
-            if(aperturaNueva)periodo.push('desde '+formatoFechaHistorial(aperturaNueva));
-            if(cierreNuevo)periodo.push('hasta '+formatoFechaHistorial(cierreNuevo));
+            if(aperturaNueva)periodo.push('desde '+fechaLegibleHistorial(aperturaNueva));
+            if(cierreNuevo)periodo.push('hasta '+fechaLegibleHistorial(cierreNuevo));
             if(!cierreNuevo&&aperturaNueva)periodo.push('sin fecha de cierre definida');
-            return 'La encuesta con título “'+escaparHtmlHistorial(tituloNuevo)+'” pasó de estado '+escaparHtmlHistorial(estadoAmigable(estadoAnterior))+' a '+escaparHtmlHistorial(estadoAmigable(estadoNuevo))+(periodo.length?' · '+periodo.join(' · '):'')+'.';
+            return 'La encuesta “'+escaparHtmlHistorial(tituloNuevo)+'” pasó de estado '+escaparHtmlHistorial(estadoAmigable(estadoAnterior))+' a '+escaparHtmlHistorial(estadoAmigable(estadoNuevo))+(periodo.length?' · '+periodo.join(' · '):'')+'.';
         }
 
         if(tituloNuevo&&tituloAnterior&&tituloNuevo!==tituloAnterior){
@@ -2347,15 +2429,25 @@ function resumenEventoHistorial(ev){
 
         if(aperturaNueva!==aperturaAnterior||cierreNuevo!==cierreAnterior){
             var partes=['Se modificó el período de la encuesta “'+escaparHtmlHistorial(tituloNuevo)+'”'];
-            if(aperturaNueva!==aperturaAnterior)partes.push('inicio: '+(aperturaNueva?formatoFechaHistorial(aperturaNueva):'sin definir'));
-            if(cierreNuevo!==cierreAnterior)partes.push('cierre: '+(cierreNuevo?formatoFechaHistorial(cierreNuevo):'sin definir'));
+            if(aperturaNueva!==aperturaAnterior)partes.push('inicio: '+fechaLegibleHistorial(aperturaNueva));
+            if(cierreNuevo!==cierreAnterior)partes.push('cierre: '+fechaLegibleHistorial(cierreNuevo));
             return partes.join(' · ')+'.';
         }
 
         return 'Se modificó la encuesta “'+escaparHtmlHistorial(tituloNuevo)+'”.';
     }
 
-    return 'Se registró una modificación en '+escaparHtmlHistorial(String(ev.entidad||'el sistema').replace(/_/g,' '))+'.';
+    if(String(ev.entidad||'')==='opciones_encuesta'){
+        var encuestaTitulo=lectura.encuesta_titulo||('Encuesta #'+(lectura.encuesta_id||nuevos.encuesta_id||anteriores.encuesta_id||'-'));
+        if(accion==='OPCION_ENCUESTA_CREADA'){
+            return 'Se agregó la opción “'+escaparHtmlHistorial(nuevos.texto||'-')+'” a la encuesta “'+escaparHtmlHistorial(encuestaTitulo)+'”.';
+        }
+        if(accion==='OPCION_TEXTO_MODIFICADO'){
+            return 'En la encuesta “'+escaparHtmlHistorial(encuestaTitulo)+'”, una opción cambió de “'+escaparHtmlHistorial(anteriores.texto||'-')+'” a “'+escaparHtmlHistorial(nuevos.texto||'-')+'”.';
+        }
+    }
+
+    return 'Se registró una modificación administrativa en '+escaparHtmlHistorial(String(ev.entidad||'el sistema').replace(/_/g,' '))+'.';
 }
 
 function toggleDetalleHistorial(id){
@@ -2418,11 +2510,11 @@ function renderizarHistorialAdministrativo(datos){
             (sensible?'':'<div><button class="admin-history-toggle" onclick="toggleDetalleHistorial('+id+')">Ver detalle</button></div>')+
           '</div>'+
           (sensible?'':'<div id="detalleHistorial_'+id+'" class="admin-history-detail">'+
-            '<div style="display:grid;gap:10px">'+
-              '<div><strong>Qué cambió</strong><div style="margin-top:6px">'+resumenTxt+'</div></div>'+
-              '<div><strong>Entidad</strong><div style="margin-top:4px">'+escaparHtmlHistorial(String(ev.entidad||'-').replace(/_/g,' '))+'</div></div>'+
-              '<div><strong>Identificador</strong><div style="margin-top:4px">'+escaparHtmlHistorial(ev.entidad_id||'-')+'</div></div>'+
-              (ev.contexto&&Object.keys(ev.contexto).length?'<div><strong>Contexto</strong><div style="margin-top:4px">'+escaparHtmlHistorial(JSON.stringify(ev.contexto))+'</div></div>':'')+
+            '<div style="display:grid;gap:12px;font-size:14px;line-height:1.55">'+
+              '<div><strong>Detalle del movimiento</strong><div style="margin-top:6px">'+resumenTxt+'</div></div>'+
+              '<div><strong>Realizado por</strong><div style="margin-top:4px">'+escaparHtmlHistorial(actorTxt)+'</div></div>'+
+              '<div><strong>Fecha y hora</strong><div style="margin-top:4px">'+escaparHtmlHistorial(formatoFechaHistorial(ev.fecha))+'</div></div>'+
+              '<div><strong>Comprobante criptográfico</strong><div style="margin-top:4px;font-family:monospace">'+escaparHtmlHistorial(ev.hash_inicio||'-')+'</div></div>'+
             '</div>'+
           '</div>')+
         '</article>';
