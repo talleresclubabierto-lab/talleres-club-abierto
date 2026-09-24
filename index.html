@@ -2336,6 +2336,9 @@ function nombreAccionHistorial(ev){
       CLAVE_RESETEADA:'Se reseteó una contraseña',
       CREDENCIAL_MIGRADA:'Se actualizó la seguridad de una credencial',
       IDENTIDAD_SEGURA_MODIFICADA:'Se actualizó la identidad segura',
+      ENCUESTA_ESTADO_MODIFICADO:'Cambió el estado de una encuesta',
+      ENCUESTA_TITULO_MODIFICADO:'Cambió el título de una encuesta',
+      ENCUESTA_FECHAS_MODIFICADAS:'Cambió el período de una encuesta',
       ASIGNAR_PERFIL_INSTITUCIONAL:'Asignó un perfil institucional',
       REVOCAR_PERFIL_INSTITUCIONAL:'Revocó un perfil institucional',
       ACTIVAR_VERSION_REGLA_GOBERNANZA:'Activó una versión de gobernanza',
@@ -2380,15 +2383,43 @@ function resumenEventoHistorial(ev){
     }
 
     if(String(ev.entidad||'').includes('encuesta')){
-        var tituloNuevo=nuevos.titulo;
+        var tituloNuevo=nuevos.titulo||anteriores.titulo||'Encuesta sin título';
         var tituloAnterior=anteriores.titulo;
+        var estadoAnterior=anteriores.estado;
+        var estadoNuevo=nuevos.estado;
+        var aperturaAnterior=anteriores.fecha_apertura;
+        var aperturaNueva=nuevos.fecha_apertura;
+        var cierreAnterior=anteriores.fecha_cierre;
+        var cierreNuevo=nuevos.fecha_cierre;
+
+        if(estadoAnterior&&estadoNuevo&&estadoAnterior!==estadoNuevo){
+            var estadoAmigable=function(v){
+                var s=String(v||'').toLowerCase();
+                if(s==='abierta')return 'activa';
+                if(s==='borrador')return 'borrador';
+                if(s==='cerrada')return 'cerrada';
+                if(s==='programada')return 'programada';
+                return s||'-';
+            };
+            var periodo=[];
+            if(aperturaNueva)periodo.push('desde '+formatoFechaHistorial(aperturaNueva));
+            if(cierreNuevo)periodo.push('hasta '+formatoFechaHistorial(cierreNuevo));
+            if(!cierreNuevo&&aperturaNueva)periodo.push('sin fecha de cierre definida');
+            return 'La encuesta con título “'+escaparHtmlHistorial(tituloNuevo)+'” pasó de estado '+escaparHtmlHistorial(estadoAmigable(estadoAnterior))+' a '+escaparHtmlHistorial(estadoAmigable(estadoNuevo))+(periodo.length?' · '+periodo.join(' · '):'')+'.';
+        }
+
         if(tituloNuevo&&tituloAnterior&&tituloNuevo!==tituloAnterior){
-            return 'Se modificó el título de una encuesta: “'+escaparHtmlHistorial(tituloAnterior)+'” → “'+escaparHtmlHistorial(tituloNuevo)+'”.';
+            return 'La encuesta cambió su título de “'+escaparHtmlHistorial(tituloAnterior)+'” a “'+escaparHtmlHistorial(tituloNuevo)+'”.';
         }
-        if(nuevos.fecha_cierre&&anteriores.fecha_cierre&&nuevos.fecha_cierre!==anteriores.fecha_cierre){
-            return 'Se modificó la fecha de cierre de una encuesta.';
+
+        if(aperturaNueva!==aperturaAnterior||cierreNuevo!==cierreAnterior){
+            var partes=['Se modificó el período de la encuesta “'+escaparHtmlHistorial(tituloNuevo)+'”'];
+            if(aperturaNueva!==aperturaAnterior)partes.push('inicio: '+(aperturaNueva?formatoFechaHistorial(aperturaNueva):'sin definir'));
+            if(cierreNuevo!==cierreAnterior)partes.push('cierre: '+(cierreNuevo?formatoFechaHistorial(cierreNuevo):'sin definir'));
+            return partes.join(' · ')+'.';
         }
-        return 'Se modificó una encuesta.';
+
+        return 'Se modificó la encuesta “'+escaparHtmlHistorial(tituloNuevo)+'”.';
     }
 
     return 'Se registró una modificación en '+escaparHtmlHistorial(String(ev.entidad||'el sistema').replace(/_/g,' '))+'.';
