@@ -2439,6 +2439,38 @@ function resumenEventoHistorial(ev){
         return 'Se creó una reversión de gobernanza hacia la versión '+escaparHtmlHistorial(anteriores.version_objetivo||'-')+' mediante una nueva versión '+escaparHtmlHistorial(nuevos.nueva_version||'-')+'.';
     }
 
+    if(String(ev.entidad||'')==='opciones_encuesta'){
+        var encuestaTitulo=lectura.encuesta_titulo||contexto.titulo||('Encuesta #'+(lectura.encuesta_id||nuevos.encuesta_id||anteriores.encuesta_id||'-'));
+        var listaNuevas=Array.isArray(nuevos.opciones)?nuevos.opciones:[];
+        var listaAnteriores=Array.isArray(anteriores.opciones)?anteriores.opciones:[];
+
+        if(accion==='OPCIONES_ENCUESTA_AGREGADAS'){
+            var textosAgregados=listaNuevas.map(function(o){return o&&o.texto}).filter(Boolean);
+            return 'Se agregaron '+textosAgregados.length+' opciones a la encuesta “'+escaparHtmlHistorial(encuestaTitulo)+'”'+(textosAgregados.length?': '+textosAgregados.map(function(t){return '“'+escaparHtmlHistorial(t)+'”'}).join(' · '):'')+'.';
+        }
+        if(accion==='OPCIONES_ENCUESTA_MODIFICADAS'){
+            var prevMap={};listaAnteriores.forEach(function(o){if(o)prevMap[Number(o.posicion)]=String(o.texto||'')});
+            var cambios=[],agregadas=[],vigentes={};
+            listaNuevas.forEach(function(o){
+                if(!o)return;var pos=Number(o.posicion),txt=String(o.texto||'');vigentes[pos]=true;
+                if(prevMap[pos]===undefined)agregadas.push(txt);
+                else if(prevMap[pos]!==txt)cambios.push('“'+escaparHtmlHistorial(prevMap[pos])+'” → “'+escaparHtmlHistorial(txt)+'”');
+            });
+            var quitadas=[];Object.keys(prevMap).forEach(function(k){if(!vigentes[Number(k)])quitadas.push(prevMap[k])});
+            var partes=['Se modificaron las opciones de la encuesta “'+escaparHtmlHistorial(encuestaTitulo)+'”'];
+            if(agregadas.length)partes.push('agregadas: '+agregadas.map(function(t){return '“'+escaparHtmlHistorial(t)+'”'}).join(' · '));
+            if(cambios.length)partes.push('modificadas: '+cambios.join(' · '));
+            if(quitadas.length)partes.push('quitadas: '+quitadas.map(function(t){return '“'+escaparHtmlHistorial(t)+'”'}).join(' · '));
+            return partes.join(' · ')+'.';
+        }
+        if(accion==='OPCION_ENCUESTA_CREADA'){
+            return 'Se agregó la opción “'+escaparHtmlHistorial(nuevos.texto||'-')+'” a la encuesta “'+escaparHtmlHistorial(encuestaTitulo)+'”.';
+        }
+        if(accion==='OPCION_TEXTO_MODIFICADO'){
+            return 'En la encuesta “'+escaparHtmlHistorial(encuestaTitulo)+'”, una opción cambió de “'+escaparHtmlHistorial(anteriores.texto||'-')+'” a “'+escaparHtmlHistorial(nuevos.texto||'-')+'”.';
+        }
+    }
+
     if(String(ev.entidad||'').includes('encuesta')){
         var tituloNuevo=nuevos.titulo||anteriores.titulo||lectura.encuesta_titulo||'Encuesta sin título';
         var tituloAnterior=anteriores.titulo;
@@ -2484,38 +2516,6 @@ function resumenEventoHistorial(ev){
         }
 
         return 'Se modificó la encuesta “'+escaparHtmlHistorial(tituloNuevo)+'”.';
-    }
-
-    if(String(ev.entidad||'')==='opciones_encuesta'){
-        var encuestaTitulo=lectura.encuesta_titulo||contexto.titulo||('Encuesta #'+(lectura.encuesta_id||nuevos.encuesta_id||anteriores.encuesta_id||'-'));
-        var listaNuevas=Array.isArray(nuevos.opciones)?nuevos.opciones:[];
-        var listaAnteriores=Array.isArray(anteriores.opciones)?anteriores.opciones:[];
-
-        if(accion==='OPCIONES_ENCUESTA_AGREGADAS'){
-            var textosAgregados=listaNuevas.map(function(o){return o&&o.texto}).filter(Boolean);
-            return 'Se agregaron '+textosAgregados.length+' opciones a la encuesta “'+escaparHtmlHistorial(encuestaTitulo)+'”'+(textosAgregados.length?': '+textosAgregados.map(function(t){return '“'+escaparHtmlHistorial(t)+'”'}).join(' · '):'')+'.';
-        }
-        if(accion==='OPCIONES_ENCUESTA_MODIFICADAS'){
-            var prevMap={};listaAnteriores.forEach(function(o){if(o)prevMap[Number(o.posicion)]=String(o.texto||'')});
-            var cambios=[],agregadas=[],vigentes={};
-            listaNuevas.forEach(function(o){
-                if(!o)return;var pos=Number(o.posicion),txt=String(o.texto||'');vigentes[pos]=true;
-                if(prevMap[pos]===undefined)agregadas.push(txt);
-                else if(prevMap[pos]!==txt)cambios.push('“'+escaparHtmlHistorial(prevMap[pos])+'” → “'+escaparHtmlHistorial(txt)+'”');
-            });
-            var quitadas=[];Object.keys(prevMap).forEach(function(k){if(!vigentes[Number(k)])quitadas.push(prevMap[k])});
-            var partes=['Se modificaron las opciones de la encuesta “'+escaparHtmlHistorial(encuestaTitulo)+'”'];
-            if(agregadas.length)partes.push('agregadas: '+agregadas.map(function(t){return '“'+escaparHtmlHistorial(t)+'”'}).join(' · '));
-            if(cambios.length)partes.push('modificadas: '+cambios.join(' · '));
-            if(quitadas.length)partes.push('quitadas: '+quitadas.map(function(t){return '“'+escaparHtmlHistorial(t)+'”'}).join(' · '));
-            return partes.join(' · ')+'.';
-        }
-        if(accion==='OPCION_ENCUESTA_CREADA'){
-            return 'Se agregó la opción “'+escaparHtmlHistorial(nuevos.texto||'-')+'” a la encuesta “'+escaparHtmlHistorial(encuestaTitulo)+'”.';
-        }
-        if(accion==='OPCION_TEXTO_MODIFICADO'){
-            return 'En la encuesta “'+escaparHtmlHistorial(encuestaTitulo)+'”, una opción cambió de “'+escaparHtmlHistorial(anteriores.texto||'-')+'” a “'+escaparHtmlHistorial(nuevos.texto||'-')+'”.';
-        }
     }
 
     return 'Se registró una modificación administrativa en '+escaparHtmlHistorial(String(ev.entidad||'el sistema').replace(/_/g,' '))+'.';
