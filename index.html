@@ -405,15 +405,15 @@ body{
 <div class="columns-container">
       <section class="login-panel">
         <div class="login-panel-title"><h3>Socios activos</h3><span class="count-pill"><span id="lblTotalSociosLogin">-</span> habilitados</span></div>
-        <label class="form-label">Número de socio</label><input id="socioUser" class="wf-input" placeholder="N° de Socio habilitado en padrón">
-        <label class="form-label">Contraseña</label><input type="password" id="socioPass" class="wf-input" placeholder="Contraseña">
+        <label class="form-label">Número de socio</label><input id="socioUser" class="wf-input" placeholder="N° de Socio habilitado en padrón" onkeydown="if(event.key==='Enter'){event.preventDefault();procesarIngreso('socio')}">
+        <label class="form-label">Contraseña</label><input type="password" id="socioPass" class="wf-input" placeholder="Contraseña" onkeydown="if(event.key==='Enter'){event.preventDefault();procesarIngreso('socio')}">
         <button class="wf-button wide" onclick="procesarIngreso('socio')">Ingresar como socio</button>
         <div id="socioBioFace" class="biometric-box">Validación biométrica</div><div id="socioBioFinger" class="biometric-box">Validación de huella digital</div>
       </section>
       <section class="login-panel">
         <div class="login-panel-title"><h3>Administradores</h3><span class="count-pill"><span id="lblCantidadAdminsLogin">1</span> habilitado(s)</span></div>
-        <label class="form-label">Número de socio administrador</label><input id="adminUser" class="wf-input" placeholder="N° de Socio administrador">
-        <label class="form-label">Contraseña</label><input type="password" id="adminPass" class="wf-input" placeholder="Contraseña">
+        <label class="form-label">Número de socio administrador</label><input id="adminUser" class="wf-input" placeholder="N° de Socio administrador" onkeydown="if(event.key==='Enter'){event.preventDefault();procesarIngreso('admin')}">
+        <label class="form-label">Contraseña</label><input type="password" id="adminPass" class="wf-input" placeholder="Contraseña" onkeydown="if(event.key==='Enter'){event.preventDefault();procesarIngreso('admin')}">
         <button class="wf-button wide" onclick="procesarIngreso('admin')">Ingresar al panel administrador</button>
         <div id="adminBioFace" class="biometric-box">Validación biométrica</div><div id="adminBioFinger" class="biometric-box">Validación de huella digital</div>
       </section>
