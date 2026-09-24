@@ -1768,6 +1768,49 @@ programarGuardadoRemoto();
 
 
 const ZONA_HORARIA_CLUB='America/Argentina/Cordoba';
+const OFFSET_HORARIO_CLUB='-03:00';
+
+function parseFechaClub(valor){
+    if(!valor)return null;
+    if(valor instanceof Date)return isNaN(valor.getTime())?null:valor;
+    var s=String(valor).trim();
+    if(!s)return null;
+    if(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{1,6})?)?$/.test(s)){
+        s+=OFFSET_HORARIO_CLUB;
+    }
+    var d=new Date(s);
+    return isNaN(d.getTime())?null:d;
+}
+function partesFechaHoraClub(valor){
+    var d=parseFechaClub(valor);
+    if(!d)return null;
+    var partes=new Intl.DateTimeFormat('en-CA',{
+        timeZone:ZONA_HORARIA_CLUB,
+        year:'numeric',month:'2-digit',day:'2-digit',
+        hour:'2-digit',minute:'2-digit',second:'2-digit',
+        hourCycle:'h23'
+    }).formatToParts(d);
+    var out={};
+    partes.forEach(function(p){if(p.type!=='literal')out[p.type]=p.value});
+    return out;
+}
+function fechaParaInputClub(valor){
+    var p=partesFechaHoraClub(valor);
+    return p?p.year+'-'+p.month+'-'+p.day+'T'+p.hour+':'+p.minute:'';
+}
+function fechaClubAISOString(valor){
+    var d=parseFechaClub(valor);
+    return d?d.toISOString():null;
+}
+function fechaDiaClub(valor){
+    var p=partesFechaHoraClub(valor);
+    return p?p.year+'-'+p.month+'-'+p.day:'';
+}
+function ahoraInputClub(minutosExtra){
+    var extra=Number(minutosExtra)||0;
+    return fechaParaInputClub(new Date(Date.now()+extra*60000));
+}
+
 function formatoFechaHora24Global(valor){
     if(!valor)return '-';
     var d=valor instanceof Date?valor:new Date(valor);
@@ -3032,11 +3075,11 @@ function limpiarFiltrosGobernanza(){
 renderizarVersionesGobernanza();
 }
 function fechaReglaDentroDeFiltro(r,desde,hasta){
-var fechas=[r.created_at,r.activada_en,r.descartada_en].filter(Boolean).map(function(v){return new Date(v)}).filter(function(d){return !isNaN(d.getTime())});
+var fechas=[r.created_at,r.activada_en,r.descartada_en].filter(Boolean);
 if(!desde&&!hasta)return true;
-return fechas.some(function(d){
-var dia=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-return(!desde||dia>=desde)&&(!hasta||dia<=hasta);
+return fechas.some(function(v){
+var dia=fechaDiaClub(v);
+return dia&&(!desde||dia>=desde)&&(!hasta||dia<=hasta);
 });
 }
 function renderizarVersionesGobernanza(){
@@ -3072,7 +3115,7 @@ if(!vigente){if(mostrarAviso!==false)alert('No se encontró una versión vigente
 var versionNueva=Math.max.apply(null,REGLAS_GOBERNANZA_ADMIN.map(function(r){return Number(r.version)||0}))+1;
 document.getElementById('govNombre').value='Regla Institucional de Antigüedad y Auditoría v'+versionNueva;
 document.getElementById('govDescripcion').value='Nueva versión derivada de la versión '+vigente.version+'. Detallar aquí el motivo y alcance del cambio.';
-var ahora=new Date();ahora.setMinutes(ahora.getMinutes()+10-ahora.getTimezoneOffset());document.getElementById('govVigenteDesde').value=ahora.toISOString().slice(0,16);
+document.getElementById('govVigenteDesde').value=ahoraInputClub(10);
 PARAMETROS_GOBERNANZA_FORM=clonarGobernanza(vigente.parametros_ponderacion||{});
 document.getElementById('govPuntosMinimos').value=Number(PARAMETROS_GOBERNANZA_FORM.puntos_minimos||1);
 document.getElementById('govPuntosPorAnio').value=Number(PARAMETROS_GOBERNANZA_FORM.puntos_por_anio||1);
@@ -3131,7 +3174,7 @@ var resumenPerfiles=perfiles.length?perfiles.map(function(p){var perfil=PERFILES
 if(!confirm('Se creará UNA versión nueva en estado BORRADOR con ambas pestañas.\n\n'+resumenPerfiles+'\n\nLa versión vigente no será modificada. ¿Continuar?'))return;
 var btn=document.getElementById('btnCrearBorradorGobernanza');if(btn)btn.disabled=true;
 try{
-var r=await llamarClubAbiertoApi({accion:'crear_borrador_gobernanza',nombre:nombre,descripcion:descripcion,vigente_desde:new Date(fecha).toISOString(),parametros_ponderacion:parametros,niveles:niveles,perfiles_especiales:perfiles,tipo_version:'modificacion',version_origen_id:idReglaGobernanza(vigente)},obtenerTokenSesionClub());
+var r=await llamarClubAbiertoApi({accion:'crear_borrador_gobernanza',nombre:nombre,descripcion:descripcion,vigente_desde:fechaClubAISOString(fecha),parametros_ponderacion:parametros,niveles:niveles,perfiles_especiales:perfiles,tipo_version:'modificacion',version_origen_id:idReglaGobernanza(vigente)},obtenerTokenSesionClub());
 alert('✓ Borrador versionado creado correctamente.');await cargarGobernanzaInstitucional();
 }catch(e){console.error(e);alert(e.message||'No pudo crearse el borrador.')}finally{if(btn)btn.disabled=false}
 }
@@ -3353,7 +3396,7 @@ var p=document.getElementById(containerId),n=p.getElementsByTagName('input').len
 input.type='text';input.className=containerId==='containerCamposModificar'?'wf-input opt-mod-field':'wf-input opt-nueva-input';input.placeholder='Opción '+letra;p.appendChild(input);
 }
 
-function parseFechaLocal(v){if(!v)return null;var d=new Date(v);return isNaN(d.getTime())?null:d}
+function parseFechaLocal(v){return parseFechaClub(v)}
 function obtenerEstadoEncuesta(key){var e=baseEncuestas[key];if(!e)return 'inexistente';var estado=e.estado||'abierta',ahora=new Date(),ap=parseFechaLocal(e.fechaApertura),ci=parseFechaLocal(e.fechaCierre);if(estado==='cerrada'||estado==='borrador')return estado;if(ci&&ahora>=ci)return 'cerrada';if(ap&&ahora<ap)return 'programada';if(estado==='programada'&&(!ap||ahora>=ap))return 'abierta';return estado}
 function etiquetaEstado(key){return obtenerEstadoEncuesta(key).toUpperCase()}
 function formatoFecha(v){var d=parseFechaLocal(v);return d?formatoFechaHora24Global(d):'Sin definir'}
@@ -3677,8 +3720,8 @@ actualizarCantidadAdministradores();
 }
 
 function inicializarCicloEncuestas(){var cmb=document.getElementById('cmbCicloEncuesta');cmb.innerHTML='';Object.keys(baseEncuestas).forEach(function(k){var o=document.createElement('option');o.value=k;o.text=baseEncuestas[k].titulo;cmb.appendChild(o)});cargarCicloEncuesta()}
-function cargarCicloEncuesta(){var key=document.getElementById('cmbCicloEncuesta').value,e=baseEncuestas[key];if(!e)return;document.getElementById('cmbEstadoEncuesta').value=e.estado||'abierta';document.getElementById('fechaAperturaEncuesta').value=e.fechaApertura||'';document.getElementById('fechaCierreEncuesta').value=e.fechaCierre||'';document.getElementById('lblEstadoEfectivo').innerHTML='<span class="status-badge">'+etiquetaEstado(key)+'</span>'}
-async function guardarCicloEncuesta(){if(ROL_ACTIVO!=='admin'){alert('Sólo un administrador puede modificar el ciclo de vida.');return}var key=document.getElementById('cmbCicloEncuesta').value,e=baseEncuestas[key];if(!e)return;var estado=document.getElementById('cmbEstadoEncuesta').value,ap=document.getElementById('fechaAperturaEncuesta').value,ci=document.getElementById('fechaCierreEncuesta').value;if(ap&&ci&&new Date(ci)<=new Date(ap)){alert('La fecha de cierre debe ser posterior a la fecha de apertura.');return}e.estado=estado;e.fechaApertura=ap;e.fechaCierre=ci;try{await guardarEncuestaSupabase(key);cargarCicloEncuesta();inicializarSelectorReset();alert('✓ Ciclo de vida guardado en Supabase.')}catch(err){console.error(err);alert('No se pudo guardar el ciclo de vida en Supabase.')}}
+function cargarCicloEncuesta(){var key=document.getElementById('cmbCicloEncuesta').value,e=baseEncuestas[key];if(!e)return;document.getElementById('cmbEstadoEncuesta').value=e.estado||'abierta';document.getElementById('fechaAperturaEncuesta').value=fechaParaInputClub(e.fechaApertura);document.getElementById('fechaCierreEncuesta').value=fechaParaInputClub(e.fechaCierre);document.getElementById('lblEstadoEfectivo').innerHTML='<span class="status-badge">'+etiquetaEstado(key)+'</span>'}
+async function guardarCicloEncuesta(){if(ROL_ACTIVO!=='admin'){alert('Sólo un administrador puede modificar el ciclo de vida.');return}var key=document.getElementById('cmbCicloEncuesta').value,e=baseEncuestas[key];if(!e)return;var estado=document.getElementById('cmbEstadoEncuesta').value,apInput=document.getElementById('fechaAperturaEncuesta').value,ciInput=document.getElementById('fechaCierreEncuesta').value;var ap=apInput?fechaClubAISOString(apInput):null,ci=ciInput?fechaClubAISOString(ciInput):null;if(apInput&&!ap){alert('La fecha de apertura no es válida.');return}if(ciInput&&!ci){alert('La fecha de cierre no es válida.');return}if(ap&&ci&&new Date(ci)<=new Date(ap)){alert('La fecha de cierre debe ser posterior a la fecha de apertura.');return}e.estado=estado;e.fechaApertura=ap||'';e.fechaCierre=ci||'';try{await guardarEncuestaSupabase(key);cargarCicloEncuesta();inicializarSelectorReset();alert('✓ Ciclo de vida guardado en horario oficial de Argentina.')}catch(err){console.error(err);alert('No se pudo guardar el ciclo de vida en Supabase.')}}
 
 function inicializarSelectorVotaciones(){
 var cmb=document.getElementById('cmbEncuestasDisponibles');cmb.innerHTML='';
