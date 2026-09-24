@@ -2251,6 +2251,68 @@ function prettyJsonHistorial(v){
     }
 }
 
+function nombreAccionHistorial(ev){
+    var a=String(ev.accion||'EVENTO');
+    var mapa={
+      CLAVE_MODIFICADA:'Cambió su contraseña',
+      CLAVE_RESETEADA:'Se reseteó una contraseña',
+      CREDENCIAL_MIGRADA:'Se actualizó la seguridad de una credencial',
+      IDENTIDAD_SEGURA_MODIFICADA:'Se actualizó la identidad segura',
+      ASIGNAR_PERFIL_INSTITUCIONAL:'Asignó un perfil institucional',
+      REVOCAR_PERFIL_INSTITUCIONAL:'Revocó un perfil institucional',
+      ACTIVAR_VERSION_REGLA_GOBERNANZA:'Activó una versión de gobernanza',
+      CREAR_BORRADOR_GOBERNANZA_CON_PERFILES:'Creó un borrador de gobernanza',
+      CREAR_REVERSION_GOBERNANZA_CON_PERFILES:'Creó una reversión de gobernanza'
+    };
+    if(mapa[a])return mapa[a];
+    return a.toLowerCase().replace(/_/g,' ').replace(/^./,function(x){return x.toUpperCase()});
+}
+
+function esEventoCredencialSensible(ev){
+    return String(ev.entidad||'')==='credenciales_socios';
+}
+
+function resumenEventoHistorial(ev){
+    var accion=String(ev.accion||'');
+    var objetivo=ev.entidad_id?String(ev.entidad_id):'';
+    var nuevos=ev.datos_nuevos||{};
+    var anteriores=ev.datos_anteriores||{};
+    var contexto=ev.contexto||{};
+
+    if(accion==='CLAVE_MODIFICADA'){
+        return 'Socio #'+escaparHtmlHistorial(objetivo)+' modificó su contraseña.';
+    }
+    if(accion==='CLAVE_RESETEADA'){
+        return 'Se reseteó la contraseña del socio #'+escaparHtmlHistorial(objetivo)+'.';
+    }
+    if(accion==='CREDENCIAL_MIGRADA'){
+        return 'Se actualizó la seguridad de acceso del socio #'+escaparHtmlHistorial(objetivo)+'.';
+    }
+    if(accion==='IDENTIDAD_SEGURA_MODIFICADA'){
+        return 'Se actualizó la identidad segura del socio #'+escaparHtmlHistorial(objetivo)+'.';
+    }
+
+    var perfilId=nuevos.perfil_id||contexto.perfil_id||anteriores.perfil_id;
+    var socioObjetivo=nuevos.numero_socio||contexto.numero_socio||anteriores.numero_socio||objetivo;
+    if(accion.toLowerCase().includes('perfil')&&perfilId){
+        return 'Se modificó el perfil institucional del socio #'+escaparHtmlHistorial(socioObjetivo)+'. Perfil ID: '+escaparHtmlHistorial(perfilId)+'.';
+    }
+
+    if(String(ev.entidad||'').includes('encuesta')){
+        var tituloNuevo=nuevos.titulo;
+        var tituloAnterior=anteriores.titulo;
+        if(tituloNuevo&&tituloAnterior&&tituloNuevo!==tituloAnterior){
+            return 'Se modificó el título de una encuesta: “'+escaparHtmlHistorial(tituloAnterior)+'” → “'+escaparHtmlHistorial(tituloNuevo)+'”.';
+        }
+        if(nuevos.fecha_cierre&&anteriores.fecha_cierre&&nuevos.fecha_cierre!==anteriores.fecha_cierre){
+            return 'Se modificó la fecha de cierre de una encuesta.';
+        }
+        return 'Se modificó una encuesta.';
+    }
+
+    return 'Se registró una modificación en '+escaparHtmlHistorial(String(ev.entidad||'el sistema').replace(/_/g,' '))+'.';
+}
+
 function toggleDetalleHistorial(id){
     var el=document.getElementById('detalleHistorial_'+id);
     if(el)el.classList.toggle('open');
@@ -2287,38 +2349,36 @@ function renderizarHistorialAdministrativo(datos){
     lista.innerHTML=datos.map(function(ev){
         var id=Number(ev.id)||0;
         var actorTxt=etiquetaActorHistorial(ev);
-        var entidadTxt=(ev.entidad||'-')+(ev.entidad_id?' · '+ev.entidad_id:'');
-        var accion=ev.accion||'EVENTO';
-        var hash=ev.hash_inicio||'-';
+        var accionTxt=nombreAccionHistorial(ev);
+        var resumenTxt=resumenEventoHistorial(ev);
+        var sensible=esEventoCredencialSensible(ev);
 
         return ''+
         '<article class="admin-history-card">'+
-          '<div class="admin-history-head">'+
+          '<div class="admin-history-head" style="grid-template-columns:170px 1.5fr 220px '+(sensible?'0px':'120px')+'">'+
             '<div>'+
-              '<div class="admin-history-meta">#'+id+'</div>'+
+              '<div class="admin-history-meta">Movimiento #'+id+'</div>'+
               '<strong>'+escaparHtmlHistorial(formatoFechaHistorial(ev.fecha))+'</strong>'+
             '</div>'+
             '<div>'+
-              '<div class="admin-history-action">'+escaparHtmlHistorial(accion)+'</div>'+
-              '<div class="admin-history-meta">'+escaparHtmlHistorial(entidadTxt)+'</div>'+
+              '<div class="admin-history-action">'+escaparHtmlHistorial(accionTxt)+'</div>'+
+              '<div style="margin-top:5px;color:#475569;font-size:13px;line-height:1.45">'+resumenTxt+'</div>'+
             '</div>'+
             '<div>'+
+              '<div class="admin-history-meta">Realizado por</div>'+
               '<strong>'+escaparHtmlHistorial(actorTxt)+'</strong>'+
-              '<div class="admin-history-meta">'+escaparHtmlHistorial(ev.actor_rol||ev.actor_fuente||'')+'</div>'+
+              '<div class="admin-history-meta">'+escaparHtmlHistorial((ev.actor_rol||'').replace(/_/g,' '))+'</div>'+
             '</div>'+
-            '<div>'+
-              '<button class="admin-history-toggle" onclick="toggleDetalleHistorial('+id+')">Ver detalle</button>'+
-              '<div class="admin-history-meta" style="margin-top:7px">HASH '+escaparHtmlHistorial(hash)+'</div>'+
-            '</div>'+
+            (sensible?'':'<div><button class="admin-history-toggle" onclick="toggleDetalleHistorial('+id+')">Ver detalle</button></div>')+
           '</div>'+
-          '<div id="detalleHistorial_'+id+'" class="admin-history-detail">'+
-            '<div class="admin-history-json">'+
-              '<div><div class="form-label">Datos anteriores</div><pre>'+escaparHtmlHistorial(prettyJsonHistorial(ev.datos_anteriores))+'</pre></div>'+
-              '<div><div class="form-label">Datos nuevos</div><pre>'+escaparHtmlHistorial(prettyJsonHistorial(ev.datos_nuevos))+'</pre></div>'+
+          (sensible?'':'<div id="detalleHistorial_'+id+'" class="admin-history-detail">'+
+            '<div style="display:grid;gap:10px">'+
+              '<div><strong>Qué cambió</strong><div style="margin-top:6px">'+resumenTxt+'</div></div>'+
+              '<div><strong>Entidad</strong><div style="margin-top:4px">'+escaparHtmlHistorial(String(ev.entidad||'-').replace(/_/g,' '))+'</div></div>'+
+              '<div><strong>Identificador</strong><div style="margin-top:4px">'+escaparHtmlHistorial(ev.entidad_id||'-')+'</div></div>'+
+              (ev.contexto&&Object.keys(ev.contexto).length?'<div><strong>Contexto</strong><div style="margin-top:4px">'+escaparHtmlHistorial(JSON.stringify(ev.contexto))+'</div></div>':'')+
             '</div>'+
-            '<div style="margin-top:14px"><div class="form-label">Contexto</div><pre style="white-space:pre-wrap;word-break:break-word;background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px;font:500 11px/1.5 \'JetBrains Mono\'">'+escaparHtmlHistorial(prettyJsonHistorial(ev.contexto))+'</pre></div>'+
-            '<div class="admin-history-meta" style="margin-top:10px">Origen: '+escaparHtmlHistorial(ev.origen||'-')+' · Fuente actor: '+escaparHtmlHistorial(ev.actor_fuente||'-')+'</div>'+
-          '</div>'+
+          '</div>')+
         '</article>';
     }).join('');
 }
