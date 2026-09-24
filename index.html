@@ -1825,9 +1825,15 @@ function prepararOpcionesAutenticacionWebAuthn(options){
     if(Array.isArray(copy.allowCredentials)){
         copy.allowCredentials=copy.allowCredentials.map(function(c){
             c.id=base64urlToArrayBuffer(c.id);
+            /* En la web de escritorio no ofrecer autenticadores híbridos
+               (teléfono por QR/Bluetooth) como vía principal. */
+            c.transports=['internal'];
             return c;
         });
     }
+    /* Fuerza la validación con el autenticador integrado del equipo:
+       Windows Hello / huella / rostro / PIN seguro local. */
+    copy.authenticatorAttachment='platform';
     return copy;
 }
 
