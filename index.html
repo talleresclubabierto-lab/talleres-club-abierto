@@ -1767,6 +1767,29 @@ programarGuardadoRemoto();
 }
 
 
+const ZONA_HORARIA_CLUB='America/Argentina/Cordoba';
+function formatoFechaHora24Global(valor){
+    if(!valor)return '-';
+    var d=valor instanceof Date?valor:new Date(valor);
+    if(isNaN(d.getTime()))return String(valor);
+    return d.toLocaleString('es-AR',{
+        timeZone:ZONA_HORARIA_CLUB,
+        day:'2-digit',month:'2-digit',year:'numeric',
+        hour:'2-digit',minute:'2-digit',second:'2-digit',
+        hourCycle:'h23'
+    });
+}
+function formatoHora24Global(valor){
+    if(!valor)return '-';
+    var d=valor instanceof Date?valor:new Date(valor);
+    if(isNaN(d.getTime()))return String(valor);
+    return d.toLocaleTimeString('es-AR',{
+        timeZone:ZONA_HORARIA_CLUB,
+        hour:'2-digit',minute:'2-digit',second:'2-digit',
+        hourCycle:'h23'
+    });
+}
+
 function base64urlToArrayBuffer(base64url){
     var padding='='.repeat((4-base64url.length%4)%4);
     var base64=(base64url+padding).replace(/-/g,'+').replace(/_/g,'/');
@@ -2056,7 +2079,7 @@ async function verificarPasskeyActual(proposito){
             PASSKEY_VERIFICACION_TEMPORAL=pruebaNativa;
             var elNativo=document.getElementById('lblUltimaVerificacionPasskey');
             if(elNativo){
-                elNativo.innerHTML='<strong>✓ Identidad verificada con biometría Android</strong><br>Propósito: '+proposito+'<br>Válida hasta: '+new Date(pruebaNativa.expiresAt).toLocaleString('es-AR',{timeZone:'America/Argentina/Cordoba',hour12:false});
+                elNativo.innerHTML='<strong>✓ Identidad verificada con biometría Android</strong><br>Propósito: '+proposito+'<br>Válida hasta: '+formatoFechaHora24Global(pruebaNativa.expiresAt);
             }
             return pruebaNativa;
         }
@@ -2090,7 +2113,7 @@ async function verificarPasskeyActual(proposito){
 
         var el=document.getElementById('lblUltimaVerificacionPasskey');
         if(el){
-            el.innerHTML='<strong>✓ Identidad verificada</strong><br>Propósito: '+proposito+'<br>Válida hasta: '+new Date(fin.expiresAt).toLocaleString('es-AR',{timeZone:'America/Argentina/Cordoba',hour12:false});
+            el.innerHTML='<strong>✓ Identidad verificada</strong><br>Propósito: '+proposito+'<br>Válida hasta: '+formatoFechaHora24Global(fin.expiresAt);
         }
 
         return PASSKEY_VERIFICACION_TEMPORAL;
@@ -2134,7 +2157,7 @@ function actualizarEstadoHistorialAdmin(){
 
     if(historialAdminVerificacionVigente()){
         estado.className='admin-history-status ok';
-        estado.innerHTML='<strong>✓ Identidad verificada.</strong> Acceso válido hasta '+new Date(HISTORIAL_ADMIN_VERIFICACION.expiresAt).toLocaleString('es-AR',{timeZone:'America/Argentina/Cordoba',hour12:false})+'.';
+        estado.innerHTML='<strong>✓ Identidad verificada.</strong> Acceso válido hasta '+formatoFechaHora24Global(HISTORIAL_ADMIN_VERIFICACION.expiresAt)+'.';
         if(recargar)recargar.disabled=false;
         if(verificar)verificar.innerText='Renovar validación';
     }else{
@@ -2275,7 +2298,7 @@ async function cargarHistorialAdministrativo(){
 function formatoFechaHistorial(v){
     if(!v)return '-';
     var d=new Date(v);
-    return isNaN(d.getTime())?String(v):d.toLocaleString('es-AR');
+    return isNaN(d.getTime())?String(v):formatoFechaHora24Global(d);
 }
 
 function etiquetaActorHistorial(ev){
@@ -2371,7 +2394,7 @@ async function verificarPasskeyParaVoto(){
     var lbl=document.getElementById('lblVerificacionVoto');
     var prueba=await verificarPasskeyActual('voto');
     if(prueba){
-        if(lbl)lbl.innerHTML='<strong style="color:#166534">✓ Identidad verificada para votar</strong> · válida hasta '+new Date(prueba.expiresAt).toLocaleTimeString('es-AR');
+        if(lbl)lbl.innerHTML='<strong style="color:#166534">✓ Identidad verificada para votar</strong> · válida hasta '+formatoHora24Global(prueba.expiresAt);
     }else{
         if(lbl)lbl.innerText='No verificada. En esta maqueta todavía podés votar igualmente.';
     }
@@ -2439,15 +2462,21 @@ try{
         return;
     }
 
-    await cargarEstadoInicialAutenticado();
-
-    /* Mantener el padrón runtime alineado para las vistas existentes. */
+    /* La identidad ya fue validada por el backend. No hacemos esperar al usuario
+       a que termine de bajar todo el estado de auditoría/votaciones. */
     if(!PADRON_SOCIOS[id]){
         PADRON_SOCIOS[id]=[sesion.nombre||('Socio #'+id),sesion.fecha_alta||''];
         recalcularPadronRuntime();
     }
 
-    /* La contraseña deja de quedar escrita en el formulario tras autenticar. */
+    var cargaEstado=cargarEstadoInicialAutenticado();
+    var estadoInicialListo=false;
+    cargaEstado.then(function(){estadoInicialListo=true}).catch(function(){});
+    await Promise.race([
+        cargaEstado.catch(function(){return null}),
+        new Promise(function(resolve){setTimeout(resolve,700)})
+    ]);
+
     if(tipo==='socio')document.getElementById('socioPass').value='';
     else document.getElementById('adminPass').value='';
 
@@ -2455,6 +2484,17 @@ try{
         if(tipo==='admin')loguearAdminInterno(id);
         else loguearSocioInterno(id);
     });
+
+    if(!estadoInicialListo){
+        finger.innerText='✓ SESIÓN SEGURA · SINCRONIZANDO DATOS…';
+        cargaEstado.then(function(){
+            finger.innerText='✓ SESIÓN SEGURA Y DATOS SINCRONIZADOS';
+            refrescarVistasTrasSincronizacion();
+        }).catch(function(e){
+            console.error('Sincronización posterior al ingreso:',e);
+            finger.innerText='✓ SESIÓN SEGURA · DATOS EN ACTUALIZACIÓN';
+        });
+    }
 
 }catch(e){
     console.error('Login seguro rechazado:',e);
@@ -2669,7 +2709,7 @@ if(id==='secVotaciones'){
     if(lbl){
         var p=PASSKEY_VERIFICACION_TEMPORAL;
         var vigente=p&&p.proposito==='voto'&&new Date(p.expiresAt).getTime()>Date.now();
-        lbl.innerHTML=vigente?'<strong style="color:#166534">✓ Identidad verificada para votar</strong> · válida hasta '+new Date(p.expiresAt).toLocaleTimeString('es-AR'):'No verificada en esta sesión.';
+        lbl.innerHTML=vigente?'<strong style="color:#166534">✓ Identidad verificada para votar</strong> · válida hasta '+formatoHora24Global(p.expiresAt):'No verificada en esta sesión.';
     }
 }
 }
@@ -2762,7 +2802,7 @@ cargarGobernanzaInstitucional();
 function idReglaGobernanza(r){return Number(r&&((r.regla_id!==undefined?r.regla_id:r.id)))||0}
 function nivelesReglaGobernanza(r){var n=r&&(r.niveles||r.niveles_configuracion||r.detalle_niveles);return Array.isArray(n)?n:[]}
 function escaparGobernanza(v){return escaparHtmlHistorial(String(v===null||v===undefined?'':v))}
-function fechaGobernanza(v){if(!v)return '-';var d=new Date(v);return isNaN(d.getTime())?String(v):d.toLocaleString('es-AR')}
+function fechaGobernanza(v){if(!v)return '-';var d=new Date(v);return isNaN(d.getTime())?String(v):formatoFechaHora24Global(d)}
 
 async function cargarGobernanzaInstitucional(){
 var estado=document.getElementById('estadoGobernanza'),lista=document.getElementById('listaVersionesGobernanza');
@@ -3118,7 +3158,7 @@ input.type='text';input.className=containerId==='containerCamposModificar'?'wf-i
 function parseFechaLocal(v){if(!v)return null;var d=new Date(v);return isNaN(d.getTime())?null:d}
 function obtenerEstadoEncuesta(key){var e=baseEncuestas[key];if(!e)return 'inexistente';var estado=e.estado||'abierta',ahora=new Date(),ap=parseFechaLocal(e.fechaApertura),ci=parseFechaLocal(e.fechaCierre);if(estado==='cerrada'||estado==='borrador')return estado;if(ci&&ahora>=ci)return 'cerrada';if(ap&&ahora<ap)return 'programada';if(estado==='programada'&&(!ap||ahora>=ap))return 'abierta';return estado}
 function etiquetaEstado(key){return obtenerEstadoEncuesta(key).toUpperCase()}
-function formatoFecha(v){var d=parseFechaLocal(v);return d?d.toLocaleString('es-AR'):'Sin definir'}
+function formatoFecha(v){var d=parseFechaLocal(v);return d?formatoFechaHora24Global(d):'Sin definir'}
 var IMPORTACION_PADRON_PENDIENTE=null;
 var PERFILES_PADRON_ADMIN=[];
 var ASIGNACIONES_PERFILES_PADRON=[];
@@ -3611,7 +3651,7 @@ ids.forEach(function(id){
         if(!isNaN(pr))pts=pr;
         if(reg.fecha){
             var fd=new Date(reg.fecha);
-            if(!isNaN(fd.getTime()))fecha=fd.toLocaleString('es-AR');
+            if(!isNaN(fd.getTime()))fecha=formatoFechaHora24Global(fd);
         }
     }
     rows.push({id:id,nombre:d.nombre,opcion:opcion,puntos:pts,fecha:fecha});
