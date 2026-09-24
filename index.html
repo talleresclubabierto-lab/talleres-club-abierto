@@ -2368,6 +2368,7 @@ function renderizarHistorialAdministrativo(datos){
               '<div class="admin-history-meta">Realizado por</div>'+
               '<strong>'+escaparHtmlHistorial(actorTxt)+'</strong>'+
               '<div class="admin-history-meta">'+escaparHtmlHistorial((ev.actor_rol||'').replace(/_/g,' '))+'</div>'+
+              '<div class="admin-history-meta" style="margin-top:8px">Comprobante criptográfico: '+escaparHtmlHistorial(ev.hash_inicio||'-')+'</div>'+
             '</div>'+
             (sensible?'':'<div><button class="admin-history-toggle" onclick="toggleDetalleHistorial('+id+')">Ver detalle</button></div>')+
           '</div>'+
