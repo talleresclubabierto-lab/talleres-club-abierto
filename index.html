@@ -2008,6 +2008,14 @@ async function verificarPasskeyActual(proposito){
     }
 
     try{
+        if(typeof PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable==='function'){
+            var autenticadorLocal=await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+            if(!autenticadorLocal){
+                var irIdentidad=confirm('Este equipo todavía no tiene disponible una identidad local compatible con Windows Hello.\n\nConfigurá Windows Hello (PIN, rostro o huella) y después registrá una Passkey para este equipo en la sección Identidad.\n\n¿Querés ir ahora a Identidad?');
+                if(irIdentidad)mostrarSeccionSocio('secIdentidad');
+                return null;
+            }
+        }
         var inicio=await llamarWebAuthn({
             action:'begin-authentication',
             numeroSocio:Number(ID_SOCIO_ACTIVO),
@@ -2044,7 +2052,8 @@ async function verificarPasskeyActual(proposito){
     }catch(e){
         console.error(e);
         if(e&&e.name==='NotAllowedError'){
-            alert('La verificación fue cancelada.');
+            var irIdentidad=confirm('No hay una Passkey local disponible para Club Abierto en este equipo, o Windows Hello canceló la validación.\n\nPrimero configurá Windows Hello y luego registrá este equipo desde la sección Identidad.\n\n¿Querés ir ahora a Identidad?');
+            if(irIdentidad)mostrarSeccionSocio('secIdentidad');
         }else{
             alert('No se pudo verificar la identidad: '+(e.message||e));
         }
