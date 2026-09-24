@@ -2172,11 +2172,6 @@ async function cargarHistorialAdministrativo(){
         return;
     }
 
-    if(!supabaseClient){
-        alert('Supabase todavía no está conectado.');
-        return;
-    }
-
     var entidadEl=document.getElementById('filtroHistorialEntidad');
     var actorEl=document.getElementById('filtroHistorialActor');
     var limiteEl=document.getElementById('filtroHistorialLimite');
