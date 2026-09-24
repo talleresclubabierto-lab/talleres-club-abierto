@@ -2301,12 +2301,23 @@ function formatoFechaHistorial(v){
     return isNaN(d.getTime())?String(v):formatoFechaHora24Global(d);
 }
 
+function esMigracionCredencialHistorica(ev){
+    var a=ev&&ev.datos_anteriores||{}, n=ev&&ev.datos_nuevos||{};
+    return String(ev&&ev.entidad||'')==='credenciales_socios' &&
+      String(ev&&ev.accion||'')==='CLAVE_MODIFICADA' &&
+      a.usa_clave_default===n.usa_clave_default &&
+      a.algoritmo_password!==n.algoritmo_password;
+}
+
 function etiquetaActorHistorial(ev){
     if(ev.actor_numero_socio){
         var nombre=ev.actor_nombre||('Socio '+ev.actor_numero_socio);
         return nombre+' · #'+Number(ev.actor_numero_socio).toLocaleString('es-AR');
     }
-    return 'Actor no determinado';
+    if(esMigracionCredencialHistorica(ev) && ev.entidad_id){
+        return 'Socio #'+Number(ev.entidad_id).toLocaleString('es-AR');
+    }
+    return 'Registro histórico sin actor capturado';
 }
 
 function prettyJsonHistorial(v){
@@ -2321,7 +2332,7 @@ function prettyJsonHistorial(v){
 function nombreAccionHistorial(ev){
     var a=String(ev.accion||'EVENTO');
     var mapa={
-      CLAVE_MODIFICADA:'Cambió su contraseña',
+      CLAVE_MODIFICADA:esMigracionCredencialHistorica(ev)?'Actualización automática de seguridad':'Cambió su contraseña',
       CLAVE_RESETEADA:'Se reseteó una contraseña',
       CREDENCIAL_MIGRADA:'Se actualizó la seguridad de una credencial',
       IDENTIDAD_SEGURA_MODIFICADA:'Se actualizó la identidad segura',
@@ -2347,6 +2358,9 @@ function resumenEventoHistorial(ev){
     var contexto=ev.contexto||{};
 
     if(accion==='CLAVE_MODIFICADA'){
+        if(esMigracionCredencialHistorica(ev)){
+            return 'Se actualizó automáticamente la seguridad de acceso del socio #'+escaparHtmlHistorial(objetivo)+'. No implica un cambio manual de contraseña.';
+        }
         return 'Socio #'+escaparHtmlHistorial(objetivo)+' modificó su contraseña.';
     }
     if(accion==='CLAVE_RESETEADA'){
@@ -2401,7 +2415,7 @@ function renderizarHistorialAdministrativo(datos){
         if(actor)actor.innerText=datos[0].actor_nombre||(
             datos[0].actor_numero_socio
                 ? '#'+Number(datos[0].actor_numero_socio).toLocaleString('es-AR')
-                : 'No determinado'
+                : 'Registro histórico sin actor capturado'
         );
     }else{
         if(ultimo)ultimo.innerText='-';
