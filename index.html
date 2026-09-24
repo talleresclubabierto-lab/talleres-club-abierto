@@ -2327,9 +2327,12 @@ function nombreAccionHistorial(ev){
       DESCARTAR_BORRADOR_GOBERNANZA:'Se descartó un borrador de gobernanza',
       CREAR_REVERSION_GOBERNANZA_CON_PERFILES:'Se creó una reversión de gobernanza',
       ENCUESTA_CREADA:'Se creó una encuesta',
+      ENCUESTA_MODIFICADA:'Se modificó una encuesta',
       ENCUESTA_ESTADO_MODIFICADO:'Cambió el estado de una encuesta',
       ENCUESTA_TITULO_MODIFICADO:'Cambió el título de una encuesta',
       ENCUESTA_FECHAS_MODIFICADAS:'Cambió el período de una encuesta',
+      OPCIONES_ENCUESTA_AGREGADAS:'Se agregaron opciones a una encuesta',
+      OPCIONES_ENCUESTA_MODIFICADAS:'Se modificaron opciones de una encuesta',
       OPCION_ENCUESTA_CREADA:'Se agregó una opción a una encuesta',
       OPCION_TEXTO_MODIFICADO:'Se modificó una opción de encuesta'
     };
@@ -2447,7 +2450,10 @@ function resumenEventoHistorial(ev){
         var cierreNuevo=nuevos.fecha_cierre;
 
         if(accion==='ENCUESTA_CREADA'){
-            return 'Se creó la encuesta “'+escaparHtmlHistorial(tituloNuevo)+'” en estado '+escaparHtmlHistorial(estadoNuevo||'borrador')+'.';
+            var periodoCreada=[];
+            if(aperturaNueva)periodoCreada.push('desde '+fechaLegibleHistorial(aperturaNueva));
+            if(cierreNuevo)periodoCreada.push('hasta '+fechaLegibleHistorial(cierreNuevo));
+            return 'Se creó la encuesta “'+escaparHtmlHistorial(tituloNuevo)+'” y quedó en estado '+escaparHtmlHistorial(estadoNuevo||'borrador')+(periodoCreada.length?' · '+periodoCreada.join(' · '):'')+'.';
         }
 
         if(estadoAnterior&&estadoNuevo&&estadoAnterior!==estadoNuevo){
@@ -2481,7 +2487,29 @@ function resumenEventoHistorial(ev){
     }
 
     if(String(ev.entidad||'')==='opciones_encuesta'){
-        var encuestaTitulo=lectura.encuesta_titulo||('Encuesta #'+(lectura.encuesta_id||nuevos.encuesta_id||anteriores.encuesta_id||'-'));
+        var encuestaTitulo=lectura.encuesta_titulo||contexto.titulo||('Encuesta #'+(lectura.encuesta_id||nuevos.encuesta_id||anteriores.encuesta_id||'-'));
+        var listaNuevas=Array.isArray(nuevos.opciones)?nuevos.opciones:[];
+        var listaAnteriores=Array.isArray(anteriores.opciones)?anteriores.opciones:[];
+
+        if(accion==='OPCIONES_ENCUESTA_AGREGADAS'){
+            var textosAgregados=listaNuevas.map(function(o){return o&&o.texto}).filter(Boolean);
+            return 'Se agregaron '+textosAgregados.length+' opciones a la encuesta “'+escaparHtmlHistorial(encuestaTitulo)+'”'+(textosAgregados.length?': '+textosAgregados.map(function(t){return '“'+escaparHtmlHistorial(t)+'”'}).join(' · '):'')+'.';
+        }
+        if(accion==='OPCIONES_ENCUESTA_MODIFICADAS'){
+            var prevMap={};listaAnteriores.forEach(function(o){if(o)prevMap[Number(o.posicion)]=String(o.texto||'')});
+            var cambios=[],agregadas=[],vigentes={};
+            listaNuevas.forEach(function(o){
+                if(!o)return;var pos=Number(o.posicion),txt=String(o.texto||'');vigentes[pos]=true;
+                if(prevMap[pos]===undefined)agregadas.push(txt);
+                else if(prevMap[pos]!==txt)cambios.push('“'+escaparHtmlHistorial(prevMap[pos])+'” → “'+escaparHtmlHistorial(txt)+'”');
+            });
+            var quitadas=[];Object.keys(prevMap).forEach(function(k){if(!vigentes[Number(k)])quitadas.push(prevMap[k])});
+            var partes=['Se modificaron las opciones de la encuesta “'+escaparHtmlHistorial(encuestaTitulo)+'”'];
+            if(agregadas.length)partes.push('agregadas: '+agregadas.map(function(t){return '“'+escaparHtmlHistorial(t)+'”'}).join(' · '));
+            if(cambios.length)partes.push('modificadas: '+cambios.join(' · '));
+            if(quitadas.length)partes.push('quitadas: '+quitadas.map(function(t){return '“'+escaparHtmlHistorial(t)+'”'}).join(' · '));
+            return partes.join(' · ')+'.';
+        }
         if(accion==='OPCION_ENCUESTA_CREADA'){
             return 'Se agregó la opción “'+escaparHtmlHistorial(nuevos.texto||'-')+'” a la encuesta “'+escaparHtmlHistorial(encuestaTitulo)+'”.';
         }
