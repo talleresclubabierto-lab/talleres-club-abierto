@@ -10,7 +10,8 @@
 .section-shell{max-width:1180px;margin:0 auto;width:100%}.dashboard-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}.dashboard-header>.wf-box{background:transparent!important;color:var(--navy)!important;border:0!important;box-shadow:none!important;padding:0!important;margin:0!important;font-size:27px!important;font-weight:800}.dashboard-header>.wf-button{background:#edf1f4!important;color:#34404c!important}
 .vote-list{display:grid;gap:12px}.choice-card,label:has(input[name='radOpt']){display:flex!important;align-items:flex-start;gap:12px;border:1px solid var(--line);border-radius:10px;padding:15px!important;margin:0!important;background:white;cursor:pointer;font-weight:600;color:var(--navy)}label:has(input[name='radOpt']):hover{border-color:#9db2c7;background:#fbfdff}input[type='radio']{accent-color:var(--navy2);width:18px;height:18px;margin-top:1px}.status-badge{display:inline-block;padding:5px 9px;border:1px solid #9cb1c5;border-radius:999px;font:700 11px 'JetBrains Mono';text-transform:uppercase;margin-top:6px;color:var(--navy2);background:#f1f6fb}.muted{color:#64748b;font-size:12px}.result-note{font-size:12px;color:#64748b;line-height:1.5;margin-top:12px}.barra-resultado-contenedor{margin-bottom:20px}.barra-resultado-texto{font-size:13px;font-weight:700;display:flex;justify-content:space-between;gap:12px;margin-bottom:8px;color:var(--navy)}.barra-resultado-fondo{background:#e8edf1;height:11px;border-radius:999px;overflow:hidden}.barra-resultado-lleno{height:100%;transition:width .4s;border-radius:999px}.chart-wrapper{padding:24px}.results-layout{display:grid;grid-template-columns:1.55fr .75fr;gap:18px}.results-layout>.wf-box{margin-bottom:0}
 .audit-row{border:1px solid var(--line);border-radius:10px;padding:15px;margin-bottom:10px;background:#fff}
-.admin-history-toolbar{display:grid;grid-template-columns:1.2fr 1fr 1fr auto;gap:12px;align-items:end;margin-bottom:16px}
+.admin-history-toolbar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:end;margin-bottom:16px}
+.admin-history-pagination{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin:18px 0}
 .admin-history-status{border:1px solid var(--line);border-radius:10px;padding:14px;background:#f8fafc;margin-bottom:16px;font-size:13px;line-height:1.55}
 .admin-history-status.ok{border-color:#b7e7cd;background:var(--green-bg);color:#166534}
 .admin-history-status.warn{border-color:#f0d3a6;background:#fff8e8;color:#7a4b00}
@@ -683,17 +684,32 @@ body{
           <input id="filtroHistorialActor" type="number" min="1" class="wf-input" placeholder="Todos">
         </div>
         <div>
-          <label class="form-label">Límite</label>
-          <select id="filtroHistorialLimite" class="wf-input">
-            <option value="50">50 eventos</option>
-            <option value="100" selected>100 eventos</option>
-            <option value="200">200 eventos</option>
-            <option value="500">500 eventos</option>
+          <label class="form-label">Rol del actor</label>
+          <select id="filtroHistorialRol" class="wf-input">
+            <option value="">Todos</option>
+            <option value="administrador_principal">Administrador principal</option>
+            <option value="administrador">Administrador</option>
+            <option value="socio">Socio</option>
+            <option value="sin_actor">Sin actor capturado</option>
           </select>
         </div>
-        <button class="wf-button" onclick="cargarHistorialAdministrativo()">Aplicar filtros</button>
+        <div><label class="form-label">Desde</label><input id="filtroHistorialDesde" type="date" class="wf-input" required></div>
+        <div><label class="form-label">Hasta</label><input id="filtroHistorialHasta" type="date" class="wf-input" required></div>
+        <div>
+          <label class="form-label">Movimientos por página</label>
+          <select id="filtroHistorialLimite" class="wf-input">
+            <option value="10" selected>10 movimientos</option>
+            <option value="25">25 movimientos</option>
+            <option value="50">50 movimientos</option>
+            <option value="100">100 movimientos</option>
+          </select>
+        </div>
+        <button class="wf-button" onclick="cargarHistorialAdministrativo(1)">Aplicar filtros</button>
       </div>
+      <p class="card-note">Podés consultar hasta 31 días por búsqueda para mantener rápida la auditoría. Elegí cualquier período histórico de hasta 31 días y recorré todos sus movimientos con Anterior y Siguiente.</p>
     </section>
+
+    <section class="card" id="origenHistorialAdmin" style="display:none"></section>
 
     <div id="resumenHistorialAdmin" class="metrics-grid">
       <div class="card"><div class="metric-label">Eventos mostrados</div><div id="historialTotalVisible" class="metric-value">0</div></div>
@@ -704,6 +720,11 @@ body{
 
     <div id="listaHistorialAdmin">
       <div class="admin-history-empty">Validá tu identidad para consultar el historial.</div>
+    </div>
+    <div class="admin-history-pagination" id="paginacionHistorialAdmin" style="display:none">
+      <button class="btn-secondary-dark" id="historialAnterior" onclick="cargarHistorialAdministrativo(HISTORIAL_ADMIN_PAGINA-1)">Anterior</button>
+      <span id="historialPaginaInfo"></span>
+      <button class="btn-secondary-dark" id="historialSiguiente" onclick="cargarHistorialAdministrativo(HISTORIAL_ADMIN_PAGINA+1)">Siguiente</button>
     </div>
   </main>
 
@@ -940,7 +961,18 @@ body{
 
 <div id="secGestionAdmins" class="sub-view full-width"><div class="topbar"><div class="brand"><span class="app-logo-mark" role="img" aria-label="Escudo Talleres Club Abierto"></span><span class="brand-role-label">TALLERES CLUB ABIERTO</span></div><div class="top-actions"><span class="navlink"><span class="network-dot"></span>Gobernanza activa</span><button onclick="volverAlLogin()">Salir</button></div></div><main class="section-shell"><div class="dashboard-header"><div class="wf-box">Gestión de administradores</div><button class="wf-button" onclick="regresarAlPanelInterno()">Volver</button></div><section class="card"><div class="card-title">Administrador principal · Socio #21.998</div><p class="card-note">Puede habilitar o quitar permisos a otros socios del padrón. El administrador principal no puede ser removido.</p><label class="form-label">N° de socio a habilitar</label><input id="txtNuevoAdministrador" type="number" min="1" class="wf-input" placeholder="Ingrese un N° de socio existente"><button class="wf-button" onclick="agregarAdministrador()">Habilitar como administrador</button><div style="margin-top:24px"><div class="form-label" style="margin-bottom:10px">Administradores habilitados</div><div id="listaAdministradores"></div></div></section></main><nav class="bottom-nav"><button class="active" onclick="regresarAlPanelInterno()"><span class="mini-icon">▦</span>Dashboard</button><button class="" onclick="irAResultadosGenerales()"><span class="mini-icon">◇</span>Votar</button><button class="" onclick="irAResultadosGenerales()"><span class="mini-icon">▥</span>Resultados</button><button class="" onclick="irAAuditoriaPublica()"><span class="mini-icon">◎</span>Auditoría</button></nav></div>
 
-<div id="secCicloAdmin" class="sub-view full-width"><div class="topbar"><div class="brand"><span class="app-logo-mark" role="img" aria-label="Escudo Talleres Club Abierto"></span><span class="brand-role-label">TALLERES CLUB ABIERTO</span></div><div class="top-actions"><span class="navlink"><span class="network-dot"></span>Gobernanza activa</span><button onclick="volverAlLogin()">Salir</button></div></div><main class="section-shell"><div class="dashboard-header"><div class="wf-box">Ciclo de vida de encuestas</div><button class="wf-button" onclick="regresarAlPanelInterno()">Volver</button></div><section class="card"><label class="form-label">Encuesta</label><select id="cmbCicloEncuesta" class="wf-input" onchange="cargarCicloEncuesta()"></select><div class="metrics-grid"><div><label class="form-label">Estado administrativo</label><select id="cmbEstadoEncuesta" class="wf-input"><option value="borrador">Borrador</option><option value="programada">Programada</option><option value="abierta">Abierta</option><option value="cerrada">Cerrada</option></select></div><div class="card-flat"><div class="metric-label">Estado efectivo</div><div id="lblEstadoEfectivo" class="metric-value">-</div></div><div><label class="form-label">Apertura</label><input id="fechaAperturaEncuesta" type="datetime-local" class="wf-input"></div><div><label class="form-label">Cierre</label><input id="fechaCierreEncuesta" type="datetime-local" class="wf-input"></div></div><p class="card-note">Borrador no admite votos; Programada se abre al llegar la fecha; Abierta acepta votos; Cerrada conserva resultados pero bloquea nuevos votos.</p><button class="wf-button" onclick="guardarCicloEncuesta()">Guardar ciclo de vida</button></section></main><nav class="bottom-nav"><button class="active" onclick="regresarAlPanelInterno()"><span class="mini-icon">▦</span>Dashboard</button><button class="" onclick="irAResultadosGenerales()"><span class="mini-icon">◇</span>Votar</button><button class="" onclick="irAResultadosGenerales()"><span class="mini-icon">▥</span>Resultados</button><button class="" onclick="irAAuditoriaPublica()"><span class="mini-icon">◎</span>Auditoría</button></nav></div>
+<div id="secCicloAdmin" class="sub-view full-width"><div class="topbar"><div class="brand"><span class="app-logo-mark" role="img" aria-label="Escudo Talleres Club Abierto"></span><span class="brand-role-label">TALLERES CLUB ABIERTO</span></div><div class="top-actions"><span class="navlink"><span class="network-dot"></span>Gobernanza activa</span><button onclick="volverAlLogin()">Salir</button></div></div><main class="section-shell"><div class="dashboard-header"><div class="wf-box">Ciclo de vida de encuestas</div><button class="wf-button" onclick="regresarAlPanelInterno()">Volver</button></div><section class="card"><label class="form-label">Encuesta</label><select id="cmbCicloEncuesta" class="wf-input" onchange="cargarCicloEncuesta()"></select><div class="metrics-grid"><div><label class="form-label">Estado administrativo</label><select id="cmbEstadoEncuesta" class="wf-input"><option value="borrador">Borrador</option><option value="programada">Programada</option><option value="abierta">Abierta</option><option value="cerrada">Cerrada</option></select></div><div class="card-flat"><div class="metric-label">Estado efectivo</div><div id="lblEstadoEfectivo" class="metric-value">-</div></div><div><label class="form-label">Apertura</label><input id="fechaAperturaEncuesta" type="datetime-local" class="wf-input"></div><div><label class="form-label">Cierre</label><input id="fechaCierreEncuesta" type="datetime-local" class="wf-input"></div></div><p class="card-note">Borrador no admite votos; Programada se abre al llegar la fecha; Abierta acepta votos; Cerrada conserva resultados pero bloquea nuevos votos.</p><button class="wf-button" onclick="guardarCicloEncuesta()">Guardar ciclo de vida</button>
+<div style="border-top:1px solid #d6e1ec;margin-top:24px;padding-top:20px">
+  <div class="card-title">Eliminar encuesta en borrador</div>
+  <p class="card-note">Sólo se puede eliminar una encuesta guardada en estado borrador y sin votos. El motivo y la eliminación quedan registrados en el historial administrativo.</p>
+  <label class="form-label" for="motivoEliminarEncuesta">Motivo obligatorio</label>
+  <select id="motivoEliminarEncuesta" class="wf-input" style="max-width:360px" onchange="actualizarEliminacionEncuesta()">
+    <option value="">Seleccionar motivo</option>
+    <option value="Encuesta Duplicada">Encuesta Duplicada</option>
+    <option value="Encuesta Erronea">Encuesta Erronea</option>
+  </select>
+  <button id="btnEliminarEncuesta" type="button" class="btn-action-red" style="display:block;margin-top:14px" onclick="eliminarEncuestaBorrador()" disabled>Eliminar encuesta</button>
+</div></section></main><nav class="bottom-nav"><button class="active" onclick="regresarAlPanelInterno()"><span class="mini-icon">▦</span>Dashboard</button><button class="" onclick="irAResultadosGenerales()"><span class="mini-icon">◇</span>Votar</button><button class="" onclick="irAResultadosGenerales()"><span class="mini-icon">▥</span>Resultados</button><button class="" onclick="irAAuditoriaPublica()"><span class="mini-icon">◎</span>Auditoría</button></nav></div>
 
 <div id="secAuditoria" class="sub-view full-width"><div class="topbar"><div class="brand"><span class="app-logo-mark" role="img" aria-label="Escudo Talleres Club Abierto"></span><span class="brand-role-label">TALLERES CLUB ABIERTO</span></div><div class="top-actions"><span class="navlink"><span class="network-dot"></span>Gobernanza activa</span><button onclick="volverAlLogin()">Salir</button></div></div><main class="section-shell"><div class="dashboard-header"><div class="wf-box">Auditoría pública de votos</div><button class="wf-button" onclick="regresarAlPanelInterno()">Volver</button></div><div class="page-head"><div><div class="eyebrow">Paredes de cristal</div><h1 class="page-title">Auditoría pública de votos</h1><p class="page-sub">Todos pueden consultar qué alternativa eligió cada socio y qué ponderación aportó.</p></div><span class="status-chip">● Transparencia total</span></div><section class="card"><div class="metrics-grid" style="grid-template-columns:1fr 1fr"><div><label class="form-label">Encuesta</label><select id="cmbAuditoriaEncuesta" class="wf-input" onchange="renderizarAuditoriaPublica()"></select></div><div><label class="form-label">Buscar socio</label><input id="txtAuditoriaSocio" type="number" min="1" class="wf-input" placeholder="Ej: 21998" oninput="renderizarAuditoriaPublica()"></div></div><div id="resumenAuditoria" class="card-flat"></div></section><div id="listaAuditoria"></div></main><nav class="bottom-nav"><button class="" onclick="regresarAlPanelInterno()"><span class="mini-icon">▦</span>Dashboard</button><button class="" onclick="mostrarSeccionSocio('secVotaciones')"><span class="mini-icon">◇</span>Votar</button><button class="" onclick="irAResultadosGenerales()"><span class="mini-icon">▥</span>Resultados</button><button class="active" onclick="irAAuditoriaPublica()"><span class="mini-icon">◎</span>Auditoría</button></nav></div>
 
@@ -1622,6 +1654,7 @@ var PASSKEY_ESTADO_ACTUAL=null;
 var PASSKEY_VERIFICACION_TEMPORAL=null;
 var HISTORIAL_ADMIN_VERIFICACION=null;
 var HISTORIAL_ADMIN_DATOS=[];
+var HISTORIAL_ADMIN_PAGINA=1;
 
 
 /*
@@ -2154,6 +2187,8 @@ async function irAHistorialAdministrativo(){
     var sec=document.getElementById('secHistorialAdmin');
     if(sec)sec.style.display='flex';
 
+    prepararPeriodoHistorialAdmin();
+
     actualizarEstadoHistorialAdmin();
 
     if(historialAdminVerificacionVigente()){
@@ -2162,6 +2197,19 @@ async function irAHistorialAdministrativo(){
         HISTORIAL_ADMIN_DATOS=[];
         renderizarHistorialAdministrativo([]);
     }
+}
+
+function prepararPeriodoHistorialAdmin(){
+    var desde=document.getElementById('filtroHistorialDesde');
+    var hasta=document.getElementById('filtroHistorialHasta');
+    if(!desde||!hasta||desde.value||hasta.value)return;
+    var partes=new Intl.DateTimeFormat('en-US',{
+        timeZone:'America/Argentina/Cordoba',year:'numeric',month:'2-digit',day:'2-digit'
+    }).formatToParts(new Date());
+    var valores={};partes.forEach(function(p){valores[p.type]=p.value});
+    hasta.value=valores.year+'-'+valores.month+'-'+valores.day;
+    var inicio=new Date(Date.parse(hasta.value+'T00:00:00Z')-30*86400000);
+    desde.value=inicio.toISOString().slice(0,10);
 }
 
 async function verificarAccesoHistorialAdmin(){
@@ -2202,7 +2250,7 @@ async function verificarAccesoHistorialAdmin(){
     }
 }
 
-async function cargarHistorialAdministrativo(){
+async function cargarHistorialAdministrativo(pagina){
     if(!ID_SOCIO_ACTIVO||!PADRON_SOCIOS[ID_SOCIO_ACTIVO]){
         alert('Acceso exclusivo de socios activos habilitados.');
         return;
@@ -2218,11 +2266,21 @@ async function cargarHistorialAdministrativo(){
     var entidadEl=document.getElementById('filtroHistorialEntidad');
     var actorEl=document.getElementById('filtroHistorialActor');
     var limiteEl=document.getElementById('filtroHistorialLimite');
+    var rolEl=document.getElementById('filtroHistorialRol');
+    var desdeEl=document.getElementById('filtroHistorialDesde');
+    var hastaEl=document.getElementById('filtroHistorialHasta');
 
     var entidad=entidadEl?entidadEl.value.trim():'';
     var actorTexto=actorEl?actorEl.value.trim():'';
-    var limite=parseInt(limiteEl?limiteEl.value:'100')||100;
+    var limite=parseInt(limiteEl?limiteEl.value:'10')||10;
     var actorFiltro=actorTexto?parseInt(actorTexto):null;
+    var desde=desdeEl?desdeEl.value:'';
+    var hasta=hastaEl?hastaEl.value:'';
+    if(!desde||!hasta){alert('Indicá la fecha inicial y la final.');return}
+    var diasPeriodo=(Date.parse(hasta+'T00:00:00Z')-Date.parse(desde+'T00:00:00Z'))/86400000;
+    if(!Number.isFinite(diasPeriodo)||diasPeriodo<0){alert('La fecha inicial debe ser anterior o igual a la final.');return}
+    if(diasPeriodo>30){alert('El período máximo es de 31 días. Acortá las fechas para consultar el historial.');return}
+    var paginaSolicitada=Number.isInteger(pagina)&&pagina>0?pagina:1;
 
     var estado=document.getElementById('estadoHistorialAdmin');
     if(estado){
@@ -2235,17 +2293,41 @@ async function cargarHistorialAdministrativo(){
             accion:'historial_administrativo',
             verification_id:HISTORIAL_ADMIN_VERIFICACION.verificationId,
             limite:limite,
+            pagina:paginaSolicitada,
             actor_filtro:Number.isFinite(actorFiltro)?actorFiltro:null,
-            entidad:entidad||null
+            entidad:entidad||null,
+            rol:rolEl?rolEl.value:null,
+            desde:desde||null,
+            hasta:hasta||null
         },obtenerTokenSesionClub());
 
         HISTORIAL_ADMIN_DATOS=Array.isArray(r.eventos)?r.eventos:[];
+        HISTORIAL_ADMIN_PAGINA=Number(r.pagina)||paginaSolicitada;
         renderizarHistorialAdministrativo(HISTORIAL_ADMIN_DATOS);
+        var totalFiltrado=Number(r.total_filtrado)||0;
+        var paginas=Math.max(1,Number(r.paginas)||1);
+        var paginacion=document.getElementById('paginacionHistorialAdmin');
+        if(paginacion)paginacion.style.display=totalFiltrado>0?'flex':'none';
+        var info=document.getElementById('historialPaginaInfo');
+        if(info)info.innerText='Página '+HISTORIAL_ADMIN_PAGINA.toLocaleString('es-AR')+' de '+paginas.toLocaleString('es-AR')+' · '+totalFiltrado.toLocaleString('es-AR')+' movimientos coincidentes';
+        var anterior=document.getElementById('historialAnterior');
+        var siguiente=document.getElementById('historialSiguiente');
+        if(anterior)anterior.disabled=HISTORIAL_ADMIN_PAGINA<=1;
+        if(siguiente)siguiente.disabled=HISTORIAL_ADMIN_PAGINA>=paginas;
+        var origen=document.getElementById('origenHistorialAdmin');
+        if(origen){
+            var primero=r.primer_evento_global;
+            origen.style.display='block';
+            origen.innerHTML='<div class="card-title">Inicio del historial con hash</div>'+
+              (primero?'<p class="card-note">Primer movimiento registrado: #'+escaparHtmlHistorial(primero.id)+' · '+escaparHtmlHistorial(formatoFechaHistorial(primero.fecha))+' · '+escaparHtmlHistorial(nombreAccionHistorial(primero))+'</p>'+
+              '<p class="card-note" style="overflow-wrap:anywhere">Comprobante criptográfico: '+escaparHtmlHistorial(primero.hash_inicio||'-')+'</p>':'<p class="card-note">No hay movimientos registrados.</p>')+
+              '<p class="card-note">Total histórico: '+Number(r.total_eventos_global||0).toLocaleString('es-AR')+' movimientos. Los filtros y las páginas permiten consultar todo el registro.</p>';
+        }
 
         estado=document.getElementById('estadoHistorialAdmin');
         if(estado){
             estado.className='admin-history-status ok';
-            estado.innerHTML='<strong>✓ Historial consultado correctamente.</strong> '+HISTORIAL_ADMIN_DATOS.length.toLocaleString('es-AR')+' evento(s) recuperados.';
+            estado.innerHTML='<strong>✓ Historial consultado correctamente.</strong> '+HISTORIAL_ADMIN_DATOS.length.toLocaleString('es-AR')+' eventos en esta página.';
         }
 
     }catch(e){
@@ -2327,6 +2409,7 @@ function nombreAccionHistorial(ev){
       DESCARTAR_BORRADOR_GOBERNANZA:'Se descartó un borrador de gobernanza',
       CREAR_REVERSION_GOBERNANZA_CON_PERFILES:'Se creó una reversión de gobernanza',
       ENCUESTA_CREADA:'Se creó una encuesta',
+      ENCUESTA_ELIMINADA_BORRADOR:'Se eliminó una encuesta en borrador',
       ENCUESTA_MODIFICADA:'Se modificó una encuesta',
       ENCUESTA_ESTADO_MODIFICADO:'Cambió el estado de una encuesta',
       ENCUESTA_TITULO_MODIFICADO:'Cambió el título de una encuesta',
@@ -2480,6 +2563,10 @@ function resumenEventoHistorial(ev){
         var aperturaNueva=nuevos.fecha_apertura;
         var cierreAnterior=anteriores.fecha_cierre;
         var cierreNuevo=nuevos.fecha_cierre;
+
+        if(accion==='ENCUESTA_ELIMINADA_BORRADOR'){
+            return 'Se eliminó la encuesta en borrador “'+escaparHtmlHistorial(tituloNuevo)+'”. Motivo: '+escaparHtmlHistorial(nuevos.motivo_eliminacion||contexto.motivo_eliminacion||'-')+'.';
+        }
 
         if(accion==='ENCUESTA_CREADA'){
             var periodoCreada=[];
@@ -3681,7 +3768,33 @@ actualizarCantidadAdministradores();
 }
 
 function inicializarCicloEncuestas(){var cmb=document.getElementById('cmbCicloEncuesta');cmb.innerHTML='';Object.keys(baseEncuestas).forEach(function(k){var o=document.createElement('option');o.value=k;o.text=baseEncuestas[k].titulo;cmb.appendChild(o)});cargarCicloEncuesta()}
-function cargarCicloEncuesta(){var key=document.getElementById('cmbCicloEncuesta').value,e=baseEncuestas[key];if(!e)return;document.getElementById('cmbEstadoEncuesta').value=e.estado||'abierta';document.getElementById('fechaAperturaEncuesta').value=fechaParaInputClub(e.fechaApertura);document.getElementById('fechaCierreEncuesta').value=fechaParaInputClub(e.fechaCierre);document.getElementById('lblEstadoEfectivo').innerHTML='<span class="status-badge">'+etiquetaEstado(key)+'</span>'}
+function actualizarEliminacionEncuesta(){
+    var key=document.getElementById('cmbCicloEncuesta').value,e=baseEncuestas[key];
+    var motivo=document.getElementById('motivoEliminarEncuesta').value;
+    var btn=document.getElementById('btnEliminarEncuesta');
+    if(btn)btn.disabled=!(ROL_ACTIVO==='admin'&&e&&e.supabaseId&&e.estado==='borrador'&&motivo);
+}
+function cargarCicloEncuesta(){var key=document.getElementById('cmbCicloEncuesta').value,e=baseEncuestas[key];if(!e){actualizarEliminacionEncuesta();return}document.getElementById('cmbEstadoEncuesta').value=e.estado||'abierta';document.getElementById('fechaAperturaEncuesta').value=fechaParaInputClub(e.fechaApertura);document.getElementById('fechaCierreEncuesta').value=fechaParaInputClub(e.fechaCierre);document.getElementById('lblEstadoEfectivo').innerHTML='<span class="status-badge">'+etiquetaEstado(key)+'</span>';document.getElementById('motivoEliminarEncuesta').value='';actualizarEliminacionEncuesta()}
+async function eliminarEncuestaBorrador(){
+    var key=document.getElementById('cmbCicloEncuesta').value,e=baseEncuestas[key];
+    var motivo=document.getElementById('motivoEliminarEncuesta').value;
+    if(ROL_ACTIVO!=='admin'||!e||!e.supabaseId||e.estado!=='borrador')return;
+    if(!['Encuesta Duplicada','Encuesta Erronea'].includes(motivo)){alert('Seleccioná un motivo de eliminación.');return}
+    if(!confirm('¿Eliminar la encuesta “'+e.titulo+'” por el motivo “'+motivo+'”? Esta acción quedará registrada.'))return;
+    var btn=document.getElementById('btnEliminarEncuesta');
+    btn.disabled=true;
+    try{
+        await llamarClubAbiertoApi({accion:'eliminar_encuesta_borrador',encuesta_id:Number(e.supabaseId),motivo:motivo},obtenerTokenSesionClub());
+        await cargarEstadoInicialAutenticado();
+        inicializarCicloEncuestas();
+        inicializarSelectorReset();
+        alert('✓ Encuesta eliminada. El motivo quedó en el historial administrativo.');
+    }catch(err){
+        console.error(err);
+        alert('No se pudo eliminar la encuesta: '+(err.message||String(err)));
+        try{await cargarEstadoInicialAutenticado();inicializarCicloEncuestas()}catch(_){actualizarEliminacionEncuesta()}
+    }
+}
 async function guardarCicloEncuesta(){if(ROL_ACTIVO!=='admin'){alert('Sólo un administrador puede modificar el ciclo de vida.');return}var key=document.getElementById('cmbCicloEncuesta').value,e=baseEncuestas[key];if(!e)return;var estado=document.getElementById('cmbEstadoEncuesta').value,apInput=document.getElementById('fechaAperturaEncuesta').value,ciInput=document.getElementById('fechaCierreEncuesta').value;var ap=apInput?fechaClubAISOString(apInput):null,ci=ciInput?fechaClubAISOString(ciInput):null;if(apInput&&!ap){alert('La fecha de apertura no es válida.');return}if(ciInput&&!ci){alert('La fecha de cierre no es válida.');return}if(ap&&ci&&new Date(ci)<=new Date(ap)){alert('La fecha de cierre debe ser posterior a la fecha de apertura.');return}e.estado=estado;e.fechaApertura=ap||'';e.fechaCierre=ci||'';try{await guardarEncuestaSupabase(key);cargarCicloEncuesta();inicializarSelectorReset();alert('✓ Ciclo de vida guardado en horario oficial de Argentina.')}catch(err){console.error(err);alert('No se pudo guardar el ciclo de vida en Supabase.')}}
 
 function inicializarSelectorVotaciones(){
