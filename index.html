@@ -29,6 +29,23 @@
 .admin-history-empty{border:1px dashed #c7d1db;border-radius:10px;padding:24px;text-align:center;color:#64748b;background:#fafcfd}
 .admin-history-toggle{border:1px solid var(--line);background:#fff;color:var(--navy);border-radius:7px;padding:8px 10px;font:700 12px Inter;cursor:pointer}
 .admin-history-toggle:hover{background:var(--soft)}
+.admin-history-mobile-trigger,.admin-history-mobile-back,.admin-history-mobile-detail-title{display:none}
+@media(max-width:700px){
+  .admin-history-head{display:none}
+  .admin-history-mobile-trigger{display:block;width:100%;border:0;background:#fff;color:var(--navy);text-align:left;padding:15px 16px;cursor:pointer;font:inherit}
+  .admin-history-mobile-trigger[role="group"]{cursor:default}
+  .admin-history-mobile-trigger:focus-visible,.admin-history-mobile-back:focus-visible{outline:3px solid #0b87c3;outline-offset:-3px}
+  .admin-history-mobile-id{display:block;color:#64748b;font:600 11px 'JetBrains Mono',monospace;letter-spacing:.02em}
+  .admin-history-mobile-date{display:block;color:#475569;font-size:12px;margin:3px 0 9px}
+  .admin-history-mobile-title{display:block;color:var(--navy);font-size:15px;line-height:1.3;font-weight:800;overflow-wrap:anywhere}
+  .admin-history-mobile-summary{display:block;color:#475569;font-size:13px;line-height:1.45;max-height:2.9em;overflow:hidden;margin-top:5px;overflow-wrap:anywhere}
+  .admin-history-mobile-actor{display:block;color:#526579;font-size:12px;line-height:1.4;margin-top:10px;overflow-wrap:anywhere}
+  .admin-history-mobile-more{display:block;color:#075d91;font-size:12px;font-weight:800;margin-top:8px}
+  .admin-history-card.mobile-detail-open .admin-history-mobile-trigger{display:none}
+  .admin-history-card.mobile-detail-open .admin-history-detail{border-top:0;padding:16px;overflow-wrap:anywhere}
+  .admin-history-mobile-back{display:inline-flex;align-items:center;margin-bottom:15px;border:0;background:#eaf3f8;color:var(--navy);border-radius:7px;padding:9px 12px;font:800 13px Inter,sans-serif;cursor:pointer}
+  .admin-history-mobile-detail-title{display:block;color:var(--navy);font-size:15px;line-height:1.35;margin:0 0 13px}
+}
 .audit-grid{display:grid;grid-template-columns:120px 1fr 140px 190px;gap:14px;align-items:center;font-size:13px}.audit-grid strong{color:var(--navy)}.admin-permission-row{display:flex;justify-content:space-between;align-items:center;gap:12px;border:1px solid var(--line);border-radius:9px;padding:13px;margin-bottom:8px;background:#fff}.admin-permission-name{font-weight:800;color:var(--navy)}.admin-permission-id{font:500 12px 'JetBrains Mono';color:#64748b;margin-top:3px}.btn-remove-admin{background:var(--red);color:#fff;border:0;padding:9px 11px;font-weight:700;border-radius:7px;cursor:pointer}.btn-remove-admin:disabled{opacity:.4}.maquetacion-box{border:1px solid #f3c6c1;background:#fff8f7;padding:18px;border-radius:12px;margin-top:18px}.maquetacion-title{color:var(--red);font:800 12px 'JetBrains Mono';text-transform:uppercase;margin-bottom:8px}.maquetacion-description{color:#6f5b59;font-size:13px;line-height:1.55;margin-bottom:12px}
 .gov-status{border:1px solid var(--line);border-radius:10px;padding:14px;background:#f8fafc;margin-bottom:16px;font-size:13px;line-height:1.55}.gov-status.ok{border-color:#b7e7cd;background:var(--green-bg);color:#166534}.gov-status.error{border-color:#f3c6c1;background:#fff8f7;color:#991b1b}.gov-version{border:1px solid var(--line);border-radius:12px;background:#fff;padding:17px;margin-bottom:12px}.gov-version.active{border-left:5px solid var(--green)}.gov-version.draft{border-left:5px solid #d99a21}.gov-version.discarded{border-left:5px solid #94a3b8;background:#f8fafc;opacity:.82}.gov-version-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}.gov-version-title{font-weight:800;color:var(--navy);font-size:17px}.gov-version-meta{font:500 11px/1.6 'JetBrains Mono';color:#64748b;margin-top:5px}.gov-badge{display:inline-block;border-radius:999px;padding:6px 10px;background:var(--soft);color:var(--navy);font:800 11px 'JetBrains Mono';text-transform:uppercase}.gov-badge.vigente{background:var(--green-bg);color:#166534}.gov-badge.borrador{background:#fff8e8;color:#7a4b00}.gov-badge.descartada{background:#e2e8f0;color:#475569}.gov-levels{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:14px}.gov-level{border:1px solid var(--line);border-radius:8px;padding:10px;background:#fafcfd}.gov-level strong{display:block;color:var(--navy);font-size:12px}.gov-level span{display:block;color:#64748b;font-size:11px;margin-top:4px}.gov-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.gov-json{min-height:190px;resize:vertical;font:500 12px/1.5 'JetBrains Mono'}.gov-danger{border:1px solid #f3c6c1;background:#fff8f7;border-radius:10px;padding:14px;margin-top:14px;color:#6f3131;font-size:13px;line-height:1.5}.gov-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
 .gov-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 16px;padding:5px;background:#eef3f7;border:1px solid var(--line);border-radius:11px}.gov-tab{flex:1;min-width:180px;border:0;border-radius:8px;padding:12px 15px;background:transparent;color:#536170;font:800 14px Inter;cursor:pointer}.gov-tab.active{background:#fff;color:var(--navy);box-shadow:0 3px 12px rgba(2,23,57,.1)}.gov-tab-panel{display:none}.gov-tab-panel.active{display:block}.gov-editor-title{font-size:16px;font-weight:800;color:var(--navy);margin:4px 0 5px}.gov-editor-note{font-size:13px;color:#64748b;line-height:1.5;margin-bottom:14px}.gov-control-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.gov-control{border:1px solid var(--line);background:#fafcfd;border-radius:10px;padding:13px}.gov-control .wf-input{margin-bottom:0}.gov-summary{border:1px solid #b9d7e8;background:#f2faff;border-radius:10px;padding:13px;color:#234d67;font-size:13px;line-height:1.55;margin:14px 0}.gov-accordion{border:1px solid var(--line);border-radius:10px;background:#fff;margin-bottom:10px;overflow:hidden}.gov-accordion summary{cursor:pointer;padding:15px 16px;font-weight:800;color:var(--navy);list-style:none;display:flex;justify-content:space-between;gap:12px}.gov-accordion summary::-webkit-details-marker{display:none}.gov-accordion summary:after{content:'⌄';color:#60758b}.gov-accordion[open] summary{border-bottom:1px solid var(--line);background:#f8fafc}.gov-accordion-body{padding:15px}.gov-permissions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:10px}.gov-check{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--line);border-radius:8px;padding:10px;background:#fafcfd;font-size:13px;color:#344454}.gov-check input{margin-top:2px;accent-color:var(--navy2)}.gov-special-card{border:1px solid var(--line);border-radius:11px;padding:15px;background:#fff;margin-bottom:10px}.gov-special-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.gov-special-name{font-weight:800;color:var(--navy)}.gov-special-code{font:500 10px 'JetBrains Mono';color:#64748b;margin-top:4px;word-break:break-all}.gov-empty-editor{border:1px dashed #b9c8d5;border-radius:10px;padding:18px;background:#fafcfd;color:#64748b;font-size:13px;text-align:center}.gov-readonly{opacity:.7;pointer-events:none}
@@ -2687,7 +2704,17 @@ function resumenEventoHistorial(ev){
 
 function toggleDetalleHistorial(id){
     var el=document.getElementById('detalleHistorial_'+id);
-    if(el)el.classList.toggle('open');
+    if(!el)return;
+    var abierto=el.classList.toggle('open');
+    var tarjeta=el.closest('.admin-history-card');
+    if(tarjeta){
+        tarjeta.classList.toggle('mobile-detail-open',abierto);
+        var disparador=tarjeta.querySelector('.admin-history-mobile-trigger');
+        if(disparador){
+            disparador.setAttribute('aria-expanded',abierto?'true':'false');
+            if(!abierto&&window.matchMedia('(max-width:700px)').matches)disparador.focus();
+        }
+    }
 }
 
 function renderizarHistorialAdministrativo(datos){
@@ -2723,10 +2750,19 @@ function renderizarHistorialAdministrativo(datos){
         var actorTxt=etiquetaActorHistorial(ev);
         var accionTxt=nombreAccionHistorial(ev);
         var resumenTxt=resumenEventoHistorial(ev);
+        var resumenBreve=resumenTxt.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
         var sensible=esEventoCredencialSensible(ev);
 
         return ''+
         '<article class="admin-history-card">'+
+          (sensible?'<div class="admin-history-mobile-trigger" role="group">':'<button type="button" class="admin-history-mobile-trigger" aria-label="Ver detalle del movimiento '+id+'" aria-controls="detalleHistorial_'+id+'" aria-expanded="false" onclick="toggleDetalleHistorial('+id+')">')+
+            '<span class="admin-history-mobile-id">Movimiento #'+id+'</span>'+
+            '<span class="admin-history-mobile-date">'+escaparHtmlHistorial(formatoFechaHistorial(ev.fecha))+'</span>'+
+            '<span class="admin-history-mobile-title">'+escaparHtmlHistorial(accionTxt)+'</span>'+
+            '<span class="admin-history-mobile-summary">'+resumenBreve+'</span>'+
+            '<span class="admin-history-mobile-actor">Realizado por '+escaparHtmlHistorial(actorTxt)+' · '+escaparHtmlHistorial((ev.actor_rol||'').replace(/_/g,' '))+'</span>'+
+            (sensible?'':'<span class="admin-history-mobile-more">Ver detalle →</span>')+
+          (sensible?'</div>':'</button>')+
           '<div class="admin-history-head" style="grid-template-columns:170px 1.5fr 220px '+(sensible?'0px':'120px')+'">'+
             '<div>'+
               '<div class="admin-history-meta">Movimiento #'+id+'</div>'+
@@ -2745,6 +2781,8 @@ function renderizarHistorialAdministrativo(datos){
             (sensible?'':'<div><button class="admin-history-toggle" onclick="toggleDetalleHistorial('+id+')">Ver detalle</button></div>')+
           '</div>'+
           (sensible?'':'<div id="detalleHistorial_'+id+'" class="admin-history-detail">'+
+            '<button type="button" class="admin-history-mobile-back" onclick="toggleDetalleHistorial('+id+')">← Volver al historial</button>'+
+            '<div class="admin-history-mobile-detail-title"><span class="admin-history-mobile-id">Movimiento #'+id+'</span>'+escaparHtmlHistorial(accionTxt)+'</div>'+
             '<div style="display:grid;gap:12px;font-size:14px;line-height:1.55">'+
               '<div><strong>Detalle del movimiento</strong><div style="margin-top:6px">'+resumenTxt+'</div></div>'+
               '<div><strong>Realizado por</strong><div style="margin-top:4px">'+escaparHtmlHistorial(actorTxt)+'</div></div>'+
