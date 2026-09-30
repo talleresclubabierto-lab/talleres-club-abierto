@@ -1,0 +1,12 @@
+{
+  "name": "club-abierto-blockchain",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "compile": "node scripts/compile-contract.mjs"
+  },
+  "dependencies": {
+    "solc": "^0.8.30"
+  }
+}
