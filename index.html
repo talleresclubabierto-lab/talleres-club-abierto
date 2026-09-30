@@ -4034,7 +4034,7 @@ ids.forEach(function(id){
     if(!d)return;
     var reg=registroVotosEmitidos[id+'_'+key];
     if(!reg)return;
-    var opcion='Voto histórico — alternativa no recuperable',pts=d.puntos,fecha='Sin fecha registrada';
+    var opcion='Voto histórico — alternativa no recuperable',pts=d.puntos,fecha='Sin fecha registrada',fechaTs=null;
     if(typeof reg==='object'&&reg!==null){
         var oi=Number(reg.opcion);
         if(Number.isInteger(oi)&&e.opts[oi]!==undefined)opcion=e.opts[oi];
@@ -4042,10 +4042,13 @@ ids.forEach(function(id){
         if(!isNaN(pr))pts=pr;
         if(reg.fecha){
             var fd=new Date(reg.fecha);
-            if(!isNaN(fd.getTime()))fecha=formatoFechaHora24Global(fd);
+            if(!isNaN(fd.getTime())){
+                fecha=formatoFechaHora24Global(fd);
+                fechaTs=fd.getTime();
+            }
         }
     }
-    rows.push({id:id,nombre:d.nombre,opcion:opcion,puntos:pts,fecha:fecha});
+    rows.push({id:id,nombre:d.nombre,opcion:opcion,puntos:pts,fecha:fecha,fechaTs:fechaTs});
 });
 var resumen=obtenerResumenExactoEncuesta(key);
 res.innerHTML='<span class="txt-info-red">'+e.titulo+'</span><div style="margin-top:8px"><strong>'+resumen.votantesEmitidos.toLocaleString('es-AR')+'</strong> votantes reales · <strong>'+resumen.puntosEmitidos.toLocaleString('es-AR')+' PTS</strong> ponderados emitidos · Estado <strong>'+etiquetaEstado(key)+'</strong></div>';
@@ -4054,7 +4057,16 @@ if(!rows.length){
     lista.innerHTML='<div class="wf-box">No hay votos que coincidan con la búsqueda.</div>';
     return;
 }
-rows.sort(function(a,b){return a.id-b.id});
+rows.sort(function(a,b){
+    var aTieneFecha=Number.isFinite(a.fechaTs),bTieneFecha=Number.isFinite(b.fechaTs);
+    if(aTieneFecha&&bTieneFecha){
+        if(b.fechaTs!==a.fechaTs)return b.fechaTs-a.fechaTs;
+        return a.id-b.id;
+    }
+    if(aTieneFecha)return -1;
+    if(bTieneFecha)return 1;
+    return a.id-b.id;
+});
 rows.forEach(function(r){
     var d=document.createElement('div');
     d.className='audit-row';
