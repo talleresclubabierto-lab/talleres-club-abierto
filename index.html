@@ -4182,7 +4182,7 @@ navigator.serviceWorker.register('./service-worker.js').catch(function(e){consol
         if(bal===0n) throw new Error("La wallet figura con 0 POL en Amoy.");
         const data=BYTECODE+EXPECTED.slice(2).padStart(64,"0");
         set("Todo preparado. MetaMask va a pedirte confirmar el despliegue del contrato.\n\nVos sólo tenés que confirmar esa transacción.","#ffd580");
-        const tx=await ethereum.request({method:"eth_sendTransaction",params:[{from:account,data,gasPrice:"0x5d21dba00"}]});
+        const tx=await ethereum.request({method:"eth_sendTransaction",params:[{from:account,data,gasPrice:"0x6fc23ac00"}]});
         localStorage.setItem(KEY,tx);
         set("Transacción enviada. Esperando confirmación en Amoy...\n"+tx,"#ffd580");
         const r=await receipt(tx);
