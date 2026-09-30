@@ -1,0 +1,29 @@
+name: Compile blockchain contract
+
+on:
+  push:
+    paths:
+      - "blockchain/contracts/**"
+      - "blockchain/scripts/**"
+      - "blockchain/package.json"
+      - ".github/workflows/blockchain-compile.yml"
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: blockchain
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: blockchain/package.json
+      - run: npm install
+      - run: npm run compile
+      - uses: actions/upload-artifact@v4
+        with:
+          name: club-abierto-anchor-artifact
+          path: blockchain/artifacts/ClubAbiertoAnchor.json
