@@ -480,6 +480,7 @@ body{
       <button class="btn-action-red" onclick="irAParedesDeCristal()"><span class="action-icon">▦</span>Paredes de Cristal<br><small style="font-weight:500;color:#64748b">Balance y auditoría económica ponderada</small></button>
       <button class="btn-action-red" onclick="irATuHistoria()"><span class="action-icon">✓</span>Tu historia con Talleres<br><small style="font-weight:500;color:#64748b">Partidos, asistencia y horarios de ingreso</small></button>
       <button class="btn-action-red" onclick="irAHistorialAdministrativo()"><span class="action-icon">▤</span>Historial de cambios<br><small style="font-weight:500;color:#64748b">Consultá el registro protegido de cambios</small></button>
+      <button class="btn-action-red" onclick="irAIntegracionBlockchain()"><span class="action-icon">⬡</span>Integración blockchain<br><small style="font-weight:500;color:#64748b">Estado, lotes y trazabilidad criptográfica</small></button>
       <button class="btn-action-red" onclick="irACambioClave()"><span class="action-icon">⌨</span>Cambiar contraseña<br><small style="font-weight:500;color:#64748b">Administrá tu clave personal</small></button>
       <button class="btn-action-red" onclick="irAPasskey()"><span class="action-icon">◎</span>Identidad biométrica / Passkey<br><small style="font-weight:500;color:#64748b">Registrá huella, Face ID o Windows Hello</small></button>
     </div>
@@ -510,6 +511,7 @@ body{
       <button class="btn-action-red" onclick="irAAuditoriaPublica()"><span class="action-icon">◎</span>Auditoría pública</button>
       <button class="btn-action-red" onclick="irAParedesDeCristal()"><span class="action-icon">▦</span>Paredes de Cristal<br><small style="font-weight:500;color:#64748b">Balance y auditoría económica ponderada</small></button>
       <button class="btn-action-red" onclick="irAHistorialAdministrativo()"><span class="action-icon">▤</span>Historial de cambios<br><small style="font-weight:500;color:#64748b">Auditoría administrativa protegida</small></button>
+      <button class="btn-action-red" onclick="irAIntegracionBlockchain()"><span class="action-icon">⬡</span>Integración blockchain<br><small style="font-weight:500;color:#64748b">Estado operativo, lotes y anclajes</small></button>
       <button class="btn-action-red" onclick="irAGobernanzaInstitucional()"><span class="action-icon">⚖</span>Gobernanza institucional<br><small style="font-weight:500;color:#64748b">Reglas versionadas, activación y reversión</small></button>
       <button id="btnGestionAdministradores" class="btn-action-red" style="display:none" onclick="mostrarSeccionAdmin('secGestionAdmins')"><span class="action-icon">♙</span>Gestionar administradores</button>
       <button class="btn-action-red" onclick="mostrarSeccionAdmin('secGestionPadron')"><span class="action-icon">☷</span>Gestionar padrón</button>
@@ -518,6 +520,57 @@ body{
     </div>
     <div class="maquetacion-box"><div class="maquetacion-title">Herramientas temporales de maquetación</div><div class="maquetacion-description">Permiten reiniciar votos durante pruebas. Estas acciones no forman parte del modelo definitivo de gobernanza blockchain.</div><select id="cmbResetEncuesta" class="wf-input"></select><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="reset-button" onclick="resetearEncuestaSeleccionada()">Resetear encuesta seleccionada</button><button class="reset-button" onclick="resetearTodasLasEncuestas()">Resetear todas</button></div></div>
   </main><nav class="bottom-nav"><button class="active" onclick="regresarAlPanelInterno()"><span class="mini-icon">▦</span>Dashboard</button><button class="" onclick="irAResultadosGenerales()"><span class="mini-icon">◇</span>Votar</button><button class="" onclick="irAResultadosGenerales()"><span class="mini-icon">▥</span>Resultados</button><button class="" onclick="irAAuditoriaPublica()"><span class="mini-icon">◎</span>Auditoría</button></nav>
+</div>
+
+
+<div id="secBlockchainIntegracion" class="sub-view full-width">
+  <div class="topbar"><div class="brand"><span class="app-logo-mark" role="img" aria-label="Escudo Talleres Club Abierto"></span><span class="brand-role-label">TALLERES CLUB ABIERTO</span></div><div class="top-actions"><span class="navlink"><span class="network-dot"></span>Integración blockchain</span><button onclick="volverAlLogin()">Salir</button></div></div>
+  <main class="section-shell">
+    <div class="dashboard-header"><div class="wf-box">Integración blockchain</div><button class="wf-button" onclick="regresarAlPanelInterno()">Volver</button></div>
+    <div class="page-head">
+      <div><div class="eyebrow">Integridad y anclaje externo</div><h1 class="page-title">Estado de integración blockchain</h1><p class="page-sub">Los registros, hashes y lotes criptográficos se conservan aunque el envío a Polygon no esté activo.</p></div>
+      <span id="blockchainEstadoChip" class="status-chip">● Cargando estado...</span>
+    </div>
+
+    <section class="card">
+      <div class="card-title">Estado institucional</div>
+      <div id="blockchainEstadoTitulo" class="metric-value" style="font-size:22px;margin-top:10px">-</div>
+      <p id="blockchainEstadoDescripcion" class="card-note" style="margin-top:10px">Cargando...</p>
+      <div class="metrics-grid" style="margin-top:18px">
+        <div class="card"><div class="metric-label">Movimientos históricos</div><div id="blockchainTotalMovimientos" class="metric-value">-</div></div>
+        <div class="card"><div class="metric-label">Pendientes de lote</div><div id="blockchainPendientes" class="metric-value">-</div></div>
+        <div class="card"><div class="metric-label">Lotes preparados</div><div id="blockchainLotesPreparados" class="metric-value">-</div></div>
+        <div class="card"><div class="metric-label">Lotes anclados</div><div id="blockchainLotesAnclados" class="metric-value">-</div></div>
+      </div>
+      <div style="margin-top:16px" class="card-note">
+        <div><strong>Red:</strong> <span id="blockchainRed">-</span></div>
+        <div><strong>Chain ID:</strong> <span id="blockchainChainId">-</span></div>
+        <div><strong>Contrato:</strong> <span id="blockchainContrato" class="mono">-</span></div>
+        <div><strong>Desde:</strong> <span id="blockchainEstadoDesde">-</span></div>
+        <div><strong>Motivo:</strong> <span id="blockchainMotivo">-</span></div>
+      </div>
+    </section>
+
+    <section id="blockchainControlPrincipal" class="card" style="display:none">
+      <div class="card-title">Control del administrador principal</div>
+      <p class="card-note">Cambiar el estado no elimina ni reescribe movimientos. Al activar por primera vez, todo historial pendiente se prepara en lotes según la política vigente antes de comenzar los envíos blockchain.</p>
+      <label class="form-label">Nuevo estado</label>
+      <select id="blockchainNuevoEstado" class="wf-input">
+        <option value="estructurada_no_activada">Integración blockchain estructurada pero no activada</option>
+        <option value="activa">Integración blockchain activada</option>
+        <option value="desactivada">Integración blockchain desactivada</option>
+      </select>
+      <label class="form-label" style="margin-top:12px">Motivo del cambio</label>
+      <textarea id="blockchainMotivoCambio" class="wf-input" rows="3" placeholder="Motivo institucional del cambio de estado"></textarea>
+      <div class="gov-actions" style="margin-top:14px"><button class="wf-button" onclick="cambiarEstadoIntegracionBlockchain()">Aplicar cambio de estado</button></div>
+    </section>
+
+    <section class="card">
+      <div class="card-title">Conservación histórica</div>
+      <p class="card-note">Mientras la integración no esté activa, cada operación continúa registrándose con su hash y trazabilidad. Cuando se active, los movimientos históricos aún no cubiertos se incorporarán en lotes de la cantidad definida por la política vigente, sin perder registros intermedios.</p>
+    </section>
+  </main>
+  <nav class="bottom-nav"><button class="active" onclick="regresarAlPanelInterno()"><span class="mini-icon">▦</span>Dashboard</button><button onclick="irAHistorialAdministrativo()"><span class="mini-icon">▤</span>Historial</button><button onclick="irAAuditoriaPublica()"><span class="mini-icon">◎</span>Auditoría</button></nav>
 </div>
 
 
@@ -3487,6 +3540,72 @@ var panel=document.getElementById('detallePartidasBalance');
 if(panel)panel.style.display='none';
 }
 function regresarAlPanelInterno(){ocultarTodo();document.getElementById(ROL_ACTIVO==='socio'?'socioDashboard':'adminDashboard').style.display='flex'}
+
+function etiquetaEstadoBlockchain(estado){
+    if(estado==='activa')return 'Integración blockchain activada';
+    if(estado==='desactivada')return 'Integración blockchain desactivada';
+    return 'Integración blockchain estructurada pero no activada';
+}
+
+function descripcionEstadoBlockchain(estado){
+    if(estado==='activa')return 'Los lotes criptográficos están habilitados para su anclaje en Polygon según la política vigente.';
+    if(estado==='desactivada')return 'La integración existe, pero el envío de nuevos anclajes blockchain fue desactivado deliberadamente. El historial, hashes y lotes continúan conservándose.';
+    return 'La infraestructura blockchain está construida y configurada, pero los anclajes reales todavía no están activados. El historial continúa generando hashes y trazabilidad sin costo de gas.';
+}
+
+async function cargarEstadoIntegracionBlockchain(){
+    var token=obtenerTokenSesionClub();
+    if(!token)throw new Error('Sesión segura requerida');
+    var data=await llamarClubAbiertoApi({accion:'estado_integracion_blockchain'},token);
+    var b=data&&data.blockchain?data.blockchain:{};
+    var estado=String(b.estado_integracion||'estructurada_no_activada');
+    var titulo=etiquetaEstadoBlockchain(estado);
+    var el=document.getElementById('blockchainEstadoTitulo');if(el)el.innerText=titulo;
+    el=document.getElementById('blockchainEstadoDescripcion');if(el)el.innerText=descripcionEstadoBlockchain(estado);
+    el=document.getElementById('blockchainEstadoChip');if(el)el.innerText='● '+titulo;
+    el=document.getElementById('blockchainTotalMovimientos');if(el)el.innerText=Number(b.total_movimientos_auditoria||0).toLocaleString('es-AR');
+    el=document.getElementById('blockchainPendientes');if(el)el.innerText=Number(b.movimientos_pendientes_de_lote||0).toLocaleString('es-AR');
+    el=document.getElementById('blockchainLotesPreparados');if(el)el.innerText=Number(b.lotes_preparados||0).toLocaleString('es-AR');
+    el=document.getElementById('blockchainLotesAnclados');if(el)el.innerText=Number(b.lotes_anclados||0).toLocaleString('es-AR');
+    el=document.getElementById('blockchainRed');if(el)el.innerText=b.red||'-';
+    el=document.getElementById('blockchainChainId');if(el)el.innerText=b.chain_id||'-';
+    el=document.getElementById('blockchainContrato');if(el)el.innerText=b.contrato||'-';
+    el=document.getElementById('blockchainMotivo');if(el)el.innerText=b.motivo||'-';
+    el=document.getElementById('blockchainEstadoDesde');if(el)el.innerText=b.estado_desde?formatearFechaHoraHistorial(b.estado_desde):'-';
+    el=document.getElementById('blockchainControlPrincipal');
+    if(el)el.style.display=b.es_principal===true?'block':'none';
+    var sel=document.getElementById('blockchainNuevoEstado');if(sel)sel.value=estado;
+    return b;
+}
+
+async function irAIntegracionBlockchain(){
+    ocultarTodo();
+    var sec=document.getElementById('secBlockchainIntegracion');
+    if(sec)sec.style.display='flex';
+    try{await cargarEstadoIntegracionBlockchain();}
+    catch(e){
+        console.error(e);
+        var d=document.getElementById('blockchainEstadoDescripcion');
+        if(d)d.innerText=e.message||'No pudo cargarse el estado blockchain.';
+    }
+}
+
+async function cambiarEstadoIntegracionBlockchain(){
+    if(ID_SOCIO_ACTIVO!==SUPER_ADMIN_ID){alert('Acción exclusiva del administrador principal.');return;}
+    var estado=document.getElementById('blockchainNuevoEstado').value;
+    var motivo=String(document.getElementById('blockchainMotivoCambio').value||'').trim();
+    if(motivo.length<5){alert('Ingresá un motivo de al menos 5 caracteres.');return;}
+    var etiqueta=etiquetaEstadoBlockchain(estado);
+    var texto='¿Confirmar cambio a “'+etiqueta+'”?';
+    if(estado==='activa')texto+='\n\nAl activarla, los lotes pendientes quedarán preparados para envío a Polygon y los anclajes reales podrán consumir POL.';
+    if(!confirm(texto))return;
+    try{
+        await llamarClubAbiertoApi({accion:'cambiar_estado_integracion_blockchain',estado:estado,motivo:motivo},obtenerTokenSesionClub());
+        document.getElementById('blockchainMotivoCambio').value='';
+        await cargarEstadoIntegracionBlockchain();
+        alert('✓ Estado de integración blockchain actualizado.');
+    }catch(e){console.error(e);alert(e.message||'No pudo modificarse el estado blockchain.');}
+}
 async function volverAlLogin(){
 await cerrarSesionSeguraClub();
 ocultarTodo();
