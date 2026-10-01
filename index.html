@@ -4577,11 +4577,19 @@ navigator.serviceWorker.register('./service-worker.js').catch(function(e){consol
         if(!window.ethereum) throw new Error("No se detectó MetaMask en este navegador.");
         const prev=localStorage.getItem(KEY);
         if(prev){
-          set("Ya existe una transacción de prueba registrada. Verificando confirmación...\n"+prev,"#ffd580");
-          const r=await receipt(prev);
-          if(r.status!=="0x1") throw new Error("La transacción anterior falló.");
-          set("PRUEBA MAINNET CONFIRMADA\n\nTX: "+prev+"\n\nBLOQUE: "+parseInt(r.blockNumber,16)+"\n\nPodés volver al chat.","#7ee787");
-          return;
+          set("Revisando el intento anterior...\n"+prev,"#ffd580");
+          const r=await ethereum.request({method:"eth_getTransactionReceipt",params:[prev]});
+          const t=await ethereum.request({method:"eth_getTransactionByHash",params:[prev]});
+          if(r&&r.status==="0x1"){
+            set("PRUEBA MAINNET CONFIRMADA\n\nTX: "+prev+"\n\nBLOQUE: "+parseInt(r.blockNumber,16)+"\n\nPodés volver al chat.","#7ee787");
+            return;
+          }
+          if(r&&r.status==="0x0") localStorage.removeItem(KEY);
+          else if(!r&&!t) localStorage.removeItem(KEY);
+          else {
+            set("El intento anterior todavía figura pendiente en la red. No se enviará otro para evitar duplicaciones.\n"+prev,"#ffd580");
+            return;
+          }
         }
         const accounts=await ethereum.request({method:"eth_requestAccounts"});
         const account=(accounts[0]||"").toLowerCase();
@@ -4599,15 +4607,10 @@ navigator.serviceWorker.register('./service-worker.js').catch(function(e){consol
         const referenceHash=await ethereum.request({method:"web3_sha3",params:[utf8hex(REFERENCE)]});
         const data="0x"+selector+pad64(referenceHash)+ROOT+pad64("0x"+LEAF_COUNT.toString(16));
         const estimated=BigInt(await ethereum.request({method:"eth_estimateGas",params:[{from:account,to:CONTRACT,data}]}));
-        const gas=((estimated*110n)/100n);
-        const gasPrice=BigInt(await ethereum.request({method:"eth_gasPrice"}));
-        const maxCost=gas*gasPrice;
         const toPol=v=>Number(v)/1e18;
-        set("Prueba lista para enviar.\n\nSaldo: "+toPol(balance).toFixed(6)+" POL\nCosto máximo estimado: "+toPol(maxCost).toFixed(6)+" POL\n\nMetaMask va a pedirte confirmar UNA transacción.","#ffd580");
+        set("Prueba lista para enviar.\n\nSaldo: "+toPol(balance).toFixed(6)+" POL\nGas estimado por la red: "+estimated.toString()+"\n\nMetaMask calculará automáticamente la tarifa y va a pedirte confirmar UNA transacción.","#ffd580");
         const tx=await ethereum.request({method:"eth_sendTransaction",params:[{
-          from:account,to:CONTRACT,data,
-          gas:"0x"+gas.toString(16),
-          gasPrice:"0x"+gasPrice.toString(16)
+          from:account,to:CONTRACT,data
         }]});
         localStorage.setItem(KEY,tx);
         set("Transacción enviada. Esperando confirmación en Polygon Mainnet...\n"+tx,"#ffd580");
