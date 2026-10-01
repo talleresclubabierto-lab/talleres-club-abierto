@@ -4626,10 +4626,17 @@ navigator.serviceWorker.register('./service-worker.js').catch(function(e){consol
         const pendingNonce=BigInt(await ethereum.request({method:"eth_getTransactionCount",params:[account,"pending"]}));
         if(pendingNonce!==latestNonce) throw new Error("Polygon informa una transacción realmente pendiente para esta wallet (nonce latest "+latestNonce+", pending "+pendingNonce+"). No se enviará otra.");
         const estimated=BigInt(await ethereum.request({method:"eth_estimateGas",params:[{from:account,to:CONTRACT,data}]}));
+        const networkGasPrice=BigInt(await ethereum.request({method:"eth_gasPrice"}));
+        const replacementGasPrice=(networkGasPrice*2n);
+        const gasLimit=(estimated*125n)/100n;
+        const maxCost=gasLimit*replacementGasPrice;
         const toPol=v=>Number(v)/1e18;
-        set("DIAGNÓSTICO CORRECTO.\n\nOwner on-chain: "+owner+"\nSimulación anchor(): OK\nNonce: "+latestNonce.toString()+" (sin pendientes)\nSaldo: "+toPol(balance).toFixed(6)+" POL\nGas estimado: "+estimated.toString()+"\n\nMetaMask va a pedirte confirmar UNA transacción.","#7ee787");
+        set("DIAGNÓSTICO CORRECTO.\n\nOwner on-chain: "+owner+"\nSimulación anchor(): OK\nNonce a reemplazar: "+latestNonce.toString()+"\nSaldo: "+toPol(balance).toFixed(6)+" POL\nGas estimado: "+estimated.toString()+"\nTarifa de reemplazo: 2× precio actual de red\nCosto máximo estimado: "+toPol(maxCost).toFixed(6)+" POL\n\nEsta transacción reemplazará el intento atascado con el mismo nonce. MetaMask va a pedirte confirmar UNA transacción.","#7ee787");
         const tx=await ethereum.request({method:"eth_sendTransaction",params:[{
-          from:account,to:CONTRACT,data,nonce:"0x"+latestNonce.toString(16)
+          from:account,to:CONTRACT,data,
+          nonce:"0x"+latestNonce.toString(16),
+          gas:"0x"+gasLimit.toString(16),
+          gasPrice:"0x"+replacementGasPrice.toString(16)
         }]});
         localStorage.setItem(KEY,tx);
         set("Transacción enviada. Esperando confirmación en Polygon Mainnet...\n"+tx,"#ffd580");
