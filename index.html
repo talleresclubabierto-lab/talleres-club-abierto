@@ -4537,6 +4537,95 @@ navigator.serviceWorker.register('./service-worker.js').catch(function(e){consol
   if(document.readyState==="loading") addEventListener("DOMContentLoaded",build,{once:true}); else build();
 })();
 </script>
+
+<!-- CLUB_ABIERTO_MAINNET_CONTROLLED_TEST_V1 -->
+<script>
+(()=>{
+  if(new URLSearchParams(location.search).get("anchor")!=="mainnet-test") return;
+  const EXPECTED="0x7620dA48c9EB3f38E9996Ae92Dc8C867EfBc26d2".toLowerCase();
+  const CHAIN_HEX="0x89";
+  const CONTRACT="0x15e15b7b765600d1b9d8d1027eccf6ac65b23f79";
+  const REFERENCE="club-abierto-mainnet-controlled-test-v1";
+  const ROOT="66d103c369c270cd7419b479f8370d03df395b865b11b360a8fda85bc61297d9";
+  const LEAF_COUNT=1n;
+  const KEY="club_abierto_mainnet_controlled_test_tx_v1";
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const receipt=async tx=>{for(let i=0;i<120;i++){const r=await ethereum.request({method:"eth_getTransactionReceipt",params:[tx]});if(r)return r;await sleep(2500)}throw new Error("La transacción sigue pendiente. Volvé a abrir esta página en unos minutos.")};
+  const utf8hex=s=>"0x"+Array.from(new TextEncoder().encode(s)).map(b=>b.toString(16).padStart(2,"0")).join("");
+  const pad64=h=>h.replace(/^0x/,"").padStart(64,"0");
+  const build=()=>{
+    document.body.innerHTML='<div style="position:fixed;inset:0;background:#071b36;color:#fff;display:flex;align-items:center;justify-content:center;font-family:Inter,Arial,sans-serif;z-index:2147483647;padding:18px">'+
+      '<div style="width:min(820px,96vw);background:#0d2b52;border:1px solid #2b5b8e;border-radius:18px;padding:28px;box-shadow:0 20px 60px #0005">'+
+        '<div style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#9fc5e8;font-weight:800">Prueba controlada · producción</div>'+
+        '<h1 style="margin:8px 0 8px">Club Abierto — Anclaje Mainnet</h1>'+
+        '<p style="color:#b8cbe0;margin:0 0 18px">Polygon PoS Mainnet · Chain ID 137 · esta operación NO activa la integración automática.</p>'+
+        '<div style="display:grid;gap:10px;background:#081a31;padding:16px;border-radius:12px">'+
+          '<div><b>Contrato:</b><br><code style="word-break:break-all">'+CONTRACT+'</code></div>'+
+          '<div><b>Referencia:</b><br><code style="word-break:break-all">'+REFERENCE+'</code></div>'+
+          '<div><b>Raíz de prueba:</b><br><code style="word-break:break-all">'+ROOT+'</code></div>'+
+          '<div><b>Hojas:</b> 1</div>'+
+        '</div>'+
+        '<div style="margin:14px 0;color:#ffd580"><b>Importante:</b> es una prueba aislada. No toma ni modifica los lotes reales pendientes de auditoría o votos.</div>'+
+        '<div id="caMainnetAnchorStatus" style="padding:14px;border-radius:10px;background:#081a31;margin-top:16px;white-space:pre-wrap">Preparando conexión con MetaMask...</div>'+
+        '<button id="caMainnetAnchorRetry" style="display:none;width:100%;padding:14px;border-radius:10px;border:0;font-weight:700;font-size:16px;cursor:pointer;margin-top:12px">Reintentar</button>'+
+      '</div></div>';
+    const status=document.getElementById("caMainnetAnchorStatus"),retry=document.getElementById("caMainnetAnchorRetry");
+    const set=(t,c)=>{status.textContent=t;status.style.color=c||"#fff"};
+    async function start(){
+      retry.style.display="none";
+      try{
+        if(!window.ethereum) throw new Error("No se detectó MetaMask en este navegador.");
+        const prev=localStorage.getItem(KEY);
+        if(prev){
+          set("Ya existe una transacción de prueba registrada. Verificando confirmación...\n"+prev,"#ffd580");
+          const r=await receipt(prev);
+          if(r.status!=="0x1") throw new Error("La transacción anterior falló.");
+          set("PRUEBA MAINNET CONFIRMADA\n\nTX: "+prev+"\n\nBLOQUE: "+parseInt(r.blockNumber,16)+"\n\nPodés volver al chat.","#7ee787");
+          return;
+        }
+        const accounts=await ethereum.request({method:"eth_requestAccounts"});
+        const account=(accounts[0]||"").toLowerCase();
+        if(account!==EXPECTED) throw new Error("La cuenta seleccionada no es la wallet esperada de Club Abierto.");
+        let chain=await ethereum.request({method:"eth_chainId"});
+        if(chain.toLowerCase()!==CHAIN_HEX){
+          await ethereum.request({method:"wallet_switchEthereumChain",params:[{chainId:CHAIN_HEX}]});
+        }
+        chain=await ethereum.request({method:"eth_chainId"});
+        if(chain.toLowerCase()!==CHAIN_HEX) throw new Error("MetaMask no quedó en Polygon Mainnet (137).");
+        const balance=BigInt(await ethereum.request({method:"eth_getBalance",params:[account,"latest"]}));
+        if(balance===0n) throw new Error("La wallet figura con 0 POL en Polygon Mainnet.");
+        const sigHash=await ethereum.request({method:"web3_sha3",params:[utf8hex("anchor(bytes32,bytes32,uint64)")]});
+        const selector=sigHash.slice(2,10);
+        const referenceHash=await ethereum.request({method:"web3_sha3",params:[utf8hex(REFERENCE)]});
+        const data="0x"+selector+pad64(referenceHash)+ROOT+pad64("0x"+LEAF_COUNT.toString(16));
+        const estimated=BigInt(await ethereum.request({method:"eth_estimateGas",params:[{from:account,to:CONTRACT,data}]}));
+        const gas=((estimated*110n)/100n);
+        const gasPrice=BigInt(await ethereum.request({method:"eth_gasPrice"}));
+        const maxCost=gas*gasPrice;
+        const toPol=v=>Number(v)/1e18;
+        set("Prueba lista para enviar.\n\nSaldo: "+toPol(balance).toFixed(6)+" POL\nCosto máximo estimado: "+toPol(maxCost).toFixed(6)+" POL\n\nMetaMask va a pedirte confirmar UNA transacción.","#ffd580");
+        const tx=await ethereum.request({method:"eth_sendTransaction",params:[{
+          from:account,to:CONTRACT,data,
+          gas:"0x"+gas.toString(16),
+          gasPrice:"0x"+gasPrice.toString(16)
+        }]});
+        localStorage.setItem(KEY,tx);
+        set("Transacción enviada. Esperando confirmación en Polygon Mainnet...\n"+tx,"#ffd580");
+        const r=await receipt(tx);
+        if(r.status!=="0x1") throw new Error("La transacción fue minada pero falló.");
+        set("PRUEBA MAINNET CONFIRMADA\n\nTX: "+tx+"\n\nBLOQUE: "+parseInt(r.blockNumber,16)+"\n\nPodés volver al chat.","#7ee787");
+      }catch(e){
+        set("No se completó la prueba:\n\n"+(e?.message||String(e)),"#ff9b9b");
+        retry.style.display="block";
+      }
+    }
+    retry.onclick=start;
+    setTimeout(start,500);
+  };
+  if(document.readyState==="loading") addEventListener("DOMContentLoaded",build,{once:true}); else build();
+})();
+</script>
+
 <!-- CLUB_ABIERTO_GENESIS_ANCHOR_V1 -->
 <script>
 (()=>{
