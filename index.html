@@ -4586,9 +4586,20 @@ navigator.serviceWorker.register('./service-worker.js').catch(function(e){consol
           }
           if(r&&r.status==="0x0") localStorage.removeItem(KEY);
           else if(!r&&!t) localStorage.removeItem(KEY);
-          else {
-            set("El intento anterior todavía figura pendiente en la red. No se enviará otro para evitar duplicaciones.\n"+prev,"#ffd580");
-            return;
+          else if(!r&&t){
+            const latestNonce=BigInt(await ethereum.request({method:"eth_getTransactionCount",params:[EXPECTED,"latest"]}));
+            const pendingNonce=BigInt(await ethereum.request({method:"eth_getTransactionCount",params:[EXPECTED,"pending"]}));
+            const txNonce=BigInt(t.nonce);
+            if(latestNonce>txNonce){
+              localStorage.removeItem(KEY);
+            }else if(pendingNonce===latestNonce){
+              localStorage.removeItem(KEY);
+            }else{
+              set("El intento anterior sigue realmente pendiente en Polygon. No se enviará otro para evitar duplicaciones.\n"+prev,"#ffd580");
+              return;
+            }
+          }else{
+            localStorage.removeItem(KEY);
           }
         }
         const accounts=await ethereum.request({method:"eth_requestAccounts"});
