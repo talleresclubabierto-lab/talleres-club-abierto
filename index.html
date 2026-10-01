@@ -566,6 +566,13 @@ body{
     </section>
 
     <section class="card">
+      <div class="card-title">Lotes criptográficos</div>
+      <p class="card-note">Cada lote conserva el rango de movimientos, la raíz Merkle y, cuando exista, la transacción y el bloque de Polygon.</p>
+      <div class="gov-actions"><button class="wf-button" onclick="cargarLotesBlockchain()">Actualizar lotes</button></div>
+      <div id="blockchainLotesLista" style="margin-top:14px"><div class="card-note">Cargando lotes...</div></div>
+    </section>
+
+    <section class="card">
       <div class="card-title">Conservación histórica</div>
       <p class="card-note">Mientras la integración no esté activa, cada operación continúa registrándose con su hash y trazabilidad. Cuando se active, los movimientos históricos aún no cubiertos se incorporarán en lotes de la cantidad definida por la política vigente, sin perder registros intermedios.</p>
     </section>
@@ -3578,11 +3585,46 @@ async function cargarEstadoIntegracionBlockchain(){
     return b;
 }
 
+async function cargarLotesBlockchain(){
+    var token=obtenerTokenSesionClub();
+    if(!token)throw new Error('Sesión segura requerida');
+    var box=document.getElementById('blockchainLotesLista');
+    if(box)box.innerHTML='<div class="card-note">Cargando lotes...</div>';
+    var data=await llamarClubAbiertoApi({accion:'lotes_blockchain',pagina:1,por_pagina:50},token);
+    var lotes=Array.isArray(data&&data.lotes)?data.lotes:[];
+    if(!box)return lotes;
+    if(!lotes.length){
+        box.innerHTML='<div class="card-note">Todavía no hay lotes registrados.</div>';
+        return lotes;
+    }
+    box.innerHTML=lotes.map(function(l){
+        var fecha=l.anclado_en||l.enviado_en||l.preparado_en;
+        var tx=l.transaccion_hash||'Pendiente de anclaje';
+        var bloque=l.bloque_numero?Number(l.bloque_numero).toLocaleString('es-AR'):'-';
+        return '<div class="card" style="margin-bottom:12px">'+
+          '<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">'+
+            '<strong>'+escaparHtmlHistorial(l.referencia||'Lote')+'</strong>'+
+            '<span class="status-chip">● '+escaparHtmlHistorial(String(l.estado||'preparado').toUpperCase())+'</span>'+
+          '</div>'+
+          '<div class="card-note" style="margin-top:10px">'+
+            '<div><strong>Tipo:</strong> '+escaparHtmlHistorial(l.tipo||'-')+'</div>'+
+            '<div><strong>Movimientos:</strong> '+Number(l.cantidad_eventos||0).toLocaleString('es-AR')+
+              ' · IDs '+escaparHtmlHistorial(String(l.primer_evento_id||'-'))+' a '+escaparHtmlHistorial(String(l.ultimo_evento_id||'-'))+'</div>'+
+            '<div><strong>Raíz Merkle:</strong> <span class="mono" style="word-break:break-all">'+escaparHtmlHistorial(l.raiz_merkle_sha256||'-')+'</span></div>'+
+            '<div><strong>TX:</strong> <span class="mono" style="word-break:break-all">'+escaparHtmlHistorial(tx)+'</span></div>'+
+            '<div><strong>Bloque:</strong> '+escaparHtmlHistorial(bloque)+'</div>'+
+            '<div><strong>Fecha:</strong> '+(fecha?formatearFechaHoraHistorial(fecha):'-')+'</div>'+
+          '</div>'+
+        '</div>';
+    }).join('');
+    return lotes;
+}
+
 async function irAIntegracionBlockchain(){
     ocultarTodo();
     var sec=document.getElementById('secBlockchainIntegracion');
     if(sec)sec.style.display='flex';
-    try{await cargarEstadoIntegracionBlockchain();}
+    try{await Promise.all([cargarEstadoIntegracionBlockchain(),cargarLotesBlockchain()]);}
     catch(e){
         console.error(e);
         var d=document.getElementById('blockchainEstadoDescripcion');
