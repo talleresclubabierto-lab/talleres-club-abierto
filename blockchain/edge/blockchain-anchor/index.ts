@@ -98,6 +98,32 @@ Deno.serve(async (req: Request) => {
     return out(400, { ok: false, error: "unknown_action" });
   }
 
+  const sessionToken = String(req.headers.get("x-club-session") || "").trim();
+  if (!sessionToken) {
+    return out(401, { ok: false, error: "secure_session_required" });
+  }
+
+  const { data: actorId, error: sessionError } = await supabase.rpc(
+    "validar_sesion_segura_interno",
+    { p_token: sessionToken },
+  );
+
+  if (sessionError || !actorId) {
+    return out(401, { ok: false, error: "invalid_or_expired_session" });
+  }
+
+  const { data: principal, error: principalError } = await supabase
+    .from("administradores")
+    .select("numero_socio,es_principal,habilitado")
+    .eq("numero_socio", Number(actorId))
+    .eq("habilitado", true)
+    .eq("es_principal", true)
+    .maybeSingle();
+
+  if (principalError || !principal) {
+    return out(403, { ok: false, error: "principal_admin_required" });
+  }
+
   if (envioHabilitado !== true) {
     return out(200, {
       ok: true,
