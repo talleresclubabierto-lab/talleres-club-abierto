@@ -435,6 +435,52 @@ body{
 .padron-loading{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:#496174}.padron-loading:before{content:'';width:9px;height:9px;border-radius:50%;background:#62dcff;box-shadow:0 0 9px rgba(98,220,255,.7)}
 @media(max-width:850px){.history-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){.history-timing{grid-template-columns:1fr}.history-match{grid-template-columns:68px minmax(0,1fr)}.history-status{grid-column:2;justify-self:start}.history-stat-value{font-size:23px}}
+
+/* Blockchain integration — role-aware visual system */
+.blockchain-shell{display:grid;gap:16px}
+.blockchain-hero{background:linear-gradient(135deg,#001b35 0%,#063c68 100%);color:#fff;border:0;box-shadow:0 18px 38px rgba(0,27,53,.16);position:relative;overflow:hidden}
+.blockchain-hero:after{content:'';position:absolute;width:260px;height:260px;border:1px solid rgba(255,255,255,.09);border-radius:50%;right:-90px;top:-120px}
+.blockchain-hero .card-title,.blockchain-hero .metric-value{color:#fff}
+.blockchain-hero .card-note{color:#d8e8f7}
+.blockchain-role-kicker{font:700 11px 'JetBrains Mono';letter-spacing:.08em;text-transform:uppercase;color:#9fc5e8;margin-bottom:8px}
+.blockchain-state-row{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.blockchain-state-copy{max-width:760px}
+.blockchain-status-panel{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:20px}
+.blockchain-stat{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.13);border-radius:10px;padding:14px}
+.blockchain-stat .metric-label{color:#b9d2e8}
+.blockchain-stat .metric-value{font-size:24px}
+.blockchain-tech-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 24px;padding-top:6px}
+.blockchain-tech-item{min-width:0}
+.blockchain-tech-item strong{display:block;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:#6b7d96;margin-bottom:4px}
+.blockchain-tech-item span{display:block;color:#27384a;overflow-wrap:anywhere}
+.blockchain-admin-only{border-left:4px solid #d4af37;background:#fffdf6}
+.blockchain-admin-banner{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px;padding:13px 14px;border-radius:10px;background:#fff8e8;border:1px solid #ecd79e;color:#604a11}
+.blockchain-admin-banner strong{color:#4f3b07}
+.blockchain-readonly-note{display:none;padding:13px 14px;border:1px solid #bfd8e8;background:#f3f9fc;border-radius:10px;color:#31556e;font-size:13px;line-height:1.55}
+.blockchain-lot-card{border:1px solid var(--line);border-radius:11px;padding:16px;margin-bottom:10px;background:#fff}
+.blockchain-lot-card:last-child{margin-bottom:0}
+.blockchain-lot-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.blockchain-lot-title{font-weight:800;color:var(--navy);overflow-wrap:anywhere}
+.blockchain-lot-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 18px;margin-top:12px;color:#536170;font-size:13px;line-height:1.45}
+.blockchain-lot-meta .wide{grid-column:1/-1}
+.blockchain-lot-meta .mono{font-size:11px;word-break:break-all}
+#secBlockchainIntegracion[data-role="socio"] .blockchain-admin-only{display:none!important}
+#secBlockchainIntegracion[data-role="socio"] .blockchain-readonly-note{display:block}
+#secBlockchainIntegracion[data-role="socio"] .blockchain-role-kicker:after{content:' · Vista del socio'}
+#secBlockchainIntegracion[data-role="admin"] .blockchain-role-kicker:after{content:' · Vista administrativa'}
+@media(max-width:800px){
+  .blockchain-status-panel{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .blockchain-tech-grid,.blockchain-lot-meta{grid-template-columns:1fr}
+  .blockchain-lot-meta .wide{grid-column:auto}
+}
+@media(max-width:520px){
+  .blockchain-status-panel{grid-template-columns:1fr 1fr;gap:9px}
+  .blockchain-stat{padding:12px}
+  .blockchain-stat .metric-value{font-size:20px}
+  .blockchain-state-row{display:block}
+  #blockchainEstadoChip{margin-top:12px}
+}
+
 </style><script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -532,27 +578,42 @@ body{
       <span id="blockchainEstadoChip" class="status-chip">● Cargando estado...</span>
     </div>
 
-    <section class="card">
-      <div class="card-title">Estado institucional</div>
-      <div id="blockchainEstadoTitulo" class="metric-value" style="font-size:22px;margin-top:10px">-</div>
-      <p id="blockchainEstadoDescripcion" class="card-note" style="margin-top:10px">Cargando...</p>
-      <div class="metrics-grid" style="margin-top:18px">
-        <div class="card"><div class="metric-label">Movimientos históricos</div><div id="blockchainTotalMovimientos" class="metric-value">-</div></div>
-        <div class="card"><div class="metric-label">Pendientes de lote</div><div id="blockchainPendientes" class="metric-value">-</div></div>
-        <div class="card"><div class="metric-label">Lotes preparados</div><div id="blockchainLotesPreparados" class="metric-value">-</div></div>
-        <div class="card"><div class="metric-label">Lotes anclados</div><div id="blockchainLotesAnclados" class="metric-value">-</div></div>
-      </div>
-      <div style="margin-top:16px" class="card-note">
-        <div><strong>Red:</strong> <span id="blockchainRed">-</span></div>
-        <div><strong>Chain ID:</strong> <span id="blockchainChainId">-</span></div>
-        <div><strong>Contrato:</strong> <span id="blockchainContrato" class="mono">-</span></div>
-        <div><strong>Desde:</strong> <span id="blockchainEstadoDesde">-</span></div>
-        <div><strong>Motivo:</strong> <span id="blockchainMotivo">-</span></div>
-      </div>
-    </section>
+    <div class="blockchain-shell">
+      <section class="card blockchain-hero">
+        <div class="blockchain-state-row">
+          <div class="blockchain-state-copy">
+            <div class="blockchain-role-kicker">Integridad verificable</div>
+            <div class="card-title">Estado institucional</div>
+            <div id="blockchainEstadoTitulo" class="metric-value" style="font-size:24px;margin-top:10px">-</div>
+            <p id="blockchainEstadoDescripcion" class="card-note" style="margin-top:10px;margin-bottom:0">Cargando...</p>
+          </div>
+          <span id="blockchainEstadoChip" class="status-chip">● Cargando estado...</span>
+        </div>
+        <div class="blockchain-status-panel">
+          <div class="blockchain-stat"><div class="metric-label">Movimientos históricos</div><div id="blockchainTotalMovimientos" class="metric-value">-</div></div>
+          <div class="blockchain-stat"><div class="metric-label">Pendientes de lote</div><div id="blockchainPendientes" class="metric-value">-</div></div>
+          <div class="blockchain-stat"><div class="metric-label">Lotes preparados</div><div id="blockchainLotesPreparados" class="metric-value">-</div></div>
+          <div class="blockchain-stat"><div class="metric-label">Lotes anclados</div><div id="blockchainLotesAnclados" class="metric-value">-</div></div>
+        </div>
+      </section>
 
-    <section id="blockchainControlPrincipal" class="card" style="display:none">
-      <div class="card-title">Control del administrador principal</div>
+      <section class="card">
+        <div class="card-title">Datos de verificación</div>
+        <p class="card-note">Información técnica pública para comprobar la red, el contrato y el estado institucional de la integración.</p>
+        <div class="blockchain-tech-grid">
+          <div class="blockchain-tech-item"><strong>Red</strong><span id="blockchainRed">-</span></div>
+          <div class="blockchain-tech-item"><strong>Chain ID</strong><span id="blockchainChainId">-</span></div>
+          <div class="blockchain-tech-item"><strong>Contrato</strong><span id="blockchainContrato" class="mono">-</span></div>
+          <div class="blockchain-tech-item"><strong>Estado desde</strong><span id="blockchainEstadoDesde">-</span></div>
+          <div class="blockchain-tech-item" style="grid-column:1/-1"><strong>Motivo institucional</strong><span id="blockchainMotivo">-</span></div>
+        </div>
+      </section>
+
+      <div class="blockchain-readonly-note"><strong>Vista informativa del socio.</strong> Esta sección permite verificar el estado, los lotes y los comprobantes públicos. Los controles de configuración y activación están reservados al administrador principal.</div>
+    </div>
+
+    <section id="blockchainControlPrincipal" class="card blockchain-admin-only" style="display:none">
+      <div class="blockchain-admin-banner"><div><strong>Control del administrador principal</strong><br><span>Acciones sensibles: cualquier cambio queda sujeto a confirmación institucional.</span></div><span class="status-chip">ADMIN</span></div><div class="card-title">Estado operativo de la integración</div>
       <p class="card-note">Cambiar el estado no elimina ni reescribe movimientos. Al activar por primera vez, todo historial pendiente se prepara en lotes según la política vigente antes de comenzar los envíos blockchain.</p>
       <label class="form-label">Nuevo estado</label>
       <select id="blockchainNuevoEstado" class="wf-input">
@@ -3601,17 +3662,17 @@ async function cargarLotesBlockchain(){
         var fecha=l.anclado_en||l.enviado_en||l.preparado_en;
         var tx=l.transaccion_hash||'Pendiente de anclaje';
         var bloque=l.bloque_numero?Number(l.bloque_numero).toLocaleString('es-AR'):'-';
-        return '<div class="card" style="margin-bottom:12px">'+
-          '<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">'+
-            '<strong>'+escaparHtmlHistorial(l.referencia||'Lote')+'</strong>'+
+        return '<div class="blockchain-lot-card">'+
+          '<div class="blockchain-lot-head">'+
+            '<div class="blockchain-lot-title">'+escaparHtmlHistorial(l.referencia||'Lote')+'</div>'+
             '<span class="status-chip">● '+escaparHtmlHistorial(String(l.estado||'preparado').toUpperCase())+'</span>'+
           '</div>'+
-          '<div class="card-note" style="margin-top:10px">'+
+          '<div class="blockchain-lot-meta">'+
             '<div><strong>Tipo:</strong> '+escaparHtmlHistorial(l.tipo||'-')+'</div>'+
             '<div><strong>Movimientos:</strong> '+Number(l.cantidad_eventos||0).toLocaleString('es-AR')+
               ' · IDs '+escaparHtmlHistorial(String(l.primer_evento_id||'-'))+' a '+escaparHtmlHistorial(String(l.ultimo_evento_id||'-'))+'</div>'+
-            '<div><strong>Raíz Merkle:</strong> <span class="mono" style="word-break:break-all">'+escaparHtmlHistorial(l.raiz_merkle_sha256||'-')+'</span></div>'+
-            '<div><strong>TX:</strong> <span class="mono" style="word-break:break-all">'+escaparHtmlHistorial(tx)+'</span></div>'+
+            '<div class="wide"><strong>Raíz Merkle:</strong><br><span class="mono">'+escaparHtmlHistorial(l.raiz_merkle_sha256||'-')+'</span></div>'+
+            '<div class="wide"><strong>TX:</strong><br><span class="mono">'+escaparHtmlHistorial(tx)+'</span></div>'+
             '<div><strong>Bloque:</strong> '+escaparHtmlHistorial(bloque)+'</div>'+
             '<div><strong>Fecha:</strong> '+(fecha?formatearFechaHoraHistorial(fecha):'-')+'</div>'+
           '</div>'+
@@ -3623,7 +3684,10 @@ async function cargarLotesBlockchain(){
 async function irAIntegracionBlockchain(){
     ocultarTodo();
     var sec=document.getElementById('secBlockchainIntegracion');
-    if(sec)sec.style.display='flex';
+    if(sec){
+        sec.style.display='flex';
+        sec.setAttribute('data-role',ROL_ACTIVO==='admin'?'admin':'socio');
+    }
     try{await Promise.all([cargarEstadoIntegracionBlockchain(),cargarLotesBlockchain()]);}
     catch(e){
         console.error(e);
