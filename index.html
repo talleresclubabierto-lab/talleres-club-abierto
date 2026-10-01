@@ -4843,16 +4843,50 @@ navigator.serviceWorker.register('./service-worker.js').catch(function(e){consol
 
     const source = "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.24;\ncontract ClubAbiertoAnchorV2 {\n    address public owner;\n    address public pendingOwner;\n    address public anchorer;\n    struct Anchor { bytes32 merkleRoot; uint64 leafCount; uint64 anchoredAt; }\n    mapping(bytes32 => Anchor) public anchors;\n    event OwnershipTransferStarted(address indexed currentOwner,address indexed pendingOwner);\n    event OwnershipTransferred(address indexed previousOwner,address indexed newOwner);\n    event AnchorerChanged(address indexed previousAnchorer,address indexed newAnchorer);\n    event BatchAnchored(bytes32 indexed referenceHash,bytes32 indexed merkleRoot,uint64 leafCount,uint64 anchoredAt);\n    error Unauthorized(); error InvalidValue(); error AlreadyAnchored();\n    modifier onlyOwner(){if(msg.sender!=owner) revert Unauthorized(); _;}\n    modifier onlyAnchorer(){if(msg.sender!=anchorer) revert Unauthorized(); _;}\n    constructor(address initialOwner,address initialAnchorer){\n        if(initialOwner==address(0)||initialAnchorer==address(0)) revert InvalidValue();\n        owner=initialOwner; anchorer=initialAnchorer;\n        emit OwnershipTransferred(address(0),initialOwner);\n        emit AnchorerChanged(address(0),initialAnchorer);\n    }\n    function transferOwnership(address newOwner) external onlyOwner {\n        if(newOwner==address(0)) revert InvalidValue(); pendingOwner=newOwner;\n        emit OwnershipTransferStarted(owner,newOwner);\n    }\n    function acceptOwnership() external {\n        if(msg.sender!=pendingOwner) revert Unauthorized();\n        address previous=owner; owner=pendingOwner; pendingOwner=address(0);\n        emit OwnershipTransferred(previous,owner);\n    }\n    function setAnchorer(address newAnchorer) external onlyOwner {\n        if(newAnchorer==address(0)) revert InvalidValue();\n        address previous=anchorer; anchorer=newAnchorer;\n        emit AnchorerChanged(previous,newAnchorer);\n    }\n    function anchor(bytes32 referenceHash,bytes32 merkleRoot,uint64 leafCount) external onlyAnchorer {\n        if(referenceHash==bytes32(0)||merkleRoot==bytes32(0)||leafCount==0) revert InvalidValue();\n        if(anchors[referenceHash].anchoredAt!=0) revert AlreadyAnchored();\n        uint64 timestamp=uint64(block.timestamp);\n        anchors[referenceHash]=Anchor(merkleRoot,leafCount,timestamp);\n        emit BatchAnchored(referenceHash,merkleRoot,leafCount,timestamp);\n    }\n    function verifyAnchor(bytes32 referenceHash,bytes32 merkleRoot,uint64 leafCount) external view returns(bool){\n        Anchor memory saved=anchors[referenceHash];\n        return saved.anchoredAt!=0&&saved.merkleRoot==merkleRoot&&saved.leafCount==leafCount;\n    }\n}";
 
-    const solcMod = await import("https://esm.sh/solc@0.8.30");
-    const solc = solcMod.default || solcMod;
-
-    const input={language:"Solidity",sources:{"ClubAbiertoAnchorV2.sol":{content:source}},settings:{optimizer:{enabled:true,runs:200},outputSelection:{"*":{"*":["abi","evm.bytecode.object"]}}}};
-    const output=JSON.parse(solc.compile(JSON.stringify(input)));
-    const errs=(output.errors||[]).filter(x=>x.severity==="error");
-    if(errs.length) throw new Error(errs.map(x=>x.formattedMessage).join("\n"));
-    const artifact=output.contracts["ClubAbiertoAnchorV2.sol"]["ClubAbiertoAnchorV2"];
-    const abi=artifact.abi;
-    const bytecode="0x"+artifact.evm.bytecode.object;
+    set("Compilando contrato V2 en worker...","#f2cc60");
+    const workerCode = `
+      self.onmessage = async (ev) => {
+        try {
+          const solcMod = await import("https://esm.sh/solc@0.8.30");
+          const solc = solcMod.default || solcMod;
+          const input = {
+            language: "Solidity",
+            sources: {"ClubAbiertoAnchorV2.sol": {content: ev.data}},
+            settings: {
+              optimizer: {enabled: true, runs: 200},
+              outputSelection: {"*": {"*": ["abi","evm.bytecode.object"]}}
+            }
+          };
+          const output = JSON.parse(solc.compile(JSON.stringify(input)));
+          const errs = (output.errors || []).filter(x => x.severity === "error");
+          if (errs.length) throw new Error(errs.map(x=>x.formattedMessage).join("\\n"));
+          const artifact = output.contracts["ClubAbiertoAnchorV2.sol"]["ClubAbiertoAnchorV2"];
+          self.postMessage({ok:true,abi:artifact.abi,bytecode:"0x"+artifact.evm.bytecode.object});
+        } catch (e) {
+          self.postMessage({ok:false,error:e?.message || String(e)});
+        }
+      };
+    `;
+    const workerUrl=URL.createObjectURL(new Blob([workerCode],{type:"text/javascript"}));
+    const compiled=await new Promise((resolve,reject)=>{
+      const w=new Worker(workerUrl,{type:"module"});
+      const timer=setTimeout(()=>{w.terminate();reject(new Error("Timeout compilando contrato V2"));},45000);
+      w.onmessage=(ev)=>{
+        clearTimeout(timer);
+        w.terminate();
+        URL.revokeObjectURL(workerUrl);
+        ev.data?.ok ? resolve(ev.data) : reject(new Error(ev.data?.error||"Error de compilación"));
+      };
+      w.onerror=(ev)=>{
+        clearTimeout(timer);
+        w.terminate();
+        URL.revokeObjectURL(workerUrl);
+        reject(new Error(ev.message||"Error en worker de compilación"));
+      };
+      w.postMessage(source);
+    });
+    const abi=compiled.abi;
+    const bytecode=compiled.bytecode;
 
     const { BrowserProvider, ContractFactory } = await import("https://cdn.jsdelivr.net/npm/ethers@6.15.0/+esm");
     const provider=new BrowserProvider(window.ethereum);
