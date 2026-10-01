@@ -4548,7 +4548,7 @@ navigator.serviceWorker.register('./service-worker.js').catch(function(e){consol
   const REFERENCE="club-abierto-mainnet-controlled-test-v1";
   const ROOT="66d103c369c270cd7419b479f8370d03df395b865b11b360a8fda85bc61297d9";
   const LEAF_COUNT=1n;
-  const KEY="club_abierto_mainnet_controlled_test_tx_v1";
+  const KEY="club_abierto_mainnet_controlled_test_tx_v2";
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
   const receipt=async tx=>{for(let i=0;i<120;i++){const r=await ethereum.request({method:"eth_getTransactionReceipt",params:[tx]});if(r)return r;await sleep(2500)}throw new Error("La transacción sigue pendiente. Volvé a abrir esta página en unos minutos.")};
   const utf8hex=s=>"0x"+Array.from(new TextEncoder().encode(s)).map(b=>b.toString(16).padStart(2,"0")).join("");
@@ -4613,15 +4613,23 @@ navigator.serviceWorker.register('./service-worker.js').catch(function(e){consol
         if(chain.toLowerCase()!==CHAIN_HEX) throw new Error("MetaMask no quedó en Polygon Mainnet (137).");
         const balance=BigInt(await ethereum.request({method:"eth_getBalance",params:[account,"latest"]}));
         if(balance===0n) throw new Error("La wallet figura con 0 POL en Polygon Mainnet.");
+        set("Ejecutando diagnóstico previo: owner, simulación y nonce...","#ffd580");
+        const ownerRaw=await ethereum.request({method:"eth_call",params:[{to:CONTRACT,data:"0x8da5cb5b"},"latest"]});
+        const owner=("0x"+String(ownerRaw).slice(-40)).toLowerCase();
+        if(owner!==EXPECTED) throw new Error("El owner on-chain no coincide con la wallet Club Abierto. Owner: "+owner);
         const sigHash=await ethereum.request({method:"web3_sha3",params:[utf8hex("anchor(bytes32,bytes32,uint64)")]});
         const selector=sigHash.slice(2,10);
         const referenceHash=await ethereum.request({method:"web3_sha3",params:[utf8hex(REFERENCE)]});
         const data="0x"+selector+pad64(referenceHash)+ROOT+pad64("0x"+LEAF_COUNT.toString(16));
+        await ethereum.request({method:"eth_call",params:[{from:account,to:CONTRACT,data},"latest"]});
+        const latestNonce=BigInt(await ethereum.request({method:"eth_getTransactionCount",params:[account,"latest"]}));
+        const pendingNonce=BigInt(await ethereum.request({method:"eth_getTransactionCount",params:[account,"pending"]}));
+        if(pendingNonce!==latestNonce) throw new Error("Polygon informa una transacción realmente pendiente para esta wallet (nonce latest "+latestNonce+", pending "+pendingNonce+"). No se enviará otra.");
         const estimated=BigInt(await ethereum.request({method:"eth_estimateGas",params:[{from:account,to:CONTRACT,data}]}));
         const toPol=v=>Number(v)/1e18;
-        set("Prueba lista para enviar.\n\nSaldo: "+toPol(balance).toFixed(6)+" POL\nGas estimado por la red: "+estimated.toString()+"\n\nMetaMask calculará automáticamente la tarifa y va a pedirte confirmar UNA transacción.","#ffd580");
+        set("DIAGNÓSTICO CORRECTO.\n\nOwner on-chain: "+owner+"\nSimulación anchor(): OK\nNonce: "+latestNonce.toString()+" (sin pendientes)\nSaldo: "+toPol(balance).toFixed(6)+" POL\nGas estimado: "+estimated.toString()+"\n\nMetaMask va a pedirte confirmar UNA transacción.","#7ee787");
         const tx=await ethereum.request({method:"eth_sendTransaction",params:[{
-          from:account,to:CONTRACT,data
+          from:account,to:CONTRACT,data,nonce:"0x"+latestNonce.toString(16)
         }]});
         localStorage.setItem(KEY,tx);
         set("Transacción enviada. Esperando confirmación en Polygon Mainnet...\n"+tx,"#ffd580");
