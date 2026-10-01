@@ -63,6 +63,17 @@ Deno.serve(async (req: Request) => {
 
   const batch = batches?.[0] || null;
 
+  const { data: envioHabilitado, error: envioError } = await supabase
+    .rpc("blockchain_envio_habilitado");
+
+  if (envioError) {
+    return out(500, {
+      ok: false,
+      error: "blockchain_operational_state_query_failed",
+      detail: envioError.message,
+    });
+  }
+
   const configured = {
     rpc: Boolean(rpcUrl),
     private_key: Boolean(privateKey),
@@ -74,13 +85,27 @@ Deno.serve(async (req: Request) => {
     return out(200, {
       ok: true,
       configured,
-      ready: Object.values(configured).every(Boolean),
+      operational_state: envioHabilitado === true ? "activa" : "no_activa",
+      sending_enabled: envioHabilitado === true,
+      ready:
+        envioHabilitado === true &&
+        Object.values(configured).every(Boolean),
       next_prepared_batch: batch,
     });
   }
 
   if (action !== "anchor") {
     return out(400, { ok: false, error: "unknown_action" });
+  }
+
+  if (envioHabilitado !== true) {
+    return out(200, {
+      ok: true,
+      anchored: false,
+      reason: "blockchain_integration_not_active",
+      sending_enabled: false,
+      next_prepared_batch: batch,
+    });
   }
 
   if (!batch) {
