@@ -28,8 +28,6 @@ Deno.serve(async (req: Request) => {
 
   const rpcUrl = Deno.env.get("POLYGON_RPC_URL") || "";
   const privateKey = Deno.env.get("BLOCKCHAIN_PRIVATE_KEY") || "";
-  const contractAddress = Deno.env.get("BLOCKCHAIN_CONTRACT_ADDRESS") || "";
-  const expectedChainId = Deno.env.get("BLOCKCHAIN_CHAIN_ID") || "";
 
   const supabase = createClient(supabaseUrl, serviceKey, {
     auth: { persistSession: false, autoRefreshToken: false },
@@ -74,6 +72,24 @@ Deno.serve(async (req: Request) => {
     });
   }
 
+  const { data: configRows, error: configError } = await supabase
+    .from("configuracion_blockchain_publica")
+    .select("version,estado_integracion,red,chain_id,contrato,confirmaciones_requeridas")
+    .order("version", { ascending: false })
+    .limit(1);
+
+  if (configError) {
+    return out(500, {
+      ok: false,
+      error: "blockchain_public_config_query_failed",
+      detail: configError.message,
+    });
+  }
+
+  const config = configRows?.[0] || null;
+  const contractAddress = String(config?.contrato || "");
+  const expectedChainId = String(config?.chain_id || "");
+
   const configured = {
     rpc: Boolean(rpcUrl),
     private_key: Boolean(privateKey),
@@ -85,8 +101,9 @@ Deno.serve(async (req: Request) => {
     return out(200, {
       ok: true,
       configured,
-      operational_state: envioHabilitado === true ? "activa" : "no_activa",
+      operational_state: config?.estado_integracion || "sin_configuracion",
       sending_enabled: envioHabilitado === true,
+      public_config: config,
       ready:
         envioHabilitado === true &&
         Object.values(configured).every(Boolean),
