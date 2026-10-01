@@ -4816,4 +4816,77 @@ navigator.serviceWorker.register('./service-worker.js').catch(function(e){consol
   if(document.readyState==="loading") addEventListener("DOMContentLoaded",build,{once:true}); else build();
 })();
 </script>
+
+<script type="module">
+(async()=>{
+  const params=new URLSearchParams(location.search);
+  if(params.get("deploy")!=="anchor-v2") return;
+  document.body.innerHTML=`
+  <main style="max-width:880px;margin:40px auto;padding:28px;font-family:system-ui;background:#0b2a4a;color:white;border-radius:20px">
+    <div style="font-size:13px;font-weight:800;color:#7cc4ff">DESPLIEGUE CONTROLADO · PRODUCCIÓN</div>
+    <h1>Club Abierto — Anchor V2</h1>
+    <p>Polygon PoS Mainnet · Chain ID 137 · este proceso NO activa la integración automática.</p>
+    <div style="background:#071b30;padding:18px;border-radius:14px;line-height:1.6">
+      <b>Owner institucional</b><br><code>0x7620dA48c9EB3f38E9996Ae92Dc8C867EfBc26d2</code><br><br>
+      <b>Anchorer automático</b><br><code>0xa66FAB8B9c179f564784188c8210602434aAD15d</code>
+    </div>
+    <pre id="deployV2Status" style="white-space:pre-wrap;background:#071b30;padding:18px;border-radius:14px;margin-top:18px;color:#c9d1d9">Preparando compilador...</pre>
+    <button id="deployV2Btn" disabled style="width:100%;padding:14px;border:0;border-radius:12px;font-weight:800;font-size:16px">Desplegar contrato V2</button>
+  </main>`;
+
+  const status=document.getElementById("deployV2Status");
+  const btn=document.getElementById("deployV2Btn");
+  const set=(t,c="#c9d1d9")=>{status.textContent=t;status.style.color=c};
+
+  try{
+    if(!window.ethereum) throw new Error("MetaMask no detectado");
+
+    const source = await fetch("/blockchain/contracts/ClubAbiertoAnchorV2.sol",{cache:"no-store"}).then(r=>{if(!r.ok) throw new Error("No se pudo cargar el contrato V2"); return r.text();});
+
+    const solcMod = await import("https://esm.sh/solc@0.8.30");
+    const solc = solcMod.default || solcMod;
+
+    const input={language:"Solidity",sources:{"ClubAbiertoAnchorV2.sol":{content:source}},settings:{optimizer:{enabled:true,runs:200},outputSelection:{"*":{"*":["abi","evm.bytecode.object"]}}}};
+    const output=JSON.parse(solc.compile(JSON.stringify(input)));
+    const errs=(output.errors||[]).filter(x=>x.severity==="error");
+    if(errs.length) throw new Error(errs.map(x=>x.formattedMessage).join("\n"));
+    const artifact=output.contracts["ClubAbiertoAnchorV2.sol"]["ClubAbiertoAnchorV2"];
+    const abi=artifact.abi;
+    const bytecode="0x"+artifact.evm.bytecode.object;
+
+    const { BrowserProvider, ContractFactory } = await import("https://cdn.jsdelivr.net/npm/ethers@6.15.0/+esm");
+    const provider=new BrowserProvider(window.ethereum);
+    const network=await provider.getNetwork();
+    if(Number(network.chainId)!==137) throw new Error("MetaMask debe estar en Polygon Mainnet (137)");
+
+    const accounts=await window.ethereum.request({method:"eth_requestAccounts"});
+    const account=String(accounts[0]||"").toLowerCase();
+    const owner="0x7620da48c9eb3f38e9996ae92dc8c867efbc26d2";
+    const anchorer="0xa66fab8b9c179f564784188c8210602434aad15d";
+    if(account!==owner) throw new Error("Seleccioná en MetaMask la cuenta Club Abierto · Institucional");
+
+    const signer=await provider.getSigner();
+    const factory=new ContractFactory(abi,bytecode,signer);
+    const deployTx=await factory.getDeployTransaction(owner,anchorer);
+    const gas=await provider.estimateGas({...deployTx,from:account});
+    const bal=await provider.getBalance(account);
+
+    set("DIAGNÓSTICO CORRECTO.\n\nRed: Polygon Mainnet (137)\nCuenta: "+account+"\nOwner: "+owner+"\nAnchorer: "+anchorer+"\nGas estimado: "+gas.toString()+"\nSaldo institucional: "+Number(bal)/1e18+" POL\n\nEl contrato será desplegado pero la integración seguirá DESACTIVADA.","#7ee787");
+    btn.disabled=false;
+    btn.onclick=async()=>{
+      btn.disabled=true;
+      try{
+        set("MetaMask va a pedirte confirmar UNA transacción de despliegue...","#f2cc60");
+        const contract=await factory.deploy(owner,anchorer);
+        const tx=contract.deploymentTransaction();
+        set("Transacción enviada:\n"+tx.hash+"\n\nEsperando confirmación...","#f2cc60");
+        const receipt=await tx.wait();
+        const addr=await contract.getAddress();
+        set("DESPLIEGUE CONFIRMADO.\n\nContrato: "+addr+"\nTX: "+tx.hash+"\nBloque: "+receipt.blockNumber+"\n\nLa integración NO fue activada.","#7ee787");
+        localStorage.setItem("club_abierto_anchor_v2_deploy",JSON.stringify({contract:addr,tx:tx.hash,block:receipt.blockNumber}));
+      }catch(e){set("No se completó el despliegue:\n\n"+(e?.shortMessage||e?.message||String(e)),"#ff7b72");btn.disabled=false;}
+    };
+  }catch(e){set("No se pudo preparar el despliegue:\n\n"+(e?.message||String(e)),"#ff7b72");}
+})();
+</script>
 </body>
