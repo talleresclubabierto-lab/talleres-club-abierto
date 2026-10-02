@@ -470,7 +470,7 @@ body{
 .blockchain-admin-only{border:1px solid #ecd79e;background:linear-gradient(180deg,#fffdf7 0%,#fffaf0 100%);box-shadow:0 12px 28px rgba(88,66,9,.08)}
 .blockchain-admin-banner{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px;padding:14px 15px;border-radius:11px;background:#fff3c9;border:1px solid #ecd079;color:#604a11}
 .blockchain-admin-banner strong{color:#4f3b07}
-.blockchain-admin-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
+.blockchain-admin-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
 .blockchain-admin-action{border:1px solid #cbd7e1;background:#fff;color:#173750;border-radius:10px;padding:13px 12px;font:800 13px Inter;cursor:pointer}
 .blockchain-admin-action:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(0,27,53,.08)}
 .blockchain-admin-action.activate{background:#0d6b47;color:#fff;border-color:#0d6b47}
@@ -656,7 +656,6 @@ body{
       <textarea id="blockchainMotivoCambio" class="wf-input" rows="3" placeholder="Ej.: Aprobación institucional para iniciar los anclajes automáticos"></textarea>
 
       <div class="blockchain-admin-actions">
-        <button id="blockchainBtnPreparada" class="blockchain-admin-action pause" onclick="cambiarEstadoIntegracionBlockchain('estructurada_no_activada')">Mantener preparada</button>
         <button id="blockchainBtnActivar" class="blockchain-admin-action activate" onclick="cambiarEstadoIntegracionBlockchain('activa')">Activar integración</button>
         <button id="blockchainBtnDesactivar" class="blockchain-admin-action disable" onclick="cambiarEstadoIntegracionBlockchain('desactivada')">Desactivar integración</button>
       </div>
@@ -3694,7 +3693,6 @@ async function cargarEstadoIntegracionBlockchain(){
     var adminEstado=document.getElementById('blockchainAdminEstadoActual');
     if(adminEstado)adminEstado.innerText='Estado actual: '+titulo;
     [
-      ['blockchainBtnPreparada','estructurada_no_activada'],
       ['blockchainBtnActivar','activa'],
       ['blockchainBtnDesactivar','desactivada']
     ].forEach(function(par){
