@@ -4923,4 +4923,23 @@ navigator.serviceWorker.register('./service-worker.js').catch(function(e){consol
   }catch(e){set("No se pudo preparar el despliegue:\n\n"+(e?.message||String(e)),"#ff7b72");}
 })();
 </script>
+
+<script>
+(async()=>{
+  const p=new URLSearchParams(location.search);
+  if(p.get("worker")!=="status") return;
+  document.body.innerHTML='<main style="max-width:760px;margin:40px auto;font-family:system-ui"><h1>Blockchain Worker Status</h1><pre id="ws">Consultando...</pre></main>';
+  try{
+    const res=await fetch("https://sziuyjicqyxnmbgtbopg.supabase.co/functions/v1/blockchain-anchor",{
+      method:"POST",
+      headers:{"content-type":"application/json"},
+      body:JSON.stringify({action:"status"})
+    });
+    const data=await res.json();
+    document.getElementById("ws").textContent=JSON.stringify(data,null,2);
+  }catch(e){
+    document.getElementById("ws").textContent="ERROR: "+(e?.message||String(e));
+  }
+})();
+</script>
 </body>
