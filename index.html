@@ -4991,4 +4991,94 @@ navigator.serviceWorker.register('./service-worker.js').catch(function(e){consol
   }
 })();
 </script>
+
+<script>
+(async()=>{
+  const p=new URLSearchParams(location.search);
+  if(p.get("worker")!=="test") return;
+
+  const TEST_PREFIX="club-abierto-worker-auto-test-v2-";
+  const WORKER_URL="https://sziuyjicqyxnmbgtbopg.supabase.co/functions/v1/blockchain-anchor";
+  const SESSION_KEY="TD_club_session_v1";
+
+  document.body.innerHTML=`
+    <main style="max-width:900px;margin:32px auto;padding:24px;font-family:Inter,system-ui,sans-serif;color:#fff">
+      <div style="font:700 12px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#86bfff">Prueba final · Backend automático</div>
+      <h1 style="margin:8px 0 6px;color:#fff;font-size:34px">Anclaje automático V2</h1>
+      <p style="margin:0 0 20px;color:#c6d8ee">Esta prueba usa el worker de producción y la cuenta técnica de anclajes. No requiere MetaMask.</p>
+      <div id="wt" style="background:#071b30;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:20px;color:#eaf2fb">Verificando condiciones...</div>
+      <button id="wtBtn" disabled style="margin-top:14px;width:100%;padding:15px;border:0;border-radius:12px;font-weight:800;font-size:16px">Ejecutar UNA prueba automática</button>
+    </main>`;
+
+  const box=document.getElementById("wt");
+  const btn=document.getElementById("wtBtn");
+  const esc=v=>String(v??"-").replace(/[&<>"]/g,s=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[s]));
+  const token=sessionStorage.getItem(SESSION_KEY)||"";
+
+  if(!token){
+    box.innerHTML='<div style="color:#ffcf8b"><b>Sesión de administrador requerida.</b><br><br>Ingresá primero al panel administrador de Club Abierto en esta misma pestaña/origen y luego volvé a esta URL.</div>';
+    return;
+  }
+
+  try{
+    const sres=await fetch(WORKER_URL,{
+      method:"POST",
+      headers:{"content-type":"application/json"},
+      body:JSON.stringify({action:"status"})
+    });
+    const s=await sres.json();
+    if(!sres.ok) throw new Error(s?.error||("HTTP "+sres.status));
+
+    const ref=String(s?.next_prepared_batch?.referencia||"");
+    const safeRef=ref.startsWith(TEST_PREFIX);
+    const send=!!s.sending_enabled;
+
+    box.innerHTML=`
+      <div style="display:grid;gap:10px">
+        <div><span style="color:#9fb5cc">Red:</span> <b>${esc(s?.public_config?.red)}</b></div>
+        <div><span style="color:#9fb5cc">Chain ID:</span> <b>${esc(s?.public_config?.chain_id)}</b></div>
+        <div><span style="color:#9fb5cc">Contrato:</span> <b style="word-break:break-all">${esc(s?.public_config?.contrato)}</b></div>
+        <div><span style="color:#9fb5cc">Próximo lote:</span> <b>${esc(ref)}</b></div>
+        <div><span style="color:#9fb5cc">Envío técnico:</span> <b style="color:${send?"#7ee787":"#ff9b9b"}">${send?"HABILITADO PARA LA PRUEBA":"BLOQUEADO"}</b></div>
+        <div><span style="color:#9fb5cc">Lote aislado:</span> <b style="color:${safeRef?"#7ee787":"#ff9b9b"}">${safeRef?"OK":"NO"}</b></div>
+      </div>`;
+
+    if(!(send&&safeRef)){
+      box.innerHTML += '<div style="margin-top:14px;color:#ff9b9b"><b>Prueba bloqueada:</b> no se cumplen las condiciones de aislamiento.</div>';
+      return;
+    }
+
+    btn.disabled=false;
+    btn.onclick=async()=>{
+      btn.disabled=true;
+      box.innerHTML += '<div style="margin-top:14px;color:#f2cc60">Enviando UNA transacción desde el worker. Esperando 3 confirmaciones...</div>';
+      try{
+        const res=await fetch(WORKER_URL,{
+          method:"POST",
+          headers:{
+            "content-type":"application/json",
+            "X-Club-Session":token
+          },
+          body:JSON.stringify({action:"anchor"})
+        });
+        const d=await res.json();
+        if(!res.ok||!d?.anchored) throw new Error(d?.detail||d?.error||d?.reason||("HTTP "+res.status));
+        box.innerHTML=`
+          <div style="color:#7ee787;font-weight:800;font-size:18px">PRUEBA AUTOMÁTICA CONFIRMADA</div>
+          <div style="margin-top:14px;line-height:1.7">
+            <div>Referencia: <b>${esc(d.referencia)}</b></div>
+            <div>TX: <b style="word-break:break-all">${esc(d.tx_hash)}</b></div>
+            <div>Bloque: <b>${esc(d.block_number)}</b></div>
+            <div>Chain ID: <b>${esc(d.chain_id)}</b></div>
+          </div>
+          <div style="margin-top:14px;color:#c6d8ee">No vuelvas a ejecutar el botón. La prueba quedó cerrada.</div>`;
+      }catch(e){
+        box.innerHTML += '<div style="margin-top:14px;color:#ff9b9b"><b>Error:</b> '+esc(e?.message||String(e))+'</div>';
+      }
+    };
+  }catch(e){
+    box.innerHTML='<div style="color:#ff9b9b"><b>Error verificando condiciones:</b> '+esc(e?.message||String(e))+'</div>';
+  }
+})();
+</script>
 </body>
