@@ -4928,17 +4928,66 @@ navigator.serviceWorker.register('./service-worker.js').catch(function(e){consol
 (async()=>{
   const p=new URLSearchParams(location.search);
   if(p.get("worker")!=="status") return;
-  document.body.innerHTML='<main style="max-width:760px;margin:40px auto;font-family:system-ui"><h1>Blockchain Worker Status</h1><pre id="ws">Consultando...</pre></main>';
+
+  document.body.innerHTML=`
+    <main style="max-width:980px;margin:32px auto;padding:24px;font-family:Inter,system-ui,sans-serif;color:#fff">
+      <div style="font:700 12px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#86bfff">Diagnóstico interno · Blockchain</div>
+      <h1 style="margin:8px 0 6px;color:#fff;font-size:34px">Blockchain Worker Status</h1>
+      <p style="margin:0 0 22px;color:#c6d8ee">Verificación técnica del worker. Esta pantalla no activa la integración ni envía transacciones.</p>
+      <div id="ws" style="background:#071b30;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:20px;color:#eaf2fb">Consultando...</div>
+    </main>`;
+
+  const box=document.getElementById("ws");
+  const esc=(v)=>String(v??"-").replace(/[&<>"]/g,s=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[s]));
+  const chip=(ok,yes="OK",no="NO")=>`<span style="display:inline-block;padding:5px 9px;border-radius:999px;font:700 11px 'JetBrains Mono',monospace;background:${ok?"#123d2f":"#3b1d25"};color:${ok?"#79f2b0":"#ff9b9b"}">${ok?yes:no}</span>`;
+  const row=(k,v)=>`<div style="display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08)"><span style="color:#9fb5cc">${esc(k)}</span><strong style="text-align:right;color:#fff;word-break:break-all">${esc(v)}</strong></div>`;
+
   try{
     const res=await fetch("https://sziuyjicqyxnmbgtbopg.supabase.co/functions/v1/blockchain-anchor",{
       method:"POST",
       headers:{"content-type":"application/json"},
       body:JSON.stringify({action:"status"})
     });
-    const data=await res.json();
-    document.getElementById("ws").textContent=JSON.stringify(data,null,2);
+    const d=await res.json();
+    if(!res.ok) throw new Error(d?.error||("HTTP "+res.status));
+
+    const cfg=d.public_config||{};
+    const conf=d.configured||{};
+    const batch=d.next_prepared_batch||null;
+
+    box.innerHTML=`
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:18px">
+        <div style="background:#0d2945;padding:16px;border-radius:12px"><div style="color:#9fb5cc;font-size:12px">RPC</div><div style="margin-top:8px">${chip(!!conf.rpc)}</div></div>
+        <div style="background:#0d2945;padding:16px;border-radius:12px"><div style="color:#9fb5cc;font-size:12px">Clave anchorer</div><div style="margin-top:8px">${chip(!!conf.anchorer_private_key)}</div></div>
+        <div style="background:#0d2945;padding:16px;border-radius:12px"><div style="color:#9fb5cc;font-size:12px">Contrato</div><div style="margin-top:8px">${chip(!!conf.contract)}</div></div>
+        <div style="background:#0d2945;padding:16px;border-radius:12px"><div style="color:#9fb5cc;font-size:12px">Envío habilitado</div><div style="margin-top:8px">${chip(!!d.sending_enabled,"ACTIVO","BLOQUEADO")}</div></div>
+      </div>
+
+      <div style="background:#0d2945;padding:18px;border-radius:12px;margin-bottom:14px">
+        <h3 style="margin:0 0 8px;color:#fff">Estado operativo</h3>
+        ${row("Estado",d.operational_state)}
+        ${row("Ready",d.ready?"true":"false")}
+        ${row("Red vigente",cfg.red)}
+        ${row("Chain ID vigente",cfg.chain_id)}
+        ${row("Contrato vigente",cfg.contrato)}
+        ${row("Confirmaciones requeridas",cfg.confirmaciones_requeridas)}
+      </div>
+
+      <div style="background:#0d2945;padding:18px;border-radius:12px">
+        <h3 style="margin:0 0 8px;color:#fff">Próximo lote preparado</h3>
+        ${batch
+          ? row("Origen",batch.source)+row("Referencia",batch.referencia)+row("Cantidad",batch.cantidad)+row("Preparado",batch.preparado_en)
+          : '<div style="color:#9fb5cc">No hay lotes preparados pendientes.</div>'}
+      </div>
+
+      <div style="margin-top:16px;padding:14px;border-radius:12px;background:${d.sending_enabled?"#123d2f":"#402413"};color:${d.sending_enabled?"#9cf7bd":"#ffd59a"}">
+        ${d.sending_enabled
+          ? "La integración está habilitada para envíos."
+          : "Seguro: el envío blockchain sigue bloqueado. Esta consulta no genera ninguna transacción."}
+      </div>
+    `;
   }catch(e){
-    document.getElementById("ws").textContent="ERROR: "+(e?.message||String(e));
+    box.innerHTML='<div style="color:#ff9b9b;font-weight:700">ERROR: '+esc(e?.message||String(e))+'</div>';
   }
 })();
 </script>
