@@ -444,18 +444,40 @@ body{
 .blockchain-hero .card-note{color:#d8e8f7}
 .blockchain-role-kicker{font:700 11px 'JetBrains Mono';letter-spacing:.08em;text-transform:uppercase;color:#9fc5e8;margin-bottom:8px}
 .blockchain-state-row{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap}
-.blockchain-state-copy{max-width:760px}
+.blockchain-state-copy{max-width:820px;flex:1 1 560px}
+.blockchain-state-banner{margin-top:10px;padding:16px 18px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.07);border-radius:12px}
+.blockchain-state-label{font:700 10px 'JetBrains Mono';letter-spacing:.09em;text-transform:uppercase;color:#9fc5e8;margin-bottom:7px}
+.blockchain-state-title{font-size:23px;font-weight:800;line-height:1.25;color:#fff}
+.blockchain-state-badge{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:9px 12px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);color:#fff;font:700 11px 'JetBrains Mono';letter-spacing:.04em;white-space:nowrap}
+.blockchain-state-badge:before{content:'';width:8px;height:8px;border-radius:50%;background:#62dcff;box-shadow:0 0 10px rgba(98,220,255,.85)}
+.blockchain-state-badge.active:before{background:#45d483;box-shadow:0 0 10px rgba(69,212,131,.75)}
+.blockchain-state-badge.off:before{background:#ff8a8a;box-shadow:0 0 10px rgba(255,138,138,.65)}
 .blockchain-status-panel{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:20px}
 .blockchain-stat{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.13);border-radius:10px;padding:14px}
 .blockchain-stat .metric-label{color:#b9d2e8}
 .blockchain-stat .metric-value{font-size:24px}
-.blockchain-tech-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 24px;padding-top:6px}
-.blockchain-tech-item{min-width:0}
-.blockchain-tech-item strong{display:block;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:#6b7d96;margin-bottom:4px}
-.blockchain-tech-item span{display:block;color:#27384a;overflow-wrap:anywhere}
-.blockchain-admin-only{border-left:4px solid #d4af37;background:#fffdf6}
-.blockchain-admin-banner{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px;padding:13px 14px;border-radius:10px;background:#fff8e8;border:1px solid #ecd79e;color:#604a11}
+.blockchain-tech-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding-top:8px}
+.blockchain-tech-item{min-width:0;border:1px solid #dbe5ee;background:#f8fbfd;border-radius:11px;padding:14px 15px}
+.blockchain-tech-item strong{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#6b7d96;margin-bottom:7px}
+.blockchain-tech-item span{display:block;color:#15324a;overflow-wrap:anywhere;font-weight:700}
+.blockchain-tech-item.contract{grid-column:1/-1;background:#071f37;border-color:#173b59}
+.blockchain-tech-item.contract strong{color:#8cb6d7}
+.blockchain-tech-item.contract span{color:#e7f4ff;font-size:12px;line-height:1.5}
+.blockchain-verify-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-bottom:4px}
+.blockchain-verify-tag{display:inline-flex;align-items:center;gap:7px;border-radius:999px;background:#e9f7ef;color:#137348;border:1px solid #bde4cc;padding:7px 10px;font:700 10px 'JetBrains Mono';letter-spacing:.04em}
+.blockchain-explorer-link{display:inline-flex;align-items:center;justify-content:center;border:1px solid #b8c8d6;background:#fff;color:#103a5c;border-radius:9px;padding:8px 11px;font-weight:800;font-size:12px;text-decoration:none}
+.blockchain-explorer-link:hover{background:#eef5f9}
+.blockchain-admin-only{border:1px solid #ecd79e;background:linear-gradient(180deg,#fffdf7 0%,#fffaf0 100%);box-shadow:0 12px 28px rgba(88,66,9,.08)}
+.blockchain-admin-banner{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px;padding:14px 15px;border-radius:11px;background:#fff3c9;border:1px solid #ecd079;color:#604a11}
 .blockchain-admin-banner strong{color:#4f3b07}
+.blockchain-admin-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
+.blockchain-admin-action{border:1px solid #cbd7e1;background:#fff;color:#173750;border-radius:10px;padding:13px 12px;font:800 13px Inter;cursor:pointer}
+.blockchain-admin-action:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(0,27,53,.08)}
+.blockchain-admin-action.activate{background:#0d6b47;color:#fff;border-color:#0d6b47}
+.blockchain-admin-action.pause{background:#173750;color:#fff;border-color:#173750}
+.blockchain-admin-action.disable{background:#fff1f0;color:#9d211a;border-color:#efb8b4}
+.blockchain-admin-action.current{opacity:.48;cursor:default;transform:none;box-shadow:none}
+.blockchain-admin-current{margin:10px 0 0;padding:10px 12px;border-radius:9px;background:#fff;border:1px solid #eadcae;color:#5d4a16;font-size:13px}
 .blockchain-readonly-note{display:none;padding:13px 14px;border:1px solid #bfd8e8;background:#f3f9fc;border-radius:10px;color:#31556e;font-size:13px;line-height:1.55}
 .blockchain-lot-card{border:1px solid var(--line);border-radius:11px;padding:16px;margin-bottom:10px;background:#fff}
 .blockchain-lot-card:last-child{margin-bottom:0}
@@ -470,6 +492,7 @@ body{
 #secBlockchainIntegracion[data-role="admin"] .blockchain-role-kicker:after{content:' · Vista administrativa'}
 @media(max-width:800px){
   .blockchain-status-panel{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .blockchain-admin-actions{grid-template-columns:1fr}
   .blockchain-tech-grid,.blockchain-lot-meta{grid-template-columns:1fr}
   .blockchain-lot-meta .wide{grid-column:auto}
 }
@@ -575,7 +598,7 @@ body{
     <div class="dashboard-header"><div class="wf-box">Integración blockchain</div><button class="wf-button" onclick="regresarAlPanelInterno()">Volver</button></div>
     <div class="page-head">
       <div><div class="eyebrow">Integridad y anclaje externo</div><h1 class="page-title">Estado de integración blockchain</h1><p class="page-sub">Los registros, hashes y lotes criptográficos se conservan aunque el envío a Polygon no esté activo.</p></div>
-      <span id="blockchainEstadoChip" class="status-chip">● Cargando estado...</span>
+      <span id="blockchainEstadoChipTop" class="status-chip">● Cargando estado...</span>
     </div>
 
     <div class="blockchain-shell">
@@ -584,10 +607,13 @@ body{
           <div class="blockchain-state-copy">
             <div class="blockchain-role-kicker">Integridad verificable</div>
             <div class="card-title">Estado institucional</div>
-            <div id="blockchainEstadoTitulo" class="metric-value" style="font-size:24px;margin-top:10px">-</div>
-            <p id="blockchainEstadoDescripcion" class="card-note" style="margin-top:10px;margin-bottom:0">Cargando...</p>
+            <div class="blockchain-state-banner">
+              <div class="blockchain-state-label">Estado actual de la integración</div>
+              <div id="blockchainEstadoTitulo" class="blockchain-state-title">-</div>
+              <p id="blockchainEstadoDescripcion" class="card-note" style="margin-top:8px;margin-bottom:0">Cargando...</p>
+            </div>
           </div>
-          <span id="blockchainEstadoChip" class="status-chip">● Cargando estado...</span>
+          <span id="blockchainEstadoChipHero" class="blockchain-state-badge">Cargando...</span>
         </div>
         <div class="blockchain-status-panel">
           <div class="blockchain-stat"><div class="metric-label">Movimientos históricos</div><div id="blockchainTotalMovimientos" class="metric-value">-</div></div>
@@ -598,14 +624,19 @@ body{
       </section>
 
       <section class="card">
-        <div class="card-title">Datos de verificación</div>
-        <p class="card-note">Información técnica pública para comprobar la red, el contrato y el estado institucional de la integración.</p>
+        <div class="blockchain-verify-head">
+          <div>
+            <div class="card-title">Verificación pública</div>
+            <p class="card-note">Datos técnicos para comprobar de forma independiente la red y el contrato utilizados por Club Abierto.</p>
+          </div>
+          <span class="blockchain-verify-tag">● DATOS VERIFICABLES</span>
+        </div>
         <div class="blockchain-tech-grid">
-          <div class="blockchain-tech-item"><strong>Red</strong><span id="blockchainRed">-</span></div>
+          <div class="blockchain-tech-item"><strong>Red blockchain</strong><span id="blockchainRed">-</span></div>
           <div class="blockchain-tech-item"><strong>Chain ID</strong><span id="blockchainChainId">-</span></div>
-          <div class="blockchain-tech-item"><strong>Contrato</strong><span id="blockchainContrato" class="mono">-</span></div>
-          <div class="blockchain-tech-item"><strong>Estado desde</strong><span id="blockchainEstadoDesde">-</span></div>
-          <div class="blockchain-tech-item" style="grid-column:1/-1"><strong>Motivo institucional</strong><span id="blockchainMotivo">-</span></div>
+          <div class="blockchain-tech-item contract"><strong>Contrato vigente</strong><span id="blockchainContrato" class="mono">-</span><a id="blockchainExplorerContrato" class="blockchain-explorer-link" href="#" target="_blank" rel="noopener" style="margin-top:10px;width:max-content">Ver contrato en explorador ↗</a></div>
+          <div class="blockchain-tech-item"><strong>Estado vigente desde</strong><span id="blockchainEstadoDesde">-</span></div>
+          <div class="blockchain-tech-item"><strong>Motivo institucional</strong><span id="blockchainMotivo">-</span></div>
         </div>
       </section>
 
@@ -613,17 +644,22 @@ body{
     </div>
 
     <section id="blockchainControlPrincipal" class="card blockchain-admin-only" style="display:none">
-      <div class="blockchain-admin-banner"><div><strong>Control del administrador principal</strong><br><span>Acciones sensibles: cualquier cambio queda sujeto a confirmación institucional.</span></div><span class="status-chip">ADMIN</span></div><div class="card-title">Estado operativo de la integración</div>
-      <p class="card-note">Cambiar el estado no elimina ni reescribe movimientos. Al activar por primera vez, todo historial pendiente se prepara en lotes según la política vigente antes de comenzar los envíos blockchain.</p>
-      <label class="form-label">Nuevo estado</label>
-      <select id="blockchainNuevoEstado" class="wf-input">
-        <option value="estructurada_no_activada">Integración blockchain estructurada pero no activada</option>
-        <option value="activa">Integración blockchain activada</option>
-        <option value="desactivada">Integración blockchain desactivada</option>
-      </select>
-      <label class="form-label" style="margin-top:12px">Motivo del cambio</label>
-      <textarea id="blockchainMotivoCambio" class="wf-input" rows="3" placeholder="Motivo institucional del cambio de estado"></textarea>
-      <div class="gov-actions" style="margin-top:14px"><button class="wf-button" onclick="cambiarEstadoIntegracionBlockchain()">Aplicar cambio de estado</button></div>
+      <div class="blockchain-admin-banner">
+        <div><strong>Control exclusivo del administrador principal</strong><br><span>Desde aquí se define si la integración permanece preparada, se activa o se desactiva.</span></div>
+        <span class="status-chip">ADMIN PRINCIPAL</span>
+      </div>
+      <div class="card-title">Control de activación blockchain</div>
+      <p class="card-note">La infraestructura ya está preparada para producción. Activar habilita los envíos automáticos a Polygon y el consumo de POL. Desactivar detiene nuevos envíos sin borrar historial ni comprobantes existentes.</p>
+      <div id="blockchainAdminEstadoActual" class="blockchain-admin-current">Estado actual: cargando...</div>
+
+      <label class="form-label" style="margin-top:16px">Motivo institucional del cambio</label>
+      <textarea id="blockchainMotivoCambio" class="wf-input" rows="3" placeholder="Ej.: Aprobación institucional para iniciar los anclajes automáticos"></textarea>
+
+      <div class="blockchain-admin-actions">
+        <button id="blockchainBtnPreparada" class="blockchain-admin-action pause" onclick="cambiarEstadoIntegracionBlockchain('estructurada_no_activada')">Mantener preparada</button>
+        <button id="blockchainBtnActivar" class="blockchain-admin-action activate" onclick="cambiarEstadoIntegracionBlockchain('activa')">Activar integración</button>
+        <button id="blockchainBtnDesactivar" class="blockchain-admin-action disable" onclick="cambiarEstadoIntegracionBlockchain('desactivada')">Desactivar integración</button>
+      </div>
     </section>
 
     <section class="card">
@@ -3630,7 +3666,14 @@ async function cargarEstadoIntegracionBlockchain(){
     var titulo=etiquetaEstadoBlockchain(estado);
     var el=document.getElementById('blockchainEstadoTitulo');if(el)el.innerText=titulo;
     el=document.getElementById('blockchainEstadoDescripcion');if(el)el.innerText=descripcionEstadoBlockchain(estado);
-    el=document.getElementById('blockchainEstadoChip');if(el)el.innerText='● '+titulo;
+    el=document.getElementById('blockchainEstadoChipTop');if(el)el.innerText='● '+titulo;
+    el=document.getElementById('blockchainEstadoChipHero');
+    if(el){
+        el.innerText=titulo;
+        el.classList.remove('active','off');
+        if(estado==='activa')el.classList.add('active');
+        if(estado==='desactivada')el.classList.add('off');
+    }
     el=document.getElementById('blockchainTotalMovimientos');if(el)el.innerText=Number(b.total_movimientos_auditoria||0).toLocaleString('es-AR');
     el=document.getElementById('blockchainPendientes');if(el)el.innerText=Number(b.movimientos_pendientes_de_lote||0).toLocaleString('es-AR');
     el=document.getElementById('blockchainLotesPreparados');if(el)el.innerText=Number(b.lotes_preparados||0).toLocaleString('es-AR');
@@ -3638,11 +3681,29 @@ async function cargarEstadoIntegracionBlockchain(){
     el=document.getElementById('blockchainRed');if(el)el.innerText=b.red||'-';
     el=document.getElementById('blockchainChainId');if(el)el.innerText=b.chain_id||'-';
     el=document.getElementById('blockchainContrato');if(el)el.innerText=b.contrato||'-';
+    var explorer=document.getElementById('blockchainExplorerContrato');
+    if(explorer){
+        var base=(String(b.red||'').toLowerCase().indexOf('amoy')>=0)?'https://amoy.polygonscan.com/address/':'https://polygonscan.com/address/';
+        if(b.contrato){explorer.href=base+encodeURIComponent(String(b.contrato));explorer.style.display='inline-flex';}
+        else{explorer.href='#';explorer.style.display='none';}
+    }
     el=document.getElementById('blockchainMotivo');if(el)el.innerText=b.motivo||'-';
     el=document.getElementById('blockchainEstadoDesde');if(el)el.innerText=b.estado_desde?formatearFechaHoraHistorial(b.estado_desde):'-';
     el=document.getElementById('blockchainControlPrincipal');
     if(el)el.style.display=b.es_principal===true?'block':'none';
-    var sel=document.getElementById('blockchainNuevoEstado');if(sel)sel.value=estado;
+    var adminEstado=document.getElementById('blockchainAdminEstadoActual');
+    if(adminEstado)adminEstado.innerText='Estado actual: '+titulo;
+    [
+      ['blockchainBtnPreparada','estructurada_no_activada'],
+      ['blockchainBtnActivar','activa'],
+      ['blockchainBtnDesactivar','desactivada']
+    ].forEach(function(par){
+      var btn=document.getElementById(par[0]);
+      if(!btn)return;
+      var actual=estado===par[1];
+      btn.disabled=actual;
+      btn.classList.toggle('current',actual);
+    });
     return b;
 }
 
@@ -3696,9 +3757,10 @@ async function irAIntegracionBlockchain(){
     }
 }
 
-async function cambiarEstadoIntegracionBlockchain(){
+async function cambiarEstadoIntegracionBlockchain(estadoForzado){
     if(ID_SOCIO_ACTIVO!==SUPER_ADMIN_ID){alert('Acción exclusiva del administrador principal.');return;}
-    var estado=document.getElementById('blockchainNuevoEstado').value;
+    var estado=String(estadoForzado||'').trim();
+    if(!['estructurada_no_activada','activa','desactivada'].includes(estado)){alert('Estado blockchain inválido.');return;}
     var motivo=String(document.getElementById('blockchainMotivoCambio').value||'').trim();
     if(motivo.length<5){alert('Ingresá un motivo de al menos 5 caracteres.');return;}
     var etiqueta=etiquetaEstadoBlockchain(estado);
