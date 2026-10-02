@@ -623,6 +623,24 @@ body{
         </div>
       </section>
 
+<section id="blockchainControlPrincipal" class="card blockchain-admin-only" style="display:none">
+      <div class="blockchain-admin-banner">
+        <div><strong>Control exclusivo del administrador principal</strong><br><span>Desde aquí se define si la integración permanece preparada, se activa o se desactiva.</span></div>
+        <span class="status-chip">ADMIN PRINCIPAL</span>
+      </div>
+      <div class="card-title">Control de activación blockchain</div>
+      <p class="card-note">La infraestructura ya está preparada para producción. Activar habilita los envíos automáticos a Polygon y el consumo de POL. Desactivar detiene nuevos envíos sin borrar historial ni comprobantes existentes.</p>
+      <div id="blockchainAdminEstadoActual" class="blockchain-admin-current">Estado actual: cargando...</div>
+
+      <label class="form-label" style="margin-top:16px">Motivo institucional del cambio</label>
+      <textarea id="blockchainMotivoCambio" class="wf-input" rows="3" placeholder="Ej.: Aprobación institucional para iniciar los anclajes automáticos"></textarea>
+
+      <div class="blockchain-admin-actions">
+        <button id="blockchainBtnActivar" class="blockchain-admin-action activate" onclick="cambiarEstadoIntegracionBlockchain('activa')">Activar integración</button>
+        <button id="blockchainBtnDesactivar" class="blockchain-admin-action disable" onclick="cambiarEstadoIntegracionBlockchain('desactivada')">Desactivar integración</button>
+      </div>
+    </section>
+
       <section class="card">
         <div class="blockchain-verify-head">
           <div>
@@ -643,23 +661,7 @@ body{
       <div class="blockchain-readonly-note"><strong>Vista informativa del socio.</strong> Esta sección permite verificar el estado, los lotes y los comprobantes públicos. Los controles de configuración y activación están reservados al administrador principal.</div>
     </div>
 
-    <section id="blockchainControlPrincipal" class="card blockchain-admin-only" style="display:none">
-      <div class="blockchain-admin-banner">
-        <div><strong>Control exclusivo del administrador principal</strong><br><span>Desde aquí se define si la integración permanece preparada, se activa o se desactiva.</span></div>
-        <span class="status-chip">ADMIN PRINCIPAL</span>
-      </div>
-      <div class="card-title">Control de activación blockchain</div>
-      <p class="card-note">La infraestructura ya está preparada para producción. Activar habilita los envíos automáticos a Polygon y el consumo de POL. Desactivar detiene nuevos envíos sin borrar historial ni comprobantes existentes.</p>
-      <div id="blockchainAdminEstadoActual" class="blockchain-admin-current">Estado actual: cargando...</div>
-
-      <label class="form-label" style="margin-top:16px">Motivo institucional del cambio</label>
-      <textarea id="blockchainMotivoCambio" class="wf-input" rows="3" placeholder="Ej.: Aprobación institucional para iniciar los anclajes automáticos"></textarea>
-
-      <div class="blockchain-admin-actions">
-        <button id="blockchainBtnActivar" class="blockchain-admin-action activate" onclick="cambiarEstadoIntegracionBlockchain('activa')">Activar integración</button>
-        <button id="blockchainBtnDesactivar" class="blockchain-admin-action disable" onclick="cambiarEstadoIntegracionBlockchain('desactivada')">Desactivar integración</button>
-      </div>
-    </section>
+    
 
     <section class="card">
       <div class="card-title">Lotes criptográficos</div>
@@ -3689,7 +3691,8 @@ async function cargarEstadoIntegracionBlockchain(){
     el=document.getElementById('blockchainMotivo');if(el)el.innerText=b.motivo||'-';
     el=document.getElementById('blockchainEstadoDesde');if(el)el.innerText=b.estado_desde?formatearFechaHoraHistorial(b.estado_desde):'-';
     el=document.getElementById('blockchainControlPrincipal');
-    if(el)el.style.display=b.es_principal===true?'block':'none';
+    var esPrincipalVisual=(b.es_principal===true) || (ROL_ACTIVO==='admin' && Number(ID_SOCIO_ACTIVO)===Number(SUPER_ADMIN_ID));
+    if(el)el.style.display=esPrincipalVisual?'block':'none';
     var adminEstado=document.getElementById('blockchainAdminEstadoActual');
     if(adminEstado)adminEstado.innerText='Estado actual: '+titulo;
     [
