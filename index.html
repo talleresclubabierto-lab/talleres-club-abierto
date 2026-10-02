@@ -3689,7 +3689,7 @@ async function cargarEstadoIntegracionBlockchain(){
         else{explorer.href='#';explorer.style.display='none';}
     }
     el=document.getElementById('blockchainMotivo');if(el)el.innerText=b.motivo||'-';
-    el=document.getElementById('blockchainEstadoDesde');if(el)el.innerText=b.estado_desde?formatearFechaHoraHistorial(b.estado_desde):'-';
+    el=document.getElementById('blockchainEstadoDesde');if(el)el.innerText=b.estado_desde?formatoFechaHora24Global(b.estado_desde):'-';
     el=document.getElementById('blockchainControlPrincipal');
     var esPrincipalVisual=(b.es_principal===true) || (ROL_ACTIVO==='admin' && Number(ID_SOCIO_ACTIVO)===Number(SUPER_ADMIN_ID));
     if(el)el.style.display=esPrincipalVisual?'block':'none';
@@ -3736,7 +3736,7 @@ async function cargarLotesBlockchain(){
             '<div class="wide"><strong>Raíz Merkle:</strong><br><span class="mono">'+escaparHtmlHistorial(l.raiz_merkle_sha256||'-')+'</span></div>'+
             '<div class="wide"><strong>TX:</strong><br><span class="mono">'+escaparHtmlHistorial(tx)+'</span></div>'+
             '<div><strong>Bloque:</strong> '+escaparHtmlHistorial(bloque)+'</div>'+
-            '<div><strong>Fecha:</strong> '+(fecha?formatearFechaHoraHistorial(fecha):'-')+'</div>'+
+            '<div><strong>Fecha:</strong> '+(fecha?formatoFechaHora24Global(fecha):'-')+'</div>'+
           '</div>'+
         '</div>';
     }).join('');
