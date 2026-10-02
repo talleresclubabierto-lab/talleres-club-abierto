@@ -487,6 +487,7 @@ body{
 .blockchain-lot-meta .wide{grid-column:1/-1}
 .blockchain-lot-meta .mono{font-size:11px;word-break:break-all}
 #secBlockchainIntegracion[data-role="socio"] .blockchain-admin-only{display:none!important}
+#secBlockchainIntegracion[data-role="admin"] .blockchain-admin-only{display:block!important}
 #secBlockchainIntegracion[data-role="socio"] .blockchain-readonly-note{display:block}
 #secBlockchainIntegracion[data-role="socio"] .blockchain-role-kicker:after{content:' · Vista del socio'}
 #secBlockchainIntegracion[data-role="admin"] .blockchain-role-kicker:after{content:' · Vista administrativa'}
@@ -597,7 +598,7 @@ body{
   <main class="section-shell">
     <div class="dashboard-header"><div class="wf-box">Integración blockchain</div><button class="wf-button" onclick="regresarAlPanelInterno()">Volver</button></div>
     <div class="page-head">
-      <div><div class="eyebrow">Integridad y anclaje externo</div><h1 class="page-title">Estado de integración blockchain</h1><p class="page-sub">Los registros, hashes y lotes criptográficos se conservan aunque el envío a Polygon no esté activo.</p></div>
+      <div><div class="eyebrow">Integridad y anclaje externo</div><h1 class="page-title">Estado de integración blockchain</h1></div>
       <span id="blockchainEstadoChipTop" class="status-chip">● Cargando estado...</span>
     </div>
 
@@ -623,7 +624,7 @@ body{
         </div>
       </section>
 
-<section id="blockchainControlPrincipal" class="card blockchain-admin-only" style="display:none">
+<section id="blockchainControlPrincipal" class="card blockchain-admin-only">
       <div class="blockchain-admin-banner">
         <div><strong>Control exclusivo del administrador principal</strong><br><span>Desde aquí se define si la integración permanece preparada, se activa o se desactiva.</span></div>
         <span class="status-chip">ADMIN PRINCIPAL</span>
@@ -652,9 +653,7 @@ body{
         <div class="blockchain-tech-grid">
           <div class="blockchain-tech-item"><strong>Red blockchain</strong><span id="blockchainRed">-</span></div>
           <div class="blockchain-tech-item"><strong>Chain ID</strong><span id="blockchainChainId">-</span></div>
-          <div class="blockchain-tech-item contract"><strong>Contrato vigente</strong><span id="blockchainContrato" class="mono">-</span><a id="blockchainExplorerContrato" class="blockchain-explorer-link" href="#" target="_blank" rel="noopener" style="margin-top:10px;width:max-content">Ver contrato en explorador ↗</a></div>
           <div class="blockchain-tech-item"><strong>Estado vigente desde</strong><span id="blockchainEstadoDesde">-</span></div>
-          <div class="blockchain-tech-item"><strong>Motivo institucional</strong><span id="blockchainMotivo">-</span></div>
         </div>
       </section>
 
@@ -3681,18 +3680,9 @@ async function cargarEstadoIntegracionBlockchain(){
     el=document.getElementById('blockchainLotesAnclados');if(el)el.innerText=Number(b.lotes_anclados||0).toLocaleString('es-AR');
     el=document.getElementById('blockchainRed');if(el)el.innerText=b.red||'-';
     el=document.getElementById('blockchainChainId');if(el)el.innerText=b.chain_id||'-';
-    el=document.getElementById('blockchainContrato');if(el)el.innerText=b.contrato||'-';
-    var explorer=document.getElementById('blockchainExplorerContrato');
-    if(explorer){
-        var base=(String(b.red||'').toLowerCase().indexOf('amoy')>=0)?'https://amoy.polygonscan.com/address/':'https://polygonscan.com/address/';
-        if(b.contrato){explorer.href=base+encodeURIComponent(String(b.contrato));explorer.style.display='inline-flex';}
-        else{explorer.href='#';explorer.style.display='none';}
-    }
-    el=document.getElementById('blockchainMotivo');if(el)el.innerText=b.motivo||'-';
     el=document.getElementById('blockchainEstadoDesde');if(el)el.innerText=b.estado_desde?formatoFechaHora24Global(b.estado_desde):'-';
     el=document.getElementById('blockchainControlPrincipal');
-    var esPrincipalVisual=(b.es_principal===true) || (ROL_ACTIVO==='admin' && Number(ID_SOCIO_ACTIVO)===Number(SUPER_ADMIN_ID));
-    if(el)el.style.display=esPrincipalVisual?'block':'none';
+    if(el && ROL_ACTIVO==='admin')el.style.display='block';
     var adminEstado=document.getElementById('blockchainAdminEstadoActual');
     if(adminEstado)adminEstado.innerText='Estado actual: '+titulo;
     [
