@@ -34,6 +34,28 @@ jobs:
           grep -q 'function obtenerPluginBiometricoNativo' android/app/src/main/assets/public/index.html
           grep -q 'native_biometric_register' android/app/src/main/assets/public/index.html
           grep -q 'Integraci' android/app/src/main/assets/public/index.html
+      - name: Validate inline JavaScript syntax
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync, writeFileSync, unlinkSync } from 'node:fs';
+          import { execFileSync } from 'node:child_process';
+          const html = readFileSync('www/index.html', 'utf8');
+          const scripts = [...html.matchAll(/<script\\b([^>]*)>([\\s\\S]*?)<\\/script\\s*>/gi)]
+            .filter(([, attrs, body]) => !/\\bsrc\\s*=/.test(attrs) && body.trim())
+            .map(([, , body]) => body);
+          if (!scripts.length) throw new Error('No inline scripts found');
+          for (let i = 0; i < scripts.length; i++) {
+            const file = '/tmp/club-abierto-script-' + i + '.js';
+            writeFileSync(file, scripts[i]);
+            try { execFileSync('node', ['--check', file], { stdio: 'pipe' }); }
+            catch (error) {
+              console.error('JavaScript syntax error in inline script', i, String(error.stderr));
+              process.exitCode = 1;
+            } finally { unlinkSync(file); }
+          }
+          if (process.exitCode) process.exit(process.exitCode);
+          console.log('Validated', scripts.length, 'inline scripts');
+          NODE
       - name: Build Android debug APK (no production signing)
         working-directory: android
         run: bash ./gradlew assembleDebug --no-daemon
