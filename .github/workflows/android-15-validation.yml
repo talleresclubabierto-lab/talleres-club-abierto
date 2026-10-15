@@ -22,8 +22,11 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - name: Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Android SDK (preinstalled on GitHub runner)
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          test -d "$ANDROID_HOME"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --version || true
       - name: Install dependencies
         run: npm install --no-audit --no-fund
       - name: Prepare web assets and synchronize Capacitor
