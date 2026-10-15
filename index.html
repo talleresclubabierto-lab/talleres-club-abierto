@@ -1028,7 +1028,7 @@ body{
   <main class="section-shell">
     <div class="dashboard-header"><div class="wf-box">Tu historia con Talleres</div><button class="wf-button" onclick="regresarAlPanelInterno()">Volver</button></div>
     <div class="page-head"><div><div class="eyebrow">Cada partido cuenta</div><h1 class="page-title">Mi asistencia</h1><p class="page-sub">Consultá tus partidos, la fecha y el horario de cada ingreso.</p></div><span id="historiaRango" class="status-chip">Datos demostrativos</span></div>
-    <div class="history-disclaimer"><strong>Resultados reales · asistencia demostrativa:</strong> se muestran únicamente los partidos que Talleres disputó como local y que ya finalizaron. Los resultados y escudos son reales; la asistencia y el momento de ingreso continúan simulados hasta conectar los registros de acceso del club.</div>
+    <div class="history-disclaimer"><strong>Resultados reales · asistencia demostrativa:</strong> se muestran partidos de local en el Mario Alberto Kempes; se excluyen encuentros de Copa Argentina en sede neutral y se eliminan duplicados. Los resultados y escudos son reales; la asistencia y el momento de ingreso continúan simulados hasta conectar los registros de acceso del club.</div>
     <div class="history-summary">
       <div class="history-stat"><div class="history-stat-label">Partidos habilitados</div><div id="historiaHabilitados" class="history-stat-value">-</div></div>
       <div class="history-stat"><div class="history-stat-label">Asistencia total</div><div id="historiaAsistidos" class="history-stat-value">-</div></div>
@@ -3238,7 +3238,21 @@ var PARTIDOS_HISTORIA_BASE=[
 ['2025-01-29','Independiente','2–3','Liga Profesional',11],['2025-02-09','Lanús','0–1','Liga Profesional',12],['2025-02-16','Atlético Tucumán','1–1','Liga Profesional',9785],['2025-03-01','Tigre','1–2','Liga Profesional',7767],['2025-03-10','Rosario Central','0–0','Liga Profesional',17],['2025-03-19','Deportivo Armenio','3–3 (4–5 pen.)','Copa Argentina',17701],['2025-04-02','São Paulo','0–1','CONMEBOL Libertadores',2026],['2025-04-05','Gimnasia La Plata','2–0','Liga Profesional',9],['2025-04-18','Vélez Sarsfield','0–1','Liga Profesional',21],['2025-05-03','Instituto','1–2','Liga Profesional',2975],['2025-05-08','Libertad','0–0','CONMEBOL Libertadores',2670],['2025-05-15','Alianza Lima','2–0','CONMEBOL Libertadores',2680],['2025-07-11','San Lorenzo','1–2','Liga Profesional',18],['2025-07-27','Godoy Cruz','0–0','Liga Profesional',6756],['2025-08-18','San Martín de San Juan','0–0','Liga Profesional',7845],['2025-08-31','Deportivo Riestra','0–1','Liga Profesional',17702],['2025-09-27','Sarmiento','1–0','Liga Profesional',10158],['2025-10-05','Belgrano','0–0','Liga Profesional',4],['2025-10-18','River Plate','0–2','Liga Profesional',16],['2025-11-08','Platense','1–0','Liga Profesional',7764],
 ['2026-01-23','Newell’s Old Boys','2–1','Liga Profesional',14],['2026-01-31','Platense','1–2','Liga Profesional',7764],['2026-02-04','Argentino de Merlo','2–0','Copa Argentina',17700],['2026-02-14','Gimnasia de Mendoza','2–1','Liga Profesional',11972],['2026-02-28','San Lorenzo','0–0','Liga Profesional',18],['2026-03-12','Instituto','2–0','Liga Profesional',2975],['2026-04-02','Boca Juniors','0–1','Liga Profesional',5],['2026-04-19','Deportivo Riestra','2–0','Liga Profesional',17702],['2026-05-09','Belgrano','0–1','Liga Profesional',4],['2026-05-20','Atlético Tucumán','0–3','Copa Argentina',9785],['2026-07-30','Vélez Sarsfield','1–3','Liga Profesional',21],['2026-08-11','Lanús','0–3','Liga Profesional',12],['2026-08-24','Rosario Central','2–2','Liga Profesional',17],['2026-08-29','Central Córdoba','0–0','Liga Profesional',11989],['2026-09-12','Unión','2–1','Liga Profesional',20]
 ];
-var PARTIDOS_HISTORIA=PARTIDOS_HISTORIA_BASE.slice();
+// Solo partidos locales en el Kempes: los encuentros de Copa Argentina en sede neutral se excluyen.
+function normalizarRivalHistoria(nombre){return String(nombre||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'')}
+function esKempesHistoria(nombre){return /(?:mario\s*(?:alberto\s*)?kempes|estadio\s*kempes|cordoba\s*stadium)/i.test(String(nombre||''))}
+function fechaISOHistoria(fecha){var d=new Date(fecha);return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Argentina/Cordoba',year:'numeric',month:'2-digit',day:'2-digit'}).format(d)}
+function diasEntreHistoria(a,b){return Math.abs((Date.parse(a+'T12:00:00Z')-Date.parse(b+'T12:00:00Z'))/86400000)}
+function limpiarPartidosHistoria(partidos){
+ var elegibles=partidos.filter(function(p){return p&&p[0]&&p[1]&&!/copa argentina/i.test(String(p[3]))});
+ var unicos=[];
+ elegibles.forEach(function(p){
+  var rival=normalizarRivalHistoria(p[1]),previo=unicos.findIndex(function(q){return normalizarRivalHistoria(q[1])===rival&&diasEntreHistoria(q[0],p[0])<=7});
+  if(previo<0)unicos.push(p);else if(p._kempesVerificado&&!unicos[previo]._kempesVerificado)unicos[previo]=p;
+ });
+ return unicos;
+}
+var PARTIDOS_HISTORIA=limpiarPartidosHistoria(PARTIDOS_HISTORIA_BASE);
 var HISTORIA_ACTUALIZACION_INTENTADA=false;
 function hashHistoria(texto){var h=2166136261;for(var i=0;i<texto.length;i++){h^=texto.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
 function minutosHoraHistoria(hora,delta){var p=hora.split(':').map(Number),total=p[0]*60+p[1]+delta;while(total<0)total+=1440;total%=1440;return String(Math.floor(total/60)).padStart(2,'0')+':'+String(total%60).padStart(2,'0')}
@@ -3246,15 +3260,25 @@ function fechaHoyHistoria(){try{return new Intl.DateTimeFormat('en-CA',{timeZone
 function logoEquipoHistoria(id){return 'https://a.espncdn.com/i/teamlogos/soccer/500/'+Number(id||0)+'.png'}
 async function actualizarPartidosHistoriaDesdeFuente(){
  if(HISTORIA_ACTUALIZACION_INTENTADA)return;HISTORIA_ACTUALIZACION_INTENTADA=true;
- var fuente=document.getElementById('historiaFuente');if(fuente)fuente.innerText='Comprobando resultados reales actualizados…';
+ var fuente=document.getElementById('historiaFuente');if(fuente)fuente.innerText='Comprobando partidos locales en el Kempes…';
  try{
   var urls=[2025,2026].map(function(anio){return 'https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/teams/19/schedule?season='+anio});
   var respuestas=await Promise.all(urls.map(function(url){return fetch(url,{headers:{Accept:'application/json'}}).then(function(r){if(!r.ok)throw new Error('Fuente deportiva no disponible');return r.json()})}));
   var dinamicos=[];
-  respuestas.forEach(function(data){var competencia=data&&data.leagues&&data.leagues[0]&&data.leagues[0].name||'Liga Profesional';(data&&Array.isArray(data.events)?data.events:[]).forEach(function(e){var c=e.competitions&&e.competitions[0],equipos=c&&c.competitors||[],local=equipos.find(function(x){return x.homeAway==='home'}),visitante=equipos.find(function(x){return x.homeAway==='away'});if(!c||!c.status||!c.status.type||c.status.type.completed!==true||!local||!visitante)return;var localId=Number(local.team&&local.team.id),localNombre=String(local.team&&local.team.displayName||'');if(localId!==19&&!localNombre.includes('Talleres'))return;var fecha=new Date(e.date).toLocaleDateString('en-CA',{timeZone:'America/Argentina/Cordoba'}),resultado=String(local.score&&local.score.displayValue!==undefined?local.score.displayValue:local.score)+'–'+String(visitante.score&&visitante.score.displayValue!==undefined?visitante.score.displayValue:visitante.score);dinamicos.push([fecha,String(visitante.team&&visitante.team.displayName||'Rival'),resultado,competencia,Number(visitante.team&&visitante.team.id)||0])})});
-  var mapa={};PARTIDOS_HISTORIA_BASE.concat(dinamicos).forEach(function(p){mapa[p[0]+'|'+p[1].toLowerCase()]=p});PARTIDOS_HISTORIA=Object.keys(mapa).map(function(k){return mapa[k]});
-  if(fuente)fuente.innerText='Resultados reales actualizados automáticamente · asistencia demostrativa.';renderizarTuHistoria();
- }catch(e){console.warn('Se conserva la última base de resultados validada:',e);if(fuente)fuente.innerText='Resultados reales validados al 21/09/2026 · asistencia demostrativa.'}
+  respuestas.forEach(function(data){var competencia=data&&data.leagues&&data.leagues[0]&&data.leagues[0].name||'Liga Profesional';(data&&Array.isArray(data.events)?data.events:[]).forEach(function(e){
+   var c=e.competitions&&e.competitions[0],equipos=c&&c.competitors||[],local=equipos.find(function(x){return x.homeAway==='home'}),visitante=equipos.find(function(x){return x.homeAway==='away'});
+   if(!c||!c.status||!c.status.type||c.status.type.completed!==true||!local||!visitante)return;
+   var localId=Number(local.team&&local.team.id),localNombre=String(local.team&&local.team.displayName||'');
+   if(localId!==19&&!/\btalleres\b/i.test(localNombre))return;
+   // homeAway no prueba el estadio: la sede debe estar identificada explícitamente.
+   var estadio=String(c.venue&&(c.venue.fullName||c.venue.name)||e.venue&&(e.venue.fullName||e.venue.name)||'');
+   if(!esKempesHistoria(estadio))return;
+   var fecha=fechaISOHistoria(e.date),resultado=String(local.score&&local.score.displayValue!==undefined?local.score.displayValue:local.score)+'–'+String(visitante.score&&visitante.score.displayValue!==undefined?visitante.score.displayValue:visitante.score);
+   var p=[fecha,String(visitante.team&&visitante.team.displayName||'Rival'),resultado,competencia,Number(visitante.team&&visitante.team.id)||0];p._kempesVerificado=true;dinamicos.push(p);
+  })});
+  PARTIDOS_HISTORIA=limpiarPartidosHistoria(PARTIDOS_HISTORIA_BASE.concat(dinamicos));
+  if(fuente)fuente.innerText='Partidos locales filtrados por estadio · asistencia demostrativa.';renderizarTuHistoria();
+ }catch(e){console.warn('Se conserva la base local sin Copa Argentina:',e);if(fuente)fuente.innerText='Partidos locales de referencia · asistencia demostrativa.'}
 }
 function datosTuHistoria(){
  var socio=obtenerDatosSocio(ID_SOCIO_ACTIVO),ant=socio?socio.antiguedad:0,tasa=ant>15?.95:(ant>=10?.90:.80);
