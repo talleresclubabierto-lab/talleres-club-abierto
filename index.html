@@ -435,6 +435,76 @@ body{
 .padron-loading{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:#496174}.padron-loading:before{content:'';width:9px;height:9px;border-radius:50%;background:#62dcff;box-shadow:0 0 9px rgba(98,220,255,.7)}
 @media(max-width:850px){.history-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){.history-timing{grid-template-columns:1fr}.history-match{grid-template-columns:68px minmax(0,1fr)}.history-status{grid-column:2;justify-self:start}.history-stat-value{font-size:23px}}
+
+/* Blockchain integration — role-aware visual system */
+.blockchain-shell{display:grid;gap:16px}
+.blockchain-hero{background:linear-gradient(135deg,#001b35 0%,#063c68 100%);color:#fff;border:0;box-shadow:0 18px 38px rgba(0,27,53,.16);position:relative;overflow:hidden}
+.blockchain-hero:after{content:'';position:absolute;width:260px;height:260px;border:1px solid rgba(255,255,255,.09);border-radius:50%;right:-90px;top:-120px}
+.blockchain-hero .card-title,.blockchain-hero .metric-value{color:#fff}
+.blockchain-hero .card-note{color:#d8e8f7}
+.blockchain-role-kicker{font:700 11px 'JetBrains Mono';letter-spacing:.08em;text-transform:uppercase;color:#9fc5e8;margin-bottom:8px}
+.blockchain-state-row{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.blockchain-state-copy{max-width:820px;flex:1 1 560px}
+.blockchain-state-banner{margin-top:10px;padding:16px 18px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.07);border-radius:12px}
+.blockchain-state-label{font:700 10px 'JetBrains Mono';letter-spacing:.09em;text-transform:uppercase;color:#9fc5e8;margin-bottom:7px}
+.blockchain-state-title{font-size:23px;font-weight:800;line-height:1.25;color:#fff}
+.blockchain-state-badge{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:9px 12px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);color:#fff;font:700 11px 'JetBrains Mono';letter-spacing:.04em;white-space:nowrap}
+.blockchain-state-badge:before{content:'';width:8px;height:8px;border-radius:50%;background:#62dcff;box-shadow:0 0 10px rgba(98,220,255,.85)}
+.blockchain-state-badge.active:before{background:#45d483;box-shadow:0 0 10px rgba(69,212,131,.75)}
+.blockchain-state-badge.off:before{background:#ff8a8a;box-shadow:0 0 10px rgba(255,138,138,.65)}
+.blockchain-status-panel{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:20px}
+.blockchain-stat{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.13);border-radius:10px;padding:14px}
+.blockchain-stat .metric-label{color:#b9d2e8}
+.blockchain-stat .metric-value{font-size:24px}
+.blockchain-tech-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding-top:8px}
+.blockchain-tech-item{min-width:0;border:1px solid #dbe5ee;background:#f8fbfd;border-radius:11px;padding:14px 15px}
+.blockchain-tech-item strong{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#6b7d96;margin-bottom:7px}
+.blockchain-tech-item span{display:block;color:#15324a;overflow-wrap:anywhere;font-weight:700}
+.blockchain-tech-item.contract{grid-column:1/-1;background:#071f37;border-color:#173b59}
+.blockchain-tech-item.contract strong{color:#8cb6d7}
+.blockchain-tech-item.contract span{color:#e7f4ff;font-size:12px;line-height:1.5}
+.blockchain-verify-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-bottom:4px}
+.blockchain-verify-tag{display:inline-flex;align-items:center;gap:7px;border-radius:999px;background:#e9f7ef;color:#137348;border:1px solid #bde4cc;padding:7px 10px;font:700 10px 'JetBrains Mono';letter-spacing:.04em}
+.blockchain-explorer-link{display:inline-flex;align-items:center;justify-content:center;border:1px solid #b8c8d6;background:#fff;color:#103a5c;border-radius:9px;padding:8px 11px;font-weight:800;font-size:12px;text-decoration:none}
+.blockchain-explorer-link:hover{background:#eef5f9}
+.blockchain-admin-only{border:1px solid #ecd79e;background:linear-gradient(180deg,#fffdf7 0%,#fffaf0 100%);box-shadow:0 12px 28px rgba(88,66,9,.08)}
+.blockchain-admin-banner{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px;padding:14px 15px;border-radius:11px;background:#fff3c9;border:1px solid #ecd079;color:#604a11}
+.blockchain-admin-banner strong{color:#4f3b07}
+.blockchain-admin-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+.blockchain-admin-action{border:1px solid #cbd7e1;background:#fff;color:#173750;border-radius:10px;padding:13px 12px;font:800 13px Inter;cursor:pointer}
+.blockchain-admin-action:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(0,27,53,.08)}
+.blockchain-admin-action.activate{background:#0d6b47;color:#fff;border-color:#0d6b47}
+.blockchain-admin-action.pause{background:#173750;color:#fff;border-color:#173750}
+.blockchain-admin-action.disable{background:#fff1f0;color:#9d211a;border-color:#efb8b4}
+.blockchain-admin-action.current{opacity:.48;cursor:default;transform:none;box-shadow:none}
+.blockchain-admin-current{margin:10px 0 0;padding:10px 12px;border-radius:9px;background:#fff;border:1px solid #eadcae;color:#5d4a16;font-size:13px}
+.blockchain-readonly-note{display:none;padding:13px 14px;border:1px solid #bfd8e8;background:#f3f9fc;border-radius:10px;color:#31556e;font-size:13px;line-height:1.55}
+.blockchain-lot-card{border:1px solid var(--line);border-radius:11px;padding:16px;margin-bottom:10px;background:#fff}
+.blockchain-lot-card:last-child{margin-bottom:0}
+.blockchain-lot-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.blockchain-lot-title{font-weight:800;color:var(--navy);overflow-wrap:anywhere}
+.blockchain-lot-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 18px;margin-top:12px;color:#536170;font-size:13px;line-height:1.45}
+.blockchain-lot-meta .wide{grid-column:1/-1}
+.blockchain-lot-meta .mono{font-size:11px;word-break:break-all}
+#secBlockchainIntegracion[data-role="socio"] .blockchain-admin-only{display:none!important}
+#secBlockchainIntegracion[data-role="admin"] .blockchain-admin-only{display:block!important}
+#secBlockchainIntegracion[data-role="socio"] .blockchain-readonly-note{display:block}
+#secBlockchainIntegracion[data-role="socio"] .blockchain-role-kicker:after{content:' · Vista del socio'}
+#secBlockchainIntegracion[data-role="admin"] .blockchain-role-kicker:after{content:' · Vista administrativa'}
+@media(max-width:800px){
+  .blockchain-status-panel{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .blockchain-admin-actions{grid-template-columns:1fr}
+  .blockchain-tech-grid,.blockchain-lot-meta{grid-template-columns:1fr}
+  .blockchain-lot-meta .wide{grid-column:auto}
+}
+@media(max-width:520px){
+  .blockchain-status-panel{grid-template-columns:1fr 1fr;gap:9px}
+  .blockchain-stat{padding:12px}
+  .blockchain-stat .metric-value{font-size:20px}
+  .blockchain-state-row{display:block}
+  #blockchainEstadoChip{margin-top:12px}
+}
+
 </style><script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -479,12 +549,13 @@ body{
       <button class="btn-action-red" onclick="irAAuditoriaPublica()"><span class="action-icon">◎</span>Auditoría pública<br><small style="font-weight:500;color:#64748b">Consultá qué votó cada socio</small></button>
       <button class="btn-action-red" onclick="irAParedesDeCristal()"><span class="action-icon">▦</span>Paredes de Cristal<br><small style="font-weight:500;color:#64748b">Balance y auditoría económica ponderada</small></button>
       <button class="btn-action-red" onclick="irATuHistoria()"><span class="action-icon">✓</span>Tu historia con Talleres<br><small style="font-weight:500;color:#64748b">Partidos, asistencia y horarios de ingreso</small></button>
-      <button class="btn-action-red" onclick="irAHistorialAdministrativo()"><span class="action-icon">≡</span>Historial de cambios<br><small style="font-weight:500;color:#64748b">Consultá el registro protegido de cambios</small></button>
+      <button class="btn-action-red" onclick="irAHistorialAdministrativo()"><span class="action-icon">▤</span>Historial de cambios<br><small style="font-weight:500;color:#64748b">Consultá el registro protegido de cambios</small></button>
+      <button class="btn-action-red" onclick="irAIntegracionBlockchain()"><span class="action-icon">⬡</span>Integración blockchain<br><small style="font-weight:500;color:#64748b">Estado, lotes y trazabilidad criptográfica</small></button>
       <button class="btn-action-red" onclick="irACambioClave()"><span class="action-icon">⌨</span>Cambiar contraseña<br><small style="font-weight:500;color:#64748b">Administrá tu clave personal</small></button>
       <button class="btn-action-red" onclick="irAPasskey()"><span class="action-icon">◎</span>Identidad biométrica / Passkey<br><small style="font-weight:500;color:#64748b">Registrá huella, Face ID o Windows Hello</small></button>
     </div>
     <div class="metrics-grid">
-      <div class="card"><div class="metric-label">Participación ponderada</div><div id="lblSocioPorcentual" style="font-size:18px;font-weight:800;color:var(--navy);margin-top:8px">-</div></div>
+      
       <div class="card"><div class="metric-label">Puntos por voto</div><div id="lblSocioPuntos" style="font-size:18px;font-weight:800;color:var(--navy);margin-top:8px">-</div></div>
       <div class="card"><div class="metric-label">Próximo escalón</div><div id="lblSocioDiasFaltantes" style="font-size:18px;font-weight:800;color:var(--navy);margin-top:8px">-</div></div>
     </div>
@@ -510,6 +581,7 @@ body{
       <button class="btn-action-red" onclick="irAAuditoriaPublica()"><span class="action-icon">◎</span>Auditoría pública</button>
       <button class="btn-action-red" onclick="irAParedesDeCristal()"><span class="action-icon">▦</span>Paredes de Cristal<br><small style="font-weight:500;color:#64748b">Balance y auditoría económica ponderada</small></button>
       <button class="btn-action-red" onclick="irAHistorialAdministrativo()"><span class="action-icon">▤</span>Historial de cambios<br><small style="font-weight:500;color:#64748b">Auditoría administrativa protegida</small></button>
+      <button class="btn-action-red" onclick="irAIntegracionBlockchain()"><span class="action-icon">⬡</span>Integración blockchain<br><small style="font-weight:500;color:#64748b">Estado operativo, lotes y anclajes</small></button>
       <button class="btn-action-red" onclick="irAGobernanzaInstitucional()"><span class="action-icon">⚖</span>Gobernanza institucional<br><small style="font-weight:500;color:#64748b">Reglas versionadas, activación y reversión</small></button>
       <button id="btnGestionAdministradores" class="btn-action-red" style="display:none" onclick="mostrarSeccionAdmin('secGestionAdmins')"><span class="action-icon">♙</span>Gestionar administradores</button>
       <button class="btn-action-red" onclick="mostrarSeccionAdmin('secGestionPadron')"><span class="action-icon">☷</span>Gestionar padrón</button>
@@ -518,6 +590,91 @@ body{
     </div>
     <div class="maquetacion-box"><div class="maquetacion-title">Herramientas temporales de maquetación</div><div class="maquetacion-description">Permiten reiniciar votos durante pruebas. Estas acciones no forman parte del modelo definitivo de gobernanza blockchain.</div><select id="cmbResetEncuesta" class="wf-input"></select><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="reset-button" onclick="resetearEncuestaSeleccionada()">Resetear encuesta seleccionada</button><button class="reset-button" onclick="resetearTodasLasEncuestas()">Resetear todas</button></div></div>
   </main><nav class="bottom-nav"><button class="active" onclick="regresarAlPanelInterno()"><span class="mini-icon">▦</span>Dashboard</button><button class="" onclick="irAResultadosGenerales()"><span class="mini-icon">◇</span>Votar</button><button class="" onclick="irAResultadosGenerales()"><span class="mini-icon">▥</span>Resultados</button><button class="" onclick="irAAuditoriaPublica()"><span class="mini-icon">◎</span>Auditoría</button></nav>
+</div>
+
+
+<div id="secBlockchainIntegracion" class="sub-view full-width">
+  <div class="topbar"><div class="brand"><span class="app-logo-mark" role="img" aria-label="Escudo Talleres Club Abierto"></span><span class="brand-role-label">TALLERES CLUB ABIERTO</span></div><div class="top-actions"><span class="navlink"><span class="network-dot"></span>Integración blockchain</span><button onclick="volverAlLogin()">Salir</button></div></div>
+  <main class="section-shell">
+    <div class="dashboard-header"><div class="wf-box">Integración blockchain</div><button class="wf-button" onclick="regresarAlPanelInterno()">Volver</button></div>
+    <div class="page-head">
+      <div><div class="eyebrow">Integridad y anclaje externo</div><h1 class="page-title">Estado de integración blockchain</h1></div>
+      <span id="blockchainEstadoChipTop" class="status-chip">● Cargando estado...</span>
+    </div>
+
+    <div class="blockchain-shell">
+      <section class="card blockchain-hero">
+        <div class="blockchain-state-row">
+          <div class="blockchain-state-copy">
+            <div class="blockchain-role-kicker">Integridad verificable</div>
+            <div class="card-title">Estado institucional</div>
+            <div class="blockchain-state-banner">
+              <div class="blockchain-state-label">Estado actual de la integración</div>
+              <div id="blockchainEstadoTitulo" class="blockchain-state-title">-</div>
+              <p id="blockchainEstadoDescripcion" class="card-note" style="margin-top:8px;margin-bottom:0">Cargando...</p>
+            </div>
+          </div>
+          <span id="blockchainEstadoChipHero" class="blockchain-state-badge">Cargando...</span>
+        </div>
+        <div class="blockchain-status-panel">
+          <div class="blockchain-stat"><div class="metric-label">Movimientos históricos</div><div id="blockchainTotalMovimientos" class="metric-value">-</div></div>
+          <div class="blockchain-stat"><div class="metric-label">Pendientes de lote</div><div id="blockchainPendientes" class="metric-value">-</div></div>
+          <div class="blockchain-stat"><div class="metric-label">Lotes preparados</div><div id="blockchainLotesPreparados" class="metric-value">-</div></div>
+          <div class="blockchain-stat"><div class="metric-label">Lotes anclados</div><div id="blockchainLotesAnclados" class="metric-value">-</div></div>
+        </div>
+      </section>
+
+<section id="blockchainControlPrincipal" class="card blockchain-admin-only">
+      <div class="blockchain-admin-banner">
+        <div><strong>Control exclusivo del administrador principal</strong><br><span>Desde aquí se define si la integración permanece preparada, se activa o se desactiva.</span></div>
+        <span class="status-chip">ADMIN PRINCIPAL</span>
+      </div>
+      <div class="card-title">Control de activación blockchain</div>
+      <p class="card-note">La infraestructura ya está preparada para producción. Activar habilita los envíos automáticos a Polygon y el consumo de POL. Desactivar detiene nuevos envíos sin borrar historial ni comprobantes existentes.</p>
+      <div id="blockchainAdminEstadoActual" class="blockchain-admin-current">Estado actual: cargando...</div>
+
+      <label class="form-label" style="margin-top:16px">Motivo institucional del cambio</label>
+      <textarea id="blockchainMotivoCambio" class="wf-input" rows="3" placeholder="Ej.: Aprobación institucional para iniciar los anclajes automáticos"></textarea>
+
+      <div class="blockchain-admin-actions">
+        <button id="blockchainBtnActivar" class="blockchain-admin-action activate" onclick="cambiarEstadoIntegracionBlockchain('activa')">Activar integración</button>
+        <button id="blockchainBtnDesactivar" class="blockchain-admin-action disable" onclick="cambiarEstadoIntegracionBlockchain('desactivada')">Desactivar integración</button>
+      </div>
+    </section>
+
+      <section class="card">
+        <div class="blockchain-verify-head">
+          <div>
+            <div class="card-title">Verificación pública</div>
+            <p class="card-note">Datos técnicos para comprobar de forma independiente la red y el contrato utilizados por Club Abierto.</p>
+          </div>
+          <span class="blockchain-verify-tag">● DATOS VERIFICABLES</span>
+        </div>
+        <div class="blockchain-tech-grid">
+          <div class="blockchain-tech-item"><strong>Red blockchain</strong><span id="blockchainRed">-</span></div>
+          <div class="blockchain-tech-item"><strong>Chain ID</strong><span id="blockchainChainId">-</span></div>
+          <div class="blockchain-tech-item"><strong>Estado vigente desde</strong><span id="blockchainEstadoDesde">-</span></div>
+        </div>
+      </section>
+
+      <div class="blockchain-readonly-note"><strong>Vista informativa del socio.</strong> Esta sección permite verificar el estado, los lotes y los comprobantes públicos. Los controles de configuración y activación están reservados al administrador principal.</div>
+    </div>
+
+    
+
+    <section class="card">
+      <div class="card-title">Lotes criptográficos</div>
+      <p class="card-note">Cada lote conserva el rango de movimientos, la raíz Merkle y, cuando exista, la transacción y el bloque de Polygon.</p>
+      <div class="gov-actions"><button class="wf-button" onclick="cargarLotesBlockchain()">Actualizar lotes</button></div>
+      <div id="blockchainLotesLista" style="margin-top:14px"><div class="card-note">Cargando lotes...</div></div>
+    </section>
+
+    <section class="card">
+      <div class="card-title">Conservación histórica</div>
+      <p class="card-note">Mientras la integración no esté activa, cada operación continúa registrándose con su hash y trazabilidad. Cuando se active, los movimientos históricos aún no cubiertos se incorporarán en lotes de la cantidad definida por la política vigente, sin perder registros intermedios.</p>
+    </section>
+  </main>
+  <nav class="bottom-nav"><button class="active" onclick="regresarAlPanelInterno()"><span class="mini-icon">▦</span>Dashboard</button><button onclick="irAHistorialAdministrativo()"><span class="mini-icon">▤</span>Historial</button><button onclick="irAAuditoriaPublica()"><span class="mini-icon">◎</span>Auditoría</button></nav>
 </div>
 
 
@@ -689,18 +846,18 @@ body{
       <div>
         <div class="eyebrow">Ledger administrativo · 5D</div>
         <h1 class="page-title">Historial administrativo</h1>
-        <p class="page-sub">Registro append-only de cambios relevantes. La lectura requiere validación biométrica administrativa vigente.</p>
+        <p class="page-sub">Registro append-only de cambios relevantes. La lectura está disponible para socios activos con validación biométrica vigente.</p>
       </div>
       <span id="chipHistorialAdmin" class="status-chip">● Protegido</span>
     </div>
 
     <div id="estadoHistorialAdmin" class="admin-history-status warn">
-      Para consultar el historial verificá primero tu identidad con biometría / Passkey.
+      Para consultar el historial verificá primero tu identidad con tu Passkey.
     </div>
 
     <section class="card">
       <div class="card-title">Acceso seguro</div>
-      <p class="card-note">La validación usa WebAuthn con propósito <strong>accion_admin</strong>. Conocer el número de socio administrador no es suficiente para acceder.</p>
+      <p class="card-note">La validación usa WebAuthn/Passkey. El historial está disponible para socios activos autenticados y requiere una verificación biométrica vigente.</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
         <button id="btnVerificarHistorialAdmin" class="wf-button" onclick="verificarAccesoHistorialAdmin()">Verificar identidad</button>
         <button id="btnRecargarHistorialAdmin" class="btn-secondary-dark" onclick="cargarHistorialAdministrativo()" disabled>Recargar historial</button>
@@ -762,7 +919,7 @@ body{
     </div>
 
     <div id="listaHistorialAdmin">
-      <div class="admin-history-empty">Validá tu identidad administrativa para consultar el historial.</div>
+      <div class="admin-history-empty">Validá tu identidad para consultar el historial.</div>
     </div>
     <div class="admin-history-pagination" id="paginacionHistorialAdmin" style="display:none">
       <button class="btn-secondary-dark" id="historialAnterior" onclick="cargarHistorialAdministrativo(HISTORIAL_ADMIN_PAGINA-1)">Anterior</button>
@@ -871,7 +1028,7 @@ body{
   <main class="section-shell">
     <div class="dashboard-header"><div class="wf-box">Tu historia con Talleres</div><button class="wf-button" onclick="regresarAlPanelInterno()">Volver</button></div>
     <div class="page-head"><div><div class="eyebrow">Cada partido cuenta</div><h1 class="page-title">Mi asistencia</h1><p class="page-sub">Consultá tus partidos, la fecha y el horario de cada ingreso.</p></div><span id="historiaRango" class="status-chip">Datos demostrativos</span></div>
-    <div class="history-disclaimer"><strong>Resultados reales · asistencia demostrativa:</strong> se muestran únicamente los partidos que Talleres disputó como local y que ya finalizaron. Los resultados y escudos son reales; la asistencia y el momento de ingreso continúan simulados hasta conectar los registros de acceso del club.</div>
+    <div class="history-disclaimer"><strong>Resultados reales · asistencia demostrativa:</strong> se muestran partidos de local en el Mario Alberto Kempes; se excluyen encuentros de Copa Argentina en sede neutral y se eliminan duplicados. Los resultados y escudos son reales; la asistencia y el momento de ingreso continúan simulados hasta conectar los registros de acceso del club.</div>
     <div class="history-summary">
       <div class="history-stat"><div class="history-stat-label">Partidos habilitados</div><div id="historiaHabilitados" class="history-stat-value">-</div></div>
       <div class="history-stat"><div class="history-stat-label">Asistencia total</div><div id="historiaAsistidos" class="history-stat-value">-</div></div>
@@ -1949,9 +2106,15 @@ function prepararOpcionesAutenticacionWebAuthn(options){
     if(Array.isArray(copy.allowCredentials)){
         copy.allowCredentials=copy.allowCredentials.map(function(c){
             c.id=base64urlToArrayBuffer(c.id);
+            /* En la web de escritorio no ofrecer autenticadores híbridos
+               (teléfono por QR/Bluetooth) como vía principal. */
+            c.transports=['internal'];
             return c;
         });
     }
+    /* Fuerza la validación con el autenticador integrado del equipo:
+       Windows Hello / huella / rostro / PIN seguro local. */
+    copy.authenticatorAttachment='platform';
     return copy;
 }
 
@@ -2283,10 +2446,10 @@ function actualizarEstadoHistorialAdmin(){
         estado.className='admin-history-status ok';
         estado.innerHTML='<strong>✓ Identidad verificada.</strong> Acceso válido hasta '+formatoFechaHora24Global(HISTORIAL_ADMIN_VERIFICACION.expiresAt)+'.';
         if(recargar)recargar.disabled=false;
-        if(verificar)verificar.innerText='Renovar validación';
+        if(verificar)verificar.innerText='Renovar validación de identidad';
     }else{
         estado.className='admin-history-status warn';
-        estado.innerHTML='Para consultar el historial verificá primero tu identidad con biometría / Passkey.';
+        estado.innerHTML='Para consultar el historial verificá primero tu identidad con tu Passkey.';
         if(recargar)recargar.disabled=true;
         if(verificar)verificar.innerText='Verificar identidad';
     }
@@ -2294,7 +2457,7 @@ function actualizarEstadoHistorialAdmin(){
 
 async function irAHistorialAdministrativo(){
     if(!ID_SOCIO_ACTIVO||!PADRON_SOCIOS[ID_SOCIO_ACTIVO]){
-        alert('Acceso exclusivo de socios activos.');
+        alert('Acceso exclusivo de socios activos habilitados.');
         return;
     }
 
@@ -2329,7 +2492,7 @@ function prepararPeriodoHistorialAdmin(){
 
 async function verificarAccesoHistorialAdmin(){
     if(!ID_SOCIO_ACTIVO||!PADRON_SOCIOS[ID_SOCIO_ACTIVO]){
-        alert('Acceso exclusivo de socios activos.');
+        alert('Acceso exclusivo de socios activos habilitados.');
         return;
     }
 
@@ -2360,14 +2523,14 @@ async function verificarAccesoHistorialAdmin(){
     }finally{
         if(btn){
             btn.disabled=false;
-            btn.innerText=historialAdminVerificacionVigente()?'Renovar validación':'Verificar identidad';
+            btn.innerText=historialAdminVerificacionVigente()?'Renovar validación de identidad':'Verificar identidad';
         }
     }
 }
 
 async function cargarHistorialAdministrativo(pagina){
     if(!ID_SOCIO_ACTIVO||!PADRON_SOCIOS[ID_SOCIO_ACTIVO]){
-        alert('Acceso exclusivo de socios activos.');
+        alert('Acceso exclusivo de socios activos habilitados.');
         return;
     }
 
@@ -2378,7 +2541,7 @@ async function cargarHistorialAdministrativo(pagina){
         return;
     }
 
-     var entidadEl=document.getElementById('filtroHistorialEntidad');
+    var entidadEl=document.getElementById('filtroHistorialEntidad');
     var actorEl=document.getElementById('filtroHistorialActor');
     var limiteEl=document.getElementById('filtroHistorialLimite');
     var rolEl=document.getElementById('filtroHistorialRol');
@@ -2989,8 +3152,8 @@ try{
 }
 
 async function resetearClaveSocioAdmin(){
-if(!ID_SOCIO_ACTIVO||!PADRON_SOCIOS[ID_SOCIO_ACTIVO]){
-    alert('Acceso exclusivo de socios activos.');
+if(ROL_ACTIVO!=='admin'||!esAdministrador(ID_SOCIO_ACTIVO)){
+    alert('Acceso exclusivo de administradores.');
     return;
 }
 var id=parseInt(document.getElementById('txtResetClaveSocio').value);
@@ -3075,7 +3238,21 @@ var PARTIDOS_HISTORIA_BASE=[
 ['2025-01-29','Independiente','2–3','Liga Profesional',11],['2025-02-09','Lanús','0–1','Liga Profesional',12],['2025-02-16','Atlético Tucumán','1–1','Liga Profesional',9785],['2025-03-01','Tigre','1–2','Liga Profesional',7767],['2025-03-10','Rosario Central','0–0','Liga Profesional',17],['2025-03-19','Deportivo Armenio','3–3 (4–5 pen.)','Copa Argentina',17701],['2025-04-02','São Paulo','0–1','CONMEBOL Libertadores',2026],['2025-04-05','Gimnasia La Plata','2–0','Liga Profesional',9],['2025-04-18','Vélez Sarsfield','0–1','Liga Profesional',21],['2025-05-03','Instituto','1–2','Liga Profesional',2975],['2025-05-08','Libertad','0–0','CONMEBOL Libertadores',2670],['2025-05-15','Alianza Lima','2–0','CONMEBOL Libertadores',2680],['2025-07-11','San Lorenzo','1–2','Liga Profesional',18],['2025-07-27','Godoy Cruz','0–0','Liga Profesional',6756],['2025-08-18','San Martín de San Juan','0–0','Liga Profesional',7845],['2025-08-31','Deportivo Riestra','0–1','Liga Profesional',17702],['2025-09-27','Sarmiento','1–0','Liga Profesional',10158],['2025-10-05','Belgrano','0–0','Liga Profesional',4],['2025-10-18','River Plate','0–2','Liga Profesional',16],['2025-11-08','Platense','1–0','Liga Profesional',7764],
 ['2026-01-23','Newell’s Old Boys','2–1','Liga Profesional',14],['2026-01-31','Platense','1–2','Liga Profesional',7764],['2026-02-04','Argentino de Merlo','2–0','Copa Argentina',17700],['2026-02-14','Gimnasia de Mendoza','2–1','Liga Profesional',11972],['2026-02-28','San Lorenzo','0–0','Liga Profesional',18],['2026-03-12','Instituto','2–0','Liga Profesional',2975],['2026-04-02','Boca Juniors','0–1','Liga Profesional',5],['2026-04-19','Deportivo Riestra','2–0','Liga Profesional',17702],['2026-05-09','Belgrano','0–1','Liga Profesional',4],['2026-05-20','Atlético Tucumán','0–3','Copa Argentina',9785],['2026-07-30','Vélez Sarsfield','1–3','Liga Profesional',21],['2026-08-11','Lanús','0–3','Liga Profesional',12],['2026-08-24','Rosario Central','2–2','Liga Profesional',17],['2026-08-29','Central Córdoba','0–0','Liga Profesional',11989],['2026-09-12','Unión','2–1','Liga Profesional',20]
 ];
-var PARTIDOS_HISTORIA=PARTIDOS_HISTORIA_BASE.slice();
+// Solo partidos locales en el Kempes: los encuentros de Copa Argentina en sede neutral se excluyen.
+function normalizarRivalHistoria(nombre){return String(nombre||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'')}
+function esKempesHistoria(nombre){return /(?:mario\s*(?:alberto\s*)?kempes|estadio\s*kempes|cordoba\s*stadium)/i.test(String(nombre||''))}
+function fechaISOHistoria(fecha){var d=new Date(fecha);return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Argentina/Cordoba',year:'numeric',month:'2-digit',day:'2-digit'}).format(d)}
+function diasEntreHistoria(a,b){return Math.abs((Date.parse(a+'T12:00:00Z')-Date.parse(b+'T12:00:00Z'))/86400000)}
+function limpiarPartidosHistoria(partidos){
+ var elegibles=partidos.filter(function(p){return p&&p[0]&&p[1]&&!/copa argentina/i.test(String(p[3]))});
+ var unicos=[];
+ elegibles.forEach(function(p){
+  var rival=normalizarRivalHistoria(p[1]),previo=unicos.findIndex(function(q){return normalizarRivalHistoria(q[1])===rival&&diasEntreHistoria(q[0],p[0])<=7});
+  if(previo<0)unicos.push(p);else if(p._kempesVerificado&&!unicos[previo]._kempesVerificado)unicos[previo]=p;
+ });
+ return unicos;
+}
+var PARTIDOS_HISTORIA=limpiarPartidosHistoria(PARTIDOS_HISTORIA_BASE);
 var HISTORIA_ACTUALIZACION_INTENTADA=false;
 function hashHistoria(texto){var h=2166136261;for(var i=0;i<texto.length;i++){h^=texto.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
 function minutosHoraHistoria(hora,delta){var p=hora.split(':').map(Number),total=p[0]*60+p[1]+delta;while(total<0)total+=1440;total%=1440;return String(Math.floor(total/60)).padStart(2,'0')+':'+String(total%60).padStart(2,'0')}
@@ -3083,15 +3260,25 @@ function fechaHoyHistoria(){try{return new Intl.DateTimeFormat('en-CA',{timeZone
 function logoEquipoHistoria(id){return 'https://a.espncdn.com/i/teamlogos/soccer/500/'+Number(id||0)+'.png'}
 async function actualizarPartidosHistoriaDesdeFuente(){
  if(HISTORIA_ACTUALIZACION_INTENTADA)return;HISTORIA_ACTUALIZACION_INTENTADA=true;
- var fuente=document.getElementById('historiaFuente');if(fuente)fuente.innerText='Comprobando resultados reales actualizados…';
+ var fuente=document.getElementById('historiaFuente');if(fuente)fuente.innerText='Comprobando partidos locales en el Kempes…';
  try{
   var urls=[2025,2026].map(function(anio){return 'https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/teams/19/schedule?season='+anio});
   var respuestas=await Promise.all(urls.map(function(url){return fetch(url,{headers:{Accept:'application/json'}}).then(function(r){if(!r.ok)throw new Error('Fuente deportiva no disponible');return r.json()})}));
   var dinamicos=[];
-  respuestas.forEach(function(data){var competencia=data&&data.leagues&&data.leagues[0]&&data.leagues[0].name||'Liga Profesional';(data&&Array.isArray(data.events)?data.events:[]).forEach(function(e){var c=e.competitions&&e.competitions[0],equipos=c&&c.competitors||[],local=equipos.find(function(x){return x.homeAway==='home'}),visitante=equipos.find(function(x){return x.homeAway==='away'});if(!c||!c.status||!c.status.type||c.status.type.completed!==true||!local||!visitante)return;var localId=Number(local.team&&local.team.id),localNombre=String(local.team&&local.team.displayName||'');if(localId!==19&&!localNombre.includes('Talleres'))return;var fecha=new Date(e.date).toLocaleDateString('en-CA',{timeZone:'America/Argentina/Cordoba'}),resultado=String(local.score&&local.score.displayValue!==undefined?local.score.displayValue:local.score)+'–'+String(visitante.score&&visitante.score.displayValue!==undefined?visitante.score.displayValue:visitante.score);dinamicos.push([fecha,String(visitante.team&&visitante.team.displayName||'Rival'),resultado,competencia,Number(visitante.team&&visitante.team.id)||0])})});
-  var mapa={};PARTIDOS_HISTORIA_BASE.concat(dinamicos).forEach(function(p){mapa[p[0]+'|'+p[1].toLowerCase()]=p});PARTIDOS_HISTORIA=Object.keys(mapa).map(function(k){return mapa[k]});
-  if(fuente)fuente.innerText='Resultados reales actualizados automáticamente · asistencia demostrativa.';renderizarTuHistoria();
- }catch(e){console.warn('Se conserva la última base de resultados validada:',e);if(fuente)fuente.innerText='Resultados reales validados al 21/09/2026 · asistencia demostrativa.'}
+  respuestas.forEach(function(data){var competencia=data&&data.leagues&&data.leagues[0]&&data.leagues[0].name||'Liga Profesional';(data&&Array.isArray(data.events)?data.events:[]).forEach(function(e){
+   var c=e.competitions&&e.competitions[0],equipos=c&&c.competitors||[],local=equipos.find(function(x){return x.homeAway==='home'}),visitante=equipos.find(function(x){return x.homeAway==='away'});
+   if(!c||!c.status||!c.status.type||c.status.type.completed!==true||!local||!visitante)return;
+   var localId=Number(local.team&&local.team.id),localNombre=String(local.team&&local.team.displayName||'');
+   if(localId!==19&&!/\btalleres\b/i.test(localNombre))return;
+   // homeAway no prueba el estadio: la sede debe estar identificada explícitamente.
+   var estadio=String(c.venue&&(c.venue.fullName||c.venue.name)||e.venue&&(e.venue.fullName||e.venue.name)||'');
+   if(!esKempesHistoria(estadio))return;
+   var fecha=fechaISOHistoria(e.date),resultado=String(local.score&&local.score.displayValue!==undefined?local.score.displayValue:local.score)+'–'+String(visitante.score&&visitante.score.displayValue!==undefined?visitante.score.displayValue:visitante.score);
+   var p=[fecha,String(visitante.team&&visitante.team.displayName||'Rival'),resultado,competencia,Number(visitante.team&&visitante.team.id)||0];p._kempesVerificado=true;dinamicos.push(p);
+  })});
+  PARTIDOS_HISTORIA=limpiarPartidosHistoria(PARTIDOS_HISTORIA_BASE.concat(dinamicos));
+  if(fuente)fuente.innerText='Partidos locales filtrados por estadio · asistencia demostrativa.';renderizarTuHistoria();
+ }catch(e){console.warn('Se conserva la base local sin Copa Argentina:',e);if(fuente)fuente.innerText='Partidos locales de referencia · asistencia demostrativa.'}
 }
 function datosTuHistoria(){
  var socio=obtenerDatosSocio(ID_SOCIO_ACTIVO),ant=socio?socio.antiguedad:0,tasa=ant>15?.95:(ant>=10?.90:.80);
@@ -3114,7 +3301,7 @@ ID_SOCIO_ACTIVO=id;ROL_ACTIVO='socio';actualizarCabeceraSegunRol();ocultarTodo()
 var d=obtenerDatosSocio(id);
 document.getElementById('lblSocioId').innerText="#"+d.id;document.getElementById('lblSocioAntiguedad').innerText=d.antiguedad+" AÑOS";
 document.getElementById('lblSocioNombre').innerText=d.nombre;
-document.getElementById('lblSocioPorcentual').innerText=d.porcentual.toFixed(3)+"% ASIGNADO DEL TOTAL";
+
 document.getElementById('lblSocioPuntos').innerText=d.puntos+" PUNTOS POR VOTO OBTENIDOS";var hp=document.getElementById('heroSocioPuntos');if(hp)hp.innerText=d.puntos+' PTS';var dg=document.getElementById('dashGreeting');if(dg)dg.innerText='Bienvenido, '+d.nombre;
 document.getElementById('lblSocioDiasFaltantes').innerText=d.diasFaltantes>0?d.diasFaltantes+" DÍAS RESTANTES":"MÁXIMO ESCALAFÓN DEL RANGO";
 }
@@ -3224,7 +3411,7 @@ if(estado)estado.innerText='✓ Permisos del Nivel '+nivel+' aplicados: '+cantid
 }
 
 function irAGobernanzaInstitucional(){
-if(!ID_SOCIO_ACTIVO||!PADRON_SOCIOS[ID_SOCIO_ACTIVO]){alert('Acceso exclusivo de socios activos.');return}
+if(ROL_ACTIVO!=='admin'||!esAdministrador(ID_SOCIO_ACTIVO)){alert('Acceso exclusivo de administradores.');return}
 ocultarTodo();document.getElementById('secGobernanzaInstitucional').style.display='flex';
 var panel=document.getElementById('panelCrearBorradorGobernanza');
 if(panel)panel.style.display=esSuperAdministrador(ID_SOCIO_ACTIVO)?'block':'none';
@@ -3554,6 +3741,127 @@ var panel=document.getElementById('detallePartidasBalance');
 if(panel)panel.style.display='none';
 }
 function regresarAlPanelInterno(){ocultarTodo();document.getElementById(ROL_ACTIVO==='socio'?'socioDashboard':'adminDashboard').style.display='flex'}
+
+function etiquetaEstadoBlockchain(estado){
+    if(estado==='activa')return 'Integración blockchain activada';
+    if(estado==='desactivada')return 'Integración blockchain desactivada';
+    return 'Integración blockchain estructurada pero no activada';
+}
+
+function descripcionEstadoBlockchain(estado){
+    if(estado==='activa')return 'Los lotes criptográficos están habilitados para su anclaje en Polygon según la política vigente.';
+    if(estado==='desactivada')return 'La integración existe, pero el envío de nuevos anclajes blockchain fue desactivado deliberadamente. El historial, hashes y lotes continúan conservándose.';
+    return 'La infraestructura blockchain está construida y configurada, pero los anclajes reales todavía no están activados. El historial continúa generando hashes y trazabilidad sin costo de gas.';
+}
+
+async function cargarEstadoIntegracionBlockchain(){
+    var token=obtenerTokenSesionClub();
+    if(!token)throw new Error('Sesión segura requerida');
+    var data=await llamarClubAbiertoApi({accion:'estado_integracion_blockchain'},token);
+    var b=data&&data.blockchain?data.blockchain:{};
+    var estado=String(b.estado_integracion||'estructurada_no_activada');
+    var titulo=etiquetaEstadoBlockchain(estado);
+    var el=document.getElementById('blockchainEstadoTitulo');if(el)el.innerText=titulo;
+    el=document.getElementById('blockchainEstadoDescripcion');if(el)el.innerText=descripcionEstadoBlockchain(estado);
+    el=document.getElementById('blockchainEstadoChipTop');if(el)el.innerText='● '+titulo;
+    el=document.getElementById('blockchainEstadoChipHero');
+    if(el){
+        el.innerText=titulo;
+        el.classList.remove('active','off');
+        if(estado==='activa')el.classList.add('active');
+        if(estado==='desactivada')el.classList.add('off');
+    }
+    el=document.getElementById('blockchainTotalMovimientos');if(el)el.innerText=Number(b.total_movimientos_auditoria||0).toLocaleString('es-AR');
+    el=document.getElementById('blockchainPendientes');if(el)el.innerText=Number(b.movimientos_pendientes_de_lote||0).toLocaleString('es-AR');
+    el=document.getElementById('blockchainLotesPreparados');if(el)el.innerText=Number(b.lotes_preparados||0).toLocaleString('es-AR');
+    el=document.getElementById('blockchainLotesAnclados');if(el)el.innerText=Number(b.lotes_anclados||0).toLocaleString('es-AR');
+    el=document.getElementById('blockchainRed');if(el)el.innerText=b.red||'-';
+    el=document.getElementById('blockchainChainId');if(el)el.innerText=b.chain_id||'-';
+    el=document.getElementById('blockchainEstadoDesde');if(el)el.innerText=b.estado_desde?formatoFechaHora24Global(b.estado_desde):'-';
+    el=document.getElementById('blockchainControlPrincipal');
+    if(el && ROL_ACTIVO==='admin')el.style.display='block';
+    var adminEstado=document.getElementById('blockchainAdminEstadoActual');
+    if(adminEstado)adminEstado.innerText='Estado actual: '+titulo;
+    [
+      ['blockchainBtnActivar','activa'],
+      ['blockchainBtnDesactivar','desactivada']
+    ].forEach(function(par){
+      var btn=document.getElementById(par[0]);
+      if(!btn)return;
+      var actual=estado===par[1];
+      btn.disabled=actual;
+      btn.classList.toggle('current',actual);
+    });
+    return b;
+}
+
+async function cargarLotesBlockchain(){
+    var token=obtenerTokenSesionClub();
+    if(!token)throw new Error('Sesión segura requerida');
+    var box=document.getElementById('blockchainLotesLista');
+    if(box)box.innerHTML='<div class="card-note">Cargando lotes...</div>';
+    var data=await llamarClubAbiertoApi({accion:'lotes_blockchain',pagina:1,por_pagina:50},token);
+    var lotes=Array.isArray(data&&data.lotes)?data.lotes:[];
+    if(!box)return lotes;
+    if(!lotes.length){
+        box.innerHTML='<div class="card-note">Todavía no hay lotes registrados.</div>';
+        return lotes;
+    }
+    box.innerHTML=lotes.map(function(l){
+        var fecha=l.anclado_en||l.enviado_en||l.preparado_en;
+        var tx=l.transaccion_hash||'Pendiente de anclaje';
+        var bloque=l.bloque_numero?Number(l.bloque_numero).toLocaleString('es-AR'):'-';
+        return '<div class="blockchain-lot-card">'+
+          '<div class="blockchain-lot-head">'+
+            '<div class="blockchain-lot-title">'+escaparHtmlHistorial(l.referencia||'Lote')+'</div>'+
+            '<span class="status-chip">● '+escaparHtmlHistorial(String(l.estado||'preparado').toUpperCase())+'</span>'+
+          '</div>'+
+          '<div class="blockchain-lot-meta">'+
+            '<div><strong>Tipo:</strong> '+escaparHtmlHistorial(l.tipo||'-')+'</div>'+
+            '<div><strong>Movimientos:</strong> '+Number(l.cantidad_eventos||0).toLocaleString('es-AR')+
+              ' · IDs '+escaparHtmlHistorial(String(l.primer_evento_id||'-'))+' a '+escaparHtmlHistorial(String(l.ultimo_evento_id||'-'))+'</div>'+
+            '<div class="wide"><strong>Raíz Merkle:</strong><br><span class="mono">'+escaparHtmlHistorial(l.raiz_merkle_sha256||'-')+'</span></div>'+
+            '<div class="wide"><strong>TX:</strong><br><span class="mono">'+escaparHtmlHistorial(tx)+'</span></div>'+
+            '<div><strong>Bloque:</strong> '+escaparHtmlHistorial(bloque)+'</div>'+
+            '<div><strong>Fecha:</strong> '+(fecha?formatoFechaHora24Global(fecha):'-')+'</div>'+
+          '</div>'+
+        '</div>';
+    }).join('');
+    return lotes;
+}
+
+async function irAIntegracionBlockchain(){
+    ocultarTodo();
+    var sec=document.getElementById('secBlockchainIntegracion');
+    if(sec){
+        sec.style.display='flex';
+        sec.setAttribute('data-role',ROL_ACTIVO==='admin'?'admin':'socio');
+    }
+    try{await Promise.all([cargarEstadoIntegracionBlockchain(),cargarLotesBlockchain()]);}
+    catch(e){
+        console.error(e);
+        var d=document.getElementById('blockchainEstadoDescripcion');
+        if(d)d.innerText=e.message||'No pudo cargarse el estado blockchain.';
+    }
+}
+
+async function cambiarEstadoIntegracionBlockchain(estadoForzado){
+    if(ID_SOCIO_ACTIVO!==SUPER_ADMIN_ID){alert('Acción exclusiva del administrador principal.');return;}
+    var estado=String(estadoForzado||'').trim();
+    if(!['estructurada_no_activada','activa','desactivada'].includes(estado)){alert('Estado blockchain inválido.');return;}
+    var motivo=String(document.getElementById('blockchainMotivoCambio').value||'').trim();
+    if(motivo.length<5){alert('Ingresá un motivo de al menos 5 caracteres.');return;}
+    var etiqueta=etiquetaEstadoBlockchain(estado);
+    var texto='¿Confirmar cambio a “'+etiqueta+'”?';
+    if(estado==='activa')texto+='\n\nAl activarla, los lotes pendientes quedarán preparados para envío a Polygon y los anclajes reales podrán consumir POL.';
+    if(!confirm(texto))return;
+    try{
+        await llamarClubAbiertoApi({accion:'cambiar_estado_integracion_blockchain',estado:estado,motivo:motivo},obtenerTokenSesionClub());
+        document.getElementById('blockchainMotivoCambio').value='';
+        await cargarEstadoIntegracionBlockchain();
+        alert('✓ Estado de integración blockchain actualizado.');
+    }catch(e){console.error(e);alert(e.message||'No pudo modificarse el estado blockchain.');}
+}
 async function volverAlLogin(){
 await cerrarSesionSeguraClub();
 ocultarTodo();
@@ -3672,7 +3980,7 @@ async function consultarSocioPadron(){
 }
 
 async function agregarSocioManual(){
-if(!ID_SOCIO_ACTIVO||!PADRON_SOCIOS[ID_SOCIO_ACTIVO]){alert('Acceso exclusivo de socios activos.');return}
+if(ROL_ACTIVO!=='admin'||!esAdministrador(ID_SOCIO_ACTIVO)){alert('Acceso exclusivo de administradores.');return}
 var id=parseInt(document.getElementById('txtPadronNuevoNumero').value);
 var nombre=document.getElementById('txtPadronNuevoNombre').value.trim().replace(/\s+/g,' ');
 var fecha=document.getElementById('txtPadronNuevaFecha').value;
@@ -3702,7 +4010,7 @@ info.innerText='Alta registrada: '+formatoFechaPadron(PADRON_SOCIOS[id][1])+' ·
 }
 
 async function guardarNombreSocio(){
-if(!ID_SOCIO_ACTIVO||!PADRON_SOCIOS[ID_SOCIO_ACTIVO]){alert('Acceso exclusivo de socios activos.');return}
+if(ROL_ACTIVO!=='admin'||!esAdministrador(ID_SOCIO_ACTIVO)){alert('Acceso exclusivo de administradores.');return}
 var id=parseInt(document.getElementById('txtPadronEditarNumero').value);
 var nombre=document.getElementById('txtPadronEditarNombre').value.trim().replace(/\s+/g,' ');
 if(isNaN(id)||!PADRON_SOCIOS[id]||!nombre){alert('Primero buscá un socio válido e ingresá un nombre.');return}
@@ -3777,7 +4085,7 @@ if(btn)btn.disabled=true;
 }
 
 async function previsualizarImportacionPadron(){
-if(!ID_SOCIO_ACTIVO||!PADRON_SOCIOS[ID_SOCIO_ACTIVO]){alert('Acceso exclusivo de socios activos.');return}
+if(ROL_ACTIVO!=='admin'||!esAdministrador(ID_SOCIO_ACTIVO)){alert('Acceso exclusivo de administradores.');return}
 var input=document.getElementById('filePadronExcel');
 var prev=document.getElementById('previewImportacionPadron');
 var btn=document.getElementById('btnConfirmarImportacionPadron');
@@ -3816,7 +4124,7 @@ prev.innerText='No se pudo interpretar el archivo. Verificá que sea Excel/CSV y
 }
 
 async function confirmarImportacionPadron(){
-if(!ID_SOCIO_ACTIVO||!PADRON_SOCIOS[ID_SOCIO_ACTIVO]){alert('Acceso exclusivo de socios activos.');return}
+if(ROL_ACTIVO!=='admin'||!esAdministrador(ID_SOCIO_ACTIVO)){alert('Acceso exclusivo de administradores.');return}
 var p=IMPORTACION_PADRON_PENDIENTE;
 if(!p||!p.total)return;
 if(p.faltaSuper){alert('El padrón de reemplazo debe incluir al socio 21.998.');return}
@@ -4204,5 +4512,723 @@ window.addEventListener('load',function(){
 navigator.serviceWorker.register('./service-worker.js').catch(function(e){console.warn('PWA no disponible:',e)});
 });
 }
+</script>
+<!-- CLUB_ABIERTO_ANCHOR_DEPLOY_V1 -->
+<script>
+(()=>{
+  if(new URLSearchParams(location.search).get("deploy")!=="anchor") return;
+  const EXPECTED="0x7620dA48c9EB3f38E9996Ae92Dc8C867EfBc26d2".toLowerCase();
+  const CHAIN_HEX="0x13882";
+  const BYTECODE="0x6080604052348015600e575f5ffd5b506040516105fe3803806105fe833981016040819052602b91609d565b6001600160a01b038116605157604051632a9ffab760e21b815260040160405180910390fd5b5f80546001600160a01b0319166001600160a01b03831690811782556040519091907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0908290a35060c8565b5f6020828403121560ac575f5ffd5b81516001600160a01b038116811460c1575f5ffd5b9392505050565b610529806100d55f395ff3fe608060405234801561000f575f5ffd5b506004361061007a575f3560e01c8063b01b6d5311610058578063b01b6d53146100ca578063c5f6276a1461012b578063e30c39781461014e578063f2fde38b14610161575f5ffd5b806315954b2c1461007e57806379ba5097146100935780638da5cb5b1461009b575b5f5ffd5b61009161008c36600461046d565b610174565b005b6100916102cb565b5f546100ad906001600160a01b031681565b6040516001600160a01b0390911681526020015b60405180910390f35b6101056100d83660046104af565b60026020525f90815260409020805460019091015467ffffffffffffffff80821691600160401b90041683565b6040805193845267ffffffffffffffff92831660208501529116908201526060016100c1565b61013e61013936600461046d565b61034e565b60405190151581526020016100c1565b6001546100ad906001600160a01b031681565b61009161016f3660046104c6565b6103cd565b5f546001600160a01b0316331461019d576040516282b42960e81b815260040160405180910390fd5b8215806101a8575081155b806101bb575067ffffffffffffffff8116155b156101d957604051632a9ffab760e21b815260040160405180910390fd5b5f83815260026020526040902060010154600160401b900467ffffffffffffffff16156102195760405163a0094ce360e01b815260040160405180910390fd5b6040805160608101825283815267ffffffffffffffff8381166020808401828152428085168688018181525f8c8152600286528990209751885592516001909701805493518716600160401b026fffffffffffffffffffffffffffffffff19909416979096169690961791909117909355845191825281019290925291849186917ffeafecce8fbaa934e4a1842aa3ddc1b372ebf6d0bb12165cad45a6426f42abdd910160405180910390a350505050565b6001546001600160a01b031633146102f5576040516282b42960e81b815260040160405180910390fd5b5f8054600180546001600160a01b038082166001600160a01b031980861682178755909216909255604051919092169283917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e09190a350565b5f83815260026020908152604080832081516060810183528154815260019091015467ffffffffffffffff80821694830194909452600160401b9004909216908201819052158015906103a15750805184145b80156103c457508267ffffffffffffffff16816020015167ffffffffffffffff16145b95945050505050565b5f546001600160a01b031633146103f6576040516282b42960e81b815260040160405180910390fd5b6001600160a01b03811661041d57604051632a9ffab760e21b815260040160405180910390fd5b600180546001600160a01b0319166001600160a01b038381169182179092555f8054604051929316917f38d16b8cac22d99fc7c124b9cd0de2d3fa1faef420bfe791d8c362d765e227009190a350565b5f5f5f6060848603121561047f575f5ffd5b8335925060208401359150604084013567ffffffffffffffff811681146104a4575f5ffd5b809150509250925092565b5f602082840312156104bf575f5ffd5b5035919050565b5f602082840312156104d6575f5ffd5b81356001600160a01b03811681146104ec575f5ffd5b939250505056fea2646970667358221220ac9520cf2fcd40a4f562c5e29ee75380ffae93334fa7e76a9747b7d2702a79f264736f6c63430008250033";
+  const KEY="club_abierto_amoy_deploy_tx_v5";
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const receipt=async tx=>{for(let i=0;i<120;i++){const r=await ethereum.request({method:"eth_getTransactionReceipt",params:[tx]});if(r)return r;await sleep(2500)}throw new Error("La transacción sigue pendiente. Volvé a abrir esta página en unos minutos.")};
+  const build=()=>{
+    document.body.innerHTML=`<div style="position:fixed;inset:0;background:#071b36;color:#fff;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;z-index:2147483647">
+      <div style="width:min(760px,92vw);background:#0d2b52;border:1px solid #2b5b8e;border-radius:18px;padding:28px;box-shadow:0 20px 60px #0005">
+        <h1 style="margin-top:0">Club Abierto — Despliegue de prueba</h1>
+        <p style="color:#b8cbe0">Polygon Amoy · Chain ID 80002 · contrato ClubAbiertoAnchor</p>
+        <div style="margin:12px 0">Wallet esperada: <code style="word-break:break-all;background:#061427;padding:3px 6px;border-radius:6px">0x7620dA48c9EB3f38E9996Ae92Dc8C867EfBc26d2</code></div>
+        <div id="caDeployStatus" style="padding:14px;border-radius:10px;background:#081a31;margin-top:16px;white-space:pre-wrap">Preparando conexión con MetaMask...</div>
+        <button id="caDeployRetry" style="display:none;width:100%;padding:14px;border-radius:10px;border:0;font-weight:700;font-size:16px;cursor:pointer;margin-top:12px">Reintentar</button>
+      </div></div>`;
+    const status=document.getElementById("caDeployStatus"),retry=document.getElementById("caDeployRetry");
+    const set=(t,c)=>{status.textContent=t;status.style.color=c||"#fff"};
+    async function start(){
+      retry.style.display="none";
+      try{
+        if(!window.ethereum) throw new Error("No se detectó MetaMask en este navegador.");
+        const prev=localStorage.getItem(KEY);
+        if(prev){
+          set("Ya existe una transacción de despliegue registrada. Verificando confirmación...\n"+prev,"#ffd580");
+          const r=await receipt(prev);
+          if(r.status!=="0x1") throw new Error("La transacción anterior falló.");
+          set("CONTRATO DESPLEGADO\n\nTX: "+prev+"\n\nCONTRATO: "+r.contractAddress+"\n\nMandá esta pantalla al chat.","#7ee787"); return;
+        }
+        set("Solicitando acceso a Account 1 en MetaMask...","#ffd580");
+        const accounts=await ethereum.request({method:"eth_requestAccounts"});
+        const account=(accounts[0]||"").toLowerCase();
+        if(account!==EXPECTED) throw new Error("La cuenta seleccionada no es Account 1 de Club Abierto.");
+        let chain=await ethereum.request({method:"eth_chainId"});
+        if(chain.toLowerCase()!==CHAIN_HEX) await ethereum.request({method:"wallet_switchEthereumChain",params:[{chainId:CHAIN_HEX}]});
+        chain=await ethereum.request({method:"eth_chainId"});
+        if(chain.toLowerCase()!==CHAIN_HEX) throw new Error("MetaMask no quedó en Polygon Amoy (80002).");
+        const bal=BigInt(await ethereum.request({method:"eth_getBalance",params:[account,"latest"]}));
+        if(bal===0n) throw new Error("La wallet figura con 0 POL en Amoy.");
+        const data=BYTECODE+EXPECTED.slice(2).padStart(64,"0");
+        set("Todo preparado. MetaMask va a pedirte confirmar el despliegue del contrato.\n\nVos sólo tenés que confirmar esa transacción.","#ffd580");
+        const estimated=BigInt(await ethereum.request({method:"eth_estimateGas",params:[{from:account,data}]}));
+        const gas="0x"+((estimated*105n)/100n).toString(16);
+        const tx=await ethereum.request({method:"eth_sendTransaction",params:[{
+          from:account,
+          data,
+          gas,
+          maxPriorityFeePerGas:"0x5d21dba00",
+          maxFeePerGas:"0x5d21dba00"
+        }]});
+        localStorage.setItem(KEY,tx);
+        set("Transacción enviada. Esperando confirmación en Amoy...\n"+tx,"#ffd580");
+        const r=await receipt(tx);
+        if(r.status!=="0x1") throw new Error("La transacción fue minada pero falló.");
+        set("CONTRATO DESPLEGADO\n\nTX: "+tx+"\n\nCONTRATO: "+r.contractAddress+"\n\nMandá esta pantalla al chat.","#7ee787");
+      }catch(e){set("No se completó el despliegue:\n\n"+(e?.message||String(e)),"#ff9b9b");retry.style.display="block"}
+    }
+    retry.onclick=start; setTimeout(start,500);
+  };
+  if(document.readyState==="loading") addEventListener("DOMContentLoaded",build,{once:true}); else build();
+})();
+</script>
+
+<!-- CLUB_ABIERTO_MAINNET_DEPLOY_V1 -->
+<script>
+(()=>{
+  if(new URLSearchParams(location.search).get("deploy")!=="mainnet") return;
+  const EXPECTED="0x7620dA48c9EB3f38E9996Ae92Dc8C867EfBc26d2".toLowerCase();
+  const CHAIN_HEX="0x89";
+  const CHAIN_ID_DEC=137;
+  const BYTECODE="0x6080604052348015600e575f5ffd5b506040516105fe3803806105fe833981016040819052602b91609d565b6001600160a01b038116605157604051632a9ffab760e21b815260040160405180910390fd5b5f80546001600160a01b0319166001600160a01b03831690811782556040519091907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0908290a35060c8565b5f6020828403121560ac575f5ffd5b81516001600160a01b038116811460c1575f5ffd5b9392505050565b610529806100d55f395ff3fe608060405234801561000f575f5ffd5b506004361061007a575f3560e01c8063b01b6d5311610058578063b01b6d53146100ca578063c5f6276a1461012b578063e30c39781461014e578063f2fde38b14610161575f5ffd5b806315954b2c1461007e57806379ba5097146100935780638da5cb5b1461009b575b5f5ffd5b61009161008c36600461046d565b610174565b005b6100916102cb565b5f546100ad906001600160a01b031681565b6040516001600160a01b0390911681526020015b60405180910390f35b6101056100d83660046104af565b60026020525f90815260409020805460019091015467ffffffffffffffff80821691600160401b90041683565b6040805193845267ffffffffffffffff92831660208501529116908201526060016100c1565b61013e61013936600461046d565b61034e565b60405190151581526020016100c1565b6001546100ad906001600160a01b031681565b61009161016f3660046104c6565b6103cd565b5f546001600160a01b0316331461019d576040516282b42960e81b815260040160405180910390fd5b8215806101a8575081155b806101bb575067ffffffffffffffff8116155b156101d957604051632a9ffab760e21b815260040160405180910390fd5b5f83815260026020526040902060010154600160401b900467ffffffffffffffff16156102195760405163a0094ce360e01b815260040160405180910390fd5b6040805160608101825283815267ffffffffffffffff8381166020808401828152428085168688018181525f8c8152600286528990209751885592516001909701805493518716600160401b026fffffffffffffffffffffffffffffffff19909416979096169690961791909117909355845191825281019290925291849186917ffeafecce8fbaa934e4a1842aa3ddc1b372ebf6d0bb12165cad45a6426f42abdd910160405180910390a350505050565b6001546001600160a01b031633146102f5576040516282b42960e81b815260040160405180910390fd5b5f8054600180546001600160a01b038082166001600160a01b031980861682178755909216909255604051919092169283917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e09190a350565b5f83815260026020908152604080832081516060810183528154815260019091015467ffffffffffffffff80821694830194909452600160401b9004909216908201819052158015906103a15750805184145b80156103c457508267ffffffffffffffff16816020015167ffffffffffffffff16145b95945050505050565b5f546001600160a01b031633146103f6576040516282b42960e81b815260040160405180910390fd5b6001600160a01b03811661041d57604051632a9ffab760e21b815260040160405180910390fd5b600180546001600160a01b0319166001600160a01b038381169182179092555f8054604051929316917f38d16b8cac22d99fc7c124b9cd0de2d3fa1faef420bfe791d8c362d765e227009190a350565b5f5f5f6060848603121561047f575f5ffd5b8335925060208401359150604084013567ffffffffffffffff811681146104a4575f5ffd5b809150509250925092565b5f602082840312156104bf575f5ffd5b5035919050565b5f602082840312156104d6575f5ffd5b81356001600160a01b03811681146104ec575f5ffd5b939250505056fea2646970667358221220ac9520cf2fcd40a4f562c5e29ee75380ffae93334fa7e76a9747b7d2702a79f264736f6c63430008250033";
+  const KEY="club_abierto_polygon_mainnet_deploy_tx_v1";
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const receipt=async tx=>{for(let i=0;i<120;i++){const r=await ethereum.request({method:"eth_getTransactionReceipt",params:[tx]});if(r)return r;await sleep(2500)}throw new Error("La transacción sigue pendiente. Volvé a abrir esta página en unos minutos.")};
+  const build=()=>{
+    document.body.innerHTML=`<div style="position:fixed;inset:0;background:#071b36;color:#fff;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;z-index:2147483647">
+      <div style="width:min(760px,92vw);background:#0d2b52;border:1px solid #2b5b8e;border-radius:18px;padding:28px;box-shadow:0 20px 60px #0005">
+        <h1 style="margin-top:0">Club Abierto — Despliegue Polygon Mainnet</h1>
+        <p style="color:#b8cbe0">Polygon PoS Mainnet · Chain ID 137 · contrato ClubAbiertoAnchor</p>
+        <div style="margin:12px 0">Wallet esperada: <code style="word-break:break-all;background:#061427;padding:3px 6px;border-radius:6px">0x7620dA48c9EB3f38E9996Ae92Dc8C867EfBc26d2</code></div>
+        <div style="margin:12px 0;color:#ffd580"><b>Importante:</b> esto sólo despliega el contrato. No activa la integración ni inicia anclajes automáticos.</div>
+        <div id="caMainnetDeployStatus" style="padding:14px;border-radius:10px;background:#081a31;margin-top:16px;white-space:pre-wrap">Preparando conexión con MetaMask...</div>
+        <button id="caMainnetDeployRetry" style="display:none;width:100%;padding:14px;border-radius:10px;border:0;font-weight:700;font-size:16px;cursor:pointer;margin-top:12px">Reintentar</button>
+      </div></div>`;
+
+    const status=document.getElementById("caMainnetDeployStatus"),retry=document.getElementById("caMainnetDeployRetry");
+    const set=(t,c)=>{status.textContent=t;status.style.color=c||"#fff"};
+
+    async function start(){
+      retry.style.display="none";
+      try{
+        if(!window.ethereum) throw new Error("No se detectó MetaMask en este navegador.");
+        const prev=localStorage.getItem(KEY);
+        if(prev){
+          set("Ya existe una transacción de despliegue registrada. Verificando confirmación...\n"+prev,"#ffd580");
+          const r=await receipt(prev);
+          if(r.status!=="0x1") throw new Error("La transacción anterior falló.");
+          set("CONTRATO MAINNET DESPLEGADO\n\nTX: "+prev+"\n\nCONTRATO: "+r.contractAddress+"\n\nMandá esta pantalla al chat.","#7ee787");
+          return;
+        }
+
+        set("Solicitando acceso a la wallet de Club Abierto...","#ffd580");
+        const accounts=await ethereum.request({method:"eth_requestAccounts"});
+        const account=(accounts[0]||"").toLowerCase();
+        if(account!==EXPECTED) throw new Error("La cuenta seleccionada no es la wallet esperada de Club Abierto.");
+
+        let chain=await ethereum.request({method:"eth_chainId"});
+        if(chain.toLowerCase()!==CHAIN_HEX){
+          try{
+            await ethereum.request({method:"wallet_switchEthereumChain",params:[{chainId:CHAIN_HEX}]});
+          }catch(e){
+            if(e&&e.code===4902){
+              await ethereum.request({method:"wallet_addEthereumChain",params:[{
+                chainId:CHAIN_HEX,
+                chainName:"Polygon Mainnet",
+                nativeCurrency:{name:"POL",symbol:"POL",decimals:18},
+                rpcUrls:["https://polygon-rpc.com/"],
+                blockExplorerUrls:["https://polygonscan.com/"]
+              }]});
+            }else{throw e}
+          }
+        }
+
+        chain=await ethereum.request({method:"eth_chainId"});
+        if(chain.toLowerCase()!==CHAIN_HEX) throw new Error("MetaMask no quedó en Polygon Mainnet (137).");
+
+        const balance=BigInt(await ethereum.request({method:"eth_getBalance",params:[account,"latest"]}));
+        if(balance===0n) throw new Error("La wallet figura con 0 POL en Polygon Mainnet.");
+
+        const data=BYTECODE+EXPECTED.slice(2).padStart(64,"0");
+        const estimated=BigInt(await ethereum.request({method:"eth_estimateGas",params:[{from:account,data}]}));
+        const gas=((estimated*110n)/100n);
+        const gasPrice=BigInt(await ethereum.request({method:"eth_gasPrice"}));
+        const maxCost=gas*gasPrice;
+
+        const toPol=v=>Number(v)/1e18;
+        set(
+          "Contrato listo para desplegar.\n\n"+
+          "Saldo: "+toPol(balance).toFixed(6)+" POL\n"+
+          "Costo máximo estimado: "+toPol(maxCost).toFixed(6)+" POL\n\n"+
+          "MetaMask va a pedirte confirmar UNA transacción. Esto NO activa los anclajes.",
+          "#ffd580"
+        );
+
+        const tx=await ethereum.request({method:"eth_sendTransaction",params:[{
+          from:account,
+          data,
+          gas:"0x"+gas.toString(16),
+          gasPrice:"0x"+gasPrice.toString(16)
+        }]});
+
+        localStorage.setItem(KEY,tx);
+        set("Transacción enviada. Esperando confirmación en Polygon Mainnet...\n"+tx,"#ffd580");
+
+        const r=await receipt(tx);
+        if(r.status!=="0x1") throw new Error("La transacción fue minada pero falló.");
+
+        set("CONTRATO MAINNET DESPLEGADO\n\nTX: "+tx+"\n\nCONTRATO: "+r.contractAddress+"\n\nMandá esta pantalla al chat.","#7ee787");
+      }catch(e){
+        set("No se completó el despliegue:\n\n"+(e?.message||String(e)),"#ff9b9b");
+        retry.style.display="block";
+      }
+    }
+
+    retry.onclick=start;
+    setTimeout(start,500);
+  };
+
+  if(document.readyState==="loading") addEventListener("DOMContentLoaded",build,{once:true}); else build();
+})();
+</script>
+
+<!-- CLUB_ABIERTO_MAINNET_CONTROLLED_TEST_V1 -->
+<script>
+(()=>{
+  if(new URLSearchParams(location.search).get("anchor")!=="mainnet-test") return;
+  const EXPECTED="0x7620dA48c9EB3f38E9996Ae92Dc8C867EfBc26d2".toLowerCase();
+  const CHAIN_HEX="0x89";
+  const CONTRACT="0x15e15b7b765600d1b9d8d1027eccf6ac65b23f79";
+  const REFERENCE="club-abierto-mainnet-controlled-test-v1";
+  const ROOT="66d103c369c270cd7419b479f8370d03df395b865b11b360a8fda85bc61297d9";
+  const LEAF_COUNT=1n;
+  const KEY="club_abierto_mainnet_controlled_test_tx_v2";
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const receipt=async tx=>{for(let i=0;i<120;i++){const r=await ethereum.request({method:"eth_getTransactionReceipt",params:[tx]});if(r)return r;await sleep(2500)}throw new Error("La transacción sigue pendiente. Volvé a abrir esta página en unos minutos.")};
+  const utf8hex=s=>"0x"+Array.from(new TextEncoder().encode(s)).map(b=>b.toString(16).padStart(2,"0")).join("");
+  const pad64=h=>h.replace(/^0x/,"").padStart(64,"0");
+  const build=()=>{
+    document.body.innerHTML='<div style="position:fixed;inset:0;background:#071b36;color:#fff;display:flex;align-items:center;justify-content:center;font-family:Inter,Arial,sans-serif;z-index:2147483647;padding:18px">'+
+      '<div style="width:min(820px,96vw);background:#0d2b52;border:1px solid #2b5b8e;border-radius:18px;padding:28px;box-shadow:0 20px 60px #0005">'+
+        '<div style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#9fc5e8;font-weight:800">Prueba controlada · producción</div>'+
+        '<h1 style="margin:8px 0 8px">Club Abierto — Anclaje Mainnet</h1>'+
+        '<p style="color:#b8cbe0;margin:0 0 18px">Polygon PoS Mainnet · Chain ID 137 · esta operación NO activa la integración automática.</p>'+
+        '<div style="display:grid;gap:10px;background:#081a31;padding:16px;border-radius:12px">'+
+          '<div><b>Contrato:</b><br><code style="word-break:break-all">'+CONTRACT+'</code></div>'+
+          '<div><b>Referencia:</b><br><code style="word-break:break-all">'+REFERENCE+'</code></div>'+
+          '<div><b>Raíz de prueba:</b><br><code style="word-break:break-all">'+ROOT+'</code></div>'+
+          '<div><b>Hojas:</b> 1</div>'+
+        '</div>'+
+        '<div style="margin:14px 0;color:#ffd580"><b>Importante:</b> es una prueba aislada. No toma ni modifica los lotes reales pendientes de auditoría o votos.</div>'+
+        '<div id="caMainnetAnchorStatus" style="padding:14px;border-radius:10px;background:#081a31;margin-top:16px;white-space:pre-wrap">Preparando conexión con MetaMask...</div>'+
+        '<button id="caMainnetAnchorRetry" style="display:none;width:100%;padding:14px;border-radius:10px;border:0;font-weight:700;font-size:16px;cursor:pointer;margin-top:12px">Reintentar</button>'+
+      '</div></div>';
+    const status=document.getElementById("caMainnetAnchorStatus"),retry=document.getElementById("caMainnetAnchorRetry");
+    const set=(t,c)=>{status.textContent=t;status.style.color=c||"#fff"};
+    async function start(){
+      retry.style.display="none";
+      try{
+        if(!window.ethereum) throw new Error("No se detectó MetaMask en este navegador.");
+        const prev=localStorage.getItem(KEY);
+        if(prev){
+          set("Revisando el intento anterior...\n"+prev,"#ffd580");
+          const r=await ethereum.request({method:"eth_getTransactionReceipt",params:[prev]});
+          const t=await ethereum.request({method:"eth_getTransactionByHash",params:[prev]});
+          if(r&&r.status==="0x1"){
+            set("PRUEBA MAINNET CONFIRMADA\n\nTX: "+prev+"\n\nBLOQUE: "+parseInt(r.blockNumber,16)+"\n\nPodés volver al chat.","#7ee787");
+            return;
+          }
+          if(r&&r.status==="0x0") localStorage.removeItem(KEY);
+          else if(!r&&!t) localStorage.removeItem(KEY);
+          else if(!r&&t){
+            const latestNonce=BigInt(await ethereum.request({method:"eth_getTransactionCount",params:[EXPECTED,"latest"]}));
+            const pendingNonce=BigInt(await ethereum.request({method:"eth_getTransactionCount",params:[EXPECTED,"pending"]}));
+            const txNonce=BigInt(t.nonce);
+            if(latestNonce>txNonce){
+              localStorage.removeItem(KEY);
+            }else if(pendingNonce===latestNonce){
+              localStorage.removeItem(KEY);
+            }else{
+              set("El intento anterior sigue realmente pendiente en Polygon. No se enviará otro para evitar duplicaciones.\n"+prev,"#ffd580");
+              return;
+            }
+          }else{
+            localStorage.removeItem(KEY);
+          }
+        }
+        const accounts=await ethereum.request({method:"eth_requestAccounts"});
+        const account=(accounts[0]||"").toLowerCase();
+        if(account!==EXPECTED) throw new Error("La cuenta seleccionada no es la wallet esperada de Club Abierto.");
+        let chain=await ethereum.request({method:"eth_chainId"});
+        if(chain.toLowerCase()!==CHAIN_HEX){
+          await ethereum.request({method:"wallet_switchEthereumChain",params:[{chainId:CHAIN_HEX}]});
+        }
+        chain=await ethereum.request({method:"eth_chainId"});
+        if(chain.toLowerCase()!==CHAIN_HEX) throw new Error("MetaMask no quedó en Polygon Mainnet (137).");
+        const balance=BigInt(await ethereum.request({method:"eth_getBalance",params:[account,"latest"]}));
+        if(balance===0n) throw new Error("La wallet figura con 0 POL en Polygon Mainnet.");
+        set("Ejecutando diagnóstico previo: owner, simulación y nonce...","#ffd580");
+        const ownerRaw=await ethereum.request({method:"eth_call",params:[{to:CONTRACT,data:"0x8da5cb5b"},"latest"]});
+        const owner=("0x"+String(ownerRaw).slice(-40)).toLowerCase();
+        if(owner!==EXPECTED) throw new Error("El owner on-chain no coincide con la wallet Club Abierto. Owner: "+owner);
+        const sigHash=await ethereum.request({method:"web3_sha3",params:[utf8hex("anchor(bytes32,bytes32,uint64)")]});
+        const selector=sigHash.slice(2,10);
+        const referenceHash=await ethereum.request({method:"web3_sha3",params:[utf8hex(REFERENCE)]});
+        const data="0x"+selector+pad64(referenceHash)+ROOT+pad64("0x"+LEAF_COUNT.toString(16));
+        await ethereum.request({method:"eth_call",params:[{from:account,to:CONTRACT,data},"latest"]});
+        const latestNonce=BigInt(await ethereum.request({method:"eth_getTransactionCount",params:[account,"latest"]}));
+        const pendingNonce=BigInt(await ethereum.request({method:"eth_getTransactionCount",params:[account,"pending"]}));
+        if(pendingNonce!==latestNonce) throw new Error("Polygon informa una transacción realmente pendiente para esta wallet (nonce latest "+latestNonce+", pending "+pendingNonce+"). No se enviará otra.");
+        const estimated=BigInt(await ethereum.request({method:"eth_estimateGas",params:[{from:account,to:CONTRACT,data}]}));
+        const networkGasPrice=BigInt(await ethereum.request({method:"eth_gasPrice"}));
+        const replacementGasPrice=(networkGasPrice*2n);
+        const gasLimit=(estimated*125n)/100n;
+        const maxCost=gasLimit*replacementGasPrice;
+        const toPol=v=>Number(v)/1e18;
+        set("DIAGNÓSTICO CORRECTO.\n\nOwner on-chain: "+owner+"\nSimulación anchor(): OK\nNonce a reemplazar: "+latestNonce.toString()+"\nSaldo: "+toPol(balance).toFixed(6)+" POL\nGas estimado: "+estimated.toString()+"\nTarifa de reemplazo: 2× precio actual de red\nCosto máximo estimado: "+toPol(maxCost).toFixed(6)+" POL\n\nEsta transacción reemplazará el intento atascado con el mismo nonce. MetaMask va a pedirte confirmar UNA transacción.","#7ee787");
+        const tx=await ethereum.request({method:"eth_sendTransaction",params:[{
+          from:account,to:CONTRACT,data,
+          nonce:"0x"+latestNonce.toString(16),
+          gas:"0x"+gasLimit.toString(16),
+          gasPrice:"0x"+replacementGasPrice.toString(16)
+        }]});
+        localStorage.setItem(KEY,tx);
+        set("Transacción enviada. Esperando confirmación en Polygon Mainnet...\n"+tx,"#ffd580");
+        const r=await receipt(tx);
+        if(r.status!=="0x1") throw new Error("La transacción fue minada pero falló.");
+        set("PRUEBA MAINNET CONFIRMADA\n\nTX: "+tx+"\n\nBLOQUE: "+parseInt(r.blockNumber,16)+"\n\nPodés volver al chat.","#7ee787");
+      }catch(e){
+        set("No se completó la prueba:\n\n"+(e?.message||String(e)),"#ff9b9b");
+        retry.style.display="block";
+      }
+    }
+    retry.onclick=start;
+    setTimeout(start,500);
+  };
+  if(document.readyState==="loading") addEventListener("DOMContentLoaded",build,{once:true}); else build();
+})();
+</script>
+
+<!-- CLUB_ABIERTO_GENESIS_ANCHOR_V1 -->
+<script>
+(()=>{
+  if(new URLSearchParams(location.search).get("anchor")!=="genesis") return;
+  const EXPECTED="0x7620dA48c9EB3f38E9996Ae92Dc8C867EfBc26d2".toLowerCase();
+  const CHAIN_HEX="0x13882";
+  const CONTRACT="0x15e15b7b765600d1b9d8d1027eccf6ac65b23f79";
+  const REFERENCE="club-abierto-genesis-historial-v1";
+  const ROOT="5860b558ee60c87cfcb6e15e2dda543029b2b2c779d9c2baf8439a2bd7d3e9a1";
+  const LEAF_COUNT=29972n;
+  const KEY="club_abierto_amoy_genesis_anchor_tx_v1";
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const receipt=async tx=>{for(let i=0;i<120;i++){const r=await ethereum.request({method:"eth_getTransactionReceipt",params:[tx]});if(r)return r;await sleep(2500)}throw new Error("La transacción sigue pendiente. Volvé a abrir esta página en unos minutos.")};
+  const utf8hex=s=>"0x"+Array.from(new TextEncoder().encode(s)).map(b=>b.toString(16).padStart(2,"0")).join("");
+  const pad64=h=>h.replace(/^0x/,"").padStart(64,"0");
+  const build=()=>{
+    document.body.innerHTML=`<div style="position:fixed;inset:0;background:#071b36;color:#fff;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;z-index:2147483647">
+      <div style="width:min(820px,92vw);background:#0d2b52;border:1px solid #2b5b8e;border-radius:18px;padding:28px;box-shadow:0 20px 60px #0005">
+        <h1 style="margin-top:0">Club Abierto — Primer anclaje blockchain</h1>
+        <p style="color:#b8cbe0">Polygon Amoy · Chain ID 80002 · lote génesis histórico</p>
+        <div style="margin:10px 0">Contrato: <code style="word-break:break-all;background:#061427;padding:3px 6px;border-radius:6px">${CONTRACT}</code></div>
+        <div style="margin:10px 0">Referencia: <code style="word-break:break-all;background:#061427;padding:3px 6px;border-radius:6px">${REFERENCE}</code></div>
+        <div style="margin:10px 0">Eventos: <b>29.972</b></div>
+        <div style="margin:10px 0">Raíz Merkle: <code style="word-break:break-all;background:#061427;padding:3px 6px;border-radius:6px">${ROOT}</code></div>
+        <div id="caAnchorStatus" style="padding:14px;border-radius:10px;background:#081a31;margin-top:16px;white-space:pre-wrap">Preparando conexión con MetaMask...</div>
+        <button id="caAnchorRetry" style="display:none;width:100%;padding:14px;border-radius:10px;border:0;font-weight:700;font-size:16px;cursor:pointer;margin-top:12px">Reintentar</button>
+      </div></div>`;
+    const status=document.getElementById("caAnchorStatus"),retry=document.getElementById("caAnchorRetry");
+    const set=(t,c)=>{status.textContent=t;status.style.color=c||"#fff"};
+    async function start(){
+      retry.style.display="none";
+      try{
+        if(!window.ethereum) throw new Error("No se detectó MetaMask en este navegador.");
+        const prev=localStorage.getItem(KEY);
+        if(prev){
+          set("Ya existe una transacción de anclaje registrada. Verificando confirmación...\n"+prev,"#ffd580");
+          const r=await receipt(prev);
+          if(r.status!=="0x1") throw new Error("La transacción anterior falló.");
+          set("ANCLAJE CONFIRMADO\n\nTX: "+prev+"\n\nBLOQUE: "+parseInt(r.blockNumber,16)+"\n\nMandá esta pantalla al chat.","#7ee787"); return;
+        }
+        set("Solicitando acceso a Account 1 en MetaMask...","#ffd580");
+        const accounts=await ethereum.request({method:"eth_requestAccounts"});
+        const account=(accounts[0]||"").toLowerCase();
+        if(account!==EXPECTED) throw new Error("La cuenta seleccionada no es Account 1 de Club Abierto.");
+        let chain=await ethereum.request({method:"eth_chainId"});
+        if(chain.toLowerCase()!==CHAIN_HEX) await ethereum.request({method:"wallet_switchEthereumChain",params:[{chainId:CHAIN_HEX}]});
+        chain=await ethereum.request({method:"eth_chainId"});
+        if(chain.toLowerCase()!==CHAIN_HEX) throw new Error("MetaMask no quedó en Polygon Amoy (80002).");
+        const balance=BigInt(await ethereum.request({method:"eth_getBalance",params:[account,"latest"]}));
+        if(balance===0n) throw new Error("La wallet figura con 0 POL en Amoy.");
+        const sigHash=await ethereum.request({method:"web3_sha3",params:[utf8hex("anchor(bytes32,bytes32,uint64)")]});
+        const selector=sigHash.slice(2,10);
+        const referenceHash=await ethereum.request({method:"web3_sha3",params:[utf8hex(REFERENCE)]});
+        const data="0x"+selector+pad64(referenceHash)+ROOT+pad64("0x"+LEAF_COUNT.toString(16));
+        const estimated=BigInt(await ethereum.request({method:"eth_estimateGas",params:[{from:account,to:CONTRACT,data}]}));
+        const gas="0x"+((estimated*105n)/100n).toString(16);
+        set("Todo preparado. MetaMask va a pedirte confirmar el PRIMER ANCLAJE BLOCKCHAIN del historial.\n\nVos sólo tenés que confirmar esa transacción.","#ffd580");
+        const tx=await ethereum.request({method:"eth_sendTransaction",params:[{
+          from:account,to:CONTRACT,data,gas,
+          maxPriorityFeePerGas:"0x5d21dba00",
+          maxFeePerGas:"0x5d21dba00"
+        }]});
+        localStorage.setItem(KEY,tx);
+        set("Transacción enviada. Esperando confirmación en Amoy...\n"+tx,"#ffd580");
+        const r=await receipt(tx);
+        if(r.status!=="0x1") throw new Error("La transacción fue minada pero falló.");
+        set("ANCLAJE CONFIRMADO\n\nTX: "+tx+"\n\nBLOQUE: "+parseInt(r.blockNumber,16)+"\n\nMandá esta pantalla al chat.","#7ee787");
+      }catch(e){set("No se completó el anclaje:\n\n"+(e?.message||String(e)),"#ff9b9b");retry.style.display="block"}
+    }
+    retry.onclick=start; setTimeout(start,500);
+  };
+  if(document.readyState==="loading") addEventListener("DOMContentLoaded",build,{once:true}); else build();
+})();
+</script>
+
+<!-- CLUB_ABIERTO_ANCHOR_TEST_BATCHES_V1 -->
+<script>
+(()=>{
+  const mode=new URLSearchParams(location.search).get("anchor");
+  const batches={
+    "audit-test":{
+      title:"Prueba — lote administrativo posterior",
+      reference:"audit-auto-v1-30067-30076",
+      root:"248382f1bf9c0a0ec9191ea111e62a8258b0fb17b9040653d7bb7ab53cfc18cc",
+      count:10n,
+      key:"club_abierto_amoy_audit_test_tx_v1"
+    },
+    "vote-test":{
+      title:"Prueba — lote de votos",
+      reference:"votes-forced-e1-1-215",
+      root:"5ec63d73157f76c14be5aba7c9c0b18e3a98a8437875c469f24fd29b1ee45ce2",
+      count:37n,
+      key:"club_abierto_amoy_vote_test_tx_v1"
+    }
+  };
+  const B=batches[mode];
+  if(!B)return;
+  const EXPECTED="0x7620dA48c9EB3f38E9996Ae92Dc8C867EfBc26d2".toLowerCase();
+  const CHAIN_HEX="0x13882";
+  const CONTRACT="0x15e15b7b765600d1b9d8d1027eccf6ac65b23f79";
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const receipt=async tx=>{for(let i=0;i<120;i++){const r=await ethereum.request({method:"eth_getTransactionReceipt",params:[tx]});if(r)return r;await sleep(2500)}throw new Error("La transacción sigue pendiente. Volvé a abrir esta página en unos minutos.")};
+  const utf8hex=s=>"0x"+Array.from(new TextEncoder().encode(s)).map(b=>b.toString(16).padStart(2,"0")).join("");
+  const pad64=h=>h.replace(/^0x/,"").padStart(64,"0");
+  const build=()=>{
+    document.body.innerHTML=`<div style="position:fixed;inset:0;background:#071b36;color:#fff;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;z-index:2147483647">
+      <div style="width:min(820px,92vw);background:#0d2b52;border:1px solid #2b5b8e;border-radius:18px;padding:28px;box-shadow:0 20px 60px #0005">
+        <h1 style="margin-top:0">Club Abierto — ${B.title}</h1>
+        <p style="color:#b8cbe0">Polygon Amoy · Chain ID 80002</p>
+        <div style="margin:10px 0">Contrato: <code style="word-break:break-all;background:#061427;padding:3px 6px;border-radius:6px">${CONTRACT}</code></div>
+        <div style="margin:10px 0">Referencia: <code style="word-break:break-all;background:#061427;padding:3px 6px;border-radius:6px">${B.reference}</code></div>
+        <div style="margin:10px 0">Registros: <b>${B.count.toString()}</b></div>
+        <div style="margin:10px 0">Raíz Merkle: <code style="word-break:break-all;background:#061427;padding:3px 6px;border-radius:6px">${B.root}</code></div>
+        <div id="caBatchStatus" style="padding:14px;border-radius:10px;background:#081a31;margin-top:16px;white-space:pre-wrap">Preparando conexión con MetaMask...</div>
+        <button id="caBatchRetry" style="display:none;width:100%;padding:14px;border-radius:10px;border:0;font-weight:700;font-size:16px;cursor:pointer;margin-top:12px">Reintentar</button>
+      </div></div>`;
+    const status=document.getElementById("caBatchStatus"),retry=document.getElementById("caBatchRetry");
+    const set=(t,c)=>{status.textContent=t;status.style.color=c||"#fff"};
+    async function start(){
+      retry.style.display="none";
+      try{
+        if(!window.ethereum) throw new Error("No se detectó MetaMask en este navegador.");
+        const prev=localStorage.getItem(B.key);
+        if(prev){
+          set("Ya existe una transacción registrada. Verificando confirmación...\n"+prev,"#ffd580");
+          const r=await receipt(prev);
+          if(r.status!=="0x1") throw new Error("La transacción anterior falló.");
+          set("ANCLAJE CONFIRMADO\n\nTX: "+prev+"\n\nBLOQUE: "+parseInt(r.blockNumber,16)+"\n\nMandá esta pantalla al chat.","#7ee787"); return;
+        }
+        const accounts=await ethereum.request({method:"eth_requestAccounts"});
+        const account=(accounts[0]||"").toLowerCase();
+        if(account!==EXPECTED) throw new Error("La cuenta seleccionada no es Account 1 de Club Abierto.");
+        let chain=await ethereum.request({method:"eth_chainId"});
+        if(chain.toLowerCase()!==CHAIN_HEX) await ethereum.request({method:"wallet_switchEthereumChain",params:[{chainId:CHAIN_HEX}]});
+        chain=await ethereum.request({method:"eth_chainId"});
+        if(chain.toLowerCase()!==CHAIN_HEX) throw new Error("MetaMask no quedó en Polygon Amoy (80002).");
+        const sigHash=await ethereum.request({method:"web3_sha3",params:[utf8hex("anchor(bytes32,bytes32,uint64)")]});
+        const selector=sigHash.slice(2,10);
+        const referenceHash=await ethereum.request({method:"web3_sha3",params:[utf8hex(B.reference)]});
+        const data="0x"+selector+pad64(referenceHash)+B.root+pad64("0x"+B.count.toString(16));
+        const estimated=BigInt(await ethereum.request({method:"eth_estimateGas",params:[{from:account,to:CONTRACT,data}]}));
+        const gas="0x"+((estimated*110n)/100n).toString(16);
+        const gasPrice=BigInt(await ethereum.request({method:"eth_gasPrice"}));
+        const balance=BigInt(await ethereum.request({method:"eth_getBalance",params:[account,"latest"]}));
+        const maxCost=((estimated*110n)/100n)*gasPrice;
+        if(balance<maxCost) throw new Error("Saldo Amoy insuficiente para esta prueba.");
+        set("Todo preparado. MetaMask va a pedirte confirmar este anclaje de prueba.\n\nVos sólo tenés que confirmar.","#ffd580");
+        const tx=await ethereum.request({method:"eth_sendTransaction",params:[{from:account,to:CONTRACT,data,gas,gasPrice:"0x"+gasPrice.toString(16)}]});
+        localStorage.setItem(B.key,tx);
+        set("Transacción enviada. Esperando confirmación en Amoy...\n"+tx,"#ffd580");
+        const r=await receipt(tx);
+        if(r.status!=="0x1") throw new Error("La transacción fue minada pero falló.");
+        set("ANCLAJE CONFIRMADO\n\nTX: "+tx+"\n\nBLOQUE: "+parseInt(r.blockNumber,16)+"\n\nMandá esta pantalla al chat.","#7ee787");
+      }catch(e){set("No se completó el anclaje:\n\n"+(e?.message||String(e)),"#ff9b9b");retry.style.display="block"}
+    }
+    retry.onclick=start;
+    setTimeout(start,500);
+  };
+  if(document.readyState==="loading") addEventListener("DOMContentLoaded",build,{once:true}); else build();
+})();
+</script>
+
+<script type="module">
+(async()=>{
+  const params=new URLSearchParams(location.search);
+  if(params.get("deploy")!=="anchor-v2") return;
+  document.body.innerHTML=`
+  <main style="max-width:880px;margin:40px auto;padding:28px;font-family:system-ui;background:#0b2a4a;color:white;border-radius:20px">
+    <div style="font-size:13px;font-weight:800;color:#7cc4ff">DESPLIEGUE CONTROLADO · PRODUCCIÓN</div>
+    <h1>Club Abierto — Anchor V2</h1>
+    <p>Polygon PoS Mainnet · Chain ID 137 · este proceso NO activa la integración automática.</p>
+    <div style="background:#071b30;padding:18px;border-radius:14px;line-height:1.6">
+      <b>Owner institucional</b><br><code>0x7620dA48c9EB3f38E9996Ae92Dc8C867EfBc26d2</code><br><br>
+      <b>Anchorer automático</b><br><code>0xa66FAB8B9c179f564784188c8210602434aAD15d</code>
+    </div>
+    <pre id="deployV2Status" style="white-space:pre-wrap;background:#071b30;padding:18px;border-radius:14px;margin-top:18px;color:#c9d1d9">Preparando compilador...</pre>
+    <button id="deployV2Btn" disabled style="width:100%;padding:14px;border:0;border-radius:12px;font-weight:800;font-size:16px">Desplegar contrato V2</button>
+  </main>`;
+
+  const status=document.getElementById("deployV2Status");
+  const btn=document.getElementById("deployV2Btn");
+  const set=(t,c="#c9d1d9")=>{status.textContent=t;status.style.color=c};
+
+  try{
+    if(!window.ethereum) throw new Error("MetaMask no detectado");
+
+    const source = "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.24;\ncontract ClubAbiertoAnchorV2 {\n    address public owner;\n    address public pendingOwner;\n    address public anchorer;\n    struct Anchor { bytes32 merkleRoot; uint64 leafCount; uint64 anchoredAt; }\n    mapping(bytes32 => Anchor) public anchors;\n    event OwnershipTransferStarted(address indexed currentOwner,address indexed pendingOwner);\n    event OwnershipTransferred(address indexed previousOwner,address indexed newOwner);\n    event AnchorerChanged(address indexed previousAnchorer,address indexed newAnchorer);\n    event BatchAnchored(bytes32 indexed referenceHash,bytes32 indexed merkleRoot,uint64 leafCount,uint64 anchoredAt);\n    error Unauthorized(); error InvalidValue(); error AlreadyAnchored();\n    modifier onlyOwner(){if(msg.sender!=owner) revert Unauthorized(); _;}\n    modifier onlyAnchorer(){if(msg.sender!=anchorer) revert Unauthorized(); _;}\n    constructor(address initialOwner,address initialAnchorer){\n        if(initialOwner==address(0)||initialAnchorer==address(0)) revert InvalidValue();\n        owner=initialOwner; anchorer=initialAnchorer;\n        emit OwnershipTransferred(address(0),initialOwner);\n        emit AnchorerChanged(address(0),initialAnchorer);\n    }\n    function transferOwnership(address newOwner) external onlyOwner {\n        if(newOwner==address(0)) revert InvalidValue(); pendingOwner=newOwner;\n        emit OwnershipTransferStarted(owner,newOwner);\n    }\n    function acceptOwnership() external {\n        if(msg.sender!=pendingOwner) revert Unauthorized();\n        address previous=owner; owner=pendingOwner; pendingOwner=address(0);\n        emit OwnershipTransferred(previous,owner);\n    }\n    function setAnchorer(address newAnchorer) external onlyOwner {\n        if(newAnchorer==address(0)) revert InvalidValue();\n        address previous=anchorer; anchorer=newAnchorer;\n        emit AnchorerChanged(previous,newAnchorer);\n    }\n    function anchor(bytes32 referenceHash,bytes32 merkleRoot,uint64 leafCount) external onlyAnchorer {\n        if(referenceHash==bytes32(0)||merkleRoot==bytes32(0)||leafCount==0) revert InvalidValue();\n        if(anchors[referenceHash].anchoredAt!=0) revert AlreadyAnchored();\n        uint64 timestamp=uint64(block.timestamp);\n        anchors[referenceHash]=Anchor(merkleRoot,leafCount,timestamp);\n        emit BatchAnchored(referenceHash,merkleRoot,leafCount,timestamp);\n    }\n    function verifyAnchor(bytes32 referenceHash,bytes32 merkleRoot,uint64 leafCount) external view returns(bool){\n        Anchor memory saved=anchors[referenceHash];\n        return saved.anchoredAt!=0&&saved.merkleRoot==merkleRoot&&saved.leafCount==leafCount;\n    }\n}";
+
+    set("Compilando contrato V2 en worker...","#f2cc60");
+    const workerCode = `
+      self.onmessage = async (ev) => {
+        try {
+          const solcMod = await import("https://esm.sh/solc@0.8.30");
+          const solc = solcMod.default || solcMod;
+          const input = {
+            language: "Solidity",
+            sources: {"ClubAbiertoAnchorV2.sol": {content: ev.data}},
+            settings: {
+              optimizer: {enabled: true, runs: 200},
+              outputSelection: {"*": {"*": ["abi","evm.bytecode.object"]}}
+            }
+          };
+          const output = JSON.parse(solc.compile(JSON.stringify(input)));
+          const errs = (output.errors || []).filter(x => x.severity === "error");
+          if (errs.length) throw new Error(errs.map(x=>x.formattedMessage).join("\\n"));
+          const artifact = output.contracts["ClubAbiertoAnchorV2.sol"]["ClubAbiertoAnchorV2"];
+          self.postMessage({ok:true,abi:artifact.abi,bytecode:"0x"+artifact.evm.bytecode.object});
+        } catch (e) {
+          self.postMessage({ok:false,error:e?.message || String(e)});
+        }
+      };
+    `;
+    const workerUrl=URL.createObjectURL(new Blob([workerCode],{type:"text/javascript"}));
+    const compiled=await new Promise((resolve,reject)=>{
+      const w=new Worker(workerUrl,{type:"module"});
+      const timer=setTimeout(()=>{w.terminate();reject(new Error("Timeout compilando contrato V2"));},45000);
+      w.onmessage=(ev)=>{
+        clearTimeout(timer);
+        w.terminate();
+        URL.revokeObjectURL(workerUrl);
+        ev.data?.ok ? resolve(ev.data) : reject(new Error(ev.data?.error||"Error de compilación"));
+      };
+      w.onerror=(ev)=>{
+        clearTimeout(timer);
+        w.terminate();
+        URL.revokeObjectURL(workerUrl);
+        reject(new Error(ev.message||"Error en worker de compilación"));
+      };
+      w.postMessage(source);
+    });
+    const abi=compiled.abi;
+    const bytecode=compiled.bytecode;
+
+    const { BrowserProvider, ContractFactory } = await import("https://cdn.jsdelivr.net/npm/ethers@6.15.0/+esm");
+    const provider=new BrowserProvider(window.ethereum);
+    const network=await provider.getNetwork();
+    if(Number(network.chainId)!==137) throw new Error("MetaMask debe estar en Polygon Mainnet (137)");
+
+    const accounts=await window.ethereum.request({method:"eth_requestAccounts"});
+    const account=String(accounts[0]||"").toLowerCase();
+    const owner="0x7620da48c9eb3f38e9996ae92dc8c867efbc26d2";
+    const anchorer="0xa66fab8b9c179f564784188c8210602434aad15d";
+    if(account!==owner) throw new Error("Seleccioná en MetaMask la cuenta Club Abierto · Institucional");
+
+    const signer=await provider.getSigner();
+    const factory=new ContractFactory(abi,bytecode,signer);
+    const deployTx=await factory.getDeployTransaction(owner,anchorer);
+    const gas=await provider.estimateGas({...deployTx,from:account});
+    const bal=await provider.getBalance(account);
+
+    set("DIAGNÓSTICO CORRECTO.\n\nRed: Polygon Mainnet (137)\nCuenta: "+account+"\nOwner: "+owner+"\nAnchorer: "+anchorer+"\nGas estimado: "+gas.toString()+"\nSaldo institucional: "+Number(bal)/1e18+" POL\n\nEl contrato será desplegado pero la integración seguirá DESACTIVADA.","#7ee787");
+    btn.disabled=false;
+    btn.onclick=async()=>{
+      btn.disabled=true;
+      try{
+        set("MetaMask va a pedirte confirmar UNA transacción de despliegue...","#f2cc60");
+        const contract=await factory.deploy(owner,anchorer);
+        const tx=contract.deploymentTransaction();
+        set("Transacción enviada:\n"+tx.hash+"\n\nEsperando confirmación...","#f2cc60");
+        const receipt=await tx.wait();
+        const addr=await contract.getAddress();
+        set("DESPLIEGUE CONFIRMADO.\n\nContrato: "+addr+"\nTX: "+tx.hash+"\nBloque: "+receipt.blockNumber+"\n\nLa integración NO fue activada.","#7ee787");
+        localStorage.setItem("club_abierto_anchor_v2_deploy",JSON.stringify({contract:addr,tx:tx.hash,block:receipt.blockNumber}));
+      }catch(e){set("No se completó el despliegue:\n\n"+(e?.shortMessage||e?.message||String(e)),"#ff7b72");btn.disabled=false;}
+    };
+  }catch(e){set("No se pudo preparar el despliegue:\n\n"+(e?.message||String(e)),"#ff7b72");}
+})();
+</script>
+
+<script>
+(async()=>{
+  const p=new URLSearchParams(location.search);
+  if(p.get("worker")!=="status") return;
+
+  document.body.innerHTML=`
+    <main style="max-width:980px;margin:32px auto;padding:24px;font-family:Inter,system-ui,sans-serif;color:#fff">
+      <div style="font:700 12px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#86bfff">Diagnóstico interno · Blockchain</div>
+      <h1 style="margin:8px 0 6px;color:#fff;font-size:34px">Blockchain Worker Status</h1>
+      <p style="margin:0 0 22px;color:#c6d8ee">Verificación técnica del worker. Esta pantalla no activa la integración ni envía transacciones.</p>
+      <div id="ws" style="background:#071b30;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:20px;color:#eaf2fb">Consultando...</div>
+    </main>`;
+
+  const box=document.getElementById("ws");
+  const esc=(v)=>String(v??"-").replace(/[&<>"]/g,s=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[s]));
+  const chip=(ok,yes="OK",no="NO")=>`<span style="display:inline-block;padding:5px 9px;border-radius:999px;font:700 11px 'JetBrains Mono',monospace;background:${ok?"#123d2f":"#3b1d25"};color:${ok?"#79f2b0":"#ff9b9b"}">${ok?yes:no}</span>`;
+  const row=(k,v)=>`<div style="display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08)"><span style="color:#9fb5cc">${esc(k)}</span><strong style="text-align:right;color:#fff;word-break:break-all">${esc(v)}</strong></div>`;
+
+  try{
+    const res=await fetch("https://sziuyjicqyxnmbgtbopg.supabase.co/functions/v1/blockchain-anchor",{
+      method:"POST",
+      headers:{"content-type":"application/json"},
+      body:JSON.stringify({action:"status"})
+    });
+    const d=await res.json();
+    if(!res.ok) throw new Error(d?.error||("HTTP "+res.status));
+
+    const cfg=d.public_config||{};
+    const conf=d.configured||{};
+    const batch=d.next_prepared_batch||null;
+
+    box.innerHTML=`
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:18px">
+        <div style="background:#0d2945;padding:16px;border-radius:12px"><div style="color:#9fb5cc;font-size:12px">RPC</div><div style="margin-top:8px">${chip(!!conf.rpc)}</div></div>
+        <div style="background:#0d2945;padding:16px;border-radius:12px"><div style="color:#9fb5cc;font-size:12px">Clave anchorer</div><div style="margin-top:8px">${chip(!!conf.anchorer_private_key)}</div></div>
+        <div style="background:#0d2945;padding:16px;border-radius:12px"><div style="color:#9fb5cc;font-size:12px">Contrato</div><div style="margin-top:8px">${chip(!!conf.contract)}</div></div>
+        <div style="background:#0d2945;padding:16px;border-radius:12px"><div style="color:#9fb5cc;font-size:12px">Envío habilitado</div><div style="margin-top:8px">${chip(!!d.sending_enabled,"ACTIVO","BLOQUEADO")}</div></div>
+      </div>
+
+      <div style="background:#0d2945;padding:18px;border-radius:12px;margin-bottom:14px">
+        <h3 style="margin:0 0 8px;color:#fff">Estado operativo</h3>
+        ${row("Estado",d.operational_state)}
+        ${row("Ready",d.ready?"true":"false")}
+        ${row("Red vigente",cfg.red)}
+        ${row("Chain ID vigente",cfg.chain_id)}
+        ${row("Contrato vigente",cfg.contrato)}
+        ${row("Confirmaciones requeridas",cfg.confirmaciones_requeridas)}
+      </div>
+
+      <div style="background:#0d2945;padding:18px;border-radius:12px">
+        <h3 style="margin:0 0 8px;color:#fff">Próximo lote preparado</h3>
+        ${batch
+          ? row("Origen",batch.source)+row("Referencia",batch.referencia)+row("Cantidad",batch.cantidad)+row("Preparado",batch.preparado_en)
+          : '<div style="color:#9fb5cc">No hay lotes preparados pendientes.</div>'}
+      </div>
+
+      <div style="margin-top:16px;padding:14px;border-radius:12px;background:${d.sending_enabled?"#123d2f":"#402413"};color:${d.sending_enabled?"#9cf7bd":"#ffd59a"}">
+        ${d.sending_enabled
+          ? "La integración está habilitada para envíos."
+          : "Seguro: el envío blockchain sigue bloqueado. Esta consulta no genera ninguna transacción."}
+      </div>
+    `;
+  }catch(e){
+    box.innerHTML='<div style="color:#ff9b9b;font-weight:700">ERROR: '+esc(e?.message||String(e))+'</div>';
+  }
+})();
+</script>
+
+<script>
+(async()=>{
+  const p=new URLSearchParams(location.search);
+  if(p.get("worker")!=="test") return;
+
+  const TEST_PREFIX="club-abierto-worker-auto-test-v2-";
+  const WORKER_URL="https://sziuyjicqyxnmbgtbopg.supabase.co/functions/v1/blockchain-anchor";
+  const SESSION_KEY="TD_club_session_v1";
+
+  document.body.innerHTML=`
+    <main style="max-width:900px;margin:32px auto;padding:24px;font-family:Inter,system-ui,sans-serif;color:#fff">
+      <div style="font:700 12px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#86bfff">Prueba final · Backend automático</div>
+      <h1 style="margin:8px 0 6px;color:#fff;font-size:34px">Anclaje automático V2</h1>
+      <p style="margin:0 0 20px;color:#c6d8ee">Esta prueba usa el worker de producción y la cuenta técnica de anclajes. No requiere MetaMask.</p>
+      <div id="wt" style="background:#071b30;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:20px;color:#eaf2fb">Verificando condiciones...</div>
+      <button id="wtBtn" disabled style="margin-top:14px;width:100%;padding:15px;border:0;border-radius:12px;font-weight:800;font-size:16px">Ejecutar UNA prueba automática</button>
+    </main>`;
+
+  const box=document.getElementById("wt");
+  const btn=document.getElementById("wtBtn");
+  const esc=v=>String(v??"-").replace(/[&<>"]/g,s=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[s]));
+  const token=sessionStorage.getItem(SESSION_KEY)||"";
+
+  if(!token){
+    box.innerHTML='<div style="color:#ffcf8b"><b>Sesión de administrador requerida.</b><br><br>Ingresá primero al panel administrador de Club Abierto en esta misma pestaña/origen y luego volvé a esta URL.</div>';
+    return;
+  }
+
+  try{
+    const sres=await fetch(WORKER_URL,{
+      method:"POST",
+      headers:{"content-type":"application/json"},
+      body:JSON.stringify({action:"status"})
+    });
+    const s=await sres.json();
+    if(!sres.ok) throw new Error(s?.error||("HTTP "+sres.status));
+
+    const ref=String(s?.next_prepared_batch?.referencia||"");
+    const safeRef=ref.startsWith(TEST_PREFIX);
+    const send=!!s.sending_enabled;
+
+    box.innerHTML=`
+      <div style="display:grid;gap:10px">
+        <div><span style="color:#9fb5cc">Red:</span> <b>${esc(s?.public_config?.red)}</b></div>
+        <div><span style="color:#9fb5cc">Chain ID:</span> <b>${esc(s?.public_config?.chain_id)}</b></div>
+        <div><span style="color:#9fb5cc">Contrato:</span> <b style="word-break:break-all">${esc(s?.public_config?.contrato)}</b></div>
+        <div><span style="color:#9fb5cc">Próximo lote:</span> <b>${esc(ref)}</b></div>
+        <div><span style="color:#9fb5cc">Envío técnico:</span> <b style="color:${send?"#7ee787":"#ff9b9b"}">${send?"HABILITADO PARA LA PRUEBA":"BLOQUEADO"}</b></div>
+        <div><span style="color:#9fb5cc">Lote aislado:</span> <b style="color:${safeRef?"#7ee787":"#ff9b9b"}">${safeRef?"OK":"NO"}</b></div>
+      </div>`;
+
+    if(!(send&&safeRef)){
+      box.innerHTML += '<div style="margin-top:14px;color:#ff9b9b"><b>Prueba bloqueada:</b> no se cumplen las condiciones de aislamiento.</div>';
+      return;
+    }
+
+    btn.disabled=false;
+    btn.onclick=async()=>{
+      btn.disabled=true;
+      box.innerHTML += '<div style="margin-top:14px;color:#f2cc60">Enviando UNA transacción desde el worker. Esperando 3 confirmaciones...</div>';
+      try{
+        const res=await fetch(WORKER_URL,{
+          method:"POST",
+          headers:{
+            "content-type":"application/json",
+            "X-Club-Session":token
+          },
+          body:JSON.stringify({action:"anchor"})
+        });
+        const d=await res.json();
+        if(!res.ok||!d?.anchored) throw new Error(d?.detail||d?.error||d?.reason||("HTTP "+res.status));
+        box.innerHTML=`
+          <div style="color:#7ee787;font-weight:800;font-size:18px">PRUEBA AUTOMÁTICA CONFIRMADA</div>
+          <div style="margin-top:14px;line-height:1.7">
+            <div>Referencia: <b>${esc(d.referencia)}</b></div>
+            <div>TX: <b style="word-break:break-all">${esc(d.tx_hash)}</b></div>
+            <div>Bloque: <b>${esc(d.block_number)}</b></div>
+            <div>Chain ID: <b>${esc(d.chain_id)}</b></div>
+          </div>
+          <div style="margin-top:14px;color:#c6d8ee">No vuelvas a ejecutar el botón. La prueba quedó cerrada.</div>`;
+      }catch(e){
+        box.innerHTML += '<div style="margin-top:14px;color:#ff9b9b"><b>Error:</b> '+esc(e?.message||String(e))+'</div>';
+      }
+    };
+  }catch(e){
+    box.innerHTML='<div style="color:#ff9b9b"><b>Error verificando condiciones:</b> '+esc(e?.message||String(e))+'</div>';
+  }
+})();
 </script>
 </body>

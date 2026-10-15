@@ -1,0 +1,79 @@
+name: Android 1.5 - validacion
+on:
+  push:
+    branches:
+      - release/android-1.5-preparacion
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Android SDK (preinstalled on GitHub runner)
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          test -d "$ANDROID_HOME"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --version || true
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Prepare web assets and synchronize Capacitor
+        run: npm run cap:sync
+      - name: Check generated Android web assets
+        run: |
+          test -s android/app/src/main/assets/public/index.html
+          grep -q 'function obtenerPluginBiometricoNativo' android/app/src/main/assets/public/index.html
+          grep -q 'native_biometric_register' android/app/src/main/assets/public/index.html
+          grep -q 'Integraci' android/app/src/main/assets/public/index.html
+      - name: Validate inline JavaScript syntax
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync, writeFileSync, unlinkSync } from 'node:fs';
+          import { execFileSync } from 'node:child_process';
+          const html = readFileSync('www/index.html', 'utf8');
+          const scripts = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)]
+            .filter(([, attrs, body]) => !/\bsrc\s*=/.test(attrs) && body.trim())
+            .map(([, , body]) => body);
+          if (!scripts.length) throw new Error('No inline scripts found');
+          for (let i = 0; i < scripts.length; i++) {
+            const file = '/tmp/club-abierto-script-' + i + '.js';
+            writeFileSync(file, scripts[i]);
+            try { execFileSync('node', ['--check', file], { stdio: 'pipe' }); }
+            catch (error) {
+              console.error('JavaScript syntax error in inline script', i, String(error.stderr));
+              process.exitCode = 1;
+            } finally { unlinkSync(file); }
+          }
+          if (process.exitCode) process.exit(process.exitCode);
+          console.log('Validated', scripts.length, 'inline scripts');
+          NODE
+      - name: Build Android debug APK (no production signing)
+        working-directory: android
+        run: bash ./gradlew assembleDebug --no-daemon
+      - name: Build unsigned release AAB (requires upload-key signing before Play)
+        working-directory: android
+        run: bash ./gradlew bundleRelease --no-daemon
+      - name: Upload unsigned release AAB for signing preparation
+        uses: actions/upload-artifact@v4
+        with:
+          name: club-abierto-1.5-release-UNSIGNED-not-for-play
+          path: android/app/build/outputs/bundle/release/*.aab
+          if-no-files-found: error
+      - name: Upload debug APK for internal validation
+        uses: actions/upload-artifact@v4
+        with:
+          name: club-abierto-1.5-debug-validation
+          path: android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
