@@ -62,6 +62,15 @@ jobs:
       - name: Build Android debug APK (no production signing)
         working-directory: android
         run: bash ./gradlew assembleDebug --no-daemon
+      - name: Build unsigned release AAB (requires upload-key signing before Play)
+        working-directory: android
+        run: bash ./gradlew bundleRelease --no-daemon
+      - name: Upload unsigned release AAB for signing preparation
+        uses: actions/upload-artifact@v4
+        with:
+          name: club-abierto-1.5-release-UNSIGNED-not-for-play
+          path: android/app/build/outputs/bundle/release/*.aab
+          if-no-files-found: error
       - name: Upload debug APK for internal validation
         uses: actions/upload-artifact@v4
         with:
