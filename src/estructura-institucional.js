@@ -1,7 +1,7 @@
 (()=>{
 'use strict';
 const API=()=>String(window.SUPABASE_URL||'').replace(/\/$/,'')+'/functions/v1/estructura-institucional-api';
-const token=()=>{try{return sessionStorage.getItem('TD_club_session_v1')||''}catch(e){return ''}};
+const token=()=>{try{return sessionStorage.getItem('TD_club_session_v1')||localStorage.getItem('TD_club_session_v1')||((typeof obtenerTokenSesionClub==='function')?obtenerTokenSesionClub():'')||''}catch(e){return (typeof obtenerTokenSesionClub==='function')?obtenerTokenSesionClub():''}};
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const estado=e=>e==='oficial'?'<span class="ei-badge ei-oficial">OFICIAL</span>':e==='publico'?'<span class="ei-badge ei-publico">PÚBLICO VERIFICADO</span>':'<span class="ei-badge ei-pendiente">NO INFORMADO PÚBLICAMENTE</span>';
 const condicion=v=>{const s=String(v||'').toLocaleLowerCase('es');if(s.includes('ad honorem'))return '<span class="ei-badge ei-lab ei-adhonorem">AD HONOREM</span>';if(s.includes('dependencia'))return '<span class="ei-badge ei-lab ei-dependencia">RELACIÓN DE DEPENDENCIA</span>';if(s.includes('proyecto'))return '<span class="ei-badge ei-lab ei-proyecto">POR PROYECTO</span>';return '<span class="ei-badge ei-lab ei-laboral-noinfo">NO INFORMADO</span>';};
