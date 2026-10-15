@@ -555,7 +555,7 @@ body{
       <button class="btn-action-red" onclick="irAPasskey()"><span class="action-icon">◎</span>Identidad biométrica / Passkey<br><small style="font-weight:500;color:#64748b">Registrá huella, Face ID o Windows Hello</small></button>
     </div>
     <div class="metrics-grid">
-      <div class="card"><div class="metric-label">Participación ponderada</div><div id="lblSocioPorcentual" style="font-size:18px;font-weight:800;color:var(--navy);margin-top:8px">-</div></div>
+      
       <div class="card"><div class="metric-label">Puntos por voto</div><div id="lblSocioPuntos" style="font-size:18px;font-weight:800;color:var(--navy);margin-top:8px">-</div></div>
       <div class="card"><div class="metric-label">Próximo escalón</div><div id="lblSocioDiasFaltantes" style="font-size:18px;font-weight:800;color:var(--navy);margin-top:8px">-</div></div>
     </div>
@@ -3301,7 +3301,7 @@ ID_SOCIO_ACTIVO=id;ROL_ACTIVO='socio';actualizarCabeceraSegunRol();ocultarTodo()
 var d=obtenerDatosSocio(id);
 document.getElementById('lblSocioId').innerText="#"+d.id;document.getElementById('lblSocioAntiguedad').innerText=d.antiguedad+" AÑOS";
 document.getElementById('lblSocioNombre').innerText=d.nombre;
-document.getElementById('lblSocioPorcentual').innerText=d.porcentual.toFixed(3)+"% ASIGNADO DEL TOTAL";
+
 document.getElementById('lblSocioPuntos').innerText=d.puntos+" PUNTOS POR VOTO OBTENIDOS";var hp=document.getElementById('heroSocioPuntos');if(hp)hp.innerText=d.puntos+' PTS';var dg=document.getElementById('dashGreeting');if(dg)dg.innerText='Bienvenido, '+d.nombre;
 document.getElementById('lblSocioDiasFaltantes').innerText=d.diasFaltantes>0?d.diasFaltantes+" DÍAS RESTANTES":"MÁXIMO ESCALAFÓN DEL RANGO";
 }
