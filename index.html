@@ -5218,7 +5218,17 @@ function setup(id){
  head.className='ca-category-head';back.type='button';back.className='ca-category-back';back.textContent='← Volver a categorías';inner.className='action-grid'+(id==='adminDashboard'?' admin-accent':'');
  head.appendChild(heading);head.appendChild(back);view.appendChild(head);view.appendChild(inner);
  var buckets=groups.map(function(){return []}),rest=[];
- buttons.forEach(function(b){var name=label(b),matched=false;groups.forEach(function(g,i){if(!matched&&g[3].indexOf(name)>=0){buckets[i].push(b);matched=true}});if(!matched)rest.push(b)});
+ var structureSeen=false;
+ buttons.forEach(function(b){
+  var name=label(b),isStructure=/^estructura institucional$/i.test(name);
+  if(isStructure){
+   if(structureSeen){b.style.display='none';return}
+   structureSeen=true;
+   var target=groups.findIndex(function(g){return g[0]===(id==='socioDashboard'?'Transparencia y auditoría':'Gobernanza')});
+   if(target>=0){buckets[target].push(b);return}
+  }
+  var matched=false;groups.forEach(function(g,i){if(!matched&&g[3].indexOf(name)>=0){buckets[i].push(b);matched=true}});if(!matched)rest.push(b)
+ });
  if(rest.length){groups.push(['Otros accesos','☷','Más herramientas del panel',[]]);buckets.push(rest)}
  function open(i){inner.replaceChildren();buckets[i].forEach(function(b){inner.appendChild(b)});heading.textContent=groups[i][0];categories.classList.add('ca-hidden');view.classList.add('ca-open');view.classList.remove('ca-hidden');back.focus()}
  function close(){view.classList.remove('ca-open');view.classList.add('ca-hidden');categories.classList.remove('ca-hidden')}
