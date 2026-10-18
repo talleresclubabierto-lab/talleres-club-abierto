@@ -5171,4 +5171,66 @@ function init(){
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
+
+<style>
+/* Reorganizacion visual aislada: no cambia funciones ni datos. */
+.ca-categories{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin:20px 0}
+.ca-category{background:#fff;color:#0a2a4e;text-align:left;border:1px solid #d4e3f0;border-radius:14px;padding:21px;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:9px;min-height:140px;box-shadow:0 4px 18px rgba(0,25,60,.08);transition:transform .16s,border-color .16s}
+.ca-category:hover,.ca-category:focus-visible{border-color:#2895dd;transform:translateY(-2px)}
+.ca-category-icon{display:grid;place-items:center;background:#eaf3fb;color:#073c70;width:42px;height:42px;border-radius:10px;font-size:21px}
+.ca-category-title{font-weight:800;font-size:18px}.ca-category-desc{font-size:13px;color:#56718b;line-height:1.5}
+.ca-category-view{display:none;margin:20px 0}.ca-category-view.ca-open{display:block}
+.ca-category-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 16px;flex-wrap:wrap}
+.ca-category-head h2{margin:0;color:#fff;font-size:24px}.ca-category-back{border:1px solid #c5d8e9;border-radius:9px;background:#fff;color:#0b3158;padding:11px 17px;font-weight:700;cursor:pointer}
+.ca-category-view .action-grid{display:grid!important}
+.ca-categories.ca-hidden,.ca-category-view.ca-hidden{display:none!important}
+@media(max-width:680px){.ca-categories{grid-template-columns:1fr;gap:10px}.ca-category{min-height:112px;padding:15px}.ca-category-title{font-size:16px}.ca-category-head h2{font-size:20px}}
+</style>
+<script>
+/* Mover los botones originales (sin clonarlos ni alterar onclick/IDs). */
+(function(){
+var defs={
+ socioDashboard:[
+ ['Mi perfil','♙','Datos personales, antigüedad y seguridad',['Cambiar contraseña','Identidad biométrica / Passkey','Tu historia con Talleres']],
+ ['Participación y votaciones','◇','Votaciones activas y resultados',['Votaciones activas','Resultados']],
+ ['Transparencia y auditoría','▤','Balances, registros y estructura institucional',['Auditoría pública','Paredes de Cristal','Historial de cambios','Integración blockchain','Concursos y licitaciones','Estructura institucional']],
+ ['Comunidad profesional','♧','Directorio y colaboración de socios',['Banco de profesionales']]
+ ],
+ adminDashboard:[
+ ['Socios y padrón','♙','Padrón y credenciales',['Gestionar padrón']],
+ ['Votaciones','◇','Encuestas, participación y resultados',['Modificar encuestas','Nueva encuesta','Resultados','Participación','Ciclo de vida']],
+ ['Gobernanza','⚖','Reglas y organización institucional',['Gobernanza institucional','Estructura institucional']],
+ ['Economía y auditoría','▦','Balances, auditorías y transparencia',['Paredes de Cristal','Auditoría pública']],
+ ['Contrataciones','▤','Concursos, proveedores y contratos',['Concursos y licitaciones']],
+ ['Profesionales','♧','Directorio y convocatorias',['Banco de profesionales']],
+ ['Seguridad y blockchain','⬡','Identidad, permisos e integración',['Integración blockchain','Cambiar contraseña','Identidad biométrica / Passkey','Gestionar administradores']],
+ ['Historial institucional','▥','Registros de cambios y seguimiento',['Historial de cambios']]
+ ]
+};
+function label(b){var x=b.cloneNode(true);x.querySelectorAll('small,.action-icon').forEach(function(n){n.remove()});return x.textContent.trim().replace(/\s+/g,' ')}
+function setup(id){
+ var dash=document.getElementById(id);if(!dash||dash.dataset.caOrganized)return;
+ var original=dash.querySelector(':scope > main > .action-grid');if(!original)return;
+ var buttons=Array.from(original.children).filter(function(x){return x.tagName==='BUTTON'});
+ var groups=defs[id],categories=document.createElement('div');categories.className='ca-categories';categories.setAttribute('aria-label','Categorías del panel');
+ var view=document.createElement('section');view.className='ca-category-view';view.setAttribute('aria-label','Opciones de categoría');
+ var heading=document.createElement('h2'),back=document.createElement('button'),inner=document.createElement('div'),head=document.createElement('div');
+ head.className='ca-category-head';back.type='button';back.className='ca-category-back';back.textContent='← Volver a categorías';inner.className='action-grid'+(id==='adminDashboard'?' admin-accent':'');
+ head.appendChild(heading);head.appendChild(back);view.appendChild(head);view.appendChild(inner);
+ var buckets=groups.map(function(){return []}),rest=[];
+ buttons.forEach(function(b){var name=label(b),matched=false;groups.forEach(function(g,i){if(!matched&&g[3].indexOf(name)>=0){buckets[i].push(b);matched=true}});if(!matched)rest.push(b)});
+ if(rest.length){groups.push(['Otros accesos','☷','Más herramientas del panel',[]]);buckets.push(rest)}
+ function open(i){inner.replaceChildren();buckets[i].forEach(function(b){inner.appendChild(b)});heading.textContent=groups[i][0];categories.classList.add('ca-hidden');view.classList.add('ca-open');view.classList.remove('ca-hidden');back.focus()}
+ function close(){view.classList.remove('ca-open');view.classList.add('ca-hidden');categories.classList.remove('ca-hidden')}
+ back.addEventListener('click',close);
+ groups.forEach(function(g,i){var card=document.createElement('button');card.type='button';card.className='ca-category';card.innerHTML='<span class="ca-category-icon" aria-hidden="true">'+g[1]+'</span><span class="ca-category-title">'+g[0]+'</span><span class="ca-category-desc">'+g[2]+'</span>';card.addEventListener('click',function(){open(i)});categories.appendChild(card)});
+ original.style.display='none';original.setAttribute('aria-hidden','true');original.after(categories,view);dash.dataset.caOrganized='1';
+ // Cuando se vuelve al inicio, recuperar la vista de categorías.
+ var observer=new MutationObserver(function(){if(dash.style.display==='flex')close()});
+ observer.observe(dash,{attributes:true,attributeFilter:['style']});
+}
+function init(){setup('socioDashboard');setup('adminDashboard')}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
 </body>
