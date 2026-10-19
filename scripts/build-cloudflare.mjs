@@ -6,6 +6,7 @@ await mkdir(output, { recursive: true });
 
 for (const file of [
   'index.html',
+  'comunidad-formativa.html',
   'manifest.webmanifest',
   'service-worker.js',
   'icon.svg',
@@ -21,4 +22,4 @@ const js = await readFile('src/estructura-institucional.js', 'utf8');
 html = html.replace('</head>', '<style data-v12="estructura-institucional">' + css + '</style>\n</head>');
 html = html.replace('</body>', '<script data-v12="estructura-institucional">' + js + '</script>\n</body>');
 await writeFile(indexPath, html, 'utf8');
-console.log('Cloudflare build: Estructura Institucional integrada.');
+console.log('Cloudflare build: Estructura Institucional y Comunidad Formativa integradas.');
