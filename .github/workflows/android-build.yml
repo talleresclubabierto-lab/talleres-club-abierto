@@ -1,0 +1,73 @@
+
+name: Android build manual
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout Android
+        uses: actions/checkout@v4
+
+      - name: Checkout web actual
+        uses: actions/checkout@v4
+        with:
+          ref: 95b5ba6e8df362cd641a673bc50952389e294e13
+          path: production-web
+          sparse-checkout: |
+            index.html
+            manifest.webmanifest
+            service-worker.js
+            icon.svg
+            src/estructura-institucional.css
+            src/estructura-institucional.js
+
+      - name: Sincronizar contenido web
+        run: |
+          cp production-web/index.html index.html
+          cp production-web/manifest.webmanifest manifest.webmanifest
+          cp production-web/service-worker.js service-worker.js
+          cp production-web/icon.svg icon.svg
+          mkdir -p src
+          cp production-web/src/estructura-institucional.css src/
+          cp production-web/src/estructura-institucional.js src/
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Sincronizar Capacitor
+        run: npm run cap:sync -- android
+
+      - name: Compilar Android
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug bundleRelease
+
+      - name: Guardar compilacion
+        uses: actions/upload-artifact@v4
+        with:
+          name: talleres-android-actualizado
+          path: |
+            android/app/build/outputs/apk/debug/*.apk
+            android/app/build/outputs/bundle/release/*.aab
+          retention-days: 14
