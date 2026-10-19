@@ -36,7 +36,7 @@ La migración crea el esquema privado `comunidad_formativa`. Cada tabla tiene RL
 |---|---|
 | `solicitudes_acceso` | Alta voluntaria, consentimiento y revisión |
 | `jugadores`, `adultos_responsables`, `vinculos` | Padrón separado, adultos autorizados y fuente/estado de validación |
-| `cuentas`, `codigos_otp`, `sesiones` | Identidad independiente, OTP de un uso y sesión cuyo token solo se almacena como HMAC |
+| `cuentas`, `codigos_otp`, `codigos_activacion`, `sesiones` | Identidad independiente, OTP y código de activación de un uso, y sesión cuyo token solo se almacena como HMAC |
 | `roles_administrativos` | Administrador general, responsable de integridad y principal de integridad |
 | `casos`, `archivos`, `actuaciones` | Presentaciones, adjuntos, estados, solicitudes/respuestas, medidas y resoluciones |
 | `accesos_identidad` | Motivo, usuario y hora de cualquier desbloqueo excepcional |
@@ -44,7 +44,7 @@ La migración crea el esquema privado `comunidad_formativa`. Cada tabla tiene RL
 | `eventos_criptograficos`, `lotes_merkle`, `anclajes` | Cadena y lotes propios del módulo, separados de las tablas actuales |
 | `importaciones`, `importacion_items` | Staging para archivo/API y conciliación segura |
 
-Los datos personales y relatos se guardan como ciphertext AES-GCM, nonce aleatorio y versión de clave. Los DNI y contactos no se guardan en claro en claves de búsqueda: se usa HMAC con secreto fuera de la base. El archivo de importación y la evidencia se alojan en el bucket privado `comunidad-formativa-privada`. No se incluyen datos seed.
+Los datos personales, relatos y fecha aproximada del hecho se guardan como ciphertext AES-GCM, nonce aleatorio y versión de clave. Los DNI y contactos no se guardan en claro en claves de búsqueda: se usa HMAC con secreto fuera de la base. El archivo de importación y la evidencia se alojan en el bucket privado `comunidad-formativa-privada`. No se incluyen datos seed.
 
 ## Roles y autorización
 

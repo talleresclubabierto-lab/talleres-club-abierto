@@ -89,8 +89,8 @@ create table comunidad_formativa.cuentas (
   estado text not null default 'pendiente' check (estado in ('pendiente','activa','suspendida','revocada')),
   creada_en timestamptz not null default now(),
   actualizada_en timestamptz not null default now(),
-  check ((tipo = 'adulto_responsable' and adulto_id is not null)
-      or (tipo = 'jugador_mayor_16' and jugador_id is not null))
+  check ((tipo = 'adulto_responsable' and adulto_id is not null and jugador_id is null)
+      or (tipo = 'jugador_mayor_16' and jugador_id is not null and adulto_id is null))
 );
 
 create table comunidad_formativa.codigos_otp (
@@ -158,14 +158,24 @@ create table comunidad_formativa.casos (
   relato_cifrado bytea not null,
   nonce bytea not null check (octet_length(nonce) = 12),
   version_clave smallint not null,
-  fecha_aproximada date,
+  fecha_aproximada_cifrada bytea,
+  fecha_aproximada_nonce bytea check (
+    fecha_aproximada_nonce is null or octet_length(fecha_aproximada_nonce) = 12
+  ),
+  fecha_aproximada_version_clave smallint,
   estado text not null default 'recibida' check (estado in (
     'recibida','en_evaluacion','informacion_solicitada','en_investigacion',
     'resuelta','archivada','reabierta'
   )),
   responsable_ref bigint,
   creada_en timestamptz not null default now(),
-  actualizada_en timestamptz not null default now()
+  actualizada_en timestamptz not null default now(),
+  check (
+    (fecha_aproximada_cifrada is null and fecha_aproximada_nonce is null
+      and fecha_aproximada_version_clave is null)
+    or (fecha_aproximada_cifrada is not null and fecha_aproximada_nonce is not null
+      and fecha_aproximada_version_clave is not null)
+  )
 );
 
 create table comunidad_formativa.archivos (
@@ -210,7 +220,9 @@ create table comunidad_formativa.proyeccion_socios (
   id uuid primary key default gen_random_uuid(),
   caso_id uuid not null unique references comunidad_formativa.casos(id),
   codigo text not null unique,
-  fecha_general date not null,
+  fecha_general date not null check (
+    date_trunc('month', fecha_general::timestamp)::date = fecha_general
+  ),
   categoria_general text not null,
   estado_publico text not null,
   hash_evento text not null check (hash_evento ~ '^[0-9a-f]{64}$'),
