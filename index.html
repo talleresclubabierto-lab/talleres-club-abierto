@@ -507,7 +507,7 @@ body{
 
 </style><script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
+<style id="comunidad-formativa-entry-css">.columns-container{grid-template-columns:repeat(3,minmax(0,1fr)}@media(max-width:800px){.columns-container{grid-template-columns:1fr}}</style></head>
 <body>
 <div class="container">
 <div id="loginScreen" class="full-width" style="display:flex;flex-direction:column">
@@ -531,6 +531,7 @@ body{
         <button class="wf-button wide" onclick="procesarIngreso('admin')">Ingresar al panel administrador</button>
         <div id="adminBioFace" class="biometric-box">Validación biométrica</div><div id="adminBioFinger" class="biometric-box">Validación de huella digital</div>
       </section>
+      <section class="login-panel" aria-labelledby="communityFormativeTitle"><div class="login-panel-title"><h3 id="communityFormativeTitle">Comunidad Formativa</h3><span class="count-pill">Acceso independiente</span></div><p class="card-note">Acceso exclusivo para jugadores de divisiones formativas, madres, padres y tutores registrados.</p><a class="wf-button wide" style="display:block;text-align:center;text-decoration:none;margin-top:18px" href="./comunidad-formativa.html">Ingresar a Comunidad Formativa</a></section>
     </div>
   </div>
 </div>
