@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - mobile/android
+      - sync-android-web-20261019
     paths:
       - 'android/**'
       - 'capacitor.config.ts'
