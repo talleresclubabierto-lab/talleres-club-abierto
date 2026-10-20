@@ -28,5 +28,5 @@ async function open(){
   root.querySelector('#ei-message').textContent='';render();
  }catch(e){root.querySelector('#ei-message').textContent=e.message||'No se pudo cargar la información';}
 }
-document.addEventListener('click',e=>{const button=e.target.closest('button');if(!button)return;const label=normalize(button.textContent);if(label==='estructura institucional' || label.startsWith('estructura institucional '){e.preventDefault();e.stopImmediatePropagation();open();}},true);
+document.addEventListener('click',e=>{const button=e.target.closest('button');if(!button)return;const label=normalize(button.textContent);if(label==='estructura institucional' || label.startsWith('estructura institucional ')){e.preventDefault();e.stopImmediatePropagation();open();}},true);
 })();
