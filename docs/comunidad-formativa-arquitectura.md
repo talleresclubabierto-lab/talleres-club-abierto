@@ -1,6 +1,6 @@
-# Comunidad Formativa — diseño técnico para revisión
+# Comunidad Formativa — diseño técnico
 
-**Estado:** propuesta de implementación en una rama de revisión. La migración no se aplicó al proyecto productivo y no contiene datos de personas.
+**Estado:** esquema privado aplicado en Supabase; Edge Function de estado activa y conectada con la página pública. No contiene datos de personas. El alta y las presentaciones siguen deshabilitadas hasta configurar y probar cifrado de aplicación y envío OTP.
 
 ## Objetivo y límites
 
@@ -90,5 +90,5 @@ El módulo no inserta filas en `auditoria_administrativa`, `lotes_merkle_auditor
 - Realizar pruebas de navegador responsive y de app Android; la app empaqueta assets locales.
 - Configurar proveedor de correo/SMS, claves de cifrado/HMAC, retención, protocolos y consentimientos antes de aceptar datos.
 
-Esta migración se publica para revisión; no se ejecutó en producción. No hay padrón real, OTP ni caso real en la rama. La implementación técnica debe acompañarse con aviso de privacidad, reglas de retención y revisión jurídica específica bajo Ley 25.326 y Ley 26.061.
+La base aislada y la función de estado están aplicadas en producción. No hay padrón real ni casos cargados. El navegador no tiene permisos sobre el esquema privado. No habilitar altas ni presentaciones hasta cerrar la configuración de claves, proveedor OTP, flujos de sesión y pruebas de seguridad. La integración blockchain permanece sin envíos. La implementación técnica debe acompañarse con aviso de privacidad, reglas de retención y revisión jurídica específica bajo Ley 25.326 y Ley 26.061.
 
