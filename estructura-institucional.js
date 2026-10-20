@@ -9,7 +9,7 @@ function render(){
  const root=document.getElementById('ei-root');if(!root||!data)return;
  const term=normalize(root.querySelector('#ei-search').value),type=root.querySelector('#ei-type').value,group=root.querySelector('#ei-group').value;
  const people=new Map((data.personas||[]).map(p=>[normalize(p.nombre_completo),p]));
- const rows=(data.asambleistas||[]).filter(a=>(type==='todos'||normalize(a.condicion)===type)&&(group==='todos'||String(a.agrupacion_origen||'Pendiente de verificar')===group)&&(!term||normalize(a.nombre_completo).includes(term)));
+ const rows=(data.asambleistas||[]).filter(a=>(type==='todos'||normalize(a.condicion)===type)&&(group==='todos'||String(a.agrupacion_origen||'Pendiente de verificar')===group)&&(!term||term.split(' ').every(word=>normalize(a.nombre_completo).includes(word))));
  root.querySelector('#ei-count').textContent=rows.length+' resultados';
  root.querySelector('#ei-results').innerHTML=rows.map(a=>{const p=people.get(normalize(a.nombre_completo));return '<tr><td>'+safe(a.nombre_completo)+link(a.linkedin_validado?a.linkedin_url:(p?.linkedin_validado?p?.linkedin_url:null),a.linkedin_validado||p?.linkedin_validado)+'</td><td>'+safe(a.condicion)+'</td><td>'+safe(a.agrupacion_origen||'Pendiente de verificar')+'</td></tr>'}).join('')||'<tr><td colspan="3">No se encontraron asambleístas.</td></tr>';
 }
