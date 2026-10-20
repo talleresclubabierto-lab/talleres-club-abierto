@@ -507,7 +507,35 @@ body{
 
 </style><script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style id="comunidad-formativa-entry-css">.columns-container{grid-template-columns:minmax(0,760px);justify-content:center;width:100%;margin-inline:auto;gap:16px}@media(max-width:800px){.columns-container{grid-template-columns:minmax(0,1fr)}}</style><link rel="stylesheet" href="./estructura-institucional.css"><script src="./estructura-institucional.js" defer></script></head>
+<style id="comunidad-formativa-entry-css">.columns-container{grid-template-columns:minmax(0,760px);justify-content:center;width:100%;margin-inline:auto;gap:16px}@media(max-width:800px){.columns-container{grid-template-columns:minmax(0,1fr)}}</style><link rel="stylesheet" href="./estructura-institucional.css"><script src="./estructura-institucional.js" defer></script><style id="home-responsive-20261020">
+#loginScreen .login-shell{width:100%;max-width:760px;padding-top:12px}
+#loginScreen .login-brand{margin-bottom:14px}
+#loginScreen .app-logo-full{transform:scale(.84);transform-origin:center center;margin-block:-12px}
+#loginScreen .login-sub{line-height:1.35;margin-top:2px}
+#loginScreen #syncStatusBox{margin:0 0 14px!important;width:100%}
+#loginScreen .login-access-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important;width:100%;max-width:none}
+#loginScreen .login-panel{min-width:0;padding:18px;border-radius:12px}
+#loginScreen .login-panel-title{gap:8px;flex-wrap:wrap;margin-bottom:12px}
+#loginScreen .login-panel-title h3{font-size:17px;line-height:1.25}
+#loginScreen .count-pill{font-size:10px}
+#loginScreen .wf-input{max-width:100%}
+#loginScreen .login-community-row{width:100%;margin-top:14px}
+#loginScreen .login-community-row .login-panel{width:100%}
+#loginScreen .login-community-row .card-note{margin:6px 0 10px;line-height:1.4}
+#loginScreen .login-community-row .wf-button{margin-top:12px!important}
+@media(max-width:620px){
+ #loginScreen .login-shell{padding-top:8px}
+ #loginScreen .login-access-grid{grid-template-columns:minmax(0,1fr)!important;gap:12px!important}
+ #loginScreen .login-panel{padding:16px}
+ #loginScreen .login-brand{margin-bottom:12px}
+ #loginScreen .app-logo-full{transform:scale(.78)}
+ #loginScreen .login-panel-title{flex-direction:row;align-items:center}
+}
+@media(min-width:621px) and (max-width:780px){
+ #loginScreen .login-panel{padding:14px}
+ #loginScreen .count-pill{font-size:9px}
+}
+</style></head>
 <body>
 <div class="container">
 <div id="loginScreen" class="full-width" style="display:flex;flex-direction:column">
@@ -516,7 +544,7 @@ body{
     <div id="syncStatusBox" class="wf-box full-width" style="border-color:#cbd5e1;background:#f8fafc;text-align:left;font-size:12px;color:#475569">
 <strong>Estado compartido:</strong> <span id="syncStatusText">Configuración Supabase pendiente</span>
 </div>
-<div class="columns-container">
+<div class="columns-container login-access-grid">
       <section class="login-panel">
         <div class="login-panel-title"><h3>Panel Socio Activo</h3><span class="count-pill"><span id="lblTotalSociosLogin">-</span> habilitados</span></div>
         <label class="form-label">Número de socio</label><input id="socioUser" class="wf-input" placeholder="N° de Socio habilitado en padrón" onkeydown="if(event.key==='Enter'){event.preventDefault();procesarIngreso('socio')}">
@@ -524,7 +552,7 @@ body{
         <button class="wf-button wide" onclick="procesarIngreso('socio')">Ingresar como socio</button>
         <div id="socioBioFace" class="biometric-box">Validación biométrica</div><div id="socioBioFinger" class="biometric-box">Validación de huella digital</div>
       </section>
-      <section class="login-panel" aria-labelledby="communityFormativeTitle"><div class="login-panel-title"><h3 id="communityFormativeTitle">Panel Comunidad Formativa</h3><span class="count-pill">Acceso independiente</span></div><p class="card-note">Acceso exclusivo para jugadores de divisiones formativas, madres, padres y tutores registrados.</p><a class="wf-button wide" style="display:block;text-align:center;text-decoration:none;margin-top:18px" href="./comunidad-formativa.html">Ingresar a Comunidad Formativa</a></section>
+
       <section class="login-panel">
         <div class="login-panel-title"><h3>Panel Administración</h3><span class="count-pill"><span id="lblCantidadAdminsLogin">1</span> habilitado(s)</span></div>
         <label class="form-label">Número de socio administrador</label><input id="adminUser" class="wf-input" placeholder="N° de Socio administrador" onkeydown="if(event.key==='Enter'){event.preventDefault();procesarIngreso('admin')}">
@@ -533,6 +561,7 @@ body{
         <div id="adminBioFace" class="biometric-box">Validación biométrica</div><div id="adminBioFinger" class="biometric-box">Validación de huella digital</div>
       </section>
     </div>
+    <div class="login-community-row">      <section class="login-panel" aria-labelledby="communityFormativeTitle"><div class="login-panel-title"><h3 id="communityFormativeTitle">Comunidad Formativa</h3><span class="count-pill">Acceso independiente</span></div><p class="card-note">Un espacio para acompañar el desarrollo, la formación y el futuro de nuestros jugadores.</p><a class="wf-button wide" style="display:block;text-align:center;text-decoration:none;margin-top:18px" href="./comunidad-formativa.html">Ingresar</a></section></div>
   </div>
 </div>
 
