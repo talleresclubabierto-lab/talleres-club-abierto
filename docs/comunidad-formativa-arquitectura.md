@@ -1,6 +1,6 @@
 # Comunidad Formativa — diseño técnico
 
-**Estado:** esquema privado aplicado en Supabase; Edge Function de estado activa y conectada con la página pública. No contiene datos de personas. El alta y las presentaciones siguen deshabilitadas hasta configurar y probar cifrado de aplicación y envío OTP.
+**Estado:** esquema privado aplicado en Supabase; Edge Function de estado y acciones de OTP por correo desplegadas. No contiene datos de personas. El envío OTP queda cerrado hasta configurar proveedor y claves secretas; verificar el correo no habilita una cuenta ni valida pertenencia.
 
 ## Objetivo y límites
 
@@ -36,7 +36,7 @@ La migración crea el esquema privado `comunidad_formativa`. Cada tabla tiene RL
 |---|---|
 | `solicitudes_acceso` | Alta voluntaria, consentimiento y revisión |
 | `jugadores`, `adultos_responsables`, `vinculos` | Padrón separado, adultos autorizados y fuente/estado de validación |
-| `cuentas`, `codigos_otp`, `codigos_activacion`, `sesiones` | Identidad independiente, OTP y código de activación de un uso, y sesión cuyo token solo se almacena como HMAC |
+| `cuentas`, `codigos_otp`, `desafios_email_otp`, `codigos_activacion`, `sesiones` | Identidad independiente, OTP y código de activación de un uso, y sesión cuyo token solo se almacena como HMAC |
 | `roles_administrativos` | Administrador general, responsable de integridad y principal de integridad |
 | `casos`, `archivos`, `actuaciones` | Presentaciones, adjuntos, estados, solicitudes/respuestas, medidas y resoluciones |
 | `accesos_identidad` | Motivo, usuario y hora de cualquier desbloqueo excepcional |
@@ -58,7 +58,7 @@ Las Edge Functions derivan el actor de la sesión validada en servidor. No conf�
 
 ## Edge Functions previstas
 
-1. `comunidad-formativa-api`: solicitud, OTP, sesiones, perfiles vinculados, presentaciones, seguimiento y archivos.
+1. `comunidad-formativa-api`: disponible para consulta de estado y OTP de correo; los flujos de solicitud, sesión, perfiles, presentaciones y archivos siguen pendientes.
 2. `comunidad-formativa-admin`: validación de solicitudes, roles, actuaciones, solicitudes de información, estados, protocolos especiales y desbloqueo de identidad.
 3. `comunidad-formativa-import`: staging, validación, deduplicación, conciliación y aplicación de archivo/API.
 4. `comunidad-formativa-public`: lista y estadísticas con salida allowlist, demoras y supresión de grupos pequeños.
@@ -90,5 +90,5 @@ El módulo no inserta filas en `auditoria_administrativa`, `lotes_merkle_auditor
 - Realizar pruebas de navegador responsive y de app Android; la app empaqueta assets locales.
 - Configurar proveedor de correo/SMS, claves de cifrado/HMAC, retención, protocolos y consentimientos antes de aceptar datos.
 
-La base aislada y la función de estado están aplicadas en producción. No hay padrón real ni casos cargados. El navegador no tiene permisos sobre el esquema privado. No habilitar altas ni presentaciones hasta cerrar la configuración de claves, proveedor OTP, flujos de sesión y pruebas de seguridad. La integración blockchain permanece sin envíos. La implementación técnica debe acompañarse con aviso de privacidad, reglas de retención y revisión jurídica específica bajo Ley 25.326 y Ley 26.061.
+La base aislada, los RPC privados de OTP y la función API están aplicados en producción. El navegador no tiene permisos sobre el esquema privado. El OTP no procesa una solicitud de alta y no habilita sesión: faltan las claves secretas y el proveedor de correo. No habilitar altas ni presentaciones hasta cerrar el flujo administrativo y sus pruebas de seguridad. La integración blockchain permanece sin envíos. La implementación técnica debe acompañarse con aviso de privacidad, reglas de retención y revisión jurídica específica bajo Ley 25.326 y Ley 26.061.
 
