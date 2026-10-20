@@ -33,7 +33,7 @@ El remitente debe pertenecer a un dominio verificado por el proveedor. No enviar
 
 ## Verificación después de configurar secretos
 
-1. Consultar `GET /functions/v1/comunidad-formativa-api` y comprobar `otp_email_ready: true`; las banderas de alta/casos deben seguir en `false` hasta completar el flujo institucional.
+1. Consultar `GET /functions/v1/comunidad-formativa-api` y comprobar que las banderas de alta, casos y anclaje sigan en `false`.
 2. Enviar `POST` JSON `{ "action": "otp_request", "email": "correo de prueba" }` desde el dominio oficial y confirmar la recepción, expiración y texto del correo.
 3. Enviar `{ "action": "otp_verify", "challenge_id": "…", "code": "…" }`; comprobar éxito, un solo uso, expiración, cinco fallos y límites por destino/origen.
 4. Consultar la tabla de desafíos solo desde el rol de servicio y confirmar que no contiene correo ni código en claro.
