@@ -206,7 +206,15 @@ Deno.serve(async (req: Request) => {
     }
     try {
       const state = await rpc("community_formative_status", {});
-      return json({ ...state, otp_email_ready: emailReady() });
+      if (!state || typeof state !== "object") throw new Error("invalid_status");
+      return json({
+        phase: state.phase === "foundation_created" ? state.phase : "foundation_created",
+        module: "comunidad_formativa",
+        intake_enabled: false,
+        case_submission_enabled: false,
+        blockchain_anchor_enabled: false,
+        otp_email_ready: emailReady(),
+      });
     } catch {
       return json({ error: "backend_unavailable", intake_enabled: false }, 503);
     }
