@@ -1,11 +1,94 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#021739"><title>Comunidad Formativa | Talleres Club Abierto</title><style>
-:root{font-family:Inter,system-ui,sans-serif;color:#172033;background:#f5f8fb;--navy:#001b35;--blue:#003057;--line:#d9e0e6;--muted:#59616b}*{box-sizing:border-box}body{margin:0}.audit-row{border:1px solid var(--line);border-radius:10px;padding:15px;background:#fff}.mono{font-family:monospace}.wf-input{display:block;width:100%;border:1px solid #c3ced9;background:#f7f9fb;padding:12px;margin-top:8px;border-radius:8px;font:inherit;color:#566}.wrap{max-width:1050px;margin:auto;padding:24px}.brand{color:var(--navy);font-weight:800}.hero{background:linear-gradient(135deg,#001b35,#003057);color:#fff;padding:32px;border-radius:16px;margin:24px 0}.hero h1{margin:0 0 8px;font-size:clamp(28px,5vw,42px)}.hero p{max-width:740px;line-height:1.6;color:#e3efff}.guard{border:1px solid #c5d7e8;background:#f0f6fc;padding:16px;border-radius:10px;line-height:1.5}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:22px}.card{border:1px solid var(--line);background:#fff;border-radius:14px;padding:22px}.card h2{font-size:20px;color:var(--navy);margin-top:0}.btn{display:inline-block;text-align:center;background:var(--navy);color:#fff;text-decoration:none;font-weight:700;padding:13px 18px;border-radius:8px;border:0;cursor:pointer}.btn2{display:inline-block;color:var(--navy);font-weight:700;padding:12px 0}.fine{color:var(--muted);font-size:14px;line-height:1.55}.demo{margin-top:20px;border-left:4px solid #d4af37;background:#fff9e5;padding:13px 16px;color:#57420b;border-radius:4px}.back{color:#174f85;text-decoration:none;font-weight:700}@media(max-width:700px){.wrap{padding:18px}.grid{grid-template-columns:1fr}.hero{padding:23px}.btn{width:100%}}
-</style></head><body><main class="wrap"><a class="back" href="./">← Talleres Club Abierto</a><div class="brand" style="margin-top:18px">TALLERES CLUB ABIERTO</div><section class="hero"><h1>Comunidad Formativa</h1><p>Un espacio de acompañamiento, escucha y protección para jugadores de divisiones formativas y sus familias.</p><div class="guard"><strong>Garantía institucional</strong><br>Ningún jugador podrá sufrir consecuencias deportivas por una presentación realizada de buena fe por él o por su familia.</div></section><section class="card"><h2>Un acceso, dos etapas</h2><p class="fine">No hace falta elegir entre número de jugador o DNI. El acceso se adapta a la información institucional disponible y conserva una única cuenta y un único recorrido.</p><p class="fine"><strong>Etapa 1 · Sin padrón oficial:</strong> una madre, padre o tutor puede solicitar el alta y declarar el vínculo formativo. La cuenta queda sujeta a revisión administrativa. Las presentaciones se reciben con reserva y el vínculo se identifica como declarado, todavía no validado.</p><p class="fine"><strong>Etapa 2 · Con padrón institucional:</strong> el club importa el padrón por archivo o API, relaciona jugadores y adultos responsables y valida los perfiles existentes. La persona continúa usando la misma cuenta y el mismo historial.</p><p class="fine">En ambas etapas, el ingreso habilitado se realiza mediante un código de seguridad enviado a un contacto confirmado.</p><p class="demo"><strong>Vista de verificación:</strong> no envía ni almacena datos personales.</p><a class="btn" href="#solicitud">Ver solicitud inicial</a></section><section class="card" id="solicitud" style="margin-top:18px"><h2>Registro voluntario — vista de demostración</h2><p class="fine">En el despliegue real, los datos de jugador y adulto se transmitirán cifrados al servidor. No cargues información real en esta vista.</p><div class="demo"><strong>DEMO — sin conexión al padrón ni al servidor.</strong> Los campos no envían información.</div><p><button class="btn" type="button" disabled>El formulario se habilitará después de completar la validación técnica</button></p></section><section class="card" id="acceso" style="margin-top:18px"><h2>Acceso individual — vista de demostración</h2><p class="fine">La cuenta quedará habilitada únicamente después de validar la pertenencia formativa y confirmar el código de seguridad.</p><p><button class="btn" type="button" disabled>El acceso se habilitará cuando el canal seguro esté conectado</button></p></section><section class="card" style="margin-top:18px"><h2>Panel Comunidad Formativa · vista de verificación</h2><div class="grid">
-<article class="card"><h2>Mi vínculo formativo</h2><p class="fine">Estado de ejemplo: vínculo declarado, pendiente de validación. Cuando exista padrón institucional, la validación actualizará este mismo perfil.</p><p class="fine">Jugador: datos no cargados · Categoría: no visible en esta demostración · Adultos autorizados: sin datos reales.</p><button class="btn" type="button" disabled>Solicitar actualización de información</button></article>
-<article class="card"><h2>Acompañamiento formativo</h2><p class="fine">Espacio para consultas, sugerencias, situaciones informadas, documentación y respuestas a solicitudes de información.</p><button class="btn" type="button" disabled>Iniciar una presentación</button></article>
-<article class="card"><h2>Canal de Integridad Formativa</h2><p class="fine">Recibe situaciones para revisión institucional. Una presentación se registra como información recibida y no como un hecho comprobado.</p><p class="fine">Categorías: posible solicitud de dinero o ventaja indebida · posible conflicto de intereses · criterios deportivos · maltrato o discriminación · protección y salud · educación · entrenamiento · alimentación · transporte · infraestructura · otras situaciones y sugerencias.</p></article>
-<article class="card"><h2>Seguimiento</h2><p class="fine">Código de demostración: <span class="mono">CF-DEMO-00001</span></p><p class="fine">Estado: Recibida · Fecha: datos de ejemplo · Identidad: reservada en esta vista.</p><button class="btn" type="button" disabled>Consultar estado o responder</button></article>
-</div></section>
-<section class="card" style="margin-top:18px"><h2>Presentación de una situación</h2><p class="fine">La futura presentación permitirá elegir categoría y nivel de reserva, describir lo ocurrido, indicar fecha aproximada y adjuntar documentación. El relato y los archivos quedarán privados. El formulario permanece deshabilitado en esta demostración.</p><div class="grid"><label class="fine">Categoría general<select class="wf-input" disabled><option>Seleccionar categoría</option></select></label><label class="fine">Fecha aproximada<input class="wf-input" type="date" disabled></label><label class="fine">Nivel de reserva<select class="wf-input" disabled><option>Seleccionar modalidad</option></select></label><label class="fine">Adjuntar documentación<input class="wf-input" type="file" disabled></label></div><label class="fine">Relato<textarea class="wf-input" rows="4" disabled placeholder="El campo se habilitará cuando el canal seguro esté disponible"></textarea></label><div class="demo">La presentación de buena fe no debe generar consecuencias deportivas para el jugador.</div></section>
-<section class="card" style="margin-top:18px"><h2>Información anonimizada para socios activos</h2><p class="fine">Ejemplo ficticio · no corresponde a un caso real</p><div class="audit-row"><strong>Presentación formativa CF-DEMO-00001</strong><p class="fine" style="margin:8px 0 0">Fecha general: octubre de 2026 · Categoría: Posible irregularidad · Área: Divisiones formativas · Estado: En evaluación · Registro criptográfico: No verificado en esta demo · Identidad: Reservada</p></div><p class="fine">No se muestran edad, categoría deportiva exacta, identidad, relato ni archivos. La publicación real deberá evitar combinaciones de datos que permitan deducir quién es el menor.</p></section>
-<section class="card" style="margin-top:18px"><h2>Gestión de Comunidad Formativa · vista de verificación</h2><p class="fine">La gestión administrativa contemplará validación de solicitudes y vínculos, importación del padrón, asignación de responsables, solicitudes de información, actuaciones, estados, medidas, protocolo especial y estadísticas agregadas.</p><p class="fine">Administrador general · Responsable de Integridad Formativa · Administrador principal de Integridad.</p><button class="btn" type="button" disabled>La gestión se habilitará luego de validar permisos y trazabilidad</button></section><footer class="fine" style="padding:20px 0">Las presentaciones se consideran situaciones informadas hasta que sean investigadas. Los datos identificatorios no forman parte de la información visible para socios.</footer></main></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#021739">
+<title>Comunidad Formativa | Talleres Club Abierto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#001b35;--navy2:#003057;--blue:#3d608a;--paper:#f7fafc;--card:#fff;--soft:#f1f4f6;--line:#d9e0e6;--muted:#64748b;--text:#181c1e;--green:#1fa968;--green-bg:#e8f8ef;--gold:#d4af37;--shadow:0 10px 30px rgba(0,27,53,.06)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--paper)}
+body{margin:0;background:var(--paper);color:var(--text);font-family:Inter,system-ui,sans-serif;min-height:100vh}
+a{color:inherit}
+.topbar{height:72px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:rgba(247,250,252,.96);backdrop-filter:blur(12px);position:sticky;top:0;z-index:30;padding:0 max(24px,calc((100vw - 1344px)/2))}
+.brand{display:flex;align-items:center;gap:14px;color:var(--navy);font-weight:800;font-size:20px;text-decoration:none}
+.crest{width:40px;height:46px;border:2px solid var(--navy2);border-radius:12px 12px 16px 16px;display:grid;place-items:center;font-weight:800;font-size:16px;background:#fff;color:var(--navy2)}
+.top-actions{display:flex;align-items:center;gap:8px}
+.top-actions a{background:transparent;color:#43474e;padding:10px 12px;border-radius:8px;font:600 14px Inter;text-decoration:none}
+.top-actions a:hover{background:var(--soft);color:var(--navy)}
+.container{width:100%;max-width:1440px;margin:0 auto;padding:34px 48px 56px}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin:0 auto 24px;max-width:1180px}
+.eyebrow{font:700 12px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin-bottom:8px}
+.page-title{font-size:clamp(30px,4vw,38px);line-height:1.12;color:var(--navy);margin:0 0 8px;letter-spacing:-.03em}
+.page-sub{color:#59616b;margin:0;font-size:16px;line-height:1.55;max-width:760px}
+.status-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1px solid #b7e7cd;background:var(--green-bg);color:#176b43;font:700 11px 'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--green)}
+.stage-note{max-width:1180px;margin:0 auto 22px;padding:14px 17px;border:1px solid #c9d7e5;border-left:4px solid var(--navy2);border-radius:10px;background:#f0f6fc;color:#24384d;font-size:14px;line-height:1.55}
+.stage-note strong{color:var(--navy)}
+.content{max-width:1180px;margin:0 auto}
+.section-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:30px 0 14px}
+.section-heading h2{font-size:19px;color:var(--navy);margin:0}
+.section-heading p{font-size:13px;color:var(--muted);margin:4px 0 0}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:22px;min-width:0}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:9px}
+.card h3{font-size:17px;line-height:1.35;color:var(--navy);margin:0}
+.card p{font-size:14px;line-height:1.55;color:#59616b;margin:0}
+.card-icon{width:38px;height:38px;flex:0 0 38px;display:grid;place-items:center;border-radius:10px;background:#eaf1f7;color:var(--navy2);font-size:18px;font-weight:800}
+.card-link{display:inline-flex;align-items:center;gap:8px;margin-top:17px;color:var(--navy2);font-size:14px;font-weight:700;text-decoration:none}
+.card-link:hover{text-decoration:underline}
+.card-link[aria-disabled=true]{color:#526579}
+.guarantee{display:flex;gap:13px;align-items:flex-start;background:#fff;border:1px solid #b7e7cd;border-radius:12px;padding:17px 19px;margin:22px 0 0;color:#174b34}
+.guarantee-mark{display:grid;place-items:center;flex:0 0 28px;width:28px;height:28px;border-radius:50%;background:var(--green-bg);color:#176b43;font-weight:800}
+.guarantee strong{display:block;color:#145c3b;font-size:14px;margin:1px 0 4px}
+.guarantee p{margin:0;font-size:14px;line-height:1.5}
+.public-area{margin-top:30px}
+.public-case{display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
+.public-case h3{margin:0 0 6px;color:var(--navy);font-size:15px}
+.public-case p{margin:0;color:#59616b;font-size:13px;line-height:1.5}
+.case-meta{font:600 11px 'JetBrains Mono',monospace;color:#526579;line-height:1.5;text-align:right}
+.privacy-note{margin-top:12px;color:var(--muted);font-size:12px;line-height:1.5}
+footer{max-width:1180px;margin:30px auto 0;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;line-height:1.5}
+@media(max-width:760px){.topbar{height:64px;padding:0 18px}.brand{font-size:16px;gap:10px}.crest{width:34px;height:40px;font-size:14px}.top-actions a{padding:9px 8px;font-size:13px}.container{padding:25px 18px 40px}.page-head{align-items:flex-start;flex-direction:column;margin-bottom:18px}.status-chip{white-space:normal}.grid{grid-template-columns:1fr}.card{padding:19px}.section-heading{align-items:flex-start;flex-direction:column;margin-top:25px}.public-case{flex-direction:column}.case-meta{text-align:left}}
+</style>
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="./" aria-label="Talleres Club Abierto, inicio"><span class="crest" aria-hidden="true">T</span><span>TALLERES CLUB ABIERTO</span></a>
+<nav class="top-actions" aria-label="Navegación principal"><a href="./">Volver al inicio</a></nav>
+</header>
+<main class="container">
+<section class="page-head">
+<div><div class="eyebrow">Acompañamiento · Integridad · Protección</div><h1 class="page-title">Comunidad Formativa</h1><p class="page-sub">Un espacio para acompañar a jugadores de divisiones formativas y sus familias, realizar consultas y dar seguimiento reservado a situaciones informadas.</p></div>
+<div class="status-chip"><span class="status-dot" aria-hidden="true"></span>Acceso para familias formativas</div>
+</section>
+<div class="stage-note"><strong>Adhesión formativa:</strong> permite iniciar el vínculo de la familia con el área. Cuando el club disponga del padrón, podrá incorporarlo y actualizar los vínculos sin rehacer esta estructura.</div>
+<div class="content">
+<div class="section-heading"><div><h2>Panel Comunidad Formativa</h2><p>Elegí el área que necesitás.</p></div></div>
+<section class="grid" aria-label="Áreas de Comunidad Formativa">
+<article class="card"><div class="card-top"><div><h3>Mi vínculo formativo</h3></div><span class="card-icon" aria-hidden="true">01</span></div><p>Consultá la vinculación del jugador y sus adultos responsables autorizados, y solicitá actualizar sus datos.</p><a class="card-link" href="#vinculo">Ver mi vínculo <span aria-hidden="true">→</span></a></article>
+<article class="card"><div class="card-top"><div><h3>Acompañamiento formativo</h3></div><span class="card-icon" aria-hidden="true">02</span></div><p>Realizá una consulta, compartí una sugerencia o respondé un pedido de información.</p><a class="card-link" href="#acompanamiento">Ir a acompañamiento <span aria-hidden="true">→</span></a></article>
+<article class="card"><div class="card-top"><div><h3>Canal de Integridad Formativa</h3></div><span class="card-icon" aria-hidden="true">03</span></div><p>Informá una situación para evaluación confidencial, con opción de reserva de identidad y seguimiento.</p><a class="card-link" href="#integridad">Conocer el canal <span aria-hidden="true">→</span></a></article>
+<article class="card"><div class="card-top"><div><h3>Mis presentaciones</h3></div><span class="card-icon" aria-hidden="true">04</span></div><p>Consultá el estado de una presentación mediante su código y revisá solicitudes de información.</p><a class="card-link" href="#seguimiento">Consultar seguimiento <span aria-hidden="true">→</span></a></article>
+</section>
+<section class="guarantee" aria-label="Garantía institucional"><span class="guarantee-mark" aria-hidden="true">✓</span><div><strong>Garantía institucional</strong><p>Ningún jugador podrá sufrir consecuencias deportivas por una presentación realizada de buena fe por él o por su familia.</p></div></section>
+<section class="public-area" id="vinculo">
+<div class="section-heading"><div><h2>Información institucional</h2><p>La información que corresponde a cada público, con resguardo de identidad.</p></div></div>
+<div class="grid">
+<article class="card" id="acompanamiento"><div class="card-top"><h3>Acompañamiento y seguimiento</h3><span class="card-icon" aria-hidden="true">↗</span></div><p>Las consultas y presentaciones se gestionan de forma privada. Cada caso puede recibir solicitudes de información y actuaciones hasta su resolución.</p></article>
+<article class="card" id="integridad"><div class="card-top"><h3>Reserva y evaluación</h3><span class="card-icon" aria-hidden="true">◇</span></div><p>Las comunicaciones se registran como situaciones informadas. Su contenido se evalúa antes de emitir conclusiones o medidas.</p></article>
+</div>
+</section>
+<section class="public-area" id="seguimiento">
+<div class="section-heading"><div><h2>Información para socios activos</h2><p>Seguimiento institucional anonimizado.</p></div></div>
+<article class="card public-case"><div><h3>Presentaciones formativas</h3><p>Cuando existan casos habilitados para consulta institucional, se publicarán su código anónimo, categoría general, estado e historial anonimizado.</p><p class="privacy-note">No se publican identidades, datos de contacto, relatos, adjuntos ni detalles deportivos que permitan reconocer a un menor. La presencia de un caso se comunicará con términos como “situación informada” o “posible irregularidad”.</p></div><div class="case-meta">IDENTIDAD<br>RESERVADA</div></article>
+</section>
+</div>
+<footer>La identidad y los antecedentes personales se mantienen privados. Toda presentación se considera una situación informada hasta que sea evaluada.</footer>
+</main>
+</body>
+</html>
