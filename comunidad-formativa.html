@@ -41,6 +41,10 @@ a{color:inherit}
 .action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:18px 0}
 .action-card{display:flex;align-items:flex-start;gap:14px;min-height:104px;padding:18px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);color:var(--navy);text-decoration:none;transition:transform .18s,border-color .18s,box-shadow .18s}
 .action-card:hover{transform:translateY(-2px);border-color:#76b8d5;box-shadow:0 14px 30px rgba(2,40,80,.16)}
+.action-card:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
+.detail-card{scroll-margin-top:96px}
+.details-grid{margin-top:10px}
+.detail-card .card-note{margin-top:2px}
 .action-icon{display:grid;place-items:center;flex:0 0 40px;width:40px;height:40px;border-radius:10px;background:#eaf1f6;color:#064778;font-size:18px;font-weight:800}
 .action-title{display:block;font-size:15px;line-height:1.35;font-weight:800;color:var(--navy);margin:0 0 5px}
 .action-copy{display:block;font-size:12px;line-height:1.5;color:#596b7d;margin:0}
@@ -75,12 +79,21 @@ footer{max-width:1180px;margin:25px auto 0;padding:15px 0 26px;border-top:1px so
 <div class="card"><div class="metric-label">ADHESIÓN FORMATIVA</div><div class="metric-value">Vínculo familiar</div><p class="card-note">La etapa inicial permite solicitar la incorporación. El padrón institucional podrá sumarse luego sin rehacer las cuentas ni esta estructura.</p></div>
 </section>
 <section class="action-grid" aria-label="Áreas de Comunidad Formativa">
-<article class="action-card"><span class="action-icon">♙</span><span><span class="action-title">Mi vínculo formativo</span><span class="action-copy">Perfil del jugador, adultos responsables y actualización de información.</span></span></article>
-<article class="action-card"><span class="action-icon">◇</span><span><span class="action-title">Acompañamiento formativo</span><span class="action-copy">Consultas, sugerencias, documentación y respuestas a solicitudes.</span></span></article>
-<article class="action-card"><span class="action-icon">◎</span><span><span class="action-title">Canal de Integridad Formativa</span><span class="action-copy">Informá una situación para evaluación y seguimiento reservado.</span></span></article>
-<article class="action-card"><span class="action-icon">▤</span><span><span class="action-title">Mis presentaciones</span><span class="action-copy">Estado del caso, solicitudes de información y respuestas.</span></span></article>
+<a class="action-card" href="#area-vinculo"><span class="action-icon">♙</span><span><span class="action-title">Mi vínculo formativo</span><span class="action-copy">Perfil del jugador, adultos responsables y actualización de información.</span></span></a>
+<a class="action-card" href="#area-acompanamiento"><span class="action-icon">◇</span><span><span class="action-title">Acompañamiento formativo</span><span class="action-copy">Consultas, sugerencias, documentación y respuestas a solicitudes.</span></span></a>
+<a class="action-card" href="#area-integridad"><span class="action-icon">◎</span><span><span class="action-title">Canal de Integridad Formativa</span><span class="action-copy">Informá una situación para evaluación y seguimiento reservado.</span></span></a>
+<a class="action-card" href="#area-seguimiento"><span class="action-icon">▤</span><span><span class="action-title">Mis presentaciones</span><span class="action-copy">Estado del caso, solicitudes de información y respuestas.</span></span></a>
 </section>
 <section class="glass-dark-note" aria-label="Garantía institucional"><span class="guarantee-mark" aria-hidden="true">✓</span><div><strong>Garantía institucional</strong><p>Ningún jugador podrá sufrir consecuencias deportivas por una presentación realizada de buena fe por él o por su familia.</p></div></section>
+<section aria-label="Secciones de Comunidad Formativa">
+<div class="section-heading"><div><h2>Secciones de Comunidad Formativa</h2><p>Información y acciones de cada espacio.</p></div></div>
+<div class="action-grid details-grid">
+<article class="card detail-card" id="area-vinculo"><div class="metric-label">MI VÍNCULO FORMATIVO</div><div class="metric-value">Perfil y responsables</div><p class="card-note">Consultá el perfil del jugador, los adultos responsables autorizados y el estado del vínculo. Desde aquí se solicitan correcciones o actualizaciones.</p></article>
+<article class="card detail-card" id="area-acompanamiento"><div class="metric-label">ACOMPAÑAMIENTO FORMATIVO</div><div class="metric-value">Consultas y sugerencias</div><p class="card-note">Realizá consultas, compartí sugerencias, adjuntá documentación y respondé pedidos de información.</p></article>
+<article class="card detail-card" id="area-integridad"><div class="metric-label">CANAL DE INTEGRIDAD</div><div class="metric-value">Informar una situación</div><p class="card-note">Comunicá posibles irregularidades, conflictos, maltrato, discriminación u otras situaciones vinculadas con la formación y el cuidado.</p></article>
+<article class="card detail-card" id="area-seguimiento"><div class="metric-label">MIS PRESENTACIONES</div><div class="metric-value">Seguimiento por código</div><p class="card-note">Revisá solicitudes de información y el estado: recibida, en evaluación, en investigación, resuelta, archivada o reabierta.</p></article>
+</div>
+</section>
 <section>
 <div class="section-heading"><div><h2>Información para socios activos</h2><p>Seguimiento institucional anonimizado.</p></div></div>
 <article class="card public-card"><div><h3>Presentaciones formativas</h3><p>Se mostrará el código anónimo, la categoría general, el estado y el historial institucional, sin revelar datos que permitan reconocer al jugador o a su familia.</p></div><span class="privacy-pill">IDENTIDAD RESERVADA</span></article>
