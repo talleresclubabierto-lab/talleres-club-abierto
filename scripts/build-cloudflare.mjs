@@ -10,6 +10,8 @@ for (const file of [
   'manifest.webmanifest',
   'service-worker.js',
   'icon.svg',
+  'estructura-institucional.js',
+  'estructura-institucional.css',
   '_headers'
 ]) {
   await cp(file, output + '/' + file);
