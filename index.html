@@ -5341,4 +5341,43 @@ document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||
 })();
 </script>
 <style>.ca-prof-form input:not([type=checkbox]),.ca-prof-form select{display:block;width:100%;padding:11px;margin-top:5px;border:1px solid #bacbdc;border-radius:8px}.ca-prof-form fieldset{border:1px solid #bacbdc;border-radius:8px}.ca-prof-form button:disabled{opacity:.5}.ca-prof-form .ca-prof-save-btn{display:inline-flex!important;align-items:center;justify-content:center;gap:12px;align-self:start;width:auto!important;min-width:245px;min-height:48px;padding:13px 24px!important;background:#0757a6!important;color:#fff!important;border:1px solid #1679d1!important;border-radius:10px!important;box-shadow:0 4px 12px rgba(0,45,100,.22)!important;font-size:15px!important;font-weight:750!important;line-height:1.2!important;cursor:pointer!important;transition:background .18s,transform .18s,box-shadow .18s}.ca-prof-form .ca-prof-save-btn:hover{background:#03447f!important;transform:translateY(-1px);box-shadow:0 6px 16px rgba(0,45,100,.3)!important}.ca-prof-form .ca-prof-save-btn:focus-visible{outline:3px solid #64b5ff;outline-offset:3px}.ca-prof-form .ca-prof-save-btn:disabled{opacity:.55!important;cursor:wait!important;transform:none}</style>
+
+<style id="ca-unified-socio-headings">
+/* Encabezados consistentes para todos los modulos del socio. */
+#socioDashboard .ca-category-head{margin-bottom:18px}
+#socioDashboard .ca-category-head h2{font-size:clamp(22px,3vw,28px);line-height:1.15}
+#secTuHistoria .dashboard-header{display:none!important}
+#secTuHistoria .page-head{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:22px 0 18px}
+#secTuHistoria .page-head .eyebrow{font-size:11px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:#56d9ff}
+#secTuHistoria .page-head .page-title{font-size:clamp(24px,3vw,30px);line-height:1.18;margin:5px 0}
+#secTuHistoria .page-head .page-sub{margin:4px 0 0;line-height:1.5}
+#secTuHistoria .page-head .status-chip{flex-shrink:0;max-width:100%;white-space:normal}
+@media(max-width:700px){#secTuHistoria .page-head{align-items:flex-start}#secTuHistoria .page-head .status-chip{font-size:10px}#socioDashboard .ca-category-head h2{font-size:22px}}
+</style>
+<script id="ca-socio-navigation-cleanup">
+(function(){
+function normalize(){
+ var dash=document.getElementById('socioDashboard');
+ if(dash){
+  dash.querySelectorAll('.ca-category-view .action-grid button').forEach(function(b){
+   var clone=b.cloneNode(true);clone.querySelectorAll('small,.action-icon').forEach(function(n){n.remove()});
+   var name=clone.textContent.replace(/\s+/g,' ').trim();
+   if(/^estructura institucional$/i.test(name)){
+    var heading=dash.querySelector('.ca-category-head h2');
+    if(heading && heading.textContent.trim()!=='Transparencia y auditoría')b.remove();
+   }
+  });
+ }
+ document.querySelectorAll('.sub-view').forEach(function(view){
+  var top=view.querySelector(':scope > .topbar .top-actions');
+  if(!top)return;
+  var backs=Array.from(view.querySelectorAll('button')).filter(function(b){return /^volver(?: al panel)?$/i.test(b.textContent.trim())});
+  var fixed=backs.find(function(b){return b.classList.contains('ca-fixed-back')})||backs[0];
+  if(fixed && fixed.parentElement!==top){fixed.classList.add('ca-fixed-back');top.insertBefore(fixed,top.firstChild)}
+  backs.forEach(function(b){if(b!==fixed)b.style.display='none'});
+ });
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',normalize);else normalize();
+})();
+</script>
 </body>
