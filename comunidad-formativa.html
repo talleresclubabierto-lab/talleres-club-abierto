@@ -172,26 +172,46 @@ footer{max-width:1180px;margin:25px auto 0;padding:15px 0 26px;border-top:1px so
   const areaVerify = document.getElementById('area-verify');
   let challengeId = null;
 
+  function showArea(key, scroll) {
+    const view = views[key];
+    if (!view) {
+      panel.hidden = true;
+      nav.hidden = false;
+      return;
+    }
+    document.getElementById('area-kicker').textContent = view.kicker;
+    document.getElementById('area-title').textContent = view.title;
+    document.getElementById('area-copy').textContent = view.copy;
+    document.getElementById('area-status').textContent = view.status;
+    nav.hidden = true;
+    panel.hidden = false;
+    if (scroll) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function areaFromLocation() {
+    const match = window.location.hash.match(/^#formativo-(vinculo|acompanamiento|integridad|seguimiento)$/);
+    showArea(match ? match[1] : null, true);
+  }
+
   document.querySelectorAll('[data-area]').forEach(function (button) {
     button.addEventListener('click', function () {
-      const view = views[button.dataset.area];
-      if (!view) return;
-      document.getElementById('area-kicker').textContent = view.kicker;
-      document.getElementById('area-title').textContent = view.title;
-      document.getElementById('area-copy').textContent = view.copy;
-      document.getElementById('area-status').textContent = view.status;
-      nav.hidden = true;
-      panel.hidden = false;
-      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const key = button.dataset.area;
+      if (!views[key]) return;
+      window.history.pushState({ area: key }, '', '#formativo-' + key);
+      showArea(key, true);
       back.focus({ preventScroll: true });
     });
   });
 
   back.addEventListener('click', function () {
-    panel.hidden = true;
-    nav.hidden = false;
+    window.history.pushState({}, '', window.location.pathname + window.location.search);
+    showArea(null, false);
     nav.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
+
+  window.addEventListener('popstate', areaFromLocation);
+  window.addEventListener('hashchange', areaFromLocation);
+  areaFromLocation();
 
   areaVerify.addEventListener('click', function () {
     otpPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
