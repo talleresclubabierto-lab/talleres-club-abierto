@@ -144,7 +144,7 @@ footer{max-width:1180px;margin:25px auto 0;padding:15px 0 26px;border-top:1px so
         body: JSON.stringify({ action: 'otp_request', email: emailInput.value.trim() })
       });
       const result = await response.json();
-      if (!response.ok) throw new Error('No se pudo enviar el código. Revisá el correo o intentá más tarde.');
+      if (!response.ok) throw new Error(result.error === 'otp_temporarily_unavailable' ? 'El envío de códigos no está disponible; la configuración del correo requiere atención administrativa.' : 'No se pudo enviar el código. Revisá el correo o intentá más tarde.');
       status.textContent = result.message || 'Si el envío es posible, recibirás un código en el correo indicado.';
       if (result.challenge_id) {
         challengeId = result.challenge_id;
@@ -205,9 +205,9 @@ footer{max-width:1180px;margin:25px auto 0;padding:15px 0 26px;border-top:1px so
     if (response.ok && state.module === 'comunidad_formativa') {
       status.textContent = state.otp_email_ready
         ? 'Correo OTP disponible · acceso sujeto a validación'
-        : 'Acceso sujeto a validación administrativa';
+        : 'Envío de correo pendiente de configuración';
     } else {
-      status.textContent = 'Acceso sujeto a validación';
+      status.textContent = 'Servicio de correo no disponible';
     }
   } catch {
     status.textContent = 'Acceso sujeto a validación';
