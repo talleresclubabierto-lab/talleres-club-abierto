@@ -7,6 +7,11 @@ await mkdir(output, { recursive: true });
 for (const file of [
   'index.html',
   'comunidad-formativa.html',
+  'comunidad-formativa-vinculo.html',
+  'comunidad-formativa-acompanamiento.html',
+  'comunidad-formativa-integridad.html',
+  'comunidad-formativa-presentaciones.html',
+  '_redirects',
   'manifest.webmanifest',
   'service-worker.js',
   'icon.svg',
