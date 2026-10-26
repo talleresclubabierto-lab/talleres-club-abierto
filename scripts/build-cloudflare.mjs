@@ -22,6 +22,8 @@ for (const file of [
   await cp(file, output + '/' + file);
 }
 
+await cp('comunidad-formativa', output + '/comunidad-formativa', { recursive: true });
+
 const indexPath = output + '/index.html';
 let html = await readFile(indexPath, 'utf8');
 const css = await readFile('src/estructura-institucional.css', 'utf8');
