@@ -2,7 +2,7 @@
 
 ## Estado
 
-El desafío de correo y las acciones `otp_request` / `otp_verify` están desplegados en `comunidad-formativa-api`. El endpoint sigue cerrado hasta cargar secretos de correo y cifrado. No hay cuentas, formularios de alta ni padrón que queden habilitados al verificar un correo.
+El desafío de correo y las acciones `otp_request` / `otp_verify` están desplegados en `comunidad-formativa-api`. La página `comunidad-formativa.html` incluye el formulario de verificación de correo. No hay cuentas, formularios de alta ni padrón que queden habilitados al verificar un correo.
 
 La verificación confirma únicamente que la persona controla esa dirección. La pertenencia formativa sigue requiriendo una revisión administrativa independiente. Para menores de 16 años, la futura cuenta principal debe corresponder a madre, padre o tutor.
 
@@ -34,7 +34,7 @@ El remitente debe pertenecer a un dominio verificado por el proveedor. No enviar
 ## Verificación después de configurar secretos
 
 1. Consultar `GET /functions/v1/comunidad-formativa-api` y comprobar que las banderas de alta, casos y anclaje sigan en `false`.
-2. Enviar `POST` JSON `{ "action": "otp_request", "email": "correo de prueba" }` desde el dominio oficial y confirmar la recepción, expiración y texto del correo.
+2. Desde la tarjeta de verificación de la página, enviar `POST` JSON `{ "action": "otp_request", "email": "correo de prueba" }` y confirmar recepción, expiración y texto del correo.
 3. Enviar `{ "action": "otp_verify", "challenge_id": "…", "code": "…" }`; comprobar éxito, un solo uso, expiración, cinco fallos y límites por destino/origen.
 4. Consultar la tabla de desafíos solo desde el rol de servicio y confirmar que no contiene correo ni código en claro.
 5. Repetir consultas con roles `anon` y `authenticated`; deben fallar.
