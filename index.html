@@ -613,6 +613,7 @@ body{
       <button class="btn-action-red" onclick="irAHistorialAdministrativo()"><span class="action-icon">▤</span>Historial de cambios<br><small style="font-weight:500;color:#64748b">Auditoría administrativa protegida</small></button>
       <button class="btn-action-red" onclick="irAIntegracionBlockchain()"><span class="action-icon">⬡</span>Integración blockchain<br><small style="font-weight:500;color:#64748b">Estado operativo, lotes y anclajes</small></button>
       <button class="btn-action-red" onclick="irAGobernanzaInstitucional()"><span class="action-icon">⚖</span>Gobernanza institucional<br><small style="font-weight:500;color:#64748b">Reglas versionadas, activación y reversión</small></button>
+      <button class="btn-action-red" onclick="abrirRevisionRedes()"><span class="action-icon">✉</span>Revisión de respuestas <span id="contadorRevisionRedes" class="review-count" style="display:none">0</span><br><small style="font-weight:500;color:#64748b">Instagram y Facebook · aprobación humana</small></button>
       <button id="btnGestionAdministradores" class="btn-action-red" style="display:none" onclick="mostrarSeccionAdmin('secGestionAdmins')"><span class="action-icon">♙</span>Gestionar administradores</button>
       <button class="btn-action-red" onclick="mostrarSeccionAdmin('secGestionPadron')"><span class="action-icon">☷</span>Gestionar padrón</button>
       <button class="btn-action-red" onclick="irACambioClave()"><span class="action-icon">⌨</span>Cambiar contraseña</button>
@@ -620,6 +621,21 @@ body{
     </div>
     
   </main><nav class="bottom-nav"><button class="active" onclick="regresarAlPanelInterno()"><span class="mini-icon">▦</span>Dashboard</button><button class="" onclick="irAResultadosGenerales()"><span class="mini-icon">◇</span>Votar</button><button class="" onclick="irAResultadosGenerales()"><span class="mini-icon">▥</span>Resultados</button><button class="" onclick="irAAuditoriaPublica()"><span class="mini-icon">◎</span>Auditoría</button></nav>
+</div>
+
+<div id="secRevisionRedes" class="sub-view full-width">
+  <div class="topbar"><div class="brand"><span class="app-logo-mark" role="img" aria-label="Escudo Talleres Club Abierto"></span><span class="brand-role-label">TALLERES CLUB ABIERTO</span></div><div class="top-actions"><span class="navlink"><span class="network-dot"></span>Revisión humana</span><button onclick="regresarAlPanelInterno()">Volver</button><button onclick="volverAlLogin()">Salir</button></div></div>
+  <main class="section-shell">
+    <div class="page-head"><div><div class="eyebrow">Redes sociales</div><h1 class="page-title">Revisión de respuestas</h1><p class="page-sub">Nada de esta bandeja se publica sin la aprobación de un administrador.</p></div></div>
+    <div class="review-tabs" role="tablist" aria-label="Estados de revisión">
+      <button class="active" data-review-state="pendiente" onclick="cambiarEstadoRevisionRedes('pendiente',this)">Pendientes</button>
+      <button data-review-state="enviado" onclick="cambiarEstadoRevisionRedes('enviado',this)">Publicadas</button>
+      <button data-review-state="rechazado" onclick="cambiarEstadoRevisionRedes('rechazado',this)">Descartadas</button>
+      <button data-review-state="fallido" onclick="cambiarEstadoRevisionRedes('fallido',this)">Con error</button>
+    </div>
+    <div id="estadoRevisionRedes" class="admin-history-status warn">Cargando respuestas…</div>
+    <div id="listaRevisionRedes"><div class="admin-history-empty">Cargando respuestas…</div></div>
+  </main>
 </div>
 
 
@@ -5341,7 +5357,6 @@ document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||
 })();
 </script>
 <style>.ca-prof-form input:not([type=checkbox]),.ca-prof-form select{display:block;width:100%;padding:11px;margin-top:5px;border:1px solid #bacbdc;border-radius:8px}.ca-prof-form fieldset{border:1px solid #bacbdc;border-radius:8px}.ca-prof-form button:disabled{opacity:.5}.ca-prof-form .ca-prof-save-btn{display:inline-flex!important;align-items:center;justify-content:center;gap:12px;align-self:start;width:auto!important;min-width:245px;min-height:48px;padding:13px 24px!important;background:#0757a6!important;color:#fff!important;border:1px solid #1679d1!important;border-radius:10px!important;box-shadow:0 4px 12px rgba(0,45,100,.22)!important;font-size:15px!important;font-weight:750!important;line-height:1.2!important;cursor:pointer!important;transition:background .18s,transform .18s,box-shadow .18s}.ca-prof-form .ca-prof-save-btn:hover{background:#03447f!important;transform:translateY(-1px);box-shadow:0 6px 16px rgba(0,45,100,.3)!important}.ca-prof-form .ca-prof-save-btn:focus-visible{outline:3px solid #64b5ff;outline-offset:3px}.ca-prof-form .ca-prof-save-btn:disabled{opacity:.55!important;cursor:wait!important;transform:none}</style>
-
 <style id="ca-unified-socio-headings">
 /* Encabezados consistentes para todos los modulos del socio. */
 #socioDashboard .ca-category-head{margin-bottom:18px}
@@ -5378,6 +5393,46 @@ function normalize(){
  });
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',normalize);else normalize();
+})();
+</script>
+<style>
+.review-count{display:inline-grid;place-items:center;min-width:23px;height:23px;margin-left:6px;padding:0 7px;border-radius:999px;background:#c62828;color:#fff;font:800 12px Inter}
+.review-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}.review-tabs button{border:1px solid #bfd0df;background:#fff;color:#173750;border-radius:9px;padding:10px 15px;font-weight:750;cursor:pointer}.review-tabs button.active{background:#0757a6;color:#fff;border-color:#0757a6}
+.review-card{border:1px solid #cbd7e1;border-radius:13px;background:#fff;padding:18px;margin-bottom:14px;box-shadow:0 7px 20px rgba(0,27,53,.06)}.review-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:13px}.review-platform{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;background:#eaf3fb;color:#075d91;font-size:12px;font-weight:800}.review-category{font:700 11px 'JetBrains Mono';color:#66788b;text-transform:uppercase;margin-top:7px}.review-original{border-left:4px solid #0757a6;background:#f5f9fc;border-radius:0 9px 9px 0;padding:13px 14px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}.review-author{font-weight:800;color:#173750;margin-bottom:5px}.review-reasons{font-size:12px;color:#6a7886;margin:9px 0}.review-card textarea{width:100%;min-height:118px;resize:vertical;border:1px solid #aebfce;border-radius:9px;padding:12px;font:500 14px/1.5 Inter,sans-serif;color:#172b3d}.review-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:11px}.review-actions button,.review-origin-link{border:0;border-radius:8px;padding:10px 14px;font-weight:750;cursor:pointer;text-decoration:none}.review-publish{background:#087443;color:#fff}.review-discard{background:#fff0ef;color:#a52821;border:1px solid #efbbb6!important}.review-origin-link{background:#eaf3fb;color:#075d91}.review-state{font-size:12px;color:#66788b;text-align:right}.review-card.is-readonly textarea{background:#f3f6f8;color:#445566}.review-card button:disabled{opacity:.55;cursor:wait}
+@media(max-width:700px){.review-head{display:block}.review-state{text-align:left;margin-top:8px}.review-actions>*{width:100%;text-align:center}.review-card{padding:15px}}
+</style>
+<script>
+(function(){
+var apiUrl=SUPABASE_URL.replace(/\/$/,'')+'/functions/v1/instagram-asistente-webhook?modo=admin';
+var currentState='pendiente';
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function dateAR(v){if(!v)return '-';try{return new Intl.DateTimeFormat('es-AR',{dateStyle:'short',timeStyle:'short',timeZone:'America/Argentina/Cordoba',hour12:false}).format(new Date(v))}catch(_){return String(v)}}
+async function api(body){
+ var token=obtenerTokenSesionClub();if(!token)throw new Error('La sesión venció. Ingresá nuevamente.');
+ var r=await fetch(apiUrl,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_PUBLISHABLE_KEY,'X-Club-Session':token},body:JSON.stringify(body)}),d={};
+ try{d=await r.json()}catch(_){}if(!r.ok||d.ok!==true)throw new Error(d.error||'No se pudo completar la operación');return d;
+}
+function render(items){
+ var list=document.getElementById('listaRevisionRedes'),pending=currentState==='pendiente'||currentState==='fallido';
+ if(!items.length){list.innerHTML='<div class="admin-history-empty">No hay respuestas en esta sección.</div>';return}
+ list.innerHTML=items.map(function(x){
+  var platform=x.plataforma==='page'?'Facebook':'Instagram',reply=x.respuesta||'',reasons=Array.isArray(x.razones)?x.razones.join(' · '):'';
+  return '<article class="review-card '+(pending?'':'is-readonly')+'" data-id="'+esc(x.id)+'">'+
+   '<div class="review-head"><div><span class="review-platform">'+platform+' · '+esc(x.tipo||'interacción')+'</span><div class="review-category">'+esc(x.categoria)+' · '+esc(x.accion_sugerida)+'</div></div><div class="review-state">'+esc(x.estado)+'<br>'+dateAR(x.creado_en)+'</div></div>'+
+   '<div class="review-original"><div class="review-author">@'+esc(x.actor_usuario||'usuario')+'</div>'+esc(x.contenido||'(sin texto)')+'</div>'+
+   (reasons?'<div class="review-reasons"><strong>Motivo de revisión:</strong> '+esc(reasons)+'</div>':'')+
+   '<label class="form-label">Respuesta sugerida '+(pending?'(podés editarla antes de publicar)':'')+'</label><textarea '+(pending?'':'readonly')+' maxlength="2200">'+esc(reply)+'</textarea>'+
+   '<div class="review-actions">'+(pending?'<button class="review-publish" onclick="publicarRevisionRedes(this)">Aprobar y publicar</button><button class="review-discard" onclick="descartarRevisionRedes(this)">Descartar</button>':'')+(x.enlace_origen?'<a class="review-origin-link" target="_blank" rel="noopener" href="'+esc(x.enlace_origen)+'">Abrir en la red social</a>':'')+'</div></article>';
+ }).join('');
+}
+window.cargarRevisionRedes=async function(state){
+ currentState=state||currentState;var status=document.getElementById('estadoRevisionRedes');status.className='admin-history-status warn';status.textContent='Cargando respuestas…';
+ try{var d=await api({accion:'listar_revision',estado:currentState});render(d.items||[]);status.className='admin-history-status ok';status.textContent=(d.items||[]).length+' respuesta(s) en esta sección.';if(currentState==='pendiente'){var c=document.getElementById('contadorRevisionRedes');c.textContent=(d.items||[]).length;c.style.display=(d.items||[]).length?'inline-grid':'none'}}catch(e){status.textContent=e.message;document.getElementById('listaRevisionRedes').innerHTML='<div class="admin-history-empty">No se pudo cargar la bandeja.</div>'}
+};
+window.abrirRevisionRedes=function(){mostrarSeccionAdmin('secRevisionRedes');document.querySelectorAll('.review-tabs button').forEach(function(b){b.classList.toggle('active',b.dataset.reviewState==='pendiente')});cargarRevisionRedes('pendiente')};
+window.cambiarEstadoRevisionRedes=function(state,button){document.querySelectorAll('.review-tabs button').forEach(function(b){b.classList.remove('active')});button.classList.add('active');cargarRevisionRedes(state)};
+window.publicarRevisionRedes=async function(button){var card=button.closest('.review-card'),text=card.querySelector('textarea').value.trim();if(!text){alert('La respuesta no puede quedar vacía.');return}if(!confirm('¿Publicar esta respuesta ahora en la conversación original?'))return;button.disabled=true;try{await api({accion:'publicar_revision',borrador_id:card.dataset.id,respuesta:text});card.remove();alert('✓ Respuesta publicada y registrada en la auditoría.')}catch(e){alert(e.message)}finally{button.disabled=false}};
+window.descartarRevisionRedes=async function(button){var card=button.closest('.review-card');if(!confirm('¿Descartar esta respuesta sin publicarla?'))return;button.disabled=true;try{await api({accion:'descartar_revision',borrador_id:card.dataset.id});card.remove()}catch(e){alert(e.message)}finally{button.disabled=false}};
 })();
 </script>
 </body>
