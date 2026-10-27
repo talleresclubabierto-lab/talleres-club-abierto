@@ -8,12 +8,12 @@ function corsHeaders(origin?: string) {
   return {
     ...(origin && ALLOWED_ORIGINS.has(origin) ? { "Access-Control-Allow-Origin": origin } : {}),
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "content-type",
+  "Access-Control-Allow-Headers": "content-type, x-club-session",
   "Cache-Control": "no-store",
   "Vary": "Origin",
   };
 }
-const MAX_BODY_BYTES = 4096;
+const MAX_BODY_BYTES = 20000;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function json(body: unknown, status = 200, origin?: string): Response {
@@ -72,6 +72,31 @@ async function encryptEmail(email: string, keyBytes: Uint8Array) {
     new TextEncoder().encode(email),
   );
   return { nonce: `\\x${hex(nonce)}`, ciphertext: `\\x${hex(new Uint8Array(ciphertext))}` };
+}
+
+async function encryptJson(value: unknown, keyBytes: Uint8Array, context: string) {
+  const nonce = crypto.getRandomValues(new Uint8Array(12));
+  const key = await crypto.subtle.importKey("raw", keyBytes, "AES-GCM", false, ["encrypt"]);
+  const ciphertext = await crypto.subtle.encrypt(
+    { name: "AES-GCM", iv: nonce, additionalData: new TextEncoder().encode(context) },
+    key,
+    new TextEncoder().encode(JSON.stringify(value)),
+  );
+  return { nonce: `\\x${hex(nonce)}`, ciphertext: `\\x${hex(new Uint8Array(ciphertext))}` };
+}
+
+function decodeBase64(value: string): Uint8Array {
+  return Uint8Array.from(atob(value), (char) => char.charCodeAt(0));
+}
+
+async function decryptJson(ciphertextB64: string, nonceB64: string, keyBytes: Uint8Array, context: string) {
+  const key = await crypto.subtle.importKey("raw", keyBytes, "AES-GCM", false, ["decrypt"]);
+  const clear = await crypto.subtle.decrypt(
+    { name: "AES-GCM", iv: decodeBase64(nonceB64), additionalData: new TextEncoder().encode(context) },
+    key,
+    decodeBase64(ciphertextB64),
+  );
+  return JSON.parse(new TextDecoder().decode(clear));
 }
 
 function randomCode(): string {
@@ -200,6 +225,155 @@ async function verifyOtp(payload: unknown, origin?: string) {
   }
 }
 
+function cleanText(value: unknown, max: number): string | null {
+  if (typeof value !== "string") return null;
+  const clean = value.normalize("NFC").trim().replace(/\s+/g, " ");
+  if (clean.length < 2 || clean.length > max || /[\u0000-\u001f\u007f]/.test(clean)) return null;
+  return clean;
+}
+
+function validUuid(value: unknown): value is string {
+  return typeof value === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
+
+function validDni(value: unknown): value is string {
+  return typeof value === "string" && /^\d{7,8}$/.test(value);
+}
+
+function applicationCode(): string {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const random = crypto.getRandomValues(new Uint8Array(8));
+  const suffix = Array.from(random, (n) => alphabet[n % alphabet.length]).join("");
+  return `CF-${new Date().getUTCFullYear()}-${suffix}`;
+}
+
+async function submitAccessRequest(payload: unknown, origin?: string) {
+  const input = payload as Record<string, unknown>;
+  if (!emailReady() || !input || !validUuid(input.challenge_id)) {
+    return json({ error: "invalid_request" }, 400, origin);
+  }
+  const email = typeof input.email === "string" ? input.email.trim().toLowerCase() : "";
+  const adultName = cleanText(input.adult_name, 120);
+  const playerName = cleanText(input.player_name, 120);
+  const adultDni = input.adult_dni;
+  const playerDni = input.player_dni;
+  const relationship = input.relationship;
+  const phone = typeof input.phone === "string" ? input.phone.trim().replace(/[\s().-]/g, "") : "";
+  const birthDate = typeof input.birth_date === "string" ? input.birth_date : "";
+  const category = typeof input.category === "string" && input.category.trim()
+    ? cleanText(input.category, 40)
+    : null;
+  const birthTime = Date.parse(`${birthDate}T00:00:00Z`);
+  const ageMs = Date.now() - birthTime;
+  const relationshipValues = new Set(["madre", "padre", "tutor"]);
+  if (!EMAIL_RE.test(email) || email.length > 254 || !adultName || !playerName ||
+      !validDni(adultDni) || !validDni(playerDni) ||
+      typeof relationship !== "string" || !relationshipValues.has(relationship) ||
+      !/^\+?\d{8,15}$/.test(phone) ||
+      !/^\d{4}-\d{2}-\d{2}$/.test(birthDate) || !Number.isFinite(birthTime) ||
+      (typeof input.category === "string" && input.category.trim() && !category) ||
+      birthTime > Date.now() || ageMs > 24 * 365.25 * 24 * 60 * 60 * 1000 ||
+      input.consent !== true) {
+    return json({ error: "invalid_application" }, 400, origin);
+  }
+
+  const encryptionKey = base64Bytes(Deno.env.get("CF_DATA_ENCRYPTION_KEY_V1") ?? "");
+  const lookupKey = base64Bytes(Deno.env.get("CF_LOOKUP_HMAC_KEY_V1") ?? "");
+  if (!encryptionKey || !lookupKey) return json({ error: "intake_temporarily_unavailable" }, 503, origin);
+
+  const normalizedAdultDni = adultDni;
+  const normalizedPlayerDni = playerDni;
+  const emailHmac = await hmac(lookupKey, `email:v1:${email}`);
+  const identifierHmac = await hmac(lookupKey, `player-dni:v1:${normalizedPlayerDni}`);
+  const encrypted = await encryptJson({
+    adult: { name: adultName, dni: normalizedAdultDni, relationship, phone },
+    player: { name: playerName, dni: normalizedPlayerDni, birth_date: birthDate, category },
+    email,
+  }, encryptionKey, "cf-access-request:v1");
+
+  try {
+    const result = await rpc("community_formative_submit_access_request", {
+      p_otp_id: input.challenge_id,
+      p_email_hmac: emailHmac,
+      p_datos_cifrados: encrypted.ciphertext,
+      p_nonce: encrypted.nonce,
+      p_version_clave: 1,
+      p_identificador_hmac: identifierHmac,
+      p_codigo: applicationCode(),
+      p_consentimiento_version: "comunidad-formativa-alta-v1",
+    });
+    if (!result?.ok) {
+      if (result?.reason === "request_exists") return json({ error: "request_exists" }, 409, origin);
+      return json({ error: "verification_required" }, 403, origin);
+    }
+    return json({ ok: true, code: result.codigo, status: "pendiente" }, 200, origin);
+  } catch {
+    return json({ error: "intake_temporarily_unavailable" }, 503, origin);
+  }
+}
+
+async function adminList(req: Request, origin?: string) {
+  const token = req.headers.get("x-club-session")?.trim() ?? "";
+  if (!token) return json({ error: "admin_session_required" }, 401, origin);
+  try {
+    const result = await rpc("community_formative_list_access_requests", { p_token: token });
+    return json(result, 200, origin);
+  } catch {
+    return json({ error: "admin_not_authorized" }, 403, origin);
+  }
+}
+
+async function adminRead(req: Request, payload: unknown, origin?: string) {
+  const token = req.headers.get("x-club-session")?.trim() ?? "";
+  const input = payload as Record<string, unknown>;
+  const requestId = input?.request_id;
+  const reason = cleanText(input?.reason, 500);
+  if (!token) return json({ error: "admin_session_required" }, 401, origin);
+  if (!validUuid(requestId) || !reason || input?.confirm !== true) {
+    return json({ error: "identity_access_confirmation_required" }, 400, origin);
+  }
+  const keyBytes = base64Bytes(Deno.env.get("CF_DATA_ENCRYPTION_KEY_V1") ?? "");
+  if (!keyBytes) return json({ error: "backend_unavailable" }, 503, origin);
+  try {
+    const audit = await encryptJson({ reason }, keyBytes, "cf-access-audit:v1");
+    const result = await rpc("community_formative_read_access_request", {
+      p_token: token, p_solicitud_id: requestId,
+      p_motivo_cifrado: audit.ciphertext, p_nonce: audit.nonce,
+      p_version_clave: 1, p_confirmada: true,
+    });
+    const data = await decryptJson(result.datos_cifrados_b64, result.nonce_b64, keyBytes, "cf-access-request:v1");
+    return json({ ok: true, request: { id: result.id, code: result.codigo, status: result.estado, data } }, 200, origin);
+  } catch {
+    return json({ error: "admin_request_unavailable" }, 403, origin);
+  }
+}
+
+async function adminReview(req: Request, payload: unknown, origin?: string) {
+  const token = req.headers.get("x-club-session")?.trim() ?? "";
+  const input = payload as Record<string, unknown>;
+  const requestId = input?.request_id;
+  const decision = input?.decision;
+  const reason = cleanText(input?.reason, 500);
+  if (!token) return json({ error: "admin_session_required" }, 401, origin);
+  if (!validUuid(requestId) || !["aprobar", "rechazar"].includes(String(decision)) || !reason || input?.confirm !== true) {
+    return json({ error: "review_confirmation_required" }, 400, origin);
+  }
+  const keyBytes = base64Bytes(Deno.env.get("CF_DATA_ENCRYPTION_KEY_V1") ?? "");
+  if (!keyBytes) return json({ error: "backend_unavailable" }, 503, origin);
+  try {
+    const audit = await encryptJson({ reason }, keyBytes, "cf-access-audit:v1");
+    const result = await rpc("community_formative_review_access_request", {
+      p_token: token, p_solicitud_id: requestId, p_decision: decision,
+      p_motivo_cifrado: audit.ciphertext, p_nonce: audit.nonce,
+      p_version_clave: 1, p_confirmada: true,
+    });
+    return json(result, 200, origin);
+  } catch {
+    return json({ error: "admin_review_unavailable" }, 403, origin);
+  }
+}
+
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get("origin") ?? undefined;
   if (origin && !ALLOWED_ORIGINS.has(origin)) {
@@ -218,7 +392,7 @@ Deno.serve(async (req: Request) => {
       return json({
         phase: state.phase === "foundation_created" ? state.phase : "foundation_created",
         module: "comunidad_formativa",
-        intake_enabled: false,
+        intake_enabled: emailReady(),
         case_submission_enabled: false,
         blockchain_anchor_enabled: false,
         otp_email_ready: emailReady(),
@@ -244,5 +418,9 @@ Deno.serve(async (req: Request) => {
     : null;
   if (actionName === "otp_request") return requestOtp(req, payload);
   if (actionName === "otp_verify") return verifyOtp(payload, origin);
+  if (actionName === "intake_submit") return submitAccessRequest(payload, origin);
+  if (actionName === "admin_list_access_requests") return adminList(req, origin);
+  if (actionName === "admin_read_access_request") return adminRead(req, payload, origin);
+  if (actionName === "admin_review_access_request") return adminReview(req, payload, origin);
   return json({ error: "unsupported_action" }, 400, origin);
 });
