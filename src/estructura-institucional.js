@@ -19,7 +19,7 @@ function cardCargo(c,d,personas){const p=personas.get(c.persona_id)||{};const af
 function renderBusquedaGlobal(d){
  const host=document.getElementById('eiGlobalSearch');if(!host)return;
  const input=host.querySelector('input'),result=host.querySelector('.ei-global-results');
- const normalize=s=>String(s||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().replace(/\\s+/g,' ').trim();
+ const normalize=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
  const people=new Map((d.personas||[]).map(p=>[String(p.id),p]));
  const areas=new Map((d.areas||[]).map(a=>[String(a.id),a]));
  const rows=(d.cargos||[]).map(c=>({cargo:c,persona:people.get(String(c.persona_id)),area:areas.get(String(c.area_id))})).filter(x=>x.persona?.nombre_completo);
