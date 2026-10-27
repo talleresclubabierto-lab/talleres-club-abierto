@@ -5246,8 +5246,8 @@ var defs={
  adminDashboard:[
  ['Socios y padrón','♙','Padrón y credenciales',['Gestionar padrón']],
  ['Votaciones','◇','Encuestas, participación y resultados',['Modificar encuestas','Nueva encuesta','Resultados','Participación','Ciclo de vida']],
- ['Gobernanza','⚖','Reglas y organización institucional',['Gobernanza institucional','Estructura institucional']],
- ['Economía y auditoría','▦','Balances, auditorías y transparencia',['Paredes de Cristal','Auditoría pública']],
+ ['Gobernanza','⚖','Reglas y organización institucional',['Gobernanza institucional']],
+ ['Economía y auditoría','▦','Balances, auditorías y transparencia',['Paredes de Cristal','Auditoría pública','Estructura institucional']],
  ['Contrataciones','▤','Concursos, proveedores y contratos',['Concursos y licitaciones']],
  ['Profesionales','♧','Directorio y convocatorias',['Banco de profesionales']],
  ['Seguridad y blockchain','⬡','Identidad, permisos e integración',['Integración blockchain','Cambiar contraseña','Identidad biométrica / Passkey','Gestionar administradores']],
@@ -5271,7 +5271,7 @@ function setup(id){
   if(isStructure){
    if(structureSeen){b.style.display='none';return}
    structureSeen=true;
-   var target=groups.findIndex(function(g){return g[0]===(id==='socioDashboard'?'Transparencia y auditoría':'Gobernanza')});
+   var target=groups.findIndex(function(g){return g[0]===(id==='socioDashboard'?'Transparencia y auditoría':'Economía y auditoría')});
    if(target>=0){buckets[target].push(b);return}
   }
   var matched=false;groups.forEach(function(g,i){if(!matched&&g[3].indexOf(name)>=0){buckets[i].push(b);matched=true}});if(!matched)rest.push(b)
@@ -5282,7 +5282,7 @@ function setup(id){
   buckets[i].forEach(function(b){
    // Un único acceso a Estructura institucional, exclusivamente en su categoría.
    if(/estructura\\s+institucional/i.test(label(b)) &&
-      groups[i][0] !== (id==='socioDashboard'?'Transparencia y auditoría':'Gobernanza'))return;
+      groups[i][0] !== (id==='socioDashboard'?'Transparencia y auditoría':'Economía y auditoría'))return;
    inner.appendChild(b)
   });
   heading.textContent=groups[i][0];categories.classList.add('ca-hidden');view.classList.add('ca-open');view.classList.remove('ca-hidden');back.focus()
