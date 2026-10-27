@@ -1,6 +1,6 @@
 # Comunidad Formativa — diseño técnico
 
-**Estado:** esquema privado aplicado en Supabase; Edge Function de estado y acciones de OTP por correo desplegadas. No contiene datos de personas. El envío OTP queda cerrado hasta configurar proveedor y claves secretas; verificar el correo no habilita una cuenta ni valida pertenencia.
+**Estado:** esquema privado aplicado en Supabase. La recepción de solicitudes de alta y su revisión administrativa se implementan en esta etapa. No hay padrón importado ni datos reales de menores.
 
 ## Objetivo y límites
 
@@ -12,8 +12,9 @@ El sistema actual usa un frontend monolítico en `index.html`, Edge Functions y 
 
 ### Etapa 1 — sin padrón del club
 
-- La persona adulta solicita el alta, declara su vínculo y confirma un teléfono o correo con OTP.
-- Puede adjuntar una constancia voluntaria mediante almacenamiento privado.
+- La persona adulta solicita el alta, declara su vínculo y confirma su correo con OTP.
+- La solicitud exige nombre y DNI del adulto responsable, vínculo, teléfono, nombre y DNI del jugador y fecha de nacimiento. Los DNI se guardan cifrados; sus valores no aparecen en registros públicos ni en la cadena.
+- La carga de constancias mediante almacenamiento privado queda como siguiente integración; la solicitud inicial se revisa administrativamente.
 - La solicitud queda “pendiente de validación”. La declaración por sí sola no se presenta como pertenencia confirmada.
 - Un responsable autorizado revisa la solicitud y deja constancia de la fuente de validación. Solo después se habilita la cuenta.
 - La cuenta principal es de la madre, el padre o el tutor. No se abre cuenta individual a menores de 16 años.
@@ -26,7 +27,7 @@ El sistema actual usa un frontend monolítico en `index.html`, Edge Functions y 
 - Duplicados, datos discordantes y vínculos múltiples requieren revisión; una importación no sobrescribe automáticamente información de contacto confirmada.
 - Desde los 16 años se puede habilitar una cuenta individual del jugador tras verificación y consentimiento aplicables.
 
-La interfaz ofrece “Solicitar acceso” e “Ingresar” en el mismo módulo. No se crean portales distintos según si la persona conoce DNI o número interno.
+El primer flujo permite confirmar el correo y enviar la solicitud. La bandeja administrativa requiere una sesión vigente del administrador principal; el listado muestra solo código, fecha y estado. Abrir identidad y decidir requieren motivo y confirmación, y quedan asentados en una tabla append-only. No se crean portales distintos según si la persona conoce DNI o número interno.
 
 ## Esquema aislado
 
@@ -36,10 +37,10 @@ La migración crea el esquema privado `comunidad_formativa`. Cada tabla tiene RL
 |---|---|
 | `solicitudes_acceso` | Alta voluntaria, consentimiento y revisión |
 | `jugadores`, `adultos_responsables`, `vinculos` | Padrón separado, adultos autorizados y fuente/estado de validación |
-| `cuentas`, `codigos_otp`, `desafios_email_otp`, `codigos_activacion`, `sesiones` | Identidad independiente, OTP y código de activación de un uso, y sesión cuyo token solo se almacena como HMAC |
+| `cuentas`, `codigos_otp`, `codigos_activacion`, `sesiones` | Identidad independiente, OTP y código de activación de un uso, y sesión cuyo token solo se almacena como HMAC |
 | `roles_administrativos` | Administrador general, responsable de integridad y principal de integridad |
 | `casos`, `archivos`, `actuaciones` | Presentaciones, adjuntos, estados, solicitudes/respuestas, medidas y resoluciones |
-| `accesos_identidad` | Motivo, usuario y hora de cualquier desbloqueo excepcional |
+| `accesos_identidad`, `auditoria_solicitudes_acceso` | Motivo, usuario y hora de consulta o decisión administrativa |
 | `proyeccion_socios` | Campos mínimos preparados para consulta anonimizada; no es una vista directa de la tabla de casos |
 | `eventos_criptograficos`, `lotes_merkle`, `anclajes` | Cadena y lotes propios del módulo, separados de las tablas actuales |
 | `importaciones`, `importacion_items` | Staging para archivo/API y conciliación segura |
@@ -58,7 +59,7 @@ Las Edge Functions derivan el actor de la sesión validada en servidor. No conf�
 
 ## Edge Functions previstas
 
-1. `comunidad-formativa-api`: disponible para consulta de estado y OTP de correo; los flujos de solicitud, sesión, perfiles, presentaciones y archivos siguen pendientes.
+1. `comunidad-formativa-api`: solicitud, OTP, sesiones, perfiles vinculados, presentaciones, seguimiento y archivos.
 2. `comunidad-formativa-admin`: validación de solicitudes, roles, actuaciones, solicitudes de información, estados, protocolos especiales y desbloqueo de identidad.
 3. `comunidad-formativa-import`: staging, validación, deduplicación, conciliación y aplicación de archivo/API.
 4. `comunidad-formativa-public`: lista y estadísticas con salida allowlist, demoras y supresión de grupos pequeños.
@@ -78,11 +79,11 @@ Cada evento genera hash en servidor sobre una representación versionada que inc
 
 El módulo no inserta filas en `auditoria_administrativa`, `lotes_merkle_auditoria` ni `lotes_merkle_votos`, y no modifica `blockchain-anchor`. La función nueva consultará el estado global vigente y solo podrá enviar si el sistema está activado y un principal autorizado confirma. Mientras tanto, los hashes y pruebas se conservan fuera de cadena. Un hash acredita integridad desde el registro, no que el relato sea verdadero.
 
-## Verificación requerida antes de producción
+## Verificación de esta etapa
 
-- Ejecutar migración en un proyecto/branch de prueba y revisar el diff de esquema.
+- La migración es aditiva: agrega consumo único al desafío OTP, un índice de duplicidad para solicitudes activas y una auditoría privada append-only. No toca tablas del padrón de socios ni funciones de votación, auditoría o anclaje.
 - Probar que `anon` y `authenticated` no pueden consultar, insertar, modificar ni borrar tablas/archivos.
-- Probar acceso vinculado por sesión, roles, expiración/revocación y límites OTP.
+- Probar acceso administrativo con sesión vigente, autorización de administrador principal, expiración/revocación y límites OTP.
 - Verificar AES-GCM, rotación de claves y búsqueda HMAC; confirmar que ningún log incluye datos en claro.
 - Probar append-only, concurrencia de la cadena, raíces Merkle y verificaciones negativas.
 - Revisar proyección contra reidentificación y resultados en poblaciones pequeñas.
@@ -90,5 +91,5 @@ El módulo no inserta filas en `auditoria_administrativa`, `lotes_merkle_auditor
 - Realizar pruebas de navegador responsive y de app Android; la app empaqueta assets locales.
 - Configurar proveedor de correo/SMS, claves de cifrado/HMAC, retención, protocolos y consentimientos antes de aceptar datos.
 
-La base aislada, los RPC privados de OTP y la función API están aplicados en producción. El navegador no tiene permisos sobre el esquema privado. El OTP no procesa una solicitud de alta y no habilita sesión: faltan las claves secretas y el proveedor de correo. No habilitar altas ni presentaciones hasta cerrar el flujo administrativo y sus pruebas de seguridad. La integración blockchain permanece sin envíos. La implementación técnica debe acompañarse con aviso de privacidad, reglas de retención y revisión jurídica específica bajo Ley 25.326 y Ley 26.061.
+La aprobación de una solicitud registra el vínculo validado, pero no reemplaza la etapa posterior de habilitar una sesión individual de Comunidad Formativa. No se deben usar datos reales de menores para la prueba técnica; se debe usar una solicitud ficticia y borrarla por el flujo administrativo de retención cuando corresponda. La implementación debe acompañarse con aviso de privacidad, reglas de retención y revisión jurídica específica bajo Ley 25.326 y Ley 26.061.
 
