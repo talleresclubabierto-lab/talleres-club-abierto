@@ -221,6 +221,18 @@ function classify(input: string): Draft {
     return { category: "agresion", action: "ocultar", tone: "sin_respuesta", reply: null,
       reasons: ["Agresión grave o posible amenaza."] };
   }
+  const mentionsPublicSupport = has([
+    "gobierno", "estado", "provincia", "nacion", "municipalidad", "municipio",
+  ]);
+  const mentionsStadiumLand = has([
+    "terreno", "hectarea", "cesion", "donacion", "comodato", "habilitacion",
+    "infraestructura", "nuevo estadio",
+  ]);
+  if (mentionsPublicSupport && mentionsStadiumLand) {
+    return { category: "pregunta_genuina", action: "revisar", tone: "institucional",
+      reply: "Entendemos tu planteo y coincidimos en que el Estado —municipal, provincial o nacional— debería acompañar a Talleres en la búsqueda de un terreno y en las habilitaciones e infraestructura necesarias, con el mismo criterio aplicado a otras instituciones de Córdoba. La propuesta del nuevo estadio no descarta esa gestión: al contrario, debería ser una de las primeras vías. Y si se consigue una cesión, donación o convenio, todo el proceso debe ser público, transparente y auditable. Gracias por aportar una idea concreta para hacerlo posible. 💙🤍",
+      reasons: ["Aporte de un hincha sobre gestión estatal de terreno, habilitaciones o infraestructura."] };
+  }
   if (text.includes("?")) {
     return { category: "pregunta_genuina", action: "revisar", tone: "tecnico",
       reply: "Buena pregunta. La propuesta busca que las decisiones relevantes tengan información clara, responsables identificados y mecanismos de participación y auditoría. Si nos precisás el punto, te respondemos con el detalle correspondiente.",
