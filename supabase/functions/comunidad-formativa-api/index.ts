@@ -242,7 +242,8 @@ function validDni(value: unknown): value is string {
 }
 
 function applicationCode(): string {
-  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  // Keep generated codes inside the SQL constraint [A-Z2-7].
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ234567";
   const random = crypto.getRandomValues(new Uint8Array(8));
   const suffix = Array.from(random, (n) => alphabet[n % alphabet.length]).join("");
   return `CF-${new Date().getUTCFullYear()}-${suffix}`;
