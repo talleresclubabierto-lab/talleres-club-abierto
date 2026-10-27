@@ -23,6 +23,9 @@ for (const file of [
 }
 
 await cp('comunidad-formativa', output + '/comunidad-formativa', { recursive: true });
+// Publish the canonical institutional assets, never the obsolete root-level overlay.
+await cp('src/estructura-institucional.js', output + '/estructura-institucional.js');
+await cp('src/estructura-institucional.css', output + '/estructura-institucional.css');
 
 const indexPath = output + '/index.html';
 let html = await readFile(indexPath, 'utf8');
