@@ -18,3 +18,16 @@
 .ei-assembly-person small{line-height:1.4}
 @media(max-width:950px){.ei-assembly-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.ei-filter-search{grid-column:1/-1}}
 @media(max-width:640px){.ei-assembly{padding:16px!important}.ei-assembly-filters{grid-template-columns:minmax(0,1fr);gap:12px}.ei-filter-search{grid-column:auto}.ei-filter-field input,.ei-filter-field select{font-size:16px}.ei-assembly-person{grid-template-columns:28px minmax(0,1fr);padding:11px 8px}.ei-assembly-person .ei-badge{grid-column:2;justify-self:start}}
+
+/* Global institutional person search */
+.ei-global-search{background:#fff;border:1px solid #dbe5ef;border-radius:12px;padding:20px;margin:20px 0;box-shadow:0 4px 18px rgba(5,30,60,.04)}
+.ei-global-search>label{display:block;font-weight:850;color:#0b3765;font-size:15px;margin-bottom:10px}
+.ei-global-search>input{box-sizing:border-box;width:100%;height:46px;border:1px solid #c5d5e6;border-radius:9px;padding:0 14px;font:inherit;font-size:14px;color:#102f50;background:#fff}
+.ei-global-search>input:focus{outline:3px solid rgba(20,107,209,.15);border-color:#2675cc}
+.ei-global-results{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px;margin-top:12px}
+.ei-global-results:empty{display:none}
+.ei-search-summary{grid-column:1/-1;font-size:12px;color:#58708c;margin:0 0 4px}
+.ei-global-result{display:flex;flex-direction:column;gap:5px;text-align:left;padding:12px;border:1px solid #dbe5ef;border-radius:9px;background:#f6f9fc;cursor:pointer;color:#123d68}
+.ei-global-result:hover,.ei-global-result:focus{background:#eaf3fd;border-color:#4d93d8}
+.ei-global-result strong{font-size:13px}.ei-global-result small{font-size:11px;color:#5a6f83}
+@media(max-width:640px){.ei-global-search{padding:15px}.ei-global-search>input{font-size:16px}.ei-global-results{grid-template-columns:1fr}}
