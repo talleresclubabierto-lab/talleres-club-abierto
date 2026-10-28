@@ -59,6 +59,19 @@ footer{margin:24px 0 0;padding:16px 0;border-top:1px solid rgba(117,217,248,.2);
 <option value="otra_situacion">Otra incidencia</option><option value="sugerencia">Sugerencia de mejora</option></select></label>
 <label class="field">Relato completo<textarea name="narrative" maxlength="10000" required></textarea></label>
 <label class="field">Personas mencionadas (opcional)<textarea name="mentioned_people" maxlength="2000"></textarea></label>
+<section aria-label="Datos de ubicación y actividad">
+<p class="note"><strong>Ubicación y actividad.</strong> La categoría se guarda junto a la temporada elegida para que los cambios futuros no alteren el historial. Si no conocés un dato, elegí “No lo sé” o escribí “No aparece”.</p>
+<label class="field">Temporada<select name="season" required><option value="2026" selected>2026</option></select></label>
+<label class="field">Provincia<select name="province" required>
+<option value="">Seleccioná primero una provincia</option><option>Córdoba</option><option>Buenos Aires</option><option>Ciudad Autónoma de Buenos Aires</option><option>Santa Fe</option><option>Catamarca</option><option>Chaco</option><option>Chubut</option><option>Corrientes</option><option>Entre Ríos</option><option>Formosa</option><option>Jujuy</option><option>La Pampa</option><option>La Rioja</option><option>Mendoza</option><option>Misiones</option><option>Neuquén</option><option>Río Negro</option><option>Salta</option><option>San Juan</option><option>San Luis</option><option>Santa Cruz</option><option>Santiago del Estero</option><option>Tierra del Fuego</option><option>Tucumán</option><option>No lo sé</option><option>Otra / no aparece</option>
+</select></label>
+<label class="field">Localidad / ciudad<input name="locality" maxlength="120" placeholder="Ej.: Córdoba, Mendiolaza, Río Cuarto o No lo sé"></label>
+<label class="field">Sede, academia, escuela o filial (si la conocés)<input name="venue" maxlength="160" placeholder="Podés escribir No aparece"></label>
+<label class="field">Deporte<select name="sport" required><option value="">Seleccioná un deporte</option><option>Fútbol</option><option>Hockey</option><option>Básquet</option><option>Vóley</option><option>Patín</option><option>No lo sé</option><option>Otro / no aparece</option></select></label>
+<label class="field">Competencia o circuito<select name="competition" required><option value="">Seleccioná una opción</option><option>AFA</option><option>Liga Cordobesa / local</option><option>Federado / provincial</option><option>Escuela oficial / academia</option><option>No lo sé</option><option>Otro / no aparece</option></select></label>
+<label class="field">Categoría deportiva (opcional)<input name="sport_category" maxlength="100" placeholder="Ej.: 5.ª, Reserva, U17, Sub 16; o No aparece"></label>
+<label class="field">División o subcategoría (opcional)<input name="division" maxlength="100" placeholder="Ej.: AFA, local, Línea B, desarrollo; o No lo sé"></label>
+</section><input type="hidden" name="communication_type" value="integridad">
 <label class="field">Fecha aproximada (opcional)<input name="approx_date" type="date"></label>
 <label class="field">Modalidad<select name="reservation" required><option value="identificada">Identificada</option><option value="reservada_frente_a_area_deportiva">Identidad reservada frente al área deportiva</option><option value="confidencial_integridad">Comunicación confidencial para Integridad</option></select></label>
 <button class="action" type="submit">Enviar presentación</button></form></section>
@@ -145,7 +158,16 @@ function wireCaseForm(){
        reservation:data.get('reservation'),
        narrative:data.get('narrative'),
        mentioned_people:data.get('mentioned_people')||'',
-       approx_date:data.get('approx_date')||''
+       approx_date:data.get('approx_date')||'',
+       communication_type:data.get('communication_type')||'integridad',
+       season:data.get('season')||'2026',
+       province:data.get('province')||'',
+       locality:data.get('locality')||'',
+       venue:data.get('venue')||'',
+       sport:data.get('sport')||'',
+       competition:data.get('competition')||'',
+       sport_category:data.get('sport_category')||'',
+       division:data.get('division')||''
      });
      if(status)status.textContent='Presentación recibida. Código de seguimiento: '+result.code+'. Guardalo para tus consultas.';
      form.reset();
