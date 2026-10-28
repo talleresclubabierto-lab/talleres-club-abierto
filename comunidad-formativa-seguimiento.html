@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#021739">
+<title>Seguimiento formativo | Talleres Club Abierto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#021739;--cyan:#62dcff;--line:#cfdae4;--muted:#c6d8e8;--text:#132234}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--text);font-family:Inter,system-ui,sans-serif;background:radial-gradient(circle at 78% 9%,rgba(98,220,255,.16),transparent 19%),linear-gradient(120deg,#01142d 0%,#06264a 43%,#031b38 67%,#021733 100%);background-attachment:fixed}
+header{height:72px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:3;padding:0 max(18px,calc((100vw - 1180px)/2));background:rgba(2,23,51,.94);border-bottom:1px solid rgba(98,220,255,.18);backdrop-filter:blur(14px)}
+.brand{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none;font-size:14px;font-weight:800}.logo{width:42px;height:46px;background:url("/assets/club-abierto-logo.webp") center top/55px auto no-repeat}
+.nav{border:1px solid rgba(117,217,248,.35);border-radius:8px;padding:10px 13px;color:#e4f1fa;text-decoration:none;font-size:13px;font-weight:700}
+main{max-width:1120px;margin:auto;padding:34px 22px 54px}.eyebrow{color:#85dffc;font:700 11px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase}h1{color:#fff;font-size:34px;margin:8px 0}.lead{color:var(--muted);font-size:15px;line-height:1.6;max-width:790px}
+.card{margin:18px 0;padding:22px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(2,23,57,.08)}h2{margin:0 0 8px;color:var(--navy);font-size:19px}
+.note{margin:16px 0;padding:15px 17px;border:1px solid rgba(117,217,248,.25);border-radius:10px;background:rgba(4,29,57,.82);color:#d8e9f5;font-size:13px;line-height:1.6}.case{padding:16px;margin:12px 0;border:1px solid #d8e4ec;border-radius:10px;background:#f7fafc}.case-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}.code{font:700 14px 'JetBrains Mono',monospace;color:#063d66}.status{display:inline-block;padding:6px 9px;background:#e6f5fb;border-radius:20px;color:#075c91;font-size:11px;font-weight:700}.meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:13px}.datum{padding:10px;border:1px solid #e0e8ee;border-radius:8px;background:#fff}.datum small{display:block;color:#617487;font-size:10px;text-transform:uppercase;letter-spacing:.04em}.datum strong{display:block;margin-top:4px;color:#1b3347;font-size:13px}.muted{color:#617487;font-size:13px;line-height:1.55}.state{min-height:24px;color:#bed6e5;font-size:13px;line-height:1.5}
+@media(max-width:700px){header{height:62px;padding:0 14px}.brand{font-size:10px;gap:8px}.logo{width:34px;height:38px;background-size:46px auto}.nav{padding:8px 9px;font-size:11px}main{padding:24px 14px 36px}h1{font-size:29px}.card{padding:17px}.case-head{align-items:flex-start;flex-direction:column}.meta{grid-template-columns:1fr}}
+</style></head>
+<body>
+<header><a class="brand" href="/" aria-label="Volver al Panel Socio Activo"><span class="logo" aria-hidden="true"></span><span>TALLERES CLUB ABIERTO · SOCIOS</span></a><a class="nav" href="/">← Panel Socio Activo</a></header>
+<main><div class="eyebrow">Panel Socio Activo / Comunidad Formativa</div><h1>Seguimiento formativo</h1>
+<p class="lead">Consultá el estado institucional de las presentaciones registradas en Comunidad Formativa. La información se muestra de forma anonimizada para proteger a jugadores y familias.</p>
+<aside class="note"><strong>Privacidad.</strong> Esta consulta no muestra nombres, DNI, categoría deportiva exacta, relatos, archivos ni personas mencionadas. Las presentaciones describen situaciones informadas y no hechos comprobados.</aside>
+<section class="card"><h2>Presentaciones registradas</h2><p class="muted">Se informa el mes de recepción y una categoría general; no se publican datos que permitan identificar a un menor o a su familia. El registro criptográfico todavía no está habilitado para estos casos.</p><div id="case-list" aria-live="polite" class="state">Verificando tu sesión de socio…</div></section>
+</main>
+<script>
+(function(){
+ const endpoint='https://sziuyjicqyxnmbgtbopg.supabase.co/functions/v1/comunidad-formativa-api';
+ const token=sessionStorage.getItem('TD_club_session_v1')||'';
+ const list=document.getElementById('case-list');
+ if(!token){list.textContent='Ingresá primero al Panel Socio Activo y abrí esta sección desde allí.';return;}
+ fetch(endpoint,{method:'POST',mode:'cors',cache:'no-store',credentials:'omit',headers:{'Content-Type':'application/json','X-Club-Session':token},body:JSON.stringify({action:'member_cases_list'})})
+ .then(async response=>{const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||'No autorizado');return data;})
+ .then(data=>{
+   const cases=Array.isArray(data.cases)?data.cases:[];
+   list.replaceChildren();
+   if(!cases.length){list.textContent='Todavía no hay presentaciones registradas.';return;}
+   for(const item of cases){
+     const article=document.createElement('article');article.className='case';
+     const header=document.createElement('div');header.className='case-head';
+     const code=document.createElement('strong');code.className='code';code.textContent=item.codigo||'Presentación formativa';
+     const status=document.createElement('span');status.className='status';status.textContent=item.estado||'En evaluación';
+     header.append(code,status);
+     const grid=document.createElement('div');grid.className='meta';
+     const values=[['Mes de recepción',item.periodo||'—'],['Categoría general',item.categoria_general||'—'],['Área','Divisiones formativas'],['Registro criptográfico',item.registro_criptografico==='verificado'?'Verificado':'No habilitado']];
+     for(const [label,value] of values){const box=document.createElement('div');box.className='datum';const small=document.createElement('small');small.textContent=label;const strong=document.createElement('strong');strong.textContent=value;box.append(small,strong);grid.append(box);}
+     article.append(header,grid);list.append(article);
+   }
+ })
+ .catch(()=>{list.textContent='No se pudo validar el acceso. Volvé al Panel Socio Activo e ingresá nuevamente.';});
+})();
+</script></body></html>
