@@ -1811,36 +1811,20 @@ async function inicializarPersistenciaCompartida(){
     actualizarEstadoSync('Conectando con Supabase…',false);
 
     try{
+        // Una sola solicitud autenticada reemplaza cuatro cargas secuenciales
+        // del mismo estado inicial (padron, administradores, encuestas y votos).
         try{
-            var totalPadronRemoto=await cargarPadronDesdeTablaSocios();
-            actualizarEstadoSync('Padrón Supabase cargado · '+totalPadronRemoto.toLocaleString('es-AR')+' socios',true);
-        }catch(errorPadron){
-            console.error('Fallback de padrón activado:',errorPadron);
+            var estadoInicialRemoto=await cargarEstadoInicialAutenticado();
+            actualizarEstadoSync('Padrón Supabase cargado · '+(Number(estadoInicialRemoto.total_socios_activos)||0).toLocaleString('es-AR')+' socios',true);
+        }catch(errorEstadoInicial){
+            console.error('No se pudo cargar el estado inicial autenticado:',errorEstadoInicial);
             PADRON_FUENTE=localStorage.getItem('TD_padronSocios')?'cache-local':'embebido';
             recalcularPadronRuntime();
-            actualizarEstadoSync('Supabase conectado · padrón en respaldo local',false);
-        }
-
-        try{
-            var totalAdminsRemoto=await cargarAdministradoresDesdeTabla();
-        }catch(errorAdmins){
-            console.error('Fallback de administradores activado:',errorAdmins);
             ADMINS_FUENTE='fallback';
             ADMIN_IDS=cargarAdministradores();
-        }
-
-        try{
-            var infoEncuestasRemoto=await cargarEncuestasDesdeTablas();
-        }catch(errorEncuestas){
-            console.error('Fallback de encuestas activado:',errorEncuestas);
             ENCUESTAS_FUENTE='payload';
-        }
-
-        try{
-            var totalVotosRemoto=await cargarVotosDesdeTabla();
-        }catch(errorVotos){
-            console.error('Fallback de votos activado:',errorVotos);
             VOTOS_FUENTE='payload';
+            actualizarEstadoSync('Supabase conectado · datos en respaldo local',false);
         }
 
         try{
