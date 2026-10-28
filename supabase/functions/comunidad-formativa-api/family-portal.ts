@@ -172,6 +172,7 @@ async function familyCaseSubmit(req: Request, payload: unknown, origin?: string)
     "otra_situacion","sugerencia",
   ]);
   const category = input.category;
+  const reporterRole = typeof input.reporter_role === "string" ? input.reporter_role : "adulto_responsable";
   const reservation = input.reservation;
   const narrative = cleanText(input.narrative, 10000);
   const mentionedPeople = typeof input.mentioned_people === "string"
@@ -193,6 +194,7 @@ async function familyCaseSubmit(req: Request, payload: unknown, origin?: string)
       typeof reservation !== "string" ||
       !["identificada","reservada_frente_a_area_deportiva","confidencial_integridad"].includes(reservation) ||
       !/^\d{4}$/.test(season) ||
+      !["adulto_responsable","jugador_con_adulto"].includes(reporterRole) ||
       !["acompanamiento","integridad"].includes(String(communicationType)) ||
       !narrative || (approxDate && !/^\d{4}-\d{2}-\d{2}$/.test(approxDate))) {
     return json({ error: "invalid_case_payload" }, 400, origin);
@@ -201,6 +203,7 @@ async function familyCaseSubmit(req: Request, payload: unknown, origin?: string)
   const report = await encryptJson({
     narrative,
     mentioned_people: mentionedPeople,
+    reporter_role: reporterRole,
   }, encryptionKey, "cf-case-report:v1");
   const dateData = approxDate
     ? await encryptJson({ date: approxDate }, encryptionKey, "cf-case-date:v1")
@@ -272,7 +275,7 @@ async function adminReadCase(req: Request,payload: unknown,origin?: string) {
     }
     return json({ok:true,case:{
       id:result.id,code:result.codigo,category:result.categoria,status:result.estado,created_at:result.creada_en,
-      narrative:report?.narrative??"",mentioned_people:report?.mentioned_people??"",approx_date:approxDate,
+      narrative:report?.narrative??"",mentioned_people:report?.mentioned_people??"",reporter_role:report?.reporter_role??"adulto_responsable",approx_date:approxDate,
     }},200,origin);
   }catch{return json({error:"admin_case_unavailable"},403,origin);}
 }
