@@ -347,7 +347,7 @@ footer{max-width:1180px;margin:25px auto 0;padding:15px 0 26px;border-top:1px so
    for(const item of cases){
      const row=document.createElement('div');row.className='public-case-row';
      const code=document.createElement('strong');code.textContent=item.codigo||'Presentación formativa';
-     const detail=document.createElement('span');detail.textContent=[item.periodo,item.categoria_general,item.estado,'Registro criptográfico: no habilitado'].filter(Boolean).join(' · ');
+     const detail=document.createElement('span');detail.textContent=[item.periodo,item.categoria_general,item.estado,'Registro criptográfico: '+(item.registro_criptografico||'pendiente')].filter(Boolean).join(' · ');
      row.append(code,detail);list.append(row);
    }
  })
