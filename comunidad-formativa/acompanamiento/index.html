@@ -4,7 +4,40 @@
 <title>Acompañamiento formativo | Comunidad Formativa</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/comunidad-formativa-panel.css">
+<style>
+:root{--navy:#021739;--cyan:#62dcff;--line:#cfdae4;--muted:#c6d8e8;--text:#132234;--paper:#f4f8fb}
+*{box-sizing:border-box}html{min-height:100%;background:#01152f}
+body{margin:0;min-height:100vh;color:var(--text);font-family:Inter,system-ui,sans-serif;background:radial-gradient(circle at 78% 9%,rgba(98,220,255,.16),transparent 19%),radial-gradient(circle at 18% 78%,rgba(27,112,174,.12),transparent 24%),linear-gradient(120deg,#01142d 0%,#01142d 22%,#06264a 22.15%,#06264a 43%,#031b38 43.15%,#031b38 67%,#0a3158 67.15%,#021733 100%);background-attachment:fixed}a{color:inherit}
+.topbar{height:72px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:30;padding:0 max(20px,calc((100vw - 1180px)/2));background:rgba(2,23,51,.92);border-bottom:1px solid rgba(98,220,255,.18);backdrop-filter:blur(14px)}
+.brand{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none;font-size:15px;font-weight:800;letter-spacing:.01em}
+.logo{display:block;width:44px;height:45px;flex:0 0 auto;background:url("/assets/club-abierto-logo.webp") center top/55px auto no-repeat;filter:drop-shadow(0 0 7px rgba(98,220,255,.32))}
+.toplink,.logout{border:1px solid rgba(117,217,248,.35);border-radius:8px;padding:10px 13px;color:#e4f1fa;background:transparent;text-decoration:none;font:700 13px Inter,sans-serif;cursor:pointer}.toplink:hover,.logout:hover{background:rgba(255,255,255,.1)}
+main{max-width:1180px;margin:0 auto;padding:32px 24px 52px}
+.crumb{margin:0 0 9px;color:#85dffc;font:700 11px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase}
+.head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:22px}
+h1{margin:0 0 7px;color:#fff;font-size:36px;line-height:1.13;letter-spacing:-.03em}
+.lead{max-width:780px;margin:0;color:var(--muted);font-size:15px;line-height:1.6}
+.badge{flex:0 0 auto;padding:8px 12px;border:1px solid #a8dfef;border-radius:999px;background:#e7faff;color:#08769a;font:700 10px 'JetBrains Mono',monospace;letter-spacing:.04em;text-transform:uppercase}
+.card{margin:15px 0;padding:22px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(2,23,57,.08)}
+h2{margin:0 0 10px;color:var(--navy);font-size:19px}
+p{margin:0 0 12px;color:#526579;font-size:14px;line-height:1.6}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.datum{padding:13px;border:1px solid #d8e4ec;border-radius:9px;background:#f7fafc}
+.datum b{display:block;color:#617487;font-size:10px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.datum span{font-size:14px;color:#132234;overflow-wrap:anywhere}
+.field{display:grid;gap:6px;margin:12px 0;color:#42566a;font-size:12px;font-weight:700}
+.field input,.field select,.field textarea{width:100%;min-height:42px;border:1px solid #bacbd8;border-radius:8px;padding:10px 12px;font:500 14px Inter,sans-serif;color:#132234;background:#fff}
+.field textarea{min-height:130px;resize:vertical}
+.action{border:0;border-radius:8px;padding:11px 16px;background:#075c91;color:#fff;font:700 13px Inter,sans-serif;cursor:pointer}
+.action:hover{background:#034873}.action:disabled{opacity:.55;cursor:wait}
+.note{padding:14px 16px;border:1px solid rgba(117,217,248,.25);border-radius:10px;background:rgba(4,29,57,.82);color:#d8e9f5;font-size:13px;line-height:1.55}
+.status{min-height:22px;margin:12px 0;color:#31566e;font-size:13px;line-height:1.5}
+.case-row{padding:14px;border:1px solid #d8e4ec;border-radius:9px;background:#f7fafc;margin:10px 0}
+.case-row strong{color:#021739}.case-row small{display:block;color:#596b7d;margin-top:6px;line-height:1.45}
+footer{margin:24px 0 0;padding:16px 0;border-top:1px solid rgba(117,217,248,.2);color:#c6d8e8;font-size:12px;line-height:1.5}
+@media(max-width:720px){.topbar{height:64px;padding:0 14px}.brand{font-size:11px;gap:8px}.logo{width:36px;height:39px;background-size:48px auto}.toplink,.logout{padding:8px 9px;font-size:11px}main{padding:24px 16px 36px}.head{align-items:flex-start;flex-direction:column;gap:12px}h1{font-size:30px}.lead{font-size:14px}.card{padding:18px}.grid{grid-template-columns:1fr}}
+
+</style>
 </head><body data-section="accompaniment">
 <header class="topbar"><a class="brand" href="/comunidad-formativa.html" aria-label="Volver a Comunidad Formativa"><span class="logo" aria-hidden="true"></span><span>TALLERES CLUB ABIERTO · COMUNIDAD FORMATIVA</span></a><div><a class="toplink" href="/comunidad-formativa.html">← Comunidad Formativa</a> <button id="logout-button" class="logout" type="button">Cerrar sesión</button></div></header>
 <main><div class="crumb">Comunidad Formativa / Acompañamiento formativo</div>
@@ -21,4 +54,109 @@
 
 <p class="status" id="panel-status" role="status" aria-live="polite">Verificando el vínculo validado…</p>
 <footer>Las presentaciones se registran como situaciones informadas, no como hechos comprobados. Las actuaciones y correcciones conservan su historial.</footer>
-</main><script src="/comunidad-formativa-family.js"></script></body></html>
+</main><script>
+(function(){
+'use strict';
+const endpoint='https://sziuyjicqyxnmbgtbopg.supabase.co/functions/v1/comunidad-formativa-api';
+const token=sessionStorage.getItem('TD_cf_family_session_v1')||'';
+const section=document.body.dataset.section||'';
+const status=document.getElementById('panel-status');
+const profileUrl='/comunidad-formativa/vinculo/';
+async function call(action,data){
+ const response=await fetch(endpoint,{method:'POST',mode:'cors',cache:'no-store',credentials:'omit',headers:{'Content-Type':'application/json','X-Club-Session':token},body:JSON.stringify(Object.assign({action},data||{}))});
+ const result=await response.json().catch(()=>({}));
+ if(!response.ok)throw new Error(result.error||'No se pudo completar la operación.');
+ return result;
+}
+function text(id,value){const el=document.getElementById(id);if(el)el.textContent=value||'—';}
+function logout(){sessionStorage.removeItem('TD_cf_family_session_v1');location.replace('/comunidad-formativa.html');}
+const logoutButton=document.getElementById('logout-button');if(logoutButton)logoutButton.addEventListener('click',logout);
+function displayCase(c){
+ const categories={consulta:'Consulta',sugerencia:'Sugerencia',posible_ventaja_indebida:'Presunta solicitud de dinero o ventaja indebida',posible_intervencion_irregular:'Presunta intervención irregular de representantes',posible_conflicto_intereses:'Posible conflicto de intereses',criterio_deportivo:'Criterios deportivos presuntamente irregulares',maltrato_discriminacion:'Maltrato o discriminación',posible_represalia:'Posibles represalias',salud_proteccion:'Salud o protección',educacion_acompanamiento:'Educación o acompañamiento',entrenamiento:'Entrenamiento',alimentacion:'Alimentación',transporte:'Transporte',infraestructura:'Infraestructura',otra_situacion:'Otra incidencia'};
+ const states={recibida:'Recibida',en_evaluacion:'En evaluación',informacion_solicitada:'Información solicitada',en_investigacion:'En investigación',resuelta:'Resuelta',archivada:'Archivada',reabierta:'Reabierta'};
+ const row=document.createElement('article');row.className='case-row';
+ const title=document.createElement('strong');title.textContent=c.codigo+' · '+(categories[c.categoria]||'Presentación');
+ const created=new Date(c.creada_en);
+ const meta=document.createElement('small');meta.textContent='Estado: '+(states[c.estado]||'Recibida')+' · '+(Number.isNaN(created.getTime())?'':new Intl.DateTimeFormat('es-AR',{dateStyle:'short'}).format(created));
+ row.append(title,meta);return row;
+}
+async function boot(){
+ if(!token){location.replace('/comunidad-formativa.html#otp-panel');return;}
+ try{
+   const result=await call('family_profile');
+   const profile=result.profile;
+   if(!profile)throw new Error('family_session_expired');
+   document.body.classList.add('family-ready');
+   const badge=document.getElementById('access-badge');if(badge)badge.textContent='Acceso habilitado';
+   text('player-name',profile.player.name);
+   text('player-category',profile.player.category||'Categoría no informada');
+   text('player-birth',profile.player.birth_date||'No informada');
+   text('adult-name',profile.adult.name);
+   text('adult-relationship',profile.adult.relationship);
+   text('adult-phone',profile.adult.phone);
+   text('adult-email',profile.adult.email);
+   if(section==='cases'||section==='presentations'||section==='accompaniment')await loadCases();
+   if(section==='accompaniment'||section==='integrity')wireCaseForm();
+   if(section==='profile')wireUpdateForm();
+   if(status)status.textContent='Sesión individual activa. El acceso vence en 8 horas o cuando se cierre la sesión.';
+ }catch(error){
+   if(String(error).includes('expired')||String(error).includes('required')){
+     sessionStorage.removeItem('TD_cf_family_session_v1');
+     location.replace('/comunidad-formativa.html#otp-panel');
+     return;
+   }
+   if(status)status.textContent='No se pudo cargar el panel. Volvé a ingresar con un nuevo código.';
+ }
+}
+async function loadCases(){
+ const list=document.getElementById('case-list');if(!list)return;
+ list.textContent='Cargando presentaciones…';
+ try{
+   const result=await call('family_cases_list');
+   const cases=Array.isArray(result.cases)?result.cases:[];
+   list.replaceChildren();
+   if(!cases.length){list.textContent='Todavía no hay presentaciones asociadas a este vínculo.';return;}
+   for(const item of cases)list.append(displayCase(item));
+ }catch(_){list.textContent='No se pudo cargar el seguimiento. Volvé a ingresar con un nuevo código.';}
+}
+function wireCaseForm(){
+ const form=document.getElementById('case-form');if(!form)return;
+ form.addEventListener('submit',async function(e){
+   e.preventDefault();
+   if(!form.reportValidity())return;
+   const button=form.querySelector('button[type="submit"]');if(button)button.disabled=true;
+   if(status)status.textContent='Enviando de forma cifrada…';
+   const data=new FormData(form);
+   try{
+     const result=await call('family_case_submit',{
+       category:data.get('category'),
+       reservation:data.get('reservation'),
+       narrative:data.get('narrative'),
+       mentioned_people:data.get('mentioned_people')||'',
+       approx_date:data.get('approx_date')||''
+     });
+     if(status)status.textContent='Presentación recibida. Código de seguimiento: '+result.code+'. Guardalo para tus consultas.';
+     form.reset();
+     if(document.getElementById('case-list'))await loadCases();
+   }catch(_){
+     if(status)status.textContent='No se pudo enviar. Revisá los campos e intentá nuevamente.';
+   }finally{if(button)button.disabled=false;}
+ });
+}
+function wireUpdateForm(){
+ const form=document.getElementById('update-form');if(!form)return;
+ form.addEventListener('submit',async function(e){
+   e.preventDefault();if(!form.reportValidity())return;
+   const button=form.querySelector('button[type="submit"]');if(button)button.disabled=true;
+   const value=new FormData(form).get('requested_change');
+   try{
+     const result=await call('family_case_submit',{category:'consulta',reservation:'identificada',narrative:'Solicitud de actualización de información: '+value,mentioned_people:'',approx_date:''});
+     if(status)status.textContent='Solicitud recibida. Código de seguimiento: '+result.code+'. La información vigente se conserva hasta su revisión.';
+     form.reset();
+   }catch(_){if(status)status.textContent='No se pudo registrar la solicitud de actualización. Intentá nuevamente.';}
+   finally{if(button)button.disabled=false;}
+ });
+}
+boot();
+})();
+</script></body></html>
