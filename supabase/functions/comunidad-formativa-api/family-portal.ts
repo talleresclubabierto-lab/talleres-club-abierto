@@ -240,7 +240,10 @@ async function familyCaseSubmit(req: Request, payload: unknown, origin?: string)
       p_opcion_catalogo_id: null,
     });
     if (!result?.ok) throw new Error("case_submit_failed");
-    return json({ ok: true, code: result.codigo, status: result.estado }, 200, origin);
+    const cryptoStatus = await rpc("community_formative_case_crypto_status", {
+      p_code: result.codigo,
+    }).catch(() => "Hash criptográfico registrado; estado de lote pendiente de lectura");
+    return json({ ok: true, code: result.codigo, status: result.estado, crypto_status: cryptoStatus }, 200, origin);
   } catch {
     return json({ error: "case_submit_unavailable" }, 503, origin);
   }
