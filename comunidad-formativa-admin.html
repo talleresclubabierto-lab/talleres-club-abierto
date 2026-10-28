@@ -101,7 +101,20 @@ main{width:min(1100px,100%);margin:0 auto;padding:28px 18px 60px}.eyebrow{color:
     try{
       const result=await call('admin_review_access_request',{request_id:currentRequest.id,decision,reason:form.get('reason'),confirm:form.get('confirm')==='on'});
       currentRequest=null;document.getElementById('identity-fields').replaceChildren();event.currentTarget.reset();details.classList.add('hidden');identityAccess.classList.add('hidden');status.textContent=result.estado==='aprobada'?'Vínculo aprobado y registrado.':'Solicitud rechazada y registrada.';await load();
-    }catch(error){status.textContent='No se pudo guardar la decisión. El motivo y la confirmación son obligatorios.';}finally{submitter.disabled=false;}
+    }catch(error){
+      const message=error instanceof Error?error.message:'';
+      if(message==='review_confirmation_required'){
+        status.textContent='Para registrar la decisión, completá el motivo y confirmá la casilla.';
+      }else{
+        currentRequest=null;
+        document.getElementById('identity-fields').replaceChildren();
+        event.currentTarget.reset();
+        details.classList.add('hidden');
+        identityAccess.classList.add('hidden');
+        await load();
+        status.textContent='No se pudo confirmar el resultado. Revisá si la solicitud sigue pendiente antes de volver a actuar.';
+      }
+    }finally{submitter.disabled=false;}
   });
   window.addEventListener('pagehide',function(){currentRequest=null;document.getElementById('identity-fields').replaceChildren();});
   load();
