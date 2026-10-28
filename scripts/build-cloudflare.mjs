@@ -37,7 +37,7 @@ html = html.replace(/<style id="ei-embedded-css">[\s\S]*?<\/style>/g, '').replac
 const fontImport = "@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');";
 if (!html.includes(fontImport)) throw new Error('Expected font import missing; review build before publishing');
 html = html.replace(fontImport, '');
-html = html.replace('</head>', '<link rel="preconnect" href="https://fonts.googleapis.com">\\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\\n<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap">\\n</head>');
+html = html.replace('</head>', '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap">\n</head>');
 html = html.replace('</head>', '<style data-v12="estructura-institucional">' + css + '</style>\n</head>');
 html = html.replace('</body>', '<script data-v12="estructura-institucional">' + js + '</script>\n</body>');
 await writeFile(indexPath, html, 'utf8');
