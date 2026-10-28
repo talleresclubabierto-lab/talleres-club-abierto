@@ -1,3 +1,5 @@
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 type PortalDeps = {
   json: (body: unknown, status?: number, origin?: string) => Response;
   rpc: (name: string, body: Record<string, unknown>) => Promise<any>;
@@ -263,3 +265,4 @@ async function adminUpdateCase(req: Request,payload: unknown,origin?: string) {
 }
  return {verifyOtp,familyProfile,familyCases,familyCaseSubmit,adminListCases,adminReadCase,adminUpdateCase};
 }
+
