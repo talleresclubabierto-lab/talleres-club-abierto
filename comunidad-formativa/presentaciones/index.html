@@ -37,12 +37,36 @@ p{margin:0 0 12px;color:#526579;font-size:14px;line-height:1.6}
 footer{margin:24px 0 0;padding:16px 0;border-top:1px solid rgba(117,217,248,.2);color:#c6d8e8;font-size:12px;line-height:1.5}
 @media(max-width:720px){.topbar{height:64px;padding:0 14px}.brand{font-size:11px;gap:8px}.logo{width:36px;height:39px;background-size:48px auto}.toplink,.logout{padding:8px 9px;font-size:11px}main{padding:24px 16px 36px}.head{align-items:flex-start;flex-direction:column;gap:12px}h1{font-size:30px}.lead{font-size:14px}.card{padding:18px}.grid{grid-template-columns:1fr}}
 
-</style>
+\n.intake-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 18px}.intake-grid .field{margin:8px 0}.intake-grid .full{grid-column:1/-1}.intake-grid textarea{min-height:110px}.field select:disabled{opacity:.7}@media(max-width:720px){.intake-grid{grid-template-columns:1fr}.intake-grid .full{grid-column:auto}}\n</style>
 </head><body data-section="presentations">
 <header class="topbar"><a class="brand" href="/comunidad-formativa.html" aria-label="Volver a Comunidad Formativa"><span class="logo" aria-hidden="true"></span><span>TALLERES CLUB ABIERTO · COMUNIDAD FORMATIVA</span></a><div><a class="toplink" href="/comunidad-formativa.html">← Comunidad Formativa</a> <button id="logout-button" class="logout" type="button">Cerrar sesión</button></div></header>
 <main><div class="crumb">Comunidad Formativa / Mis presentaciones</div>
 <section class="head"><div><h1>Mis presentaciones</h1><p class="lead">Consultá los códigos, estados y fechas de las comunicaciones presentadas desde este vínculo.</p></div><span class="badge" id="access-badge">Verificando sesión…</span></section>
 <p class="note">Acceso individual por código. Los datos de identidad del adulto y del jugador solo se muestran dentro de esta sesión familiar autorizada.</p>
+
+<section class="card" id="nueva-presentacion"><h2>Nueva comunicación</h2>
+<p>Elegí si necesitás pedir ayuda o informar una situación. Los filtros de temporada y actividad son los mismos para todas las familias y jugadores.</p>
+<p class="note"><strong>Quién presenta.</strong> Usá la opción que corresponda. En menores, el acceso y el envío se realizan desde la sesión del adulto responsable validado; el jugador puede completar el formulario junto con esa persona.</p>
+<form id="case-form">
+<div class="intake-grid">
+<label class="field">Quién completa esta comunicación<select name="reporter_role" required><option value="adulto_responsable" selected>Madre, padre o tutor/a</option><option value="jugador_con_adulto">Jugador/a junto a su adulto responsable</option></select></label>
+<label class="field">¿Qué necesitás?<select name="communication_type" required><option value="">Seleccioná una opción</option><option value="acompanamiento">Pedir ayuda o acompañamiento</option><option value="integridad">Informar o denunciar una situación</option></select></label>
+<label class="field">Temporada<select name="season" required><option value="2026" selected>2026</option></select></label>
+<label class="field">Provincia<select name="province" required><option value="">Seleccioná una provincia</option><option>Córdoba</option><option>Buenos Aires</option><option>Ciudad Autónoma de Buenos Aires</option><option>Santa Fe</option><option>Catamarca</option><option>Chaco</option><option>Chubut</option><option>Corrientes</option><option>Entre Ríos</option><option>Formosa</option><option>Jujuy</option><option>La Pampa</option><option>La Rioja</option><option>Mendoza</option><option>Misiones</option><option>Neuquén</option><option>Río Negro</option><option>Salta</option><option>San Juan</option><option>San Luis</option><option>Santa Cruz</option><option>Santiago del Estero</option><option>Tierra del Fuego</option><option>Tucumán</option><option>No lo sé</option><option>Otra / no aparece</option></select></label>
+<label class="field">Localidad o ciudad<input name="locality" maxlength="120" placeholder="Ej.: Córdoba o Río Cuarto"></label>
+<label class="field">Sede, academia, escuela o filial (opcional)<input name="venue" maxlength="160"></label>
+<label class="field">Deporte<select name="sport" required><option value="">Seleccioná un deporte</option><option>Fútbol</option><option>Hockey</option><option>Básquet</option><option>Vóley</option><option>Patín</option><option>No lo sé</option><option>Otro / no aparece</option></select></label>
+<label class="field">Competencia o circuito<select name="competition" required><option value="">Seleccioná una opción</option><option>AFA</option><option>Liga Cordobesa / local</option><option>Federado / provincial</option><option>Escuela oficial / academia</option><option>No lo sé</option><option>Otro / no aparece</option></select></label>
+<label class="field">Categoría de la situación<select name="category" required disabled><option value="">Primero elegí qué necesitás</option></select></label>
+<label class="field">Categoría deportiva o división (opcional)<input name="sport_category" maxlength="100" placeholder="Ej.: 5.ª AFA, Reserva local, U17"></label>
+<label class="field">Subdivisión o equipo (opcional)<input name="division" maxlength="100" placeholder="Ej.: AFA, local, Línea B"></label>
+<label class="field">Fecha aproximada (opcional)<input name="approx_date" type="date"></label>
+<label class="field full">Relato<textarea name="narrative" maxlength="10000" required placeholder="Describí qué necesitás o qué situación querés informar."></textarea></label>
+<label class="field full">Personas mencionadas (opcional)<textarea name="mentioned_people" maxlength="2000" placeholder="Se conservará en el registro privado cifrado."></textarea></label>
+<label class="field full">Reserva de identidad<select name="reservation" required><option value="identificada">Identificada</option><option value="reservada_frente_a_area_deportiva">Identidad reservada frente al área deportiva</option><option value="confidencial_integridad">Comunicación confidencial para Integridad</option></select></label>
+</div>
+<button class="action" type="submit">Enviar comunicación</button>
+</form></section>
 
 <section class="card"><h2>Seguimiento de presentaciones</h2><p>El relato, los archivos y la identidad de quien presenta no se muestran en esta lista.</p><div id="case-list">Cargando…</div><a class="toplink" href="/comunidad-formativa/integridad/">Nueva presentación</a></section>
 
@@ -71,7 +95,7 @@ function displayCase(c){
  const row=document.createElement('article');row.className='case-row';
  const title=document.createElement('strong');title.textContent=c.codigo+' · '+(categories[c.categoria]||'Presentación');
  const created=new Date(c.creada_en);
- const meta=document.createElement('small');meta.textContent='Estado: '+(states[c.estado]||'Recibida')+' · '+(Number.isNaN(created.getTime())?'':new Intl.DateTimeFormat('es-AR',{dateStyle:'short'}).format(created));
+ const meta=document.createElement('small');meta.textContent='Estado: '+(states[c.estado]||'Recibida')+' · '+(Number.isNaN(created.getTime())?'':new Intl.DateTimeFormat('es-AR',{dateStyle:'short'}).format(created))+(c.registro_criptografico?' · '+c.registro_criptografico:'');
  row.append(title,meta);return row;
 }
 async function boot(){
@@ -90,7 +114,7 @@ async function boot(){
    text('adult-phone',profile.adult.phone);
    text('adult-email',profile.adult.email);
    if(section==='cases'||section==='presentations'||section==='accompaniment')await loadCases();
-   if(section==='accompaniment'||section==='integrity')wireCaseForm();
+   if(section==='accompaniment'||section==='integrity'||section==='presentations')wireCaseForm();
    if(section==='profile')wireUpdateForm();
    if(status)status.textContent='Sesión individual activa. El acceso vence en 8 horas o cuando se cierre la sesión.';
  }catch(error){
@@ -115,22 +139,59 @@ async function loadCases(){
 }
 function wireCaseForm(){
  const form=document.getElementById('case-form');if(!form)return;
+ const typeField=form.elements.communication_type;
+ const categoryField=form.elements.category;
+ const categories={
+  acompanamiento:[
+   ['consulta','Consulta'],['sugerencia','Sugerencia'],['educacion_acompanamiento','Educación o acompañamiento'],
+   ['salud_proteccion','Salud o protección'],['entrenamiento','Entrenamiento'],['alimentacion','Alimentación'],
+   ['transporte','Transporte'],['infraestructura','Infraestructura'],['otra_situacion','Otra situación']
+  ],
+  integridad:[
+   ['posible_ventaja_indebida','Presunta solicitud de dinero, comisión o ventaja indebida'],
+   ['posible_intervencion_irregular','Presunta intervención irregular de representantes'],
+   ['posible_conflicto_intereses','Posible conflicto de intereses'],
+   ['criterio_deportivo','Criterios deportivos presuntamente irregulares'],
+   ['maltrato_discriminacion','Maltrato o discriminación'],['posible_represalia','Posibles represalias'],
+   ['salud_proteccion','Condiciones médicas o de protección'],['educacion_acompanamiento','Educación y acompañamiento'],
+   ['entrenamiento','Condiciones de entrenamiento'],['alimentacion','Alimentación'],['transporte','Transporte'],
+   ['infraestructura','Infraestructura'],['otra_situacion','Otra incidencia'],['sugerencia','Sugerencia de mejora']
+  ]
+ };
+ function syncCategories(){
+  const type=typeField.value;
+  categoryField.replaceChildren(new Option(type?'Seleccioná una categoría':'Primero elegí qué necesitás',''));
+  for(const [value,label] of (categories[type]||[]))categoryField.add(new Option(label,value));
+  categoryField.disabled=!type;
+ }
+ typeField.addEventListener('change',syncCategories);
+ const initial=new FormData(form).get('communication_type');
+ if(initial){typeField.value=initial;syncCategories();}
  form.addEventListener('submit',async function(e){
-   e.preventDefault();
-   if(!form.reportValidity())return;
+   e.preventDefault();if(!form.reportValidity())return;
    const button=form.querySelector('button[type="submit"]');if(button)button.disabled=true;
-   if(status)status.textContent='Enviando de forma cifrada…';
+   if(status)status.textContent='Enviando comunicación cifrada y registrando su hash…';
    const data=new FormData(form);
    try{
      const result=await call('family_case_submit',{
+       reporter_role:data.get('reporter_role'),
+       communication_type:data.get('communication_type'),
        category:data.get('category'),
        reservation:data.get('reservation'),
        narrative:data.get('narrative'),
        mentioned_people:data.get('mentioned_people')||'',
-       approx_date:data.get('approx_date')||''
+       approx_date:data.get('approx_date')||'',
+       season:data.get('season')||'2026',
+       province:data.get('province')||'',
+       locality:data.get('locality')||'',
+       venue:data.get('venue')||'',
+       sport:data.get('sport')||'',
+       competition:data.get('competition')||'',
+       sport_category:data.get('sport_category')||'',
+       division:data.get('division')||''
      });
-     if(status)status.textContent='Presentación recibida. Código de seguimiento: '+result.code+'. Guardalo para tus consultas.';
-     form.reset();
+     if(status)status.textContent='Comunicación recibida. Código: '+result.code+'. Registro criptográfico: '+(result.crypto_status||'hash pendiente de confirmación')+'.';
+     form.reset();syncCategories();
      if(document.getElementById('case-list'))await loadCases();
    }catch(_){
      if(status)status.textContent='No se pudo enviar. Revisá los campos e intentá nuevamente.';
