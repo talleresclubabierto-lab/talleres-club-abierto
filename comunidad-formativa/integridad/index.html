@@ -45,6 +45,9 @@ footer{margin:24px 0 0;padding:16px 0;border-top:1px solid rgba(117,217,248,.2);
 <p class="note">Acceso individual por código. Los datos de identidad del adulto y del jugador solo se muestran dentro de esta sesión familiar autorizada.</p>
 
 <section class="card"><h2>Presentar una situación</h2><form id="case-form">
+<label class="field">Quién completa esta presentación<select name="reporter_role" required><option value="adulto_responsable" selected>Madre, padre o tutor/a</option><option value="jugador_con_adulto">Jugador/a junto a su adulto responsable</option></select></label>
+<p class="note">El formulario y los filtros son iguales para todos. Para menores, la presentación se envía desde la sesión del adulto responsable autorizado; el jugador puede completarla junto con esa persona.</p>
+
 <label class="field">Categoría<select name="category" required><option value="">Seleccioná una categoría</option>
 <option value="posible_ventaja_indebida">Presunta solicitud de dinero, comisión o ventaja indebida</option>
 <option value="posible_intervencion_irregular">Presunta intervención irregular de representantes</option>
@@ -155,6 +158,7 @@ function wireCaseForm(){
    try{
      const result=await call('family_case_submit',{
        category:data.get('category'),
+       reporter_role:data.get('reporter_role')||'adulto_responsable',
        reservation:data.get('reservation'),
        narrative:data.get('narrative'),
        mentioned_people:data.get('mentioned_people')||'',
