@@ -18,6 +18,23 @@ jobs:
         run: node --check scripts/build-cloudflare.mjs
       - name: Build web
         run: node scripts/build-cloudflare.mjs
+      - name: Validate login bootstrap request deduplication
+        run: |
+          node --input-type=module <<'EOF'
+          import { readFileSync } from 'node:fs';
+          import assert from 'node:assert/strict';
+          const html=readFileSync('dist/index.html','utf8');
+          const start=html.indexOf('async function inicializarPersistenciaCompartida()');
+          assert(start>0,'Bootstrap function missing');
+          const body=html.slice(start,html.indexOf('var ID_SOCIO_ACTIVO',start));
+          assert.equal((body.match(/await cargarEstadoInicialAutenticado\(\)/g)||[]).length,1,'Expected exactly one initial state fetch');
+          for(const name of ['cargarPadronDesdeTablaSocios','cargarAdministradoresDesdeTabla','cargarEncuestasDesdeTablas','cargarVotosDesdeTabla']) {
+            assert(!body.includes('await '+name+'()'),'Redundant bootstrap fetch: '+name);
+          }
+          assert(body.includes('comprobarServicioCredenciales()'),'Credential service check removed');
+          assert(body.includes('cargarEstadoGlobalRemoto()'),'Global state load removed');
+          console.log('Login bootstrap deduplication checks passed');
+          EOF
       - name: Validate generated HTML font loading
         run: |
           node --input-type=module <<'EOF'
