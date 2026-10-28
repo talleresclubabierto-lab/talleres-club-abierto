@@ -168,7 +168,7 @@ async function familyCaseSubmit(req: Request, payload: unknown, origin?: string)
     : "";
   const approxDate = typeof input.approx_date === "string" ? input.approx_date : "";
   const season = typeof input.season === "string" ? input.season : "2026";
-  const communicationType = input.communication_type;
+  const communicationType = input.communication_type ?? "acompanamiento";
   const classification = {
     province: cleanText(input.province, 100),
     locality: cleanText(input.locality, 120),
