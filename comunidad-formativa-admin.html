@@ -157,7 +157,10 @@ main{width:min(1100px,100%);margin:0 auto;padding:28px 18px 60px}.eyebrow{color:
       const labels={consulta:'Consulta',sugerencia:'Sugerencia',posible_ventaja_indebida:'Presunta solicitud de dinero o ventaja indebida',posible_intervencion_irregular:'Presunta intervención irregular de representantes',posible_conflicto_intereses:'Posible conflicto de intereses',criterio_deportivo:'Criterios deportivos presuntamente irregulares',maltrato_discriminacion:'Maltrato o discriminación',posible_represalia:'Posibles represalias',salud_proteccion:'Salud o protección',educacion_acompanamiento:'Educación o acompañamiento',entrenamiento:'Entrenamiento',alimentacion:'Alimentación',transporte:'Transporte',infraestructura:'Infraestructura',otra_situacion:'Otra incidencia'};
       for(const item of cases){
         const row=node('div',undefined,'request-row');
-        const meta=node('div');meta.append(node('div',item.codigo,'request-code'),node('div',(labels[item.categoria]||'Presentación')+' · '+item.estado+' · '+date(item.creada_en),'request-meta'));
+        const meta=node('div');
+        meta.append(node('div',item.codigo,'request-code'),node('div',(labels[item.categoria]||'Presentación')+' · '+item.estado+' · '+date(item.creada_en),'request-meta'));
+        const classification=[item.temporada&&('Temporada '+item.temporada),item.provincia,item.localidad,item.sede,item.deporte,item.competencia,item.categoria_deportiva,item.division].filter(Boolean).join(' · ');
+        if(classification)meta.append(node('div',classification,'request-meta'));
         const button=node('button','Revisar caso','btn');button.type='button';button.addEventListener('click',()=>{
           selectedCaseId=item.id;currentCase=null;
           document.getElementById('case-details').classList.add('hidden');
