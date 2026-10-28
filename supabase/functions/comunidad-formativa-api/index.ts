@@ -1,4 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createFamilyPortal } from "./family-portal.ts";
 
 const ALLOWED_ORIGINS = new Set([
   "https://www.talleresclubabierto.com",
@@ -185,7 +186,7 @@ async function requestOtp(req: Request, payload: unknown) {
           from: sender,
           to: [email],
           subject: "Código de acceso | Comunidad Formativa",
-          text: `Tu código de verificación es ${code}. Vence en 5 minutos. Si no solicitaste este código, ignora este correo. Este código solo verifica el correo y no habilita una cuenta ni confirma pertenencia a divisiones formativas.`,
+          text: `Tu código de verificación es ${code}. Vence en 5 minutos. Si no solicitaste este código, ignora este correo. Si el vínculo ya fue aprobado, este código permite abrir tu sesión. Si todavía no fue aprobado, solo verifica el correo y no habilita el acceso.`,
         }),
       });
       sent = response.ok;
@@ -197,29 +198,6 @@ async function requestOtp(req: Request, payload: unknown) {
       return json({ error: "otp_temporarily_unavailable" }, 503, origin);
     }
     return json({ ok: true, challenge_id: id, message: "Si el envío es posible, recibirás un código en el correo indicado." }, 200, origin);
-  } catch {
-    return json({ error: "otp_temporarily_unavailable" }, 503, origin);
-  }
-}
-
-async function verifyOtp(payload: unknown, origin?: string) {
-  const lookupKey = base64Bytes(Deno.env.get("CF_LOOKUP_HMAC_KEY_V1") ?? "");
-  if (!lookupKey) return json({ error: "otp_temporarily_unavailable" }, 503, origin);
-  if (!payload || typeof payload !== "object") return json({ error: "invalid_request" }, 400, origin);
-  const input = payload as Record<string, unknown>;
-  if (typeof input.challenge_id !== "string" ||
-      !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(input.challenge_id) ||
-      typeof input.code !== "string" || !/^\d{6}$/.test(input.code)) {
-    return json({ error: "invalid_code" }, 400, origin);
-  }
-  try {
-    const valid = await rpc("community_formative_verify_email_otp", {
-      p_id: input.challenge_id,
-      p_codigo_hmac: await hmac(lookupKey, `otp:v1:${input.code}`),
-    });
-    return valid === true
-      ? json({ ok: true, email_verified: true, access_enabled: false }, 200, origin)
-      : json({ error: "invalid_or_expired_code" }, 400, origin);
   } catch {
     return json({ error: "otp_temporarily_unavailable" }, 503, origin);
   }
@@ -375,6 +353,8 @@ async function adminReview(req: Request, payload: unknown, origin?: string) {
   }
 }
 
+const familyPortal=createFamilyPortal({json,rpc,hmac,base64Bytes,decryptJson,encryptJson,cleanText,validUuid,applicationCode});
+
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get("origin") ?? undefined;
   if (origin && !ALLOWED_ORIGINS.has(origin)) {
@@ -394,7 +374,7 @@ Deno.serve(async (req: Request) => {
         phase: state.phase === "foundation_created" ? state.phase : "foundation_created",
         module: "comunidad_formativa",
         intake_enabled: emailReady(),
-        case_submission_enabled: false,
+        case_submission_enabled: true,
         blockchain_anchor_enabled: false,
         otp_email_ready: emailReady(),
       }, 200, origin);
@@ -418,9 +398,15 @@ Deno.serve(async (req: Request) => {
     ? (payload as Record<string, unknown>).action
     : null;
   if (actionName === "otp_request") return requestOtp(req, payload);
-  if (actionName === "otp_verify") return verifyOtp(payload, origin);
+  if (actionName === "otp_verify") return familyPortal.verifyOtp(payload, origin);
+  if (actionName === "family_profile") return familyPortal.familyProfile(req, origin);
+  if (actionName === "family_cases_list") return familyPortal.familyCases(req, origin);
+  if (actionName === "family_case_submit") return familyPortal.familyCaseSubmit(req, payload, origin);
   if (actionName === "intake_submit") return submitAccessRequest(payload, origin);
   if (actionName === "admin_list_access_requests") return adminList(req, origin);
+  if (actionName === "admin_list_cases") return familyPortal.adminListCases(req, origin);
+  if (actionName === "admin_read_case") return familyPortal.adminReadCase(req, payload, origin);
+  if (actionName === "admin_update_case") return familyPortal.adminUpdateCase(req, payload, origin);
   if (actionName === "admin_read_access_request") return adminRead(req, payload, origin);
   if (actionName === "admin_review_access_request") return adminReview(req, payload, origin);
   return json({ error: "unsupported_action" }, 400, origin);

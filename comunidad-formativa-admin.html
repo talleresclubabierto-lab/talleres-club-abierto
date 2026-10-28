@@ -11,13 +11,13 @@
 <style>
 :root{--navy:#021739;--navy2:#062850;--cyan:#62dcff;--line:#cfdae4;--muted:#617487;--text:#132234;--red:#8d2036}
 *{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--text);font-family:Inter,system-ui,sans-serif;background:linear-gradient(120deg,#01142d 0%,#01142d 22%,#06264a 22.15%,#06264a 43%,#031b38 43.15%,#031b38 67%,#0a3158 67.15%,#021733 100%);background-attachment:fixed}
-.topbar{height:68px;position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:0 max(18px,calc((100vw - 1100px)/2));background:rgba(2,23,51,.94);border-bottom:1px solid rgba(98,220,255,.2);backdrop-filter:blur(12px)}.brand{color:white;text-decoration:none;font-size:14px;font-weight:800;letter-spacing:.02em}.nav{color:#d9eaf5;text-decoration:none;font-size:13px;font-weight:700;padding:9px 12px;border-radius:8px}.nav:hover{background:rgba(255,255,255,.1)}
-main{width:min(1100px,100%);margin:0 auto;padding:28px 18px 60px}.eyebrow{color:#75d9f8;font:700 12px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase}.title{margin:8px 0;color:white;font-size:32px;line-height:1.2}.sub{color:#c6d8e8;line-height:1.55;margin:0 0 20px;max-width:760px}.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;margin:14px 0;box-shadow:0 12px 32px rgba(2,23,57,.12)}.notice{background:#eef8fc;border-color:#b9d9e6;color:#28495d;font-size:13px;line-height:1.5}.status{min-height:22px;padding:10px 12px;border:1px solid rgba(117,217,248,.3);border-radius:8px;color:#e6f4ff;background:rgba(255,255,255,.08);font-size:13px;line-height:1.5}.request-list{display:grid;gap:10px}.request-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px;border:1px solid var(--line);border-radius:10px}.request-code{font:700 13px 'JetBrains Mono',monospace;color:var(--navy)}.request-meta{font-size:12px;color:#596b7d;margin-top:4px}.btn{border:0;border-radius:8px;padding:10px 14px;background:#075c91;color:#fff;font:700 13px Inter,sans-serif;cursor:pointer}.btn:hover{background:#034873}.btn:disabled{opacity:.55;cursor:wait}.btn-danger{background:var(--red)}.btn-danger:hover{background:#69182a}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:grid;gap:6px;color:#42566a;font-size:12px;font-weight:700}.field input,.field textarea{width:100%;border:1px solid #bacbd8;border-radius:8px;padding:10px 12px;font:500 14px Inter,sans-serif;color:#132234;background:#fff}.field textarea{min-height:82px;resize:vertical}.full{grid-column:1/-1}.confirm{display:flex;align-items:flex-start;gap:9px;color:#42566a;font-size:13px;line-height:1.45}.confirm input{margin-top:2px}.identity{display:grid;grid-template-columns:1fr 1fr;gap:12px}.identity .item{padding:12px;border:1px solid #dce5ec;border-radius:8px;background:#fbfdfe}.item b{display:block;margin-bottom:4px;color:#617487;font-size:10px;text-transform:uppercase;letter-spacing:.05em}.item span{font-size:14px;overflow-wrap:anywhere}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.empty{color:#596b7d;font-size:13px}.hidden{display:none!important}
+.brand{display:flex;align-items:center;gap:10px}.brand-mark{display:inline-block;width:44px;height:40px;background:url('/assets/club-abierto-logo.webp') center/contain no-repeat}.topbar{height:68px;position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:0 max(18px,calc((100vw - 1100px)/2));background:rgba(2,23,51,.94);border-bottom:1px solid rgba(98,220,255,.2);backdrop-filter:blur(12px)}.brand{color:white;text-decoration:none;font-size:14px;font-weight:800;letter-spacing:.02em}.nav{color:#d9eaf5;text-decoration:none;font-size:13px;font-weight:700;padding:9px 12px;border-radius:8px}.nav:hover{background:rgba(255,255,255,.1)}
+main{width:min(1100px,100%);margin:0 auto;padding:28px 18px 60px}.eyebrow{color:#75d9f8;font:700 12px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase}.title{margin:8px 0;color:white;font-size:32px;line-height:1.2}.sub{color:#c6d8e8;line-height:1.55;margin:0 0 20px;max-width:760px}.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;margin:14px 0;box-shadow:0 12px 32px rgba(2,23,57,.12)}.notice{background:#eef8fc;border-color:#b9d9e6;color:#28495d;font-size:13px;line-height:1.5}.status{min-height:22px;padding:10px 12px;border:1px solid rgba(117,217,248,.3);border-radius:8px;color:#e6f4ff;background:rgba(255,255,255,.08);font-size:13px;line-height:1.5}.request-list{display:grid;gap:10px}.request-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px;border:1px solid var(--line);border-radius:10px}.request-code{font:700 13px 'JetBrains Mono',monospace;color:var(--navy)}.request-meta{font-size:12px;color:#596b7d;margin-top:4px}.btn{border:0;border-radius:8px;padding:10px 14px;background:#075c91;color:#fff;font:700 13px Inter,sans-serif;cursor:pointer}.btn:hover{background:#034873}.btn:disabled{opacity:.55;cursor:wait}.btn-danger{background:var(--red)}.btn-danger:hover{background:#69182a}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:grid;gap:6px;color:#42566a;font-size:12px;font-weight:700}.field input,.field textarea{width:100%;border:1px solid #bacbd8;border-radius:8px;padding:10px 12px;font:500 14px Inter,sans-serif;color:#132234;background:#fff}.field textarea{min-height:82px;resize:vertical}.full{grid-column:1/-1}.confirm{display:flex;align-items:flex-start;gap:9px;color:#42566a;font-size:13px;line-height:1.45}.confirm input{margin-top:2px}.identity{display:grid;grid-template-columns:1fr 1fr;gap:12px}.identity .item{padding:12px;border:1px solid #dce5ec;border-radius:8px;background:#fbfdfe}.item b{display:block;margin-bottom:4px;color:#617487;font-size:10px;text-transform:uppercase;letter-spacing:.05em}.item span{font-size:14px;overflow-wrap:anywhere}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.empty{color:#596b7d;font-size:13px}.case-report{white-space:pre-wrap;overflow-wrap:anywhere}.hidden{display:none!important}
 @media(max-width:650px){.topbar{height:62px;padding:0 14px}.brand{font-size:11px}.nav{font-size:11px;padding:8px}.title{font-size:26px}.form-grid,.identity{grid-template-columns:1fr}.full{grid-column:auto}.request-row{align-items:flex-start;flex-direction:column}.request-row .btn{width:100%}main{padding:22px 14px 42px}}
 </style>
 </head>
 <body>
-<header class="topbar"><a class="brand" href="./index.html">TALLERES CLUB ABIERTO · ADMINISTRACIÓN</a><a class="nav" href="./index.html">Volver al panel</a></header>
+<header class="topbar"><a class="brand" href="/comunidad-formativa.html#gestion" target="_top"><span class="brand-mark" aria-hidden="true"></span>TALLERES CLUB ABIERTO · ADMINISTRACIÓN</a><a class="nav" href="/comunidad-formativa.html" target="_top">Volver al panel</a></header>
 <main>
   <div class="eyebrow">Gestión de Comunidad Formativa</div>
   <h1 class="title">Solicitudes de acceso</h1>
@@ -25,6 +25,37 @@ main{width:min(1100px,100%);margin:0 auto;padding:28px 18px 60px}.eyebrow{color:
   <section class="card notice"><strong>Acceso restringido al administrador principal.</strong> Los DNI se conservan cifrados en la base privada. El motivo de consulta también se cifra y se registra junto con el usuario y la fecha.</section>
   <div class="status" id="status" role="status" aria-live="polite">Cargando solicitudes…</div>
   <section class="card"><div class="request-list" id="request-list"></div></section>
+  <section class="card">
+    <h2>Presentaciones de las familias</h2>
+    <p>La bandeja no muestra quién realizó cada presentación. La consulta del relato y de las personas mencionadas queda registrada.</p>
+    <button class="btn" id="case-refresh" type="button">Actualizar casos</button>
+    <div class="request-list" id="admin-case-list" style="margin-top:14px"></div>
+  </section>
+  <section class="card hidden" id="case-read-access">
+    <h2>Revisión de presentación</h2>
+    <p>Indicá el motivo de consulta. El acceso se registrará antes de mostrar el relato y los nombres mencionados.</p>
+    <form class="form-grid" id="case-read-form">
+      <label class="field full">Motivo obligatorio<textarea name="reason" maxlength="500" required></textarea></label>
+      <label class="confirm full"><input name="confirm" type="checkbox" required><span>Confirmo que necesito consultar este caso para su seguimiento.</span></label>
+      <div class="full"><button class="btn" id="case-read-button" type="submit">Registrar consulta y abrir caso</button></div>
+    </form>
+  </section>
+  <section class="card hidden" id="case-details">
+    <h2 id="case-detail-title">Presentación</h2>
+    <div class="identity" id="case-detail-meta"></div>
+    <h3>Relato informado</h3><p id="case-narrative" class="case-report"></p>
+    <div id="mentioned-people-wrap"><h3>Personas mencionadas</h3><p id="case-mentioned-people" class="case-report"></p></div>
+    <form class="form-grid" id="case-action-form">
+      <label class="field">Estado<select name="status" required>
+        <option value="recibida">Recibida</option><option value="en_evaluacion">En evaluación</option>
+        <option value="informacion_solicitada">Información solicitada</option><option value="en_investigacion">En investigación</option>
+        <option value="resuelta">Resuelta</option><option value="archivada">Archivada</option><option value="reabierta">Reabierta</option>
+      </select></label>
+      <label class="field">Motivo de la actuación<textarea name="reason" maxlength="500" required></textarea></label>
+      <label class="confirm full"><input name="confirm" type="checkbox" required><span>Confirmo que la actuación quedará asentada en el historial.</span></label>
+      <div class="full"><button class="btn" type="submit">Registrar actuación</button></div>
+    </form>
+  </section>
 
   <section class="card hidden" id="identity-access">
     <h2>Consulta de identidad</h2>
@@ -116,8 +147,64 @@ main{width:min(1100px,100%);margin:0 auto;padding:28px 18px 60px}.eyebrow{color:
       }
     }finally{submitter.disabled=false;}
   });
-  window.addEventListener('pagehide',function(){currentRequest=null;document.getElementById('identity-fields').replaceChildren();});
+  async function loadCases(){
+    const target=document.getElementById('admin-case-list');
+    try{
+      const result=await call('admin_list_cases');
+      const cases=Array.isArray(result.cases)?result.cases:[];
+      target.replaceChildren();
+      if(!cases.length){target.append(node('p','Todavía no hay presentaciones.','empty'));return;}
+      const labels={consulta:'Consulta',sugerencia:'Sugerencia',posible_ventaja_indebida:'Presunta solicitud de dinero o ventaja indebida',posible_intervencion_irregular:'Presunta intervención irregular de representantes',posible_conflicto_intereses:'Posible conflicto de intereses',criterio_deportivo:'Criterios deportivos presuntamente irregulares',maltrato_discriminacion:'Maltrato o discriminación',posible_represalia:'Posibles represalias',salud_proteccion:'Salud o protección',educacion_acompanamiento:'Educación o acompañamiento',entrenamiento:'Entrenamiento',alimentacion:'Alimentación',transporte:'Transporte',infraestructura:'Infraestructura',otra_situacion:'Otra incidencia'};
+      for(const item of cases){
+        const row=node('div',undefined,'request-row');
+        const meta=node('div');meta.append(node('div',item.codigo,'request-code'),node('div',(labels[item.categoria]||'Presentación')+' · '+item.estado+' · '+date(item.creada_en),'request-meta'));
+        const button=node('button','Revisar caso','btn');button.type='button';button.addEventListener('click',()=>{
+          selectedCaseId=item.id;currentCase=null;
+          document.getElementById('case-details').classList.add('hidden');
+          document.getElementById('case-read-access').classList.remove('hidden');
+          document.getElementById('case-read-form').reset();
+          document.getElementById('case-read-access').scrollIntoView({behavior:'smooth',block:'start'});
+        });
+        row.append(meta,button);target.append(row);
+      }
+    }catch(_){target.replaceChildren(node('p','No se pudo cargar la bandeja de casos.','empty'));}
+  }
+  document.getElementById('case-refresh').addEventListener('click',loadCases);
+  document.getElementById('case-read-form').addEventListener('submit',async function(event){
+    event.preventDefault();if(!selectedCaseId)return;
+    const form=new FormData(event.currentTarget);const button=document.getElementById('case-read-button');button.disabled=true;
+    try{
+      const result=await call('admin_read_case',{case_id:selectedCaseId,reason:form.get('reason'),confirm:form.get('confirm')==='on'});
+      currentCase=result.case;
+      document.getElementById('case-detail-title').textContent=currentCase.code+' · '+currentCase.status;
+      const fields=document.getElementById('case-detail-meta');fields.replaceChildren();
+      for(const [label,value] of [['Categoría',currentCase.category],['Fecha de presentación',date(currentCase.created_at)],['Fecha aproximada',currentCase.approx_date||'No informada']]){
+        const item=node('div',undefined,'item');item.append(node('b',label),node('span',String(value||'—')));fields.append(item);
+      }
+      document.getElementById('case-narrative').textContent=currentCase.narrative||'';
+      const people=currentCase.mentioned_people||'';
+      document.getElementById('case-mentioned-people').textContent=people||'No se indicaron personas por nombre.';
+      document.getElementById('case-read-access').classList.add('hidden');
+      document.getElementById('case-details').classList.remove('hidden');
+      document.getElementById('status').textContent='Consulta registrada. La identidad de quien presentó el caso no se muestra.';
+      document.getElementById('case-details').scrollIntoView({behavior:'smooth',block:'start'});
+    }catch(_){document.getElementById('status').textContent='No se pudo abrir el caso. Revisá el motivo y tu sesión.';}
+    finally{button.disabled=false;}
+  });
+  document.getElementById('case-action-form').addEventListener('submit',async function(event){
+    event.preventDefault();if(!currentCase)return;
+    const form=new FormData(event.currentTarget);const button=event.currentTarget.querySelector('button[type="submit"]');button.disabled=true;
+    try{
+      const result=await call('admin_update_case',{case_id:currentCase.id,status:form.get('status'),reason:form.get('reason'),confirm:form.get('confirm')==='on'});
+      document.getElementById('case-details').classList.add('hidden');currentCase=null;selectedCaseId=null;event.currentTarget.reset();
+      document.getElementById('status').textContent='Actuación registrada para '+result.code+'.';
+      await loadCases();
+    }catch(_){document.getElementById('status').textContent='No se pudo registrar la actuación. Completá el motivo y la confirmación.';}
+    finally{button.disabled=false;}
+  });
+  window.addEventListener('pagehide',function(){currentRequest=null;currentCase=null;document.getElementById('identity-fields').replaceChildren();});
   load();
+  loadCases();
 })();
 </script>
 </body>

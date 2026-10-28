@@ -1,0 +1,31 @@
+:root{--navy:#021739;--cyan:#62dcff;--line:#cfdae4;--muted:#c6d8e8;--text:#132234;--paper:#f4f8fb}
+*{box-sizing:border-box}html{min-height:100%;background:#01152f}
+body{margin:0;min-height:100vh;color:var(--text);font-family:Inter,system-ui,sans-serif;background:radial-gradient(circle at 78% 9%,rgba(98,220,255,.16),transparent 19%),radial-gradient(circle at 18% 78%,rgba(27,112,174,.12),transparent 24%),linear-gradient(120deg,#01142d 0%,#01142d 22%,#06264a 22.15%,#06264a 43%,#031b38 43.15%,#031b38 67%,#0a3158 67.15%,#021733 100%);background-attachment:fixed}a{color:inherit}
+.topbar{height:72px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:30;padding:0 max(20px,calc((100vw - 1180px)/2));background:rgba(2,23,51,.92);border-bottom:1px solid rgba(98,220,255,.18);backdrop-filter:blur(14px)}
+.brand{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none;font-size:15px;font-weight:800;letter-spacing:.01em}
+.logo{display:block;width:44px;height:45px;flex:0 0 auto;background:url("/assets/club-abierto-logo.webp") center top/55px auto no-repeat;filter:drop-shadow(0 0 7px rgba(98,220,255,.32))}
+.toplink,.logout{border:1px solid rgba(117,217,248,.35);border-radius:8px;padding:10px 13px;color:#e4f1fa;background:transparent;text-decoration:none;font:700 13px Inter,sans-serif;cursor:pointer}.toplink:hover,.logout:hover{background:rgba(255,255,255,.1)}
+main{max-width:1180px;margin:0 auto;padding:32px 24px 52px}
+.crumb{margin:0 0 9px;color:#85dffc;font:700 11px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase}
+.head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:22px}
+h1{margin:0 0 7px;color:#fff;font-size:36px;line-height:1.13;letter-spacing:-.03em}
+.lead{max-width:780px;margin:0;color:var(--muted);font-size:15px;line-height:1.6}
+.badge{flex:0 0 auto;padding:8px 12px;border:1px solid #a8dfef;border-radius:999px;background:#e7faff;color:#08769a;font:700 10px 'JetBrains Mono',monospace;letter-spacing:.04em;text-transform:uppercase}
+.card{margin:15px 0;padding:22px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(2,23,57,.08)}
+h2{margin:0 0 10px;color:var(--navy);font-size:19px}
+p{margin:0 0 12px;color:#526579;font-size:14px;line-height:1.6}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.datum{padding:13px;border:1px solid #d8e4ec;border-radius:9px;background:#f7fafc}
+.datum b{display:block;color:#617487;font-size:10px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.datum span{font-size:14px;color:#132234;overflow-wrap:anywhere}
+.field{display:grid;gap:6px;margin:12px 0;color:#42566a;font-size:12px;font-weight:700}
+.field input,.field select,.field textarea{width:100%;min-height:42px;border:1px solid #bacbd8;border-radius:8px;padding:10px 12px;font:500 14px Inter,sans-serif;color:#132234;background:#fff}
+.field textarea{min-height:130px;resize:vertical}
+.action{border:0;border-radius:8px;padding:11px 16px;background:#075c91;color:#fff;font:700 13px Inter,sans-serif;cursor:pointer}
+.action:hover{background:#034873}.action:disabled{opacity:.55;cursor:wait}
+.note{padding:14px 16px;border:1px solid rgba(117,217,248,.25);border-radius:10px;background:rgba(4,29,57,.82);color:#d8e9f5;font-size:13px;line-height:1.55}
+.status{min-height:22px;margin:12px 0;color:#31566e;font-size:13px;line-height:1.5}
+.case-row{padding:14px;border:1px solid #d8e4ec;border-radius:9px;background:#f7fafc;margin:10px 0}
+.case-row strong{color:#021739}.case-row small{display:block;color:#596b7d;margin-top:6px;line-height:1.45}
+footer{margin:24px 0 0;padding:16px 0;border-top:1px solid rgba(117,217,248,.2);color:#c6d8e8;font-size:12px;line-height:1.5}
+@media(max-width:720px){.topbar{height:64px;padding:0 14px}.brand{font-size:11px;gap:8px}.logo{width:36px;height:39px;background-size:48px auto}.toplink,.logout{padding:8px 9px;font-size:11px}main{padding:24px 16px 36px}.head{align-items:flex-start;flex-direction:column;gap:12px}h1{font-size:30px}.lead{font-size:14px}.card{padding:18px}.grid{grid-template-columns:1fr}}
