@@ -167,9 +167,22 @@ async function familyCaseSubmit(req: Request, payload: unknown, origin?: string)
     ? input.mentioned_people.normalize("NFC").trim().replace(/\s+/g," ").slice(0,2000)
     : "";
   const approxDate = typeof input.approx_date === "string" ? input.approx_date : "";
+  const season = typeof input.season === "string" ? input.season : "2026";
+  const communicationType = input.communication_type;
+  const classification = {
+    province: cleanText(input.province, 100),
+    locality: cleanText(input.locality, 120),
+    venue: cleanText(input.venue, 160),
+    sport: cleanText(input.sport, 100),
+    competition: cleanText(input.competition, 100),
+    sport_category: cleanText(input.sport_category, 100),
+    division: cleanText(input.division, 100),
+  };
   if (typeof category !== "string" || !categories.has(category) ||
       typeof reservation !== "string" ||
       !["identificada","reservada_frente_a_area_deportiva","confidencial_integridad"].includes(reservation) ||
+      !/^\d{4}$/.test(season) ||
+      !["acompanamiento","integridad"].includes(String(communicationType)) ||
       !narrative || (approxDate && !/^\d{4}-\d{2}-\d{2}$/.test(approxDate))) {
     return json({ error: "invalid_case_payload" }, 400, origin);
   }
@@ -188,7 +201,7 @@ async function familyCaseSubmit(req: Request, payload: unknown, origin?: string)
   }, encryptionKey, "cf-case-action:v1");
 
   try {
-    const result = await rpc("community_formative_create_family_case", {
+    const result = await rpc("community_formative_create_family_case_v2", {
       p_token_hmac: session.tokenHmac,
       p_codigo: applicationCode(),
       p_categoria: category,
@@ -201,6 +214,16 @@ async function familyCaseSubmit(req: Request, payload: unknown, origin?: string)
       p_fecha_version_clave: dateData.ciphertext ? 1 : null,
       p_actuacion_cifrada: action.ciphertext,
       p_actuacion_nonce: action.nonce,
+      p_temporada: season,
+      p_tipo_comunicacion: communicationType,
+      p_provincia: classification.province,
+      p_localidad: classification.locality,
+      p_sede: classification.venue,
+      p_deporte: classification.sport,
+      p_competencia: classification.competition,
+      p_categoria_deportiva: classification.sport_category,
+      p_division: classification.division,
+      p_opcion_catalogo_id: null,
     });
     if (!result?.ok) throw new Error("case_submit_failed");
     return json({ ok: true, code: result.codigo, status: result.estado }, 200, origin);
