@@ -145,6 +145,17 @@ async function familyCases(req: Request, origin?: string) {
   }
 }
 
+async function memberCases(req: Request, origin?: string) {
+  const token = req.headers.get("x-club-session")?.trim() ?? "";
+  if (!token) return json({ error: "member_session_required" }, 401, origin);
+  try {
+    const result = await rpc("community_formative_list_member_cases", { p_token: token });
+    return json({ ok: true, cases: Array.isArray(result) ? result : [] }, 200, origin);
+  } catch {
+    return json({ error: "member_not_authorized" }, 403, origin);
+  }
+}
+
 async function familyCaseSubmit(req: Request, payload: unknown, origin?: string) {
   const session = await familySession(req);
   const encryptionKey = base64Bytes(Deno.env.get("CF_DATA_ENCRYPTION_KEY_V1") ?? "");
@@ -235,7 +246,7 @@ async function adminListCases(req: Request, origin?: string) {
   const token=req.headers.get("x-club-session")?.trim()??"";
   if(!token)return json({error:"admin_session_required"},401,origin);
   try{
-    const rows=await rpc("community_formative_list_admin_case_rows",{p_token:token});
+    const rows=await rpc("community_formative_list_admin_case_rows_v2",{p_token:token});
     return json({ok:true,cases:Array.isArray(rows)?rows:[]},200,origin);
   }catch{return json({error:"admin_not_authorized"},403,origin);}
 }
@@ -286,6 +297,6 @@ async function adminUpdateCase(req: Request,payload: unknown,origin?: string) {
     return json({ok:true,code:result.codigo,status:result.estado},200,origin);
   }catch{return json({error:"admin_case_update_unavailable"},403,origin);}
 }
- return {verifyOtp,familyProfile,familyCases,familyCaseSubmit,adminListCases,adminReadCase,adminUpdateCase};
+ return {verifyOtp,familyProfile,familyCases,memberCases,familyCaseSubmit,adminListCases,adminReadCase,adminUpdateCase};
 }
 
