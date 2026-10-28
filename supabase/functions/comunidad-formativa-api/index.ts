@@ -401,6 +401,7 @@ Deno.serve(async (req: Request) => {
   if (actionName === "otp_verify") return familyPortal.verifyOtp(payload, origin);
   if (actionName === "family_profile") return familyPortal.familyProfile(req, origin);
   if (actionName === "family_cases_list") return familyPortal.familyCases(req, origin);
+  if (actionName === "member_cases_list") return familyPortal.memberCases(req, origin);
   if (actionName === "family_case_submit") return familyPortal.familyCaseSubmit(req, payload, origin);
   if (actionName === "intake_submit") return submitAccessRequest(payload, origin);
   if (actionName === "admin_list_access_requests") return adminList(req, origin);
