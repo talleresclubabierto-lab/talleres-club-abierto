@@ -45,8 +45,12 @@ footer{margin:24px 0 0;padding:16px 0;border-top:1px solid rgba(117,217,248,.2);
 <p class="note">Acceso individual por código. Los datos de identidad del adulto y del jugador solo se muestran dentro de esta sesión familiar autorizada.</p>
 
 <section class="card"><h2>Nueva comunicación</h2><form id="case-form">
+<label class="field">Quién completa esta presentación<select name="reporter_role" required><option value="adulto_responsable" selected>Madre, padre o tutor/a</option><option value="jugador_con_adulto">Jugador/a junto a su adulto responsable</option></select></label>
+<p class="note">El formulario y los filtros son iguales para todos. Para menores, la presentación se envía desde la sesión del adulto responsable autorizado; el jugador puede completarla junto con esa persona.</p>
+
 <label class="field">Tipo de comunicación<select name="category" required><option value="">Elegí una opción</option><option value="consulta">Consulta</option><option value="sugerencia">Sugerencia</option><option value="educacion_acompanamiento">Educación o acompañamiento</option><option value="otra_situacion">Otra situación</option></select></label>
 <label class="field">Relato<textarea name="narrative" maxlength="10000" required placeholder="Contanos qué necesitás. Evitá incluir datos médicos si no son necesarios."></textarea></label>
+<label class="field">Personas mencionadas (opcional)<textarea name="mentioned_people" maxlength="2000"></textarea></label>
 <section aria-label="Datos de ubicación y actividad">
 <p class="note"><strong>Ubicación y actividad.</strong> La categoría se guarda junto a la temporada elegida para que los cambios futuros no alteren el historial. Si no conocés un dato, elegí “No lo sé” o escribí “No aparece”.</p>
 <label class="field">Temporada<select name="season" required><option value="2026" selected>2026</option></select></label>
@@ -143,6 +147,7 @@ function wireCaseForm(){
    try{
      const result=await call('family_case_submit',{
        category:data.get('category'),
+       reporter_role:data.get('reporter_role')||'adulto_responsable',
        reservation:data.get('reservation'),
        narrative:data.get('narrative'),
        mentioned_people:data.get('mentioned_people')||'',
