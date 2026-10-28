@@ -129,7 +129,8 @@ Deno.serve(async (req: Request) => {
       error: "prepared_batch_query_failed",
       detail:
         auditQuery.error?.message ||
-        voteQuery.error?.message ||\n        formativeError?.message,
+        voteQuery.error?.message ||
+        formativeError?.message,
     });
   }
 
@@ -381,7 +382,7 @@ Deno.serve(async (req: Request) => {
             "0x" +
             String(item[rootField]).replace(/^0x/, "");
 
-          const count = BigInt(item[countField]);
+          const count = BigInt(String(item[countField] ?? 0));
 
           const matchingLog = receipt.logs.some((log) => {
             if (log.address.toLowerCase() !== contractAddress.toLowerCase()) {
@@ -562,7 +563,7 @@ Deno.serve(async (req: Request) => {
         : batch.source === "votos"
         ? "lotes_merkle_votos"
         : "lotes_merkle";
-    const batchClient = supabase;
+
 
     const { data: stillEnabled, error: gateError } =
       await supabase.rpc("blockchain_envio_habilitado");
