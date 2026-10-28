@@ -1,0 +1,33 @@
+name: Performance safety checks
+on:
+  pull_request:
+    paths:
+      - 'scripts/build-cloudflare.mjs'
+      - 'index.html'
+      - '.github/workflows/performance-safety.yml'
+  workflow_dispatch:
+jobs:
+  build-and-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check build script syntax
+        run: node --check scripts/build-cloudflare.mjs
+      - name: Build web
+        run: node scripts/build-cloudflare.mjs
+      - name: Validate generated HTML font loading
+        run: |
+          node --input-type=module <<'EOF'
+          import { readFileSync } from 'node:fs';
+          import assert from 'node:assert/strict';
+          const html = readFileSync('dist/index.html','utf8');
+          assert(!html.includes("@import url('https://fonts.googleapis.com"), 'Legacy font import remains');
+          assert(html.includes('rel="preconnect" href="https://fonts.gstatic.com" crossorigin'), 'Missing preconnect');
+          assert(html.includes('rel="stylesheet" href="https://fonts.googleapis.com/css2?'), 'Missing stylesheet');
+          assert(html.includes('data-v12="estructura-institucional"'), 'Institutional CSS missing');
+          assert(html.includes('data-v12="estructura-institucional"') && html.includes('data-v12="estructura-institucional">'), 'Institutional JS missing');
+          console.log('Web build smoke checks passed');
+          EOF
