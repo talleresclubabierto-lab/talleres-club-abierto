@@ -25,7 +25,7 @@
   const state = {
     actor: null, bootstrap: null, expired: false, activeToken: '', sessionGeneration: 0, activeTab: 'mine',
     clubs: new Map(), players: new Map(), clubsCursor: null, playersCursor: null, clubsQuery: null, playersQuery: null,
-    selectedClub: null, selectedPlayer: null, clubAutoCompetition: false, createRequestId: null, createPending: null,
+    selectedClub: null, selectedPlayer: null, clubAutoCompetition: false, playerAutoTransfermarktUrl: null, createRequestId: null, createPending: null,
     createBusy: false, successId: null, currentDetailId: null,
     lists: { mine: { items: [], cursor: null, loaded: false }, admin: { items: [], cursor: null, loaded: false } },
     mutations: new Map()
@@ -96,12 +96,13 @@
     if ($('detail-dialog').open) $('detail-dialog').close();
     state.actor = null; state.bootstrap = null; state.activeToken = '';
     state.clubs.clear(); state.players.clear(); state.mutations.clear();
-    state.selectedClub = null; state.selectedPlayer = null; state.createPending = null;
+    state.selectedClub = null; state.selectedPlayer = null; state.playerAutoTransfermarktUrl = null; state.createPending = null;
     state.createRequestId = null; state.successId = null; state.currentDetailId = null; state.createBusy = false;
     state.clubAutoCompetition = false; state.clubsQuery = null; state.playersQuery = null;
     state.lists.mine = { items: [], cursor: null, loaded: false };
     state.lists.admin = { items: [], cursor: null, loaded: false };
     $('recommend-form').reset();
+    updateClubReference(); updatePlayerReview();
     for (const id of ['mine-list', 'admin-list', 'detail-body']) $(id).replaceChildren();
     for (const id of ['success-description', 'selected-club-name', 'selected-club-description', 'actor-label', 'mine-count', 'admin-count']) $(id).textContent = '';
     $('admin-query').value = '';
@@ -228,6 +229,27 @@
     return parsed.href;
   }
 
+  function clearAutoPlayerProfile() {
+    const input = $('transfermarkt-url');
+    if (state.playerAutoTransfermarktUrl && safeUrl(input.value.trim(), 'transfermarkt') === state.playerAutoTransfermarktUrl) {
+      input.value = ''; input.setCustomValidity(''); input.removeAttribute('aria-invalid');
+    }
+    state.playerAutoTransfermarktUrl = null;
+  }
+
+  function autofillPlayerProfile(player) {
+    const input = $('transfermarkt-url');
+    const current = input.value.trim();
+    const canReplace = !current || Boolean(state.playerAutoTransfermarktUrl && safeUrl(current, 'transfermarkt') === state.playerAutoTransfermarktUrl);
+    const candidate = safeUrl(player?.transfermarkt_url, 'transfermarkt');
+    const profile = candidate && /\/profil\/spieler\/\d+(?:\/|$)/.test(new URL(candidate).pathname) ? candidate : null;
+    state.playerAutoTransfermarktUrl = null;
+    if (!canReplace) return;
+    input.value = profile || '';
+    input.setCustomValidity(''); input.removeAttribute('aria-invalid');
+    state.playerAutoTransfermarktUrl = profile;
+  }
+
   function appendLink(container, raw, label, kind) {
     const href = safeUrl(raw, kind);
     if (!href) return;
@@ -288,11 +310,10 @@
     replaceOptions($('player-position'), (Array.isArray(data.positions) ? data.positions : []).map((item) => ({ value: item, label: item })), 'Seleccioná una posición');
     for (const id of ['mine-status', 'admin-status']) replaceOptions($(id), Object.entries(STATUS).map(([value, label]) => ({ value, label })), 'Todos los estados');
     const clubCount = Math.max(0, Number(data.catalogue?.club_count) || 0);
+    const playerCount = Math.max(0, Number(data.catalogue?.player_count) || 0);
     const empty = clubCount === 0;
     $('catalogue-notice').hidden = false;
-    $('catalogue-notice').textContent = empty
-      ? 'El catálogo de clubes todavía está en preparación. Podés cargar un club y enviar tu recomendación ahora con la opción Otro club. Los jugadores también pueden cargarse manualmente.'
-      : `Catálogo inicial y parcial: ${clubCount.toLocaleString('es-AR')} ${clubCount === 1 ? 'club' : 'clubes'}. Si el equipo no aparece, usá Otro club. Los jugadores también pueden cargarse manualmente.`;
+    $('catalogue-notice').textContent = `Catálogo de Argentina: ${clubCount.toLocaleString('es-AR')} ${clubCount === 1 ? 'club' : 'clubes'} y ${playerCount.toLocaleString('es-AR')} ${playerCount === 1 ? 'jugador registrado' : 'jugadores registrados'}. La cobertura de ligas, categorías y planteles es parcial. Si falta el equipo, usá Otro club. También podés recomendar un jugador cargando sus datos manualmente.`;
     $('manual-club-toggle').checked = empty;
     setManualClub(false);
     updateRoute(false);
@@ -313,6 +334,7 @@
 
   function clearPlayer(clearCategory = false) {
     cancelChannel('players'); clearDebounce('players');
+    clearAutoPlayerProfile();
     state.selectedPlayer = null; state.players.clear(); state.playersCursor = null;
     $('player-choice').replaceChildren(option('', 'Seleccioná una categoría', true));
     $('players-more').hidden = true;
@@ -327,6 +349,7 @@
     const competition = state.clubAutoCompetition && route() === 'province' ? '' : $('club-competition').value;
     state.clubAutoCompetition = false;
     state.selectedClub = null;
+    updateClubReference();
     restoreCompetitions(competition);
     $('selected-club').hidden = true;
     $('club-choice').value = '';
@@ -458,10 +481,29 @@
 
   function showClubSummary() {
     const club = state.selectedClub;
+    updateClubReference();
     if (!club) return;
     $('selected-club-name').textContent = club.name;
     const scope = club.reference_scope === 'primer_equipo_masculino' ? 'Referencia: primer equipo masculino' : '';
     $('selected-club-description').textContent = [club.city, club.province, club.competition_name || club.league, club.division, scope].filter(Boolean).join(' · ');
+  }
+
+  function updateClubReference() {
+    const sources = Array.isArray(state.selectedClub?.source_urls) ? state.selectedClub.source_urls : [];
+    const href = sources.map((raw) => safeUrl(raw, 'transfermarkt')).find((url) => url && /\/(?:startseite|kader)\/verein\/\d+(?:\/|$)/.test(new URL(url).pathname));
+    const link = $('selected-club-transfermarkt');
+    link.hidden = !href;
+    if (href) link.href = href;
+    else link.removeAttribute('href');
+  }
+
+  function updatePlayerReview() {
+    const checkedAt = state.selectedPlayer?.checked_at;
+    const parsed = checkedAt ? new Date(checkedAt) : null;
+    const valid = parsed && !Number.isNaN(parsed.getTime());
+    const review = $('selected-player-review');
+    review.hidden = !valid;
+    review.textContent = valid ? `Ficha de este jugador revisada el ${new Intl.DateTimeFormat('es-AR', { dateStyle: 'medium', timeZone: 'America/Argentina/Buenos_Aires' }).format(parsed)}.` : '';
   }
 
   function updateCustomCategory() {
@@ -476,6 +518,7 @@
     $('player-lookup').hidden = !available;
     if (!available) $('player-lookup').open = false;
     $('player-manual-help').textContent = state.selectedPlayer ? 'Datos del jugador seleccionado. Podés completar la posición que observaste.' : 'Completá los datos del jugador. No necesita figurar en el catálogo.';
+    updatePlayerReview();
   }
 
   function updateSector() {
@@ -514,7 +557,7 @@
       $('players-more').textContent = 'Cargar más jugadores'; delete $('players-more').dataset.retry;
     } catch (error) {
       if (!request.current() || cancelled(error)) return;
-      if (!more) $('player-choice').replaceChildren(option('', 'No se pudo cargar el plantel', true));
+      if (!more) $('player-choice').replaceChildren(option('', 'No se pudo cargar el catálogo de jugadores', true));
       $('players-help').textContent = `${message(error)} Podés completar el jugador manualmente.`;
       $('players-more').hidden = false; $('players-more').textContent = 'Reintentar búsqueda'; $('players-more').dataset.retry = 'true';
     } finally {
@@ -530,6 +573,7 @@
     $('player-last-name').value = player.last_name || '';
     $('player-position').value = player.position || '';
     $('player-sector').value = 'no_especificado';
+    autofillPlayerProfile(player);
     updateSector(); updatePlayerLookup();
   }
 
@@ -934,8 +978,9 @@
   $('player-choice').addEventListener('change', selectPlayer);
   $('players-more').addEventListener('click', () => loadPlayers($('players-more').dataset.retry !== 'true'));
   for (const id of ['player-first-name', 'player-last-name']) $(id).addEventListener('input', () => {
-    state.selectedPlayer = null; $('player-choice').value = ''; updatePlayerLookup();
+    state.selectedPlayer = null; clearAutoPlayerProfile(); $('player-choice').value = ''; updatePlayerLookup();
   });
+  $('transfermarkt-url').addEventListener('input', () => { state.playerAutoTransfermarktUrl = null; });
   $('player-position').addEventListener('change', updateSector);
   $('recommend-reason').addEventListener('input', () => { $('reason-count').textContent = `${$('recommend-reason').value.length} / 4000`; });
   for (const input of $('recommend-form').querySelectorAll('input,select,textarea')) {
