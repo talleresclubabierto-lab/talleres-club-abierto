@@ -95,7 +95,7 @@
                     </div>
                     <div class="field" id="competition-field"><label for="club-competition">Liga / competencia <span class="required" id="competition-required" aria-hidden="true" hidden>*</span></label><select id="club-competition" aria-describedby="competition-help"><option value="">Todas las competencias</option></select><p class="field-help" id="competition-help">La competencia se completa cuando está asociada al equipo.</p></div>
                   </div>
-                  <div class="selected-club" id="selected-club" hidden><span class="selected-label">EQUIPO SELECCIONADO</span><strong id="selected-club-name"></strong><span id="selected-club-description"></span></div>
+                  <div class="selected-club" id="selected-club" hidden><span class="selected-label">EQUIPO SELECCIONADO</span><strong id="selected-club-name"></strong><span class="selected-club-description" id="selected-club-description"></span><a class="catalogue-reference" id="selected-club-transfermarkt" target="_blank" rel="noopener noreferrer" hidden>Ver club en Transfermarkt <span aria-hidden="true">↗</span></a></div>
                 </div>
 
                 <div id="manual-club-fields" class="field-grid" hidden>
@@ -113,10 +113,11 @@
                   <div class="field" id="custom-category-field" hidden><label for="custom-category">¿Qué categoría? <span class="required" aria-hidden="true">*</span></label><input id="custom-category" minlength="2" maxlength="100" placeholder="Ej.: Sub-18 de la liga local" disabled></div>
                 </div>
                 <details class="player-lookup" id="player-lookup" hidden>
-                  <summary>Buscar un jugador en el plantel</summary>
+                  <summary>Buscar un jugador en el catálogo</summary>
                   <div class="lookup-content"><label for="player-query">Nombre o apellido</label><input id="player-query" type="search" maxlength="100" placeholder="Buscar jugador" enterkeyhint="search"><label for="player-choice">Jugadores del catálogo</label><select id="player-choice" size="4"><option value="" disabled>Seleccioná una categoría</option></select><div class="result-footer"><p id="players-help" class="field-help" role="status">También podés completar el nombre y apellido abajo.</p><button class="button button-small button-secondary" id="players-more" type="button" hidden>Cargar más jugadores</button></div></div>
                 </details>
                 <p class="field-help player-manual-help" id="player-manual-help">Completá los datos del jugador. No necesita figurar en el catálogo.</p>
+                <p class="field-help player-review" id="selected-player-review" hidden role="status"></p>
                 <div class="field-grid">
                   <div class="field"><label for="player-first-name">Nombre <span class="required" aria-hidden="true">*</span></label><input id="player-first-name" required minlength="2" maxlength="100" autocapitalize="words"></div>
                   <div class="field"><label for="player-last-name">Apellido <span class="required" aria-hidden="true">*</span></label><input id="player-last-name" required minlength="2" maxlength="100" autocapitalize="words"></div>
@@ -130,7 +131,7 @@
                 <div class="field"><label for="recommend-reason">Motivo de la recomendación <span class="required" aria-hidden="true">*</span></label><textarea id="recommend-reason" required rows="5" minlength="20" maxlength="4000" placeholder="¿Qué cualidades destacás? Podés describir situaciones de juego, decisiones o habilidades que observaste." aria-describedby="reason-help reason-count"></textarea><div class="text-meta"><p class="field-help" id="reason-help">Describí aspectos deportivos concretos, en al menos 20 caracteres.</p><span id="reason-count" class="character-count">0 / 4000</span></div></div>
                 <div class="field"><label for="recommend-observation">Dónde lo observaste <span class="optional">opcional</span></label><textarea id="recommend-observation" rows="2" maxlength="2000" placeholder="Partido, competencia, fecha aproximada o contexto de la observación."></textarea></div>
                 <div class="field"><label for="video-url">Enlace a un video <span class="optional">opcional</span></label><input id="video-url" type="url" maxlength="2048" placeholder="https://…" inputmode="url" autocapitalize="off" spellcheck="false"><p class="field-help">YouTube o Vimeo. Compartí un enlace que el equipo evaluador pueda abrir.</p></div>
-                <div class="field"><label for="transfermarkt-url">Perfil en Transfermarkt <span class="optional">opcional</span></label><input id="transfermarkt-url" type="url" maxlength="2048" placeholder="https://www.transfermarkt.com/…" inputmode="url" autocapitalize="off" spellcheck="false"><p class="field-help">El perfil se guarda como referencia para acompañar tu aporte.</p></div>
+                <div class="field"><label for="transfermarkt-url">Perfil en Transfermarkt <span class="optional">opcional</span></label><input id="transfermarkt-url" type="url" maxlength="2048" placeholder="https://www.transfermarkt.com/…" inputmode="url" autocapitalize="off" spellcheck="false" aria-describedby="transfermarkt-help"><p class="field-help" id="transfermarkt-help">Al elegir un jugador, se completa si hay un perfil registrado. Podés modificarlo o agregar uno manualmente; se guarda como referencia para tu aporte.</p></div>
               </section>
             </fieldset>
             <div class="submit-panel"><p>Tu recomendación, tu nombre como autor y las devoluciones serán visibles para todos los socios de Club Abierto.</p><button id="create-submit" class="button button-primary button-submit" type="submit">Enviar recomendación <span aria-hidden="true">↗</span></button></div>

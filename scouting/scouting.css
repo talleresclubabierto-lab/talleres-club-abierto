@@ -99,11 +99,13 @@ input[aria-invalid=true],select[aria-invalid=true],textarea[aria-invalid=true]{b
 .selected-club{background:#122c4c;border:1px solid #2d527b;border-radius:10px;padding:13px 15px;margin-top:17px;display:grid;gap:3px}
 .selected-label{font-size:9px;font-weight:750;letter-spacing:.12em;color:#a6bff6}
 .selected-club strong{font-size:14px;font-weight:700}
-.selected-club>span:last-child{font-size:12px;color:#b5c6e0}
+.selected-club-description{font-size:12px;color:#b5c6e0}
+.catalogue-reference{justify-self:start;display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:5px 0;font-size:12px;font-weight:650;line-height:1.5}
 .player-lookup{margin-top:19px;border:1px solid #344e73;border-radius:10px;background:#102240}
 summary{cursor:pointer;min-height:44px;padding:12px 15px;color:#c3d3fa;font-size:13px;font-weight:650}
 .lookup-content{padding:0 15px 15px;display:flex;flex-direction:column;gap:9px}
 .player-manual-help{margin:19px 0 15px}
+.player-review{margin:-6px 0 15px;color:#bfd1ef}
 .submit-panel{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:3px 0 7px}
 .submit-panel>p{font-size:12px;color:var(--muted);max-width:300px}
 .button-submit{min-height:50px;padding:13px 21px;flex-shrink:0}

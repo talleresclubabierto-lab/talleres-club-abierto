@@ -254,3 +254,38 @@ horizontal. Los datos ficticios de esta prueba no se enviaron a producción.
 El servicio real y el SQL se verificaron por separado según las comprobaciones
 anteriores. Esta revisión no equivale a usar una cuenta real de socio en el flujo
 completo del navegador.
+
+## Ampliación manual del catálogo argentino — 29/10/2026
+
+La migración `20261029205239_scouting_argentina_catalogue_manual_2026_10.sql`
+publica el corte documentado en `scouting/catalogue-argentina-2026-10.json`.
+Se incorporaron 142 clubes y se enriquecieron los 11 existentes, conservando sus
+UUID y claves: 153 clubes activos en total, todos con ID y enlace observado de
+Transfermarkt. La distribución del primer equipo masculino en 2026 es Primera
+División 30, Primera Nacional 36, Federal A 37, Primera B 22 y Primera C 28.
+
+La membresía y la ubicación se contrastaron con AFA, clubes y organismos públicos.
+La localidad corresponde a la sede deportiva estable; las sedes administrativas
+divergentes y precisiones geográficas quedan documentadas por registro. Las URLs
+históricas de Transfermarkt se preservan como referencias de identidad, sin
+atribuirles una confirmación de la temporada actual ni cambiar sus parámetros.
+Esta carga no es un feed licenciado ni una descarga integral de Transfermarkt.
+
+Se recopilaron 121 referencias de jugadores. Sólo 21 jugadores de Talleres,
+corroborados con fuentes oficiales recientes del club, se publicaron en
+`scouting.players`. Las 98 referencias pendientes y los 2 conflictos de club se
+conservan en la planilla y en `catalogue_runs.metadata.player_references`; no son
+seleccionables como jugadores actuales. Las posiciones ambiguas quedan vacías
+para que el socio elija la posición que observó. No se declara plantel completo.
+
+El lote conserva sus fuentes, estados de revisión y SHA-256 del JSON. Repetir la
+misma clave y contenido no duplica registros; una clave ya publicada con otro
+hash se rechaza. Las correcciones posteriores requieren un nuevo corte revisado.
+La actualización mensual sigue siendo un procedimiento manual, sin cron activo.
+No se borran clubes, recomendaciones ni eventos, ni se reactivan bajas existentes.
+
+El selector de jugadores agrega `transfermarkt_url` y `checked_at` al contrato
+existente. El frontend muestra el enlace observado del club y puede completar el
+perfil del jugador; preserva cualquier enlace escrito manualmente. La fecha se
+refiere a la revisión de la ficha individual. La lectura compartida, los roles y
+las reglas de auditoría siguen siendo los mismos.
