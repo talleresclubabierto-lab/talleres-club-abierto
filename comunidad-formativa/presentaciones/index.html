@@ -165,7 +165,8 @@ function wireCaseForm(){
   categoryField.disabled=!type;
  }
  typeField.addEventListener('change',syncCategories);
- const initial=new FormData(form).get('communication_type');
+ const requestedType=new URLSearchParams(window.location.search).get('tipo');
+ const initial=['acompanamiento','integridad'].includes(requestedType)?requestedType:new FormData(form).get('communication_type');
  if(initial){typeField.value=initial;syncCategories();}
  form.addEventListener('submit',async function(e){
    e.preventDefault();if(!form.reportValidity())return;
