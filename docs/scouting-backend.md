@@ -14,18 +14,23 @@ sólo administradores habilitados pueden decidir estados o validar clubes.
 
 El catálogo inicial se cargó desde `scouting/catalogue-seed.json`, cuya
 procedencia son referencias oficiales verificadas: 11 clubes y ningún jugador importado.
-No hay credenciales de Transfermarkt, descargas de sus páginas ni sincronización mensual
-habilitada. `bootstrap.catalogue.provider_status` informa `pending_authorization`.
+No hay credenciales ni un feed licenciado de Transfermarkt.
+`bootstrap.catalogue.provider_status` informa `pending_authorization` para ese proveedor.
+La actualización mensual del catálogo con fuentes oficiales se ejecuta desde la
+tarea programada documentada en [scouting-monthly-refresh.md](scouting-monthly-refresh.md).
 No debe interpretarse el catálogo parcial como cobertura de todas las ligas.
 
 ## Archivos y despliegue
 
 - `supabase/migrations/20261029202902_scouting_colaborativo_paredes_de_cristal.sql`: migración de estructura y RPC, aplicada.
 - `supabase/migrations/20261029202924_scouting_initial_official_catalogue.sql`: migración del catálogo inicial, aplicada.
+- `supabase/migrations/20261029214442_scouting_current_season_projection.sql`: proyección de temporada vigente y conservación de validaciones históricas, aplicada.
 - `scouting/catalogue-seed.json`: datos y fuentes verificadas de los 11 clubes iniciales.
 - `supabase/functions/scouting-api/index.ts`: Edge Function independiente.
 - `supabase/tests/scouting-contract.sql`: prueba de integración, con datos ficticios
   dentro de `BEGIN` / `ROLLBACK`.
+- `supabase/tests/scouting-current-season.sql`: regresión de temporada, afiliaciones
+  futuras/históricas y validación tardía de clubes manuales, con `ROLLBACK`.
 - `scripts/test-scouting-api.mjs`: pruebas locales del adaptador HTTP con respuestas
   simuladas del RPC; no usan secretos ni servicios reales.
 
@@ -94,7 +99,10 @@ cliente; debe devolverse tal como se recibió. La implementación inicial utiliz
 offset acotado, por lo que cambios simultáneos del listado pueden mover registros
 entre páginas; el cliente puede actualizar la primera página para reconciliarlo.
 
-`clubs.items[].competitions` conserva las competencias y temporadas disponibles.
+`clubs.items[].competitions` muestra las relaciones de competencias activas cuya
+temporada coincide con `competitions.season`. Las relaciones de temporadas
+anteriores se conservan en la base y en los snapshots históricos, y no se ofrecen
+como afiliaciones actuales al crear una recomendación.
 `reference_scope=primer_equipo_masculino` identifica el alcance de la semilla:
 la competencia del primer equipo no es una afirmación sobre el torneo de un juvenil.
 La categoría de la recomendación es un campo independiente. El snapshot conserva
@@ -172,6 +180,9 @@ los socios habilitados. Un envío con `internal_note` no vacío es rechazado.
 - `admin_validate_club` exige motivo, crea o vincula un club por identidad normalizada
   con bloqueo contra carreras, registra la decisión y conserva el snapshot anterior.
   No publica automáticamente datos de un club ingresado por un socio.
+  Si crea una relación de competencia, conserva la temporada declarada en ese
+  snapshot; una aprobación posterior no la convierte en una afiliación de la
+  temporada vigente. Si no hay temporada informada, no inventa una relación.
 
 ## Auditoría y blockchain
 
@@ -281,7 +292,9 @@ para que el socio elija la posición que observó. No se declara plantel complet
 El lote conserva sus fuentes, estados de revisión y SHA-256 del JSON. Repetir la
 misma clave y contenido no duplica registros; una clave ya publicada con otro
 hash se rechaza. Las correcciones posteriores requieren un nuevo corte revisado.
-La actualización mensual sigue siendo un procedimiento manual, sin cron activo.
+Esta carga fue manual. El procedimiento recurrente posterior está documentado en
+[scouting-monthly-refresh.md](scouting-monthly-refresh.md); su programador es la tarea
+de ChatGPT, sin un segundo cron en Supabase.
 No se borran clubes, recomendaciones ni eventos, ni se reactivan bajas existentes.
 
 El selector de jugadores agrega `transfermarkt_url` y `checked_at` al contrato
@@ -289,3 +302,26 @@ existente. El frontend muestra el enlace observado del club y puede completar el
 perfil del jugador; preserva cualquier enlace escrito manualmente. La fecha se
 refiere a la revisión de la ficha individual. La lectura compartida, los roles y
 las reglas de auditoría siguen siendo los mismos.
+
+## Actualización mensual y temporadas — 29/10/2026
+
+La tarea **Actualización del scouting argentino** quedó habilitada en ChatGPT
+para el día 1 de cada mes por la mañana, en horario de Córdoba, con inicio el
+1/11/2026. El procedimiento completo, las fuentes, la conciliación, los snapshots,
+las planillas y la recuperación ante fallos están en
+[scouting-monthly-refresh.md](scouting-monthly-refresh.md).
+
+La migración `20261029214442_scouting_current_season_projection.sql` ajusta la
+proyección de competencias y la creación de recomendaciones a la temporada
+vigente configurada de cada competencia. Las relaciones anteriores y futuras
+se conservan, pero no se ofrecen como afiliaciones actuales. Una recomendación
+antigua mantiene su snapshot, incluso cuando se repite su envío idempotente.
+La validación tardía de un club manual conserva la temporada declarada.
+
+La definición se recuperó del RPC vivo y el cambio se ensayó junto con 15 grupos
+de regresión de temporada y el contrato completo de scouting, dentro de una única
+transacción revertida. Después de aplicar la migración se verificaron la definición
+esperada, los permisos, el modo de ejecución y las huellas completas del catálogo:
+153 clubes, 21 jugadores y todas sus relaciones permanecieron iguales. No quedaron
+socios ni recomendaciones de prueba. El cambio no modifica el circuito de auditoría
+ni confirma una nueva transacción blockchain.
