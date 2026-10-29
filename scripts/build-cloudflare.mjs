@@ -6,6 +6,7 @@ await mkdir(output, { recursive: true });
 
 for (const file of [
   'index.html',
+  'scouting.html',
   'comunidad-formativa.html',
   'comunidad-formativa-vinculo.html',
   'comunidad-formativa-acompanamiento.html',
@@ -23,6 +24,12 @@ for (const file of [
 }
 
 await cp('comunidad-formativa', output + '/comunidad-formativa', { recursive: true });
+await mkdir(output + '/scouting', { recursive: true });
+for (const file of ['scouting.css', 'scouting.js']) {
+  await cp('scouting/' + file, output + '/scouting/' + file);
+}
+await mkdir(output + '/assets', { recursive: true });
+await cp('assets/club-abierto-logo.webp', output + '/assets/club-abierto-logo.webp');
 // Publish the canonical institutional assets, never the obsolete root-level overlay.
 await cp('src/estructura-institucional.js', output + '/estructura-institucional.js');
 await cp('src/estructura-institucional.css', output + '/estructura-institucional.css');
@@ -41,4 +48,5 @@ html = html.replace('</head>', '<link rel="preconnect" href="https://fonts.googl
 html = html.replace('</head>', '<style data-v12="estructura-institucional">' + css + '</style>\n</head>');
 html = html.replace('</body>', '<script data-v12="estructura-institucional">' + js + '</script>\n</body>');
 await writeFile(indexPath, html, 'utf8');
-console.log('Cloudflare build: Estructura Institucional y Comunidad Formativa integradas.');
+console.log('Cloudflare build: Estructura Institucional, Comunidad Formativa y Scouting integrados.');
+

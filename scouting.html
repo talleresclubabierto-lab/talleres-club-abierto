@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07142c">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="same-origin">
+  <title>Scouting colaborativo · Talleres Club Abierto</title>
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/scouting/scouting.css">
+  <script src="/scouting/scouting.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Ir al contenido</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">
+        <img src="/assets/club-abierto-logo.webp" width="48" height="54" alt="Escudo de Talleres Club Abierto">
+        <div><span class="brand-title">TALLERES</span><span class="brand-subtitle">CLUB ABIERTO</span></div>
+      </div>
+      <div class="header-actions">
+        <span class="actor-chip" id="actor-label" hidden></span>
+        <a class="button button-subtle back-button" href="/index.html" id="back-button"><span aria-hidden="true">←</span> Volver</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-shell" id="main">
+    <section class="boot-panel panel" id="boot-panel" aria-labelledby="boot-title">
+      <span class="loading-ring" id="boot-spinner" aria-hidden="true"></span>
+      <p class="eyebrow">TALLERES CLUB ABIERTO</p>
+      <h1 id="boot-title" tabindex="-1">Preparando scouting</h1>
+      <p id="boot-message" class="muted" role="status">Estamos verificando tu sesión.</p>
+      <div class="boot-actions">
+        <button class="button button-primary" id="boot-retry" type="button" hidden>Reintentar</button>
+        <a class="button button-secondary" id="login-link" href="/index.html" target="_top" hidden>Volver al ingreso</a>
+      </div>
+    </section>
+
+    <div id="application" hidden>
+      <section class="page-heading" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">PARTICIPACIÓN DE LOS SOCIOS</p>
+          <h1 id="page-title">Scouting <span>colaborativo</span></h1>
+          <p class="page-lead">Recomendaciones del fútbol argentino, con autor, seguimiento y devoluciones a la vista de todos los socios.</p>
+        </div>
+        <span class="privacy-pill"><span class="privacy-dot" aria-hidden="true"></span> Paredes de cristal</span>
+      </section>
+
+      <div class="tabs" role="tablist" aria-label="Secciones de scouting">
+        <button id="tab-mine" class="tab" type="button" role="tab" aria-controls="panel-mine" aria-selected="true" tabindex="0" data-tab="mine">Recomendaciones del club</button>
+        <button id="tab-recommend" class="tab" type="button" role="tab" aria-controls="panel-recommend" aria-selected="false" tabindex="-1" data-tab="recommend">Recomendar jugador</button>
+        <button id="tab-admin" class="tab" type="button" role="tab" aria-controls="panel-admin" aria-selected="false" tabindex="-1" data-tab="admin" hidden>Gestión</button>
+      </div>
+
+      <section id="panel-recommend" class="tab-panel" role="tabpanel" aria-labelledby="tab-recommend">
+        <div id="create-success" class="panel success-panel" hidden tabindex="-1" role="status">
+          <span class="success-mark" aria-hidden="true">✓</span>
+          <p class="eyebrow">APORTE RECIBIDO</p>
+          <h2>Tu recomendación quedó registrada</h2>
+          <p id="success-description"></p>
+          <p class="muted">Tu aporte ya forma parte de las recomendaciones del club. Podés consultar el estado y agregar información al mismo registro.</p>
+          <div class="button-row">
+            <button id="success-detail" class="button button-primary" type="button">Ver recomendación</button>
+            <button id="new-recommendation" class="button button-secondary" type="button">Recomendar otro jugador</button>
+          </div>
+        </div>
+
+        <div class="recommend-layout" id="recommend-layout">
+          <form id="recommend-form" class="recommend-form" autocomplete="off">
+            <div id="create-feedback" class="feedback" hidden role="alert" tabindex="-1"></div>
+            <fieldset class="form-fields" id="create-fields">
+              <legend class="sr-only">Datos de la recomendación</legend>
+              <section class="panel form-section" aria-labelledby="club-section-title">
+                <div class="section-heading"><span class="step-number" aria-hidden="true">01</span><div><h2 id="club-section-title">El equipo</h2><p>Ubicá el club donde juega.</p></div></div>
+                <fieldset class="route-picker">
+                  <legend>¿Cómo querés buscarlo?</legend>
+                  <div class="segmented-control">
+                    <label><input type="radio" name="search-route" value="province" checked><span>Por provincia</span></label>
+                    <label><input type="radio" name="search-route" value="competition"><span>Por competencia</span></label>
+                  </div>
+                </fieldset>
+
+                <p class="notice" id="catalogue-notice" hidden></p>
+                <label class="check-control manual-toggle"><input type="checkbox" id="manual-club-toggle"><span><strong>Otro club</strong><small>Ingresar el club y su liga manualmente</small></span></label>
+
+                <div id="catalogue-fields">
+                  <div id="club-filter-flow" class="field-stack">
+                    <div class="field" id="province-field"><label for="club-province">Provincia / CABA <span class="required" id="province-required" aria-hidden="true">*</span></label><select id="club-province"><option value="">Seleccioná una provincia</option></select></div>
+                    <div class="field club-picker" id="club-picker-field">
+                      <label for="club-query">Buscar club</label><input id="club-query" type="search" maxlength="100" placeholder="Nombre del club o localidad" enterkeyhint="search" aria-describedby="clubs-help">
+                      <label for="club-choice">Equipo <span class="required" aria-hidden="true">*</span></label><select id="club-choice" size="4" aria-describedby="clubs-help"><option value="" disabled>Elegí una provincia para buscar</option></select>
+                      <div class="result-footer"><p class="field-help" id="clubs-help" role="status">Podés usar Otro club si no lo encontrás.</p><button id="clubs-more" class="button button-small button-secondary" type="button" hidden>Cargar más clubes</button></div>
+                    </div>
+                    <div class="field" id="competition-field"><label for="club-competition">Liga / competencia <span class="required" id="competition-required" aria-hidden="true" hidden>*</span></label><select id="club-competition" aria-describedby="competition-help"><option value="">Todas las competencias</option></select><p class="field-help" id="competition-help">La competencia se completa cuando está asociada al equipo.</p></div>
+                  </div>
+                  <div class="selected-club" id="selected-club" hidden><span class="selected-label">EQUIPO SELECCIONADO</span><strong id="selected-club-name"></strong><span id="selected-club-description"></span></div>
+                </div>
+
+                <div id="manual-club-fields" class="field-grid" hidden>
+                  <div class="field"><label for="manual-province">Provincia / CABA <span class="required" aria-hidden="true">*</span></label><select id="manual-province" disabled><option value="">Seleccioná una provincia</option></select></div>
+                  <div class="field"><label for="manual-city">Ciudad o localidad <span class="required" aria-hidden="true">*</span></label><input id="manual-city" minlength="2" maxlength="100" disabled></div>
+                  <div class="field"><label for="manual-club-name">Nombre del club <span class="required" aria-hidden="true">*</span></label><input id="manual-club-name" minlength="2" maxlength="160" disabled></div>
+                  <div class="field"><label for="manual-league">Liga / competencia <span class="required" aria-hidden="true">*</span></label><input id="manual-league" minlength="2" maxlength="160" placeholder="Nombre de la liga o del torneo" disabled></div>
+                </div>
+              </section>
+
+              <section class="panel form-section" aria-labelledby="player-section-title">
+                <div class="section-heading"><span class="step-number" aria-hidden="true">02</span><div><h2 id="player-section-title">El jugador</h2><p>Indicá en qué categoría y posición juega.</p></div></div>
+                <div class="field-grid">
+                  <div class="field"><label for="player-category">Categoría del jugador <span class="required" aria-hidden="true">*</span></label><select id="player-category" required><option value="">Seleccioná una categoría</option></select></div>
+                  <div class="field" id="custom-category-field" hidden><label for="custom-category">¿Qué categoría? <span class="required" aria-hidden="true">*</span></label><input id="custom-category" minlength="2" maxlength="100" placeholder="Ej.: Sub-18 de la liga local" disabled></div>
+                </div>
+                <details class="player-lookup" id="player-lookup" hidden>
+                  <summary>Buscar un jugador en el plantel</summary>
+                  <div class="lookup-content"><label for="player-query">Nombre o apellido</label><input id="player-query" type="search" maxlength="100" placeholder="Buscar jugador" enterkeyhint="search"><label for="player-choice">Jugadores del catálogo</label><select id="player-choice" size="4"><option value="" disabled>Seleccioná una categoría</option></select><div class="result-footer"><p id="players-help" class="field-help" role="status">También podés completar el nombre y apellido abajo.</p><button class="button button-small button-secondary" id="players-more" type="button" hidden>Cargar más jugadores</button></div></div>
+                </details>
+                <p class="field-help player-manual-help" id="player-manual-help">Completá los datos del jugador. No necesita figurar en el catálogo.</p>
+                <div class="field-grid">
+                  <div class="field"><label for="player-first-name">Nombre <span class="required" aria-hidden="true">*</span></label><input id="player-first-name" required minlength="2" maxlength="100" autocapitalize="words"></div>
+                  <div class="field"><label for="player-last-name">Apellido <span class="required" aria-hidden="true">*</span></label><input id="player-last-name" required minlength="2" maxlength="100" autocapitalize="words"></div>
+                  <div class="field"><label for="player-position">Posición principal <span class="required" aria-hidden="true">*</span></label><select id="player-position" required><option value="">Seleccioná una posición</option></select></div>
+                  <div class="field" id="sector-field" hidden><label for="player-sector">Sector <span class="optional">opcional</span></label><select id="player-sector" disabled><option value="no_especificado">Sin especificar</option><option value="derecha">Derecha</option><option value="izquierda">Izquierda</option><option value="ambos">Ambos</option></select></div>
+                </div>
+              </section>
+
+              <section class="panel form-section" aria-labelledby="reason-section-title">
+                <div class="section-heading"><span class="step-number" aria-hidden="true">03</span><div><h2 id="reason-section-title">Tu mirada</h2><p>Contanos qué viste y por qué lo recomendás.</p></div></div>
+                <div class="field"><label for="recommend-reason">Motivo de la recomendación <span class="required" aria-hidden="true">*</span></label><textarea id="recommend-reason" required rows="5" minlength="20" maxlength="4000" placeholder="¿Qué cualidades destacás? Podés describir situaciones de juego, decisiones o habilidades que observaste." aria-describedby="reason-help reason-count"></textarea><div class="text-meta"><p class="field-help" id="reason-help">Describí aspectos deportivos concretos, en al menos 20 caracteres.</p><span id="reason-count" class="character-count">0 / 4000</span></div></div>
+                <div class="field"><label for="recommend-observation">Dónde lo observaste <span class="optional">opcional</span></label><textarea id="recommend-observation" rows="2" maxlength="2000" placeholder="Partido, competencia, fecha aproximada o contexto de la observación."></textarea></div>
+                <div class="field"><label for="video-url">Enlace a un video <span class="optional">opcional</span></label><input id="video-url" type="url" maxlength="2048" placeholder="https://…" inputmode="url" autocapitalize="off" spellcheck="false"><p class="field-help">YouTube o Vimeo. Compartí un enlace que el equipo evaluador pueda abrir.</p></div>
+                <div class="field"><label for="transfermarkt-url">Perfil en Transfermarkt <span class="optional">opcional</span></label><input id="transfermarkt-url" type="url" maxlength="2048" placeholder="https://www.transfermarkt.com/…" inputmode="url" autocapitalize="off" spellcheck="false"><p class="field-help">El perfil se guarda como referencia para acompañar tu aporte.</p></div>
+              </section>
+            </fieldset>
+            <div class="submit-panel"><p>Tu recomendación, tu nombre como autor y las devoluciones serán visibles para todos los socios de Club Abierto.</p><button id="create-submit" class="button button-primary button-submit" type="submit">Enviar recomendación <span aria-hidden="true">↗</span></button></div>
+          </form>
+
+          <aside class="guide-panel panel" aria-labelledby="guide-title">
+            <div class="pitch-motif" aria-hidden="true"><span></span></div>
+            <p class="eyebrow">TU MIRADA SUMA</p><h2 id="guide-title">Desde cada cancha,<br>un nuevo aporte.</h2>
+            <p class="muted">Un espacio para acercar referencias deportivas y compartir su seguimiento con los socios de Club Abierto.</p>
+            <ol class="guide-steps"><li><strong>Recomendá</strong><span>Identificá al jugador y compartí lo que observaste.</span></li><li><strong>Seguí el estado</strong><span>Consultá las revisiones y devoluciones de cada aporte.</span></li><li><strong>Sumá información</strong><span>Agregá detalles a tu recomendación cuando los tengas.</span></li></ol>
+            <p class="guide-footnote">Todos los aportes tienen la misma visibilidad; la antigüedad no asigna puntaje. Cada recomendación conserva su autor y su historial visible para todos los socios.</p>
+          </aside>
+        </div>
+      </section>
+
+      <section id="panel-mine" class="tab-panel" role="tabpanel" aria-labelledby="tab-mine" hidden>
+        <div class="list-heading"><div><h2>Recomendaciones del club</h2><p class="muted">Conocé quién recomienda, qué se observó y cuál fue la devolución.</p></div><button class="button button-secondary" id="mine-refresh" type="button">Actualizar</button></div>
+        <div class="list-toolbar panel"><div class="field"><label for="mine-status">Estado</label><select id="mine-status"><option value="">Todos los estados</option></select></div><label class="check-control own-filter"><input id="mine-only" type="checkbox"><span>Mis recomendaciones</span></label><span id="mine-count" class="muted" role="status"></span></div>
+        <div class="feedback" id="mine-feedback" hidden role="alert"></div>
+        <div class="recommendation-list" id="mine-list" aria-live="polite" aria-busy="false"></div>
+        <div class="load-more-row"><button id="mine-more" class="button button-secondary" type="button" hidden>Cargar más recomendaciones</button></div>
+      </section>
+
+      <section id="panel-admin" class="tab-panel" role="tabpanel" aria-labelledby="tab-admin" hidden>
+        <div class="list-heading"><div><p class="eyebrow">EQUIPO EVALUADOR</p><h2>Gestión de scouting</h2><p class="muted">Revisá aportes y dejá un seguimiento visible para todos los socios.</p></div><button class="button button-secondary" id="admin-refresh" type="button">Actualizar</button></div>
+        <div class="list-toolbar panel"><div class="field"><label for="admin-status">Estado</label><select id="admin-status"><option value="">Todos los estados</option></select></div><div class="field toolbar-search"><label for="admin-query">Buscar recomendación</label><input id="admin-query" type="search" maxlength="100" placeholder="Jugador, club o referencia" enterkeyhint="search"></div><span id="admin-count" class="muted" role="status"></span></div>
+        <div class="feedback" id="admin-feedback" hidden role="alert"></div>
+        <div class="recommendation-list" id="admin-list" aria-live="polite" aria-busy="false"></div>
+        <div class="load-more-row"><button id="admin-more" class="button button-secondary" type="button" hidden>Cargar más recomendaciones</button></div>
+      </section>
+      <footer class="page-footer"><span>TALLERES CLUB ABIERTO</span><span>Scouting colaborativo · Fútbol argentino</span></footer>
+    </div>
+  </main>
+
+  <dialog id="detail-dialog" class="detail-dialog" aria-labelledby="detail-title">
+    <div class="dialog-top"><div><p class="eyebrow" id="detail-code">RECOMENDACIÓN</p><h2 id="detail-title" tabindex="-1">Cargando detalle</h2></div><button id="detail-close" class="button button-subtle dialog-close" type="button" aria-label="Cerrar detalle">×</button></div>
+    <div class="dialog-body" id="detail-body"></div>
+  </dialog>
+  <noscript><div class="noscript-message">Para usar scouting necesitás habilitar JavaScript en tu navegador. <a href="/index.html">Volver a Club Abierto</a></div></noscript>
+</body>
+</html>
