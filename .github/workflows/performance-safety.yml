@@ -35,6 +35,21 @@ jobs:
           assert(body.includes('cargarEstadoGlobalRemoto()'),'Global state load removed');
           console.log('Login bootstrap deduplication checks passed');
           EOF
+      - name: Validate immediate authenticated login
+        run: |
+          node --input-type=module <<'EOF'
+          import { readFileSync } from 'node:fs';
+          import assert from 'node:assert/strict';
+          const html=readFileSync('dist/index.html','utf8');
+          const start=html.indexOf('async function procesarIngreso(');
+          assert(start>0,'Login handler missing');
+          const body=html.slice(start,html.indexOf('function irACambioClave()',start));
+          assert(body.includes('await loginSeguroClub(id,clave)'), 'Backend authentication missing');
+          assert(!body.includes('setTimeout(resolve,700)'), 'Artificial wait remains');
+          assert(body.indexOf('ejecutarAnimacion(face,finger')<body.indexOf('cargaEstado=cargarEstadoInicialAutenticado()'), 'Data hydration still blocks dashboard');
+          assert(body.includes('sesion.es_administrador!==true'), 'Admin authorization check missing');
+          console.log('Immediate authenticated login checks passed');
+          EOF
       - name: Validate generated HTML font loading
         run: |
           node --input-type=module <<'EOF'

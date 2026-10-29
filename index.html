@@ -3023,13 +3023,10 @@ try{
         recalcularPadronRuntime();
     }
 
-    var cargaEstado=cargarEstadoInicialAutenticado();
+    // La sesión ya fue autenticada. Mostrar el panel sin esperar la carga
+    // del padrón y de los módulos secundarios, que se sincronizan después.
+    var cargaEstado=null;
     var estadoInicialListo=false;
-    cargaEstado.then(function(){estadoInicialListo=true}).catch(function(){});
-    await Promise.race([
-        cargaEstado.catch(function(){return null}),
-        new Promise(function(resolve){setTimeout(resolve,700)})
-    ]);
 
     if(tipo==='socio')document.getElementById('socioPass').value='';
     else document.getElementById('adminPass').value='';
@@ -3041,6 +3038,7 @@ try{
 
     if(!estadoInicialListo){
         finger.innerText='✓ SESIÓN SEGURA · SINCRONIZANDO DATOS…';
+        cargaEstado=cargarEstadoInicialAutenticado();
         cargaEstado.then(function(){
             finger.innerText='✓ SESIÓN SEGURA Y DATOS SINCRONIZADOS';
             refrescarVistasTrasSincronizacion();
