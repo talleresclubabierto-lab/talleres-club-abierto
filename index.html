@@ -5290,7 +5290,7 @@ var defs={
  ['Mi perfil','♙','Datos personales, antigüedad y seguridad',['Cambiar contraseña','Identidad biométrica / Passkey','Tu historia con Talleres']],
  ['Participación y votaciones','◇','Votaciones, resultados y recomendaciones deportivas',['Votaciones activas','Resultados','Scouting colaborativo']],
  ['Transparencia y auditoría','▤','Balances, registros y estructura institucional',['Auditoría pública','Paredes de Cristal','Historial de cambios','Integración blockchain','Concursos y licitaciones','Estructura institucional']],
- ['Comunidad profesional','♧','Directorio y colaboración de socios',['Banco de profesionales']]
+ ['Otros accesos','☷','Más herramientas del panel',['Banco de profesionales']]
  ],
  adminDashboard:[
  ['Socios y padrón','♙','Padrón y credenciales',['Gestionar padrón']],
@@ -5325,14 +5325,16 @@ function setup(id){
   }
   var matched=false;groups.forEach(function(g,i){if(!matched&&g[3].indexOf(name)>=0){buckets[i].push(b);matched=true}});if(!matched)rest.push(b)
  });
- if(rest.length){groups.push(['Otros accesos','☷','Más herramientas del panel',[]]);buckets.push(rest)}
+ if(rest.length){var other=groups.findIndex(function(g){return g[0]==='Otros accesos'});if(other>=0)buckets[other].push.apply(buckets[other],rest);else{groups.push(['Otros accesos','☷','Más herramientas del panel',[]]);buckets.push(rest)}}
  function open(i){
   inner.replaceChildren();
+  var allowedStructure=(groups[i][0]===(id==='socioDashboard'?'Transparencia y auditoría':'Economía y auditoría'));
+  var insertedStructure=false;
   buckets[i].forEach(function(b){
-   // Un único acceso a Estructura institucional, exclusivamente en su categoría.
-   if(/estructura\\s+institucional/i.test(label(b)) &&
-      groups[i][0] !== (id==='socioDashboard'?'Transparencia y auditoría':'Economía y auditoría'))return;
-   inner.appendChild(b)
+   var isStructure=/^estructura\s+institucional$/i.test(label(b));
+   if(isStructure&&(!allowedStructure||insertedStructure))return;
+   if(isStructure)insertedStructure=true;
+   inner.appendChild(b);
   });
   heading.textContent=groups[i][0];categories.classList.add('ca-hidden');view.classList.add('ca-open');view.classList.remove('ca-hidden');back.focus()
  }
