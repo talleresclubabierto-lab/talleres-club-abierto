@@ -5315,26 +5315,43 @@ function setup(id){
  head.appendChild(heading);head.appendChild(back);view.appendChild(head);view.appendChild(inner);
  var buckets=groups.map(function(){return []}),rest=[];
  var structureSeen=false;
+ function normalizedButtonName(b){
+  var x=b.cloneNode(true);
+  x.querySelectorAll('small,.action-icon,svg,i').forEach(function(n){n.remove()});
+  return (x.textContent||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim().toLowerCase();
+ }
+ function isStructureButton(b){return /estructura\s+institucional/.test(normalizedButtonName(b))}
  buttons.forEach(function(b){
-  var name=label(b),isStructure=/^estructura institucional$/i.test(name);
+  var name=label(b),isStructure=isStructureButton(b);
   if(isStructure){
-   if(structureSeen){b.style.display='none';return}
+   if(structureSeen){b.remove();return}
    structureSeen=true;
    var target=groups.findIndex(function(g){return g[0]===(id==='socioDashboard'?'Transparencia y auditoría':'Economía y auditoría')});
    if(target>=0){buckets[target].push(b);return}
   }
-  var matched=false;groups.forEach(function(g,i){if(!matched&&g[3].indexOf(name)>=0){buckets[i].push(b);matched=true}});if(!matched)rest.push(b)
+  var matched=false;
+  groups.forEach(function(g,i){if(!matched&&g[3].indexOf(name)>=0){buckets[i].push(b);matched=true}});
+  if(!matched)rest.push(b);
  });
- if(rest.length){var other=groups.findIndex(function(g){return g[0]==='Otros accesos'});if(other>=0)buckets[other].push.apply(buckets[other],rest);else{groups.push(['Otros accesos','☷','Más herramientas del panel',[]]);buckets.push(rest)}}
+ if(rest.length){
+  var other=groups.findIndex(function(g){return g[0]==='Otros accesos'});
+  if(other>=0)buckets[other].push.apply(buckets[other],rest);
+  else{groups.push(['Otros accesos','☷','Más herramientas del panel',[]]);buckets.push(rest)}
+ }
  function open(i){
   inner.replaceChildren();
   var allowedStructure=(groups[i][0]===(id==='socioDashboard'?'Transparencia y auditoría':'Economía y auditoría'));
   var insertedStructure=false;
   buckets[i].forEach(function(b){
-   var isStructure=/^estructura\s+institucional$/i.test(label(b));
-   if(isStructure&&(!allowedStructure||insertedStructure))return;
-   if(isStructure)insertedStructure=true;
+   if(isStructureButton(b)){
+    if(!allowedStructure||insertedStructure)return;
+    insertedStructure=true;
+   }
    inner.appendChild(b);
+  });
+  // Final safeguard: only one institutional access in the correct category.
+  Array.from(inner.querySelectorAll('button')).filter(isStructureButton).forEach(function(b,j){
+   if(!allowedStructure||j>0)b.remove();
   });
   heading.textContent=groups[i][0];categories.classList.add('ca-hidden');view.classList.add('ca-open');view.classList.remove('ca-hidden');back.focus()
  }
