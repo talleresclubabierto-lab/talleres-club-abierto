@@ -5339,26 +5339,48 @@ function setup(id){
   else{groups.push(['Otros accesos','☷','Más herramientas del panel',[]]);buckets.push(rest)}
  }
  function open(i){
+  // Each category gets only its own buttons, never shared or cloned menus.
   inner.replaceChildren();
-  var allowedStructure=(groups[i][0]===(id==='socioDashboard'?'Transparencia y auditoría':'Economía y auditoría'));
-  var insertedStructure=false;
+  var correct=groups[i][0]===(id==='socioDashboard'?'Transparencia y auditoría':'Economía y auditoría');
+  var seen=false;
   buckets[i].forEach(function(b){
    if(isStructureButton(b)){
-    if(!allowedStructure||insertedStructure)return;
-    insertedStructure=true;
+    if(!correct||seen)return;
+    seen=true;
    }
    inner.appendChild(b);
   });
-  // Final safeguard: only one institutional access in the correct category.
-  Array.from(inner.querySelectorAll('button')).filter(isStructureButton).forEach(function(b,j){
-   if(!allowedStructure||j>0)b.remove();
-  });
-  heading.textContent=groups[i][0];categories.classList.add('ca-hidden');view.classList.add('ca-open');view.classList.remove('ca-hidden');back.focus()
+  heading.textContent=groups[i][0];
+  categories.classList.add('ca-hidden');
+  view.classList.add('ca-open');
+  view.classList.remove('ca-hidden');
+  back.focus();
  }
+ // Recheck every category transition and any dynamically inserted buttons.
+ function enforceUniqueStructure(){
+  var currentTitle=heading.textContent.trim();
+  var correct=currentTitle===(id==='socioDashboard'?'Transparencia y auditoría':'Economía y auditoría');
+  var found=false;
+  Array.from(view.querySelectorAll('.action-grid button')).forEach(function(b){
+   if(!isStructureButton(b))return;
+   if(!correct||found){b.remove();return}
+   found=true;
+  });
+  // The original action grid must never become a second visible menu.
+  original.style.setProperty('display','none','important');
+  original.setAttribute('aria-hidden','true');
+ }
+ view.addEventListener('click',enforceUniqueStructure,true);
+ var scheduled=false;
+ new MutationObserver(function(){
+  if(scheduled)return;
+  scheduled=true;
+  queueMicrotask(function(){scheduled=false;enforceUniqueStructure()});
+ }).observe(view,{childList:true,subtree:true});
  function close(){view.classList.remove('ca-open');view.classList.add('ca-hidden');categories.classList.remove('ca-hidden')}
  back.addEventListener('click',close);
  groups.forEach(function(g,i){var card=document.createElement('button');card.type='button';card.className='ca-category';card.innerHTML='<span class="ca-category-icon" aria-hidden="true">'+g[1]+'</span><span class="ca-category-title">'+g[0]+'</span><span class="ca-category-desc">'+g[2]+'</span>';card.addEventListener('click',function(){open(i)});categories.appendChild(card)});
- original.style.display='none';original.setAttribute('aria-hidden','true');original.after(categories,view);dash.dataset.caOrganized='1';
+ original.style.setProperty('display','none','important');original.setAttribute('aria-hidden','true');original.after(categories,view);dash.dataset.caOrganized='1';
  // Cuando se vuelve al inicio, recuperar la vista de categorías.
  var observer=new MutationObserver(function(){if(dash.style.display==='flex')close()});
  observer.observe(dash,{attributes:true,attributeFilter:['style']});
