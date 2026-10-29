@@ -578,7 +578,7 @@ body{
       <button class="btn-action-red" onclick="irAResultadosGenerales()"><span class="action-icon">▥</span>Resultados<br><small style="font-weight:500;color:#64748b">Votantes y ponderación en tiempo real</small></button>
       <button class="btn-action-red" onclick="irAAuditoriaPublica()"><span class="action-icon">◎</span>Auditoría pública<br><small style="font-weight:500;color:#64748b">Consultá qué votó cada socio</small></button>
       <button class="btn-action-red" onclick="irAParedesDeCristal()"><span class="action-icon">▦</span>Paredes de Cristal<br><small style="font-weight:500;color:#64748b">Balance y auditoría económica ponderada</small></button>
-      <a class="btn-action-red" href="/comunidad-formativa#socios-casos" style="display:block;text-decoration:none"><span class="action-icon">◉</span>Seguimiento de Comunidad Formativa<br><small style="font-weight:500;color:#64748b">Consultá estados y categorías generales de manera anonimizada</small></a>
+      <button class="btn-action-red" type="button" onclick="irASeguimientoComunidadFormativa()"><span class="action-icon">◉</span>Seguimiento de Comunidad Formativa<br><small style="font-weight:500;color:#64748b">Consultá presentaciones de forma anonimizada</small></button>
       <button class="btn-action-red" onclick="irATuHistoria()"><span class="action-icon">✓</span>Tu historia con Talleres<br><small style="font-weight:500;color:#64748b">Partidos, asistencia y horarios de ingreso</small></button>
       <button class="btn-action-red" onclick="irAHistorialAdministrativo()"><span class="action-icon">▤</span>Historial de cambios<br><small style="font-weight:500;color:#64748b">Consultá el registro protegido de cambios</small></button>
       <button class="btn-action-red" onclick="irAIntegracionBlockchain()"><span class="action-icon">⬡</span>Integración blockchain<br><small style="font-weight:500;color:#64748b">Estado, lotes y trazabilidad criptográfica</small></button>
@@ -591,6 +591,14 @@ body{
       <div class="card"><div class="metric-label">Próximo escalón</div><div id="lblSocioDiasFaltantes" style="font-size:18px;font-weight:800;color:var(--navy);margin-top:8px">-</div></div>
     </div>
   </main><nav class="bottom-nav"><button class="active" onclick="regresarAlPanelInterno()"><span class="mini-icon">▦</span>Dashboard</button><button class="" onclick="mostrarSeccionSocio('secVotaciones')"><span class="mini-icon">◇</span>Votar</button><button class="" onclick="irAResultadosGenerales()"><span class="mini-icon">▥</span>Resultados</button><button class="" onclick="irAAuditoriaPublica()"><span class="mini-icon">◎</span>Auditoría</button></nav>
+</div>
+
+<div id="secSeguimientoComunidadFormativa" class="sub-view full-width">
+  <div class="topbar"><div class="brand"><span class="app-logo-mark" role="img" aria-label="Escudo Talleres Club Abierto"></span><span class="brand-role-label">TALLERES CLUB ABIERTO · PANEL SOCIO ACTIVO</span></div><div class="top-actions"><span class="navlink"><span class="network-dot"></span>Seguimiento anonimizado</span><button type="button" onclick="regresarAlPanelInterno()">Volver al panel</button><button type="button" onclick="volverAlLogin()">Salir</button></div></div>
+  <main class="section-shell">
+    <div class="page-head"><div><div class="eyebrow">Panel de socio / Comunidad Formativa</div><h1 class="page-title">Seguimiento de presentaciones formativas</h1><p class="page-sub">Consultá el código, período, categoría general, estado y registro criptográfico. No se muestran la identidad del jugador o de su familia, el relato ni los archivos.</p></div><span class="status-chip">● Identidad reservada</span></div>
+    <section class="card" aria-labelledby="cf-member-cases-title"><h2 id="cf-member-cases-title" class="metric-label">Presentaciones registradas</h2><p class="page-sub">Las comunicaciones se consideran situaciones informadas hasta ser evaluadas. La información se presenta de forma anonimizada.</p><div id="cfMemberCasesStatus" class="admin-history-status warn" role="status" aria-live="polite">Cargando presentaciones…</div><div id="cfMemberCasesList" class="admin-history-list" aria-live="polite"></div></section>
+  </main>
 </div>
 
 <div id="adminDashboard" class="dashboard full-width">
@@ -3251,6 +3259,41 @@ actualizarCantidadAdministradores();
 function ocultarTodo(){
 document.getElementById('loginScreen').style.display='none';
 document.querySelectorAll('.dashboard,.sub-view').forEach(function(v){v.style.display='none'});
+}
+async function irASeguimientoComunidadFormativa(){
+    if(ROL_ACTIVO!=='socio'){alert('Esta consulta está disponible desde una sesión de socio activo.');return;}
+    ocultarTodo();
+    var sec=document.getElementById('secSeguimientoComunidadFormativa');
+    sec.style.display='flex';
+    var status=document.getElementById('cfMemberCasesStatus');
+    var list=document.getElementById('cfMemberCasesList');
+    status.textContent='Validando sesión y cargando presentaciones…';
+    status.className='admin-history-status warn';
+    list.replaceChildren();
+    var token=obtenerTokenSesionClub();
+    if(!token){status.textContent='La sesión del Panel Socio Activo no está disponible. Volvé a ingresar.';return;}
+    try{
+        var response=await fetch('https://sziuyjicqyxnmbgtbopg.supabase.co/functions/v1/comunidad-formativa-api',{
+            method:'POST',mode:'cors',cache:'no-store',credentials:'omit',
+            headers:{'Content-Type':'application/json','X-Club-Session':token},
+            body:JSON.stringify({action:'member_cases_list'})
+        });
+        var data=await response.json().catch(function(){return {};});
+        if(!response.ok)throw new Error(data.error||'No se pudo validar la sesión del socio.');
+        var cases=Array.isArray(data.cases)?data.cases:[];
+        status.textContent=cases.length?'Se encontraron '+cases.length+' presentación(es).':'Todavía no hay presentaciones registradas.';
+        status.className='admin-history-status '+(cases.length?'ok':'warn');
+        cases.forEach(function(item){
+            var row=document.createElement('article');row.className='card';
+            var code=document.createElement('strong');code.textContent=item.codigo||'Presentación formativa';
+            var detail=document.createElement('p');detail.className='page-sub';
+            detail.textContent=[item.periodo,item.categoria_general,item.estado,'Registro criptográfico: '+(item.registro_criptografico||'pendiente')].filter(Boolean).join(' · ');
+            row.append(code,detail);list.appendChild(row);
+        });
+    }catch(error){
+        status.textContent=error&&error.message?error.message:'No se pudo cargar el seguimiento. Intentá nuevamente.';
+        status.className='admin-history-status error';
+    }
 }
 function mostrarSeccionSocio(id){
 ocultarTodo();
