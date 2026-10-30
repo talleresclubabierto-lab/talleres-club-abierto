@@ -180,10 +180,10 @@ const dashboard = { total_player_references: 137, total_recommendations: 150, id
   assert.match($('squad-status').textContent, /Plantel de Primera: 30 jugadores publicados en Transfermarkt/); assert.match($('squad-status').textContent, /Temporada de la fuente: 26\/27/); assert.equal($('squad-source').hidden, false);
   assert.match($('player-category').options.find(option => option.value === 'Reserva').textContent, /32/);
   await h.loadPlayers(true); assert.equal(h.state.players.size, 30); assert.match($('players-help').textContent, /30 de 30/); assert.equal($('players-more').hidden, true);
-  $('player-query').value = 'Nombre que no existe';
+  $('player-position-filter').value = 'Defensor Central';
   h.setHandler(async () => reply({ items: [], next_cursor: null, total_count: 0, squad })); await h.loadPlayers();
-  assert.match($('player-choice').textContent, /No hay coincidencias/); assert.match($('players-help').textContent, /borrá la búsqueda/);
-  $('player-query').value = ''; $('player-category').value = 'Reserva';
+  assert.match($('player-choice').textContent, /No hay jugadores con esta posición/); assert.match($('players-help').textContent, /Todas las posiciones/);
+  $('player-position-filter').value = ''; $('player-category').value = 'Reserva';
   h.setHandler(async () => reply({ items: [], next_cursor: null, total_count: 0, squad: { ...squad, category: 'Reserva', status: 'not_loaded', player_count: 0, source_url: null } })); await h.loadPlayers();
   assert.match($('squad-status').textContent, /todavía no está cargado en Club Abierto/); assert.match($('squad-status').textContent, /no significa que el plantel no exista en Transfermarkt/); assert.equal($('squad-source').hidden, true);
   h.renderSquad({ ...squad, status: 'partial', player_count: 4 }); assert.match($('squad-status').textContent, /parcialmente cargado: 4/);
@@ -201,6 +201,66 @@ const dashboard = { total_player_references: 137, total_recommendations: 150, id
   h.renderSquad({ ...squad, source_season: null }); assert(!$('squad-status').textContent.includes('Temporada'), 'Do not infer Transfermarkt season from competition season');
   h.dispose();
   console.log('PASS squads: immediate Primera load, separate Reserva counts, complete/partial/unavailable coverage, source/date, 25+5 pagination, missing dataset distinct from search miss and a consulted source publishing zero rows.');
+}
+
+// The position selector requests the whole squad filter on the server, with
+// independent pagination and without changing a player's recommendation fields.
+{
+  const h = harness(); const $ = h.el;
+  h.state.activeTab = 'recommend';
+  h.state.clubs.set('club-positions', { id: 'club-positions', name: 'Club Posiciones', province: 'Córdoba', competitions: [] });
+  $('club-choice').value = 'club-positions';
+  const roster = Array.from({ length: 60 }, (_, index) => ({ id: 'position-' + index, first_name: 'Jugador', last_name: String(index), position: index < 25 ? 'Arquero' : index < 55 ? 'Defensor Central' : null }));
+  const squad = { category: 'Primera', status: 'verified', player_count: 60, expected_count: 60, checked_at: '2026-10-30T12:00:00Z', source_url: 'https://www.transfermarkt.com/example/kader/verein/123' };
+  const serverReply = request => {
+    const filtered = roster.filter(player => request.payload.position === '__unknown__' ? player.position === null : !request.payload.position || player.position === request.payload.position);
+    const offset = Number(request.payload.cursor || 0);
+    return reply({ items: filtered.slice(offset, offset + 25), next_cursor: filtered.length > offset + 25 ? String(offset + 25) : null, total_count: filtered.length, squad });
+  };
+  h.setHandler(async request => serverReply(request));
+  h.selectClub(); await tick();
+  assert.deepEqual($('player-position-filter').options.map(option => option.value), ['', ...h.state.bootstrap.positions, '__unknown__']);
+  assert.equal($('player-position-filter').options[0].textContent, 'Todas las posiciones');
+  assert.equal($('player-position-filter').options.at(-1).textContent, 'Sin posición informada');
+  assert.equal(h.calls.at(-1).payload.position, null); assert.equal('query' in h.calls.at(-1).payload, false);
+  $('player-choice').value = 'position-0'; h.selectPlayer();
+  const selected = h.state.selectedPlayer; const originalName = $('player-first-name').value;
+  const callsBefore = h.calls.length; $('player-position').value = 'Defensor Central'; await $('player-position').fire('change');
+  assert.equal(h.calls.length, callsBefore); assert.equal($('player-position-filter').value, '');
+  $('player-position').value = 'Arquero';
+  $('player-position-filter').value = 'Defensor Central'; await $('player-position-filter').fire('change');
+  assert.equal(h.calls.at(-1).payload.position, 'Defensor Central'); assert.equal(h.calls.at(-1).payload.cursor, null);
+  assert.equal(h.state.players.size, 25); assert(h.state.players.has('position-25'), 'Server-filtered results beyond the original first page were lost');
+  assert.equal(h.state.selectedPlayer, selected); assert.equal($('player-first-name').value, originalName); assert.equal($('player-position').value, 'Arquero');
+  assert.match($('players-help').textContent, /25 de 30 jugadores para esta posición/); assert.equal(h.state.squad.player_count, 60);
+  await $('players-more').fire('click'); await tick();
+  assert.equal(h.calls.at(-1).payload.position, 'Defensor Central'); assert.equal(h.calls.at(-1).payload.cursor, '25');
+  assert.equal(h.state.players.size, 30); assert.equal($('players-more').hidden, true);
+  $('player-position-filter').value = '__unknown__'; await $('player-position-filter').fire('change');
+  assert.equal(h.calls.at(-1).payload.position, '__unknown__'); assert.equal(h.calls.at(-1).payload.cursor, null);
+  assert.equal(h.state.players.size, 5); assert([...h.state.players.values()].every(player => player.position === null));
+  assert.equal($('player-position').value, 'Arquero'); assert.equal(h.state.selectedPlayer, selected);
+  $('player-position-filter').value = ''; await $('player-position-filter').fire('change');
+  assert.equal(h.calls.at(-1).payload.position, null); assert.equal(h.state.players.size, 25); assert.match($('players-help').textContent, /25 de 60/);
+
+  $('player-position-filter').value = 'Defensor Central'; await $('player-position-filter').fire('change');
+  $('player-category').value = 'Reserva'; await $('player-category').fire('change'); await tick();
+  assert.equal($('player-position-filter').value, ''); assert.equal(h.calls.at(-1).payload.position, null); assert.equal(h.calls.at(-1).payload.category, 'Reserva'); assert.equal(h.calls.at(-1).payload.cursor, null);
+  $('player-position-filter').value = '__unknown__'; await $('player-position-filter').fire('change');
+  h.state.clubs.set('club-other', { id: 'club-other', name: 'Otro Club', province: 'Córdoba', competitions: [] }); $('club-choice').value = 'club-other'; h.selectClub(); await tick();
+  assert.equal($('player-position-filter').value, ''); assert.equal(h.calls.at(-1).payload.club_id, 'club-other'); assert.equal(h.calls.at(-1).payload.position, null); assert.equal(h.calls.at(-1).payload.cursor, null);
+
+  let resolvePrevious, previousSignal;
+  h.setHandler((request, signal) => request.payload.position === 'Defensor Central' ? new Promise(resolve => { previousSignal = signal; resolvePrevious = () => resolve(serverReply(request)); }) : Promise.resolve(serverReply(request)));
+  $('player-position-filter').value = 'Defensor Central'; const previous = $('player-position-filter').fire('change');
+  $('player-position-filter').value = '__unknown__'; await $('player-position-filter').fire('change');
+  assert.equal(previousSignal.aborted, true); assert.equal(h.state.players.size, 5);
+  resolvePrevious(); await previous;
+  assert.equal(h.state.playersQuery.position, '__unknown__'); assert.equal(h.state.players.size, 5); assert([...h.state.players.values()].every(player => player.position === null));
+  assert.equal($('players-more').hidden, true); h.dispose();
+  assert(!html.includes('id="player-query"') && !html.includes('Buscar en este plantel'));
+  assert(html.includes('/scouting/scouting.js?v=20261030-position-filter'));
+  console.log('PASS position filter: bootstrap options, server-wide results beyond original page, filtered pagination, unknown/all, independent recommendation position and selection, club/category resets, aborted/stale requests discarded.');
 }
 
 // A disposed native view aborts all work, including mutations outside read channels.

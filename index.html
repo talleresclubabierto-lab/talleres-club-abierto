@@ -3269,7 +3269,7 @@ if(host&&host.shadowRoot)host.shadowRoot.replaceChildren();
 var SCOUTING_NATIVE_LOAD=null,SCOUTING_NATIVE_MOUNT=null,SCOUTING_NATIVE_GENERATION=0;
 function cargarRecursosScouting(){
 if(SCOUTING_NATIVE_LOAD)return SCOUTING_NATIVE_LOAD;
-var version='20261030-native-squads';
+var version='20261030-position-filter';
 function resource(path){
 var controller=new AbortController(),timeout=setTimeout(function(){controller.abort()},20000);
 return fetch(path+'?v='+version,{cache:'no-cache',credentials:'same-origin',signal:controller.signal}).then(function(response){

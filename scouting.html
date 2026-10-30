@@ -9,7 +9,7 @@
   <title>Scouting colaborativo · Talleres Club Abierto</title>
   <link rel="icon" href="/icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/scouting/scouting.css">
-  <script src="/scouting/scouting.js" defer></script>
+  <script src="/scouting/scouting.js?v=20261030-position-filter" defer></script>
 </head>
 <body data-scouting-standalone>
   <a class="skip-link" href="#main">Ir al contenido</a>
@@ -118,7 +118,7 @@
                 </div>
                 <section class="player-lookup" id="player-lookup" aria-labelledby="squad-title" hidden>
                   <h3 class="lookup-title" id="squad-title">Plantel del equipo</h3>
-                  <div class="lookup-content"><p class="squad-status field-help" id="squad-status" role="status" hidden></p><a class="catalogue-reference" id="squad-source" target="_blank" rel="noopener noreferrer" hidden>Ver plantel en Transfermarkt ↗</a><label for="player-query">Nombre o apellido</label><input id="player-query" type="search" maxlength="100" placeholder="Buscar en este plantel" enterkeyhint="search"><label for="player-choice">Seleccioná un jugador</label><select id="player-choice" size="6"><option value="" disabled>Seleccioná una categoría</option></select><div class="result-footer"><p id="players-help" class="field-help" role="status">Seleccioná un jugador para completar su ficha.</p><button class="button button-small button-secondary" id="players-more" type="button" hidden>Cargar más jugadores</button></div></div>
+                  <div class="lookup-content"><p class="squad-status field-help" id="squad-status" role="status" hidden></p><a class="catalogue-reference" id="squad-source" target="_blank" rel="noopener noreferrer" hidden>Ver plantel en Transfermarkt ↗</a><label for="player-position-filter">Filtrar por posición</label><select id="player-position-filter"><option value="">Todas las posiciones</option></select><label for="player-choice">Seleccioná un jugador</label><select id="player-choice" size="6"><option value="" disabled>Seleccioná una categoría</option></select><div class="result-footer"><p id="players-help" class="field-help" role="status">Seleccioná un jugador para completar su ficha.</p><button class="button button-small button-secondary" id="players-more" type="button" hidden>Cargar más jugadores</button></div></div>
                 </section>
                 <p class="field-help player-manual-help" id="player-manual-help">Completá los datos del jugador. No necesita figurar en el catálogo.</p>
                 <p class="field-help player-review" id="selected-player-review" hidden role="status"></p>

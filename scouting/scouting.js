@@ -428,7 +428,9 @@
     const categories = (Array.isArray(data.categories) ? data.categories : []).filter((item) => !/^otra(?: categoría)?$/i.test(item)).map((item) => ({ value: item, label: item }));
     categories.push({ value: OTHER_CATEGORY, label: 'Otra categoría' });
     replaceOptions($('player-category'), categories, 'Seleccioná una categoría');
-    replaceOptions($('player-position'), (Array.isArray(data.positions) ? data.positions : []).map((item) => ({ value: item, label: item })), 'Seleccioná una posición');
+    const positions = (Array.isArray(data.positions) ? data.positions : []).map((item) => ({ value: item, label: item }));
+    replaceOptions($('player-position'), positions, 'Seleccioná una posición');
+    replaceOptions($('player-position-filter'), [...positions, { value: '__unknown__', label: 'Sin posición informada' }], 'Todas las posiciones');
     replaceOptions($('mine-status'), Object.entries(STATUS).map(([value, label]) => ({ value, label })), 'Todos los estados');
     const clubCount = Math.max(0, Number(data.catalogue?.club_count) || 0);
     const playerCount = Math.max(0, Number(data.catalogue?.player_count) || 0);
@@ -475,7 +477,7 @@
     $('player-choice').replaceChildren(option('', 'Seleccioná una categoría', true));
     $('squad-status').hidden = true; $('squad-source').hidden = true;
     $('players-more').hidden = true;
-    $('player-query').value = '';
+    $('player-position-filter').value = '';
     $('player-first-name').value = ''; $('player-last-name').value = '';
     $('player-age').value = ''; state.playerAutoAge = null;
     $('player-position').value = ''; $('player-sector').value = 'no_especificado';
@@ -731,7 +733,7 @@
     const request = requestChannel('players');
     if (!more) {
       state.players.clear(); state.playersCursor = null;
-      state.playersQuery = { club_id: state.selectedClub.id, category: category(), query: $('player-query').value.trim() };
+      state.playersQuery = { club_id: state.selectedClub.id, category: category(), position: $('player-position-filter').value || null };
     }
     if (!category() || category().length < 2) {
       $('player-choice').replaceChildren(option('', 'Seleccioná una categoría para buscar', true));
@@ -748,13 +750,13 @@
       renderSquad(data.squad);
       for (const player of Array.isArray(data.items) ? data.items : []) state.players.set(String(player.id), player);
       state.playersCursor = data.next_cursor || null;
-      const noMatch = state.playersQuery.query && Number(data.squad?.player_count || 0) > 0;
+      const noMatch = state.playersQuery.position && Number(data.squad?.player_count || 0) > 0;
       const emptySource = reviewedEmptySquad(data.squad);
-      $('player-choice').replaceChildren(option('', state.players.size ? 'Seleccioná un jugador del plantel' : noMatch ? 'No hay coincidencias con este nombre' : emptySource ? 'Fuente sin nómina publicada' : 'Plantel pendiente de carga', true));
+      $('player-choice').replaceChildren(option('', state.players.size ? 'Seleccioná un jugador del plantel' : noMatch ? 'No hay jugadores con esta posición' : emptySource ? 'Fuente sin nómina publicada' : 'Plantel pendiente de carga', true));
       for (const player of state.players.values()) $('player-choice').append(option(player.id, [player.first_name, player.last_name].filter(Boolean).join(' ') + (player.position ? ` · ${player.position}` : '')));
       if (selectedId && state.players.has(String(selectedId))) $('player-choice').value = String(selectedId);
       const total = Number.isInteger(data.total_count) && data.total_count >= state.players.size ? data.total_count : null;
-      $('players-help').textContent = state.players.size ? `${total === null ? `${state.players.size} jugadores cargados` : `Mostrando ${state.players.size} de ${total} jugadores`}${state.playersQuery.query ? ' para esta búsqueda' : ''}. Seleccioná uno para completar su ficha.` : noMatch ? 'Probá con otro nombre o borrá la búsqueda para ver el plantel.' : emptySource ? 'Podés ingresar nombre y apellido en los campos de abajo.' : 'Mientras se completa la carga, podés ingresar nombre y apellido en los campos de abajo.';
+      $('players-help').textContent = state.players.size ? `${total === null ? `${state.players.size} jugadores cargados` : `Mostrando ${state.players.size} de ${total} jugadores`}${state.playersQuery.position ? ' para esta posición' : ''}. Seleccioná uno para completar su ficha.` : noMatch ? 'Elegí Todas las posiciones para ver el plantel.' : emptySource ? 'Podés ingresar nombre y apellido en los campos de abajo.' : 'Mientras se completa la carga, podés ingresar nombre y apellido en los campos de abajo.';
       $('players-more').hidden = !state.playersCursor;
       $('players-more').textContent = 'Cargar más jugadores'; delete $('players-more').dataset.retry;
     } catch (error) {
@@ -1364,7 +1366,7 @@
   listen($('custom-category'), 'input', () => {
     clearPlayer(false); if (!$('player-lookup').hidden) debounce('players', () => loadPlayers());
   });
-  listen($('player-query'), 'input', () => { cancelChannel('players'); debounce('players', () => loadPlayers()); });
+  listen($('player-position-filter'), 'change', () => loadPlayers());
   listen($('player-choice'), 'change', selectPlayer);
   listen($('players-more'), 'click', () => loadPlayers($('players-more').dataset.retry !== 'true'));
   for (const id of ['player-first-name', 'player-last-name']) listen($(id), 'input', () => {
