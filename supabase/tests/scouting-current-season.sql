@@ -1,5 +1,5 @@
 -- Integration regression for the current-season projection.
--- Run after 20261029214442_scouting_current_season_projection.sql, as a database test operator.
+-- Run after the shared-dashboard migration, as a database test operator.
 -- All identities, clubs and competitions are synthetic. No real session is read.
 -- ALWAYS execute the entire BEGIN / ROLLBACK block. No external worker is invoked.
 begin;
@@ -41,8 +41,8 @@ declare
   v_check_count integer := 0;
 begin
   v_def_md5 := md5(pg_get_functiondef('public.scouting_api(text,text,jsonb)'::regprocedure));
-  if v_def_md5 <> '972089e8df055deb7d23884704c38d22' then
-    raise exception 'Install the reviewed current-season patch before running this regression';
+  if v_def_md5 <> '8a135faf5ebfd96e1ac61c5e260a7536' then
+    raise exception 'Install the reviewed dashboard patch, which preserves the current-season projection, before running this regression';
   end if;
   v_comp_a := 'qa-season-a-' || left(v_suffix,12);
   v_comp_b := 'qa-season-b-' || left(v_suffix,12);
@@ -81,7 +81,7 @@ begin
   select jsonb_agg(to_jsonb(cc) order by cc.club_id,cc.competition_id,cc.season)
     into v_before_history from scouting.club_competitions cc
     where club_id in (v_moving,v_same,v_legacy,v_historical,v_unclassified);
-  v_payload := jsonb_build_object('category','Sub-17','player_id',null,
+  v_payload := jsonb_build_object('panel_context','socio','category','Sub-17','player_id',null,
     'player',jsonb_build_object('first_name','SYNTHETIC','last_name','SEASON TEST','position','Lateral','sector','derecha'),
     'reason','Referencia deportiva ficticia para comprobar la proyección de temporadas',
     'observation',null,'video_url',null,'transfermarkt_url',null);

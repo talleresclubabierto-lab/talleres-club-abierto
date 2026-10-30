@@ -9,7 +9,20 @@
     en_revision: 'En revisión',
     informacion_solicitada: 'Información solicitada',
     en_seguimiento: 'En seguimiento',
+    contactado: 'Contactado',
+    visitado: 'Visitado',
+    convocado_a_prueba: 'Convocado a prueba',
+    prueba_realizada: 'Prueba realizada',
+    no_avanza: 'No avanza',
     cerrada: 'Cerrada'
+  });
+  const DASHBOARD_METRICS = Object.freeze({
+    'metric-recomendados': 'total_player_references',
+    'metric-contactados': 'contacted',
+    'metric-visitados': 'visited',
+    'metric-convocados-a-prueba': 'invited_to_trial',
+    'metric-prueba-realizada': 'trial_completed',
+    'metric-no-avanzan': 'not_advanced'
   });
   const PROOF_STATUS = Object.freeze({
     registrada: 'Registrada en auditoría',
@@ -23,11 +36,14 @@
   const channels = new Map();
   const timers = new Map();
   const state = {
-    actor: null, bootstrap: null, expired: false, activeToken: '', sessionGeneration: 0, activeTab: 'mine',
+    actor: null, bootstrap: null, expired: false, activeToken: '', sessionGeneration: 0, activeTab: 'mine', panelContext: initialPanelContext(),
     clubs: new Map(), players: new Map(), clubsCursor: null, playersCursor: null, clubsQuery: null, playersQuery: null,
-    selectedClub: null, selectedPlayer: null, clubAutoCompetition: false, playerAutoTransfermarktUrl: null, createRequestId: null, createPending: null,
+    selectedClub: null, selectedPlayer: null, clubAutoCompetition: false, playerAutoTransfermarktUrl: null, playerAutoAge: null, createRequestId: null, createPending: null,
     createBusy: false, successId: null, currentDetailId: null,
-    lists: { mine: { items: [], cursor: null, loaded: false }, admin: { items: [], cursor: null, loaded: false } },
+    list: { items: [], cursor: null, loaded: false, query: null },
+    dashboard: { data: null, loaded: false },
+    rankedPlayerFilter: null,
+    referenceRecommendation: null,
     mutations: new Map()
   };
 
@@ -57,12 +73,81 @@
     catch (_) { return ''; }
   }
 
+  function initialPanelContext() {
+    return new URLSearchParams(window.location.search).get('panel_context') === 'admin' ? 'admin' : 'socio';
+  }
+
+  function canRecommend() { return Boolean(state.actor) && state.panelContext === 'socio'; }
+  function canManage(recommendation) { return state.panelContext === 'admin' && state.actor?.role === 'admin' && recommendation.can_manage === true; }
+
+  function applyPanelContext(value) {
+    if (!['socio', 'admin'].includes(value)) return;
+    const changed = state.panelContext !== value;
+    state.panelContext = value;
+    $('tab-recommend').hidden = !canRecommend();
+    $('dashboard-recommend').hidden = !canRecommend();
+    $('create-submit').disabled = !canRecommend() || state.createBusy;
+    if (changed && $('detail-dialog').open) $('detail-dialog').close();
+    if (state.actor && state.activeTab === 'recommend' && !canRecommend()) activateTab('mine');
+    else if (changed && state.actor && state.list.loaded) renderList();
+  }
+
   function date(value) {
     const parsed = new Date(value);
     if (!value || Number.isNaN(parsed.getTime())) return 'Fecha no disponible';
     return new Intl.DateTimeFormat('es-AR', {
       dateStyle: 'medium', timeStyle: 'short', hour12: false, timeZone: 'America/Argentina/Buenos_Aires'
     }).format(parsed);
+  }
+
+  function shortDate(value) {
+    if (typeof value !== 'string' || !value) return null;
+    const calendarOnly = /^\d{4}-\d{2}-\d{2}$/.test(value);
+    const parsed = new Date(calendarOnly ? `${value}T12:00:00Z` : value);
+    if (Number.isNaN(parsed.getTime())) return null;
+    return new Intl.DateTimeFormat('es-AR', { dateStyle: 'medium', timeZone: calendarOnly ? 'UTC' : 'America/Argentina/Buenos_Aires' }).format(parsed);
+  }
+
+  function knownAge(value) {
+    if (value === null || value === undefined || value === '') return null;
+    const age = Number(value);
+    return Number.isInteger(age) && age >= 1 && age <= 100 ? age : null;
+  }
+
+  function ageLabel(player) {
+    const age = knownAge(player?.age_at_recommendation);
+    return age === null ? 'Sin edad informada' : `${age} ${age === 1 ? 'año' : 'años'}`;
+  }
+
+  function authorLabel(author) {
+    const number = author?.numero_socio;
+    const membership = number === null || number === undefined || String(number).trim() === '' ? 'N° de socio no informado' : `N° ${number}`;
+    return `${membership} · ${author?.name || 'Socio de Club Abierto'}`;
+  }
+
+  function verifiedMarketValue(value) {
+    if (!value || value.verification !== 'verified' || value.source !== 'Transfermarkt') return null;
+    const amount = value.amount === null || value.amount === undefined || value.amount === '' ? NaN : Number(value.amount);
+    const currency = typeof value.currency === 'string' ? value.currency.toUpperCase() : '';
+    const href = safeUrl(value.source_url, 'transfermarkt');
+    const asOf = shortDate(value.as_of);
+    const verifiedAt = shortDate(value.verified_at);
+    if (!Number.isFinite(amount) || amount < 0 || !/^[A-Z]{3}$/.test(currency) || !href || !/\/profil\/spieler\/\d+(?:\/|$)/.test(new URL(href).pathname) || !asOf || !verifiedAt) return null;
+    try {
+      const formatted = new Intl.NumberFormat('es-AR', { style: 'currency', currency, currencyDisplay: 'code', minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(amount);
+      return { formatted, href, asOf, verifiedAt };
+    } catch (_) { return null; }
+  }
+
+  function appendMarketValue(container, raw) {
+    const value = verifiedMarketValue(raw);
+    container.append(node('span', 'market-value', value ? value.formatted : 'Sin valor informado'));
+    if (!value) return;
+    const source = node('a', 'market-source', 'Transfermarkt ↗');
+    source.href = value.href; source.target = '_blank'; source.rel = 'noopener noreferrer';
+    const provenance = node('span', 'market-provenance');
+    provenance.append(source, node('span', '', `Valor al ${value.asOf} · Verificado el ${value.verifiedAt}`));
+    container.append(provenance);
   }
 
   function message(error) {
@@ -94,24 +179,34 @@
     for (const timer of timers.values()) clearTimeout(timer);
     timers.clear();
     if ($('detail-dialog').open) $('detail-dialog').close();
-    state.actor = null; state.bootstrap = null; state.activeToken = '';
+    state.actor = null; state.bootstrap = null; state.activeToken = ''; state.activeTab = 'mine';
     state.clubs.clear(); state.players.clear(); state.mutations.clear();
-    state.selectedClub = null; state.selectedPlayer = null; state.playerAutoTransfermarktUrl = null; state.createPending = null;
+    state.selectedClub = null; state.selectedPlayer = null; state.playerAutoTransfermarktUrl = null; state.playerAutoAge = null; state.createPending = null;
     state.createRequestId = null; state.successId = null; state.currentDetailId = null; state.createBusy = false;
     state.clubAutoCompetition = false; state.clubsQuery = null; state.playersQuery = null;
-    state.lists.mine = { items: [], cursor: null, loaded: false };
-    state.lists.admin = { items: [], cursor: null, loaded: false };
+    state.list = { items: [], cursor: null, loaded: false, query: null };
+    state.dashboard = { data: null, loaded: false };
+    state.rankedPlayerFilter = null; state.referenceRecommendation = null;
     $('recommend-form').reset();
-    updateClubReference(); updatePlayerReview();
-    for (const id of ['mine-list', 'admin-list', 'detail-body']) $(id).replaceChildren();
-    for (const id of ['success-description', 'selected-club-name', 'selected-club-description', 'actor-label', 'mine-count', 'admin-count']) $(id).textContent = '';
-    $('admin-query').value = '';
+    updateClubReference(); updatePlayerReview(); updateReferenceNotice();
+    for (const id of ['mine-list', 'detail-body']) $(id).replaceChildren();
+    for (const id of ['success-description', 'selected-club-name', 'selected-club-description', 'actor-label', 'mine-count']) $(id).textContent = '';
+    $('mine-query').value = ''; $('mine-only').checked = false;
+    for (const id of Object.keys(DASHBOARD_METRICS)) $(id).textContent = '—';
+    $('dashboard-total').textContent = 'Consultando los totales globales del scouting.';
+    $('dashboard-updated').textContent = ''; $('dashboard-updated').hidden = true;
+    $('ranking-list').replaceChildren(); $('ranking-list').hidden = true;
+    $('ranking-empty').textContent = 'El listado se mostrará cuando termine la consulta del tablero.'; $('ranking-empty').hidden = false;
+    $('player-filter').hidden = true; $('player-filter-name').textContent = '';
+    $('dashboard-metrics').setAttribute('aria-busy', 'false');
+    setFeedback('dashboard-feedback', ''); setFeedback('mine-feedback', '');
     $('club-choice').replaceChildren(option('', 'Elegí una provincia para buscar', true));
     $('player-choice').replaceChildren(option('', 'Seleccioná una categoría', true));
     setFeedback('create-feedback', '');
     $('create-success').hidden = true; $('recommend-layout').hidden = false;
     $('create-fields').disabled = false;
-    $('create-submit').disabled = false; $('create-submit').textContent = 'Enviar recomendación ↗';
+    $('create-submit').disabled = true; $('create-submit').textContent = 'Enviar recomendación ↗';
+    $('tab-recommend').hidden = true; $('dashboard-recommend').hidden = true;
     $('actor-label').hidden = true;
   }
 
@@ -237,6 +332,11 @@
     state.playerAutoTransfermarktUrl = null;
   }
 
+  function clearAutoPlayerAge() {
+    if (state.playerAutoAge !== null && knownAge($('player-age').value) === state.playerAutoAge) $('player-age').value = '';
+    state.playerAutoAge = null;
+  }
+
   function autofillPlayerProfile(player) {
     const input = $('transfermarkt-url');
     const current = input.value.trim();
@@ -288,11 +388,11 @@
       initialiseForm(data);
       $('actor-label').textContent = `${data.actor.role === 'admin' ? 'Administración' : 'Socio'} · ${data.actor.numero_socio}`;
       $('actor-label').hidden = false;
-      $('tab-admin').hidden = data.actor.role !== 'admin';
+      applyPanelContext(state.panelContext);
       $('boot-panel').hidden = true;
       $('application').hidden = false;
       $('mine-only').checked = location.hash === '#mis-recomendaciones';
-      activateTab(location.hash === '#gestion' && data.actor.role === 'admin' ? 'admin' : location.hash === '#recomendar' ? 'recommend' : 'mine');
+      activateTab(location.hash === '#recomendar' && canRecommend() ? 'recommend' : 'mine');
     } catch (error) {
       if (!request.current() || cancelled(error)) return;
       setBoot('No pudimos abrir scouting', message(error), { retry: true, login: error.status === 403 });
@@ -308,7 +408,7 @@
     categories.push({ value: OTHER_CATEGORY, label: 'Otra categoría' });
     replaceOptions($('player-category'), categories, 'Seleccioná una categoría');
     replaceOptions($('player-position'), (Array.isArray(data.positions) ? data.positions : []).map((item) => ({ value: item, label: item })), 'Seleccioná una posición');
-    for (const id of ['mine-status', 'admin-status']) replaceOptions($(id), Object.entries(STATUS).map(([value, label]) => ({ value, label })), 'Todos los estados');
+    replaceOptions($('mine-status'), Object.entries(STATUS).map(([value, label]) => ({ value, label })), 'Todos los estados');
     const clubCount = Math.max(0, Number(data.catalogue?.club_count) || 0);
     const playerCount = Math.max(0, Number(data.catalogue?.player_count) || 0);
     const empty = clubCount === 0;
@@ -320,8 +420,8 @@
   }
 
   function activateTab(name, focus = false) {
-    if (name === 'admin' && state.actor?.role !== 'admin') return;
-    if (!['recommend', 'mine', 'admin'].includes(name)) return;
+    if (name === 'recommend' && !canRecommend()) name = 'mine';
+    if (!['recommend', 'mine'].includes(name)) return;
     state.activeTab = name;
     for (const tab of document.querySelectorAll('[data-tab]')) {
       const active = tab.dataset.tab === name;
@@ -329,18 +429,37 @@
       $(`panel-${tab.dataset.tab}`).hidden = !active;
       if (active && focus) tab.focus();
     }
-    if (name !== 'recommend' && !state.lists[name].loaded) loadList(name);
+    if (name === 'mine') {
+      for (const channel of ['clubs', 'players']) { cancelChannel(channel); clearDebounce(channel); }
+      $('club-choice').setAttribute('aria-busy', 'false'); $('player-choice').setAttribute('aria-busy', 'false');
+      $('clubs-more').disabled = manualClub(); $('players-more').disabled = false;
+      if (!state.list.loaded) loadList();
+      if (!state.dashboard.loaded) loadDashboard();
+    } else {
+      cancelChannel('list'); clearDebounce('list-query'); cancelChannel('dashboard');
+      $('mine-list').setAttribute('aria-busy', 'false'); $('dashboard-metrics').setAttribute('aria-busy', 'false');
+      $('mine-refresh').disabled = false; $('mine-more').disabled = false;
+      if (!manualClub() && !state.selectedClub) loadClubs();
+      if ($('player-lookup').open) loadPlayers();
+    }
   }
 
   function clearPlayer(clearCategory = false) {
+    const referenced = state.referenceRecommendation;
+    const previous = referenced ? { age: $('player-age').value, position: $('player-position').value, sector: $('player-sector').value } : null;
     cancelChannel('players'); clearDebounce('players');
-    clearAutoPlayerProfile();
+    if (!referenced) clearAutoPlayerProfile();
     state.selectedPlayer = null; state.players.clear(); state.playersCursor = null;
     $('player-choice').replaceChildren(option('', 'Seleccioná una categoría', true));
     $('players-more').hidden = true;
     $('player-query').value = '';
     $('player-first-name').value = ''; $('player-last-name').value = '';
+    $('player-age').value = ''; state.playerAutoAge = null;
     $('player-position').value = ''; $('player-sector').value = 'no_especificado';
+    if (referenced) {
+      $('player-first-name').value = referenced.firstName; $('player-last-name').value = referenced.lastName;
+      $('player-age').value = previous.age; $('player-position').value = previous.position; $('player-sector').value = previous.sector;
+    }
     if (clearCategory) { $('player-category').value = ''; $('custom-category').value = ''; updateCustomCategory(); }
     updateSector(); updatePlayerLookup();
   }
@@ -406,6 +525,7 @@
   }
 
   async function loadClubs(more = false) {
+    if (state.activeTab !== 'recommend' || !canRecommend()) return;
     if (!state.bootstrap || manualClub()) return;
     clearDebounce('clubs');
     const request = requestChannel('clubs');
@@ -514,11 +634,26 @@
   }
 
   function updatePlayerLookup() {
-    const available = !manualClub() && Boolean(state.selectedClub) && Number(state.bootstrap?.catalogue?.player_count || 0) > 0;
+    const available = !state.referenceRecommendation && !manualClub() && Boolean(state.selectedClub) && Number(state.bootstrap?.catalogue?.player_count || 0) > 0;
     $('player-lookup').hidden = !available;
     if (!available) $('player-lookup').open = false;
-    $('player-manual-help').textContent = state.selectedPlayer ? 'Datos del jugador seleccionado. Podés completar la posición que observaste.' : 'Completá los datos del jugador. No necesita figurar en el catálogo.';
+    $('player-manual-help').textContent = state.referenceRecommendation ? 'La identidad está vinculada al aporte original. Para recomendar a otra persona, elegí Nuevo jugador. La posición y la edad que informes corresponden a tu nuevo aporte.' : state.selectedPlayer ? 'Datos del jugador seleccionado. Podés completar la posición que observaste.' : 'Completá los datos del jugador. No necesita figurar en el catálogo.';
     updatePlayerReview();
+  }
+
+  function updateReferenceNotice() {
+    const reference = state.referenceRecommendation;
+    $('reference-notice').hidden = !reference;
+    $('reference-player-name').textContent = reference ? [reference.firstName, reference.lastName].filter(Boolean).join(' ') : '';
+    $('reference-description').textContent = reference ? `Vinculado a ${reference.code || 'la recomendación original'}. Revisá el club y la categoría de este aporte y escribí tu propio motivo. El vínculo identifica a la persona, sin verificar por sí solo una referencia manual.` : '';
+    $('player-first-name').readOnly = Boolean(reference); $('player-last-name').readOnly = Boolean(reference);
+  }
+
+  function clearRecommendationReference(resetPlayer = true) {
+    state.referenceRecommendation = null;
+    updateReferenceNotice();
+    if (resetPlayer) clearPlayer(false);
+    else updatePlayerLookup();
   }
 
   function updateSector() {
@@ -528,7 +663,7 @@
   }
 
   async function loadPlayers(more = false) {
-    if (!state.selectedClub || manualClub() || $('player-lookup').hidden) return;
+    if (state.activeTab !== 'recommend' || !canRecommend() || !state.selectedClub || manualClub() || $('player-lookup').hidden) return;
     clearDebounce('players');
     const request = requestChannel('players');
     if (!more) {
@@ -566,11 +701,14 @@
   }
 
   function selectPlayer() {
+    if (state.referenceRecommendation) return;
     const player = state.players.get($('player-choice').value);
     if (!player) return;
     state.selectedPlayer = player;
     $('player-first-name').value = player.first_name || '';
     $('player-last-name').value = player.last_name || '';
+    state.playerAutoAge = knownAge(player.age_current ?? player.age_at_recommendation);
+    $('player-age').value = state.playerAutoAge === null ? '' : String(state.playerAutoAge);
     $('player-position').value = player.position || '';
     $('player-sector').value = 'no_especificado';
     autofillPlayerProfile(player);
@@ -587,6 +725,7 @@
   }
 
   function createPayload() {
+    if (!canRecommend()) return null;
     if (!$('recommend-form').reportValidity()) return null;
     if (!manualClub() && !state.selectedClub) {
       setFeedback('create-feedback', 'Seleccioná un equipo del listado o activá Otro club para ingresarlo manualmente.', 'error', true);
@@ -596,6 +735,13 @@
     if (manualClub()) required.unshift(['manual-city', 2, 'La ciudad'], ['manual-club-name', 2, 'El nombre del club'], ['manual-league', 2, 'La liga']);
     if ($('player-category').value === OTHER_CATEGORY) required.push(['custom-category', 2, 'La categoría']);
     for (const [id, minimum, label] of required) if (!validateField(id, minimum, label)) return null;
+    if (state.referenceRecommendation && ($('player-first-name').value.trim() !== state.referenceRecommendation.firstName || $('player-last-name').value.trim() !== state.referenceRecommendation.lastName)) {
+      setFeedback('create-feedback', 'Para cambiar la persona vinculada, elegí Nuevo jugador y completá sus datos.', 'error', true); return null;
+    }
+    const ageInput = $('player-age');
+    if (ageInput.value.trim() && knownAge(ageInput.value) === null) {
+      ageInput.setCustomValidity('Ingresá una edad en años cumplidos, entre 1 y 100, o dejá el campo vacío.'); ageInput.reportValidity(); return null;
+    }
     for (const [id, kind, description] of [
       ['video-url', 'video', 'Ingresá un enlace HTTPS de YouTube o Vimeo.'],
       ['transfermarkt-url', 'transfermarkt', 'Ingresá un enlace HTTPS al perfil de un jugador o al plantel de un club en Transfermarkt.']
@@ -606,11 +752,13 @@
     state.createRequestId ||= uuid();
     return {
       request_id: state.createRequestId,
+      panel_context: 'socio',
+      reference_recommendation_id: state.referenceRecommendation?.id || null,
       club_id: manualClub() ? null : state.selectedClub.id,
       club_manual: manualClub() ? { province: $('manual-province').value, city: $('manual-city').value.trim(), name: $('manual-club-name').value.trim(), league: $('manual-league').value.trim() } : null,
       competition_id: manualClub() ? null : state.selectedClub.competition_id || $('club-competition').value || null,
-      category: category(), player_id: state.selectedPlayer?.id || null,
-      player: { first_name: $('player-first-name').value.trim(), last_name: $('player-last-name').value.trim(), position: $('player-position').value, sector: $('player-sector').disabled ? 'no_especificado' : $('player-sector').value },
+      category: category(), player_id: state.referenceRecommendation ? null : state.selectedPlayer?.id || null,
+      player: { first_name: $('player-first-name').value.trim(), last_name: $('player-last-name').value.trim(), position: $('player-position').value, sector: $('player-sector').disabled ? 'no_especificado' : $('player-sector').value, age_at_recommendation: knownAge(ageInput.value) },
       reason: $('recommend-reason').value.trim(), observation: $('recommend-observation').value.trim(),
       video_url: safeUrl($('video-url').value.trim(), 'video'), transfermarkt_url: safeUrl($('transfermarkt-url').value.trim(), 'transfermarkt')
     };
@@ -618,7 +766,7 @@
 
   async function createRecommendation(event) {
     event.preventDefault();
-    if (state.createBusy || state.expired) return;
+    if (!canRecommend() || state.createBusy || state.expired) return;
     const generation = state.sessionGeneration;
     const payload = state.createPending || createPayload();
     if (!payload) return;
@@ -631,7 +779,7 @@
       const recommendation = data.recommendation;
       if (!recommendation?.id) throw new ApiError('No recibimos una constancia completa del envío. Reintentá para recuperar el resultado.', 'INVALID_RESPONSE', 502);
       state.createPending = null; state.createRequestId = null; state.successId = recommendation.id;
-      state.lists.mine.loaded = false; state.lists.admin.loaded = false;
+      state.list.loaded = false; state.dashboard.loaded = false;
       $('recommend-layout').hidden = true; $('create-success').hidden = false;
       const name = [recommendation.player?.first_name || payload.player.first_name, recommendation.player?.last_name || payload.player.last_name].join(' ');
       $('success-description').textContent = `${name}${recommendation.club?.name ? ` · ${recommendation.club.name}` : ''}. Referencia: ${recommendation.code || recommendation.id}.`;
@@ -649,14 +797,17 @@
       if (generation === state.sessionGeneration) {
         state.createBusy = false;
         $('create-fields').disabled = Boolean(state.createPending);
-        $('create-submit').disabled = false;
+        $('create-submit').disabled = !canRecommend();
         $('create-submit').textContent = state.createPending ? 'Reintentar envío' : 'Enviar recomendación ↗';
       }
     }
   }
 
-  function newRecommendation() {
+  function newRecommendation(focus = true) {
+    if (!canRecommend()) return;
+    state.referenceRecommendation = null;
     $('recommend-form').reset();
+    updateReferenceNotice();
     for (const input of $('recommend-form').querySelectorAll('input,select,textarea')) input.setCustomValidity('');
     state.createRequestId = null; state.createPending = null; state.successId = null;
     $('manual-club-toggle').checked = Number(state.bootstrap?.catalogue?.club_count || 0) === 0;
@@ -664,8 +815,46 @@
     $('create-fields').disabled = false; $('reason-count').textContent = '0 / 4000';
     clearClub(); updateRoute(); setManualClub(false); updateCustomCategory();
     setFeedback('create-feedback', '');
-    $('club-section-title').scrollIntoView({ block: 'start' });
-    const target = manualClub() ? $('manual-province') : $('club-province'); target.focus();
+    if (focus) {
+      $('club-section-title').scrollIntoView({ block: 'start' });
+      const target = manualClub() ? $('manual-province') : $('club-province'); target.focus();
+    }
+  }
+
+  function recommendAlso(recommendation) {
+    if (!canRecommend() || !recommendation?.id) return;
+    if (state.createBusy || state.createPending) {
+      if ($('detail-dialog').open) $('detail-dialog').close();
+      activateTab('recommend');
+      setFeedback('create-feedback', 'Primero confirmá el envío pendiente antes de iniciar otra recomendación.', 'info', true); return;
+    }
+    newRecommendation(false);
+    state.referenceRecommendation = { id: recommendation.id, code: recommendation.code, firstName: (recommendation.player?.first_name || '').trim(), lastName: (recommendation.player?.last_name || '').trim() };
+    const club = recommendation.club || {};
+    const manual = !club.id || club.source === 'manual';
+    $('manual-club-toggle').checked = manual; setManualClub(false);
+    if (manual) {
+      $('manual-province').value = club.province || ''; $('manual-city').value = club.city || '';
+      $('manual-club-name').value = club.name || ''; $('manual-league').value = club.league || club.competition_name || '';
+    } else {
+      $('club-province').value = club.province || '';
+      const referenceClub = { ...club, competitions: club.competition_id ? [{ id: club.competition_id, name: club.competition_name || club.league || 'Competencia del aporte original', season: club.season, division: club.division, reference_scope: club.reference_scope }] : [] };
+      state.clubs.set(String(club.id), referenceClub);
+      $('club-choice').replaceChildren(option(club.id, club.name || 'Equipo del aporte original'));
+      $('club-choice').value = String(club.id); selectClub();
+    }
+    const existingCategory = recommendation.category || '';
+    if ([...$('player-category').options].some((entry) => entry.value === existingCategory)) $('player-category').value = existingCategory;
+    else { $('player-category').value = OTHER_CATEGORY; $('custom-category').value = existingCategory; }
+    updateCustomCategory();
+    $('player-first-name').value = state.referenceRecommendation.firstName; $('player-last-name').value = state.referenceRecommendation.lastName;
+    $('player-age').value = ''; state.playerAutoAge = null;
+    $('player-position').value = recommendation.player?.position || ''; $('player-sector').value = recommendation.player?.sector || 'no_especificado';
+    autofillPlayerProfile({ transfermarkt_url: recommendation.transfermarkt_url });
+    updateReferenceNotice(); updateSector(); updatePlayerLookup();
+    if ($('detail-dialog').open) $('detail-dialog').close();
+    activateTab('recommend', true);
+    $('reference-notice').scrollIntoView({ block: 'start' }); $('recommend-reason').focus({ preventScroll: true });
   }
 
   function statusBadge(value) {
@@ -679,71 +868,160 @@
 
   function card(recommendation) {
     const article = node('article', 'recommendation-card');
-    const content = node('div');
+    const content = node('div', 'card-content');
     content.append(node('h3', '', playerName(recommendation)));
-    content.append(node('p', 'club-line', [recommendation.club?.name, recommendation.club?.city, recommendation.club?.province].filter(Boolean).join(' · ') || 'Club sin información'));
-    content.append(node('p', 'author-line', `Recomienda: ${recommendation.author?.name || 'Socio de Club Abierto'}`));
-    const meta = node('div', 'card-meta');
-    for (const text of [recommendation.category, recommendation.player?.position, date(recommendation.created_at), recommendation.code]) if (text) meta.append(node('span', '', text));
-    content.append(meta);
+    if (recommendation.category) content.append(node('p', 'card-category', recommendation.category));
+    const facts = node('dl', 'record-grid');
+    for (const [label, value] of [
+      ['Fecha de recomendación', date(recommendation.created_at)],
+      ['Socio que recomienda', authorLabel(recommendation.author)],
+      ['Club', recommendation.club?.name],
+      ['Liga / competencia', recommendation.club?.competition_name || recommendation.club?.league],
+      ['Provincia / CABA', recommendation.club?.province],
+      ['Edad al recomendar', ageLabel(recommendation.player)],
+      ['Posición', recommendation.player?.position]
+    ]) facts.append(detailPair(label, value));
+    const market = node('div', 'record-market');
+    const marketValue = node('dd'); appendMarketValue(marketValue, recommendation.player?.market_value);
+    market.append(node('dt', '', 'Valor de mercado'), marketValue); facts.append(market);
+    content.append(facts);
     const actions = node('div', 'card-actions');
     actions.append(statusBadge(recommendation.status));
     const button = node('button', 'button button-secondary', 'Ver detalle'); button.type = 'button';
     button.setAttribute('aria-label', `Ver recomendación de ${playerName(recommendation)}`);
     button.addEventListener('click', () => openDetail(recommendation.id));
-    actions.append(button); article.append(content, actions); return article;
+    actions.append(button);
+    if (recommendation.code) actions.append(node('span', 'card-reference', recommendation.code));
+    article.append(content, actions); return article;
   }
 
-  function renderList(kind) {
-    const list = $(`${kind}-list`); list.replaceChildren();
-    const items = state.lists[kind].items;
+  function renderList() {
+    const list = $('mine-list'); list.replaceChildren();
+    const items = state.list.items;
     if (!items.length) {
       const empty = node('div', 'empty-state');
-      const filtered = Boolean($(`${kind}-status`).value || kind === 'admin' && $('admin-query').value.trim());
-      empty.append(node('h3', '', filtered ? 'No hay recomendaciones con estos filtros' : kind === 'mine' ? $('mine-only').checked ? 'Todavía no enviaste recomendaciones' : 'Todavía no hay recomendaciones del club' : 'Todavía no hay recomendaciones para revisar'));
-      empty.append(node('p', '', filtered ? 'Probá con otro estado o modificá la búsqueda.' : kind === 'mine' ? 'Compartí un aporte deportivo. Su autor, estado y devoluciones quedarán visibles para todos los socios.' : 'Los aportes de los socios aparecerán en esta bandeja.'));
-      if (kind === 'mine' && !filtered) {
+      const filtered = Boolean($('mine-status').value || $('mine-query').value.trim() || state.rankedPlayerFilter);
+      empty.append(node('h3', '', filtered ? 'No hay recomendaciones con estos filtros' : $('mine-only').checked ? 'Todavía no enviaste recomendaciones' : 'Todavía no hay recomendaciones del club'));
+      empty.append(node('p', '', filtered ? 'Probá con otro estado o modificá la búsqueda.' : 'Los aportes de los socios aparecerán aquí, con su autor, sus datos y su seguimiento.'));
+      if (canRecommend() && !filtered) {
         const button = node('button', 'button button-primary', 'Recomendar jugador'); button.type = 'button';
         button.addEventListener('click', () => activateTab('recommend', true)); empty.append(button);
       }
       list.append(empty);
     } else for (const item of items) list.append(card(item));
-    $(`${kind}-count`).textContent = items.length ? `${items.length} ${items.length === 1 ? 'recomendación cargada' : 'recomendaciones cargadas'}` : '';
+    $('mine-count').textContent = items.length ? `${items.length} ${items.length === 1 ? 'recomendación cargada' : 'recomendaciones cargadas'}` : '';
   }
 
-  async function loadList(kind, more = false) {
-    if (!state.actor || state.expired || kind === 'admin' && state.actor.role !== 'admin') return;
-    const request = requestChannel(`list-${kind}`);
-    const listState = state.lists[kind];
-    const list = $(`${kind}-list`);
-    const moreButton = $(`${kind}-more`);
+  async function loadList(more = false) {
+    if (!state.actor || state.expired || state.activeTab !== 'mine' || more && !state.list.cursor) return;
+    clearDebounce('list-query');
+    const request = requestChannel('list');
+    const listState = state.list;
+    const list = $('mine-list');
+    const moreButton = $('mine-more');
     if (!more) {
       listState.items = []; listState.cursor = null; listState.loaded = false;
+      listState.query = { status: $('mine-status').value || null, query: $('mine-query').value.trim(), mine_only: $('mine-only').checked, player_id: state.rankedPlayerFilter?.playerId || null, reference_recommendation_id: state.rankedPlayerFilter?.referenceRecommendationId || null };
       const loading = node('div', 'list-loading');
       const ring = node('span', 'loading-ring'); ring.setAttribute('aria-hidden', 'true');
       loading.append(ring, node('span', '', 'Cargando recomendaciones…')); list.replaceChildren(loading);
-      $(`${kind}-count`).textContent = ''; moreButton.hidden = true;
+      $('mine-count').textContent = ''; moreButton.hidden = true;
     }
     list.setAttribute('aria-busy', 'true'); moreButton.disabled = true;
-    $(`${kind}-refresh`).disabled = true;
-    setFeedback(`${kind}-feedback`, '');
+    $('mine-refresh').disabled = true;
+    setFeedback('mine-feedback', '');
     try {
-      const payload = { status: $(`${kind}-status`).value || null, cursor: more ? listState.cursor : null };
-      if (kind === 'admin') payload.query = $('admin-query').value.trim();
-      else payload.mine_only = $('mine-only').checked;
-      const data = await api(kind === 'admin' ? 'admin_list' : 'feed', payload, request.signal);
+      const payload = { ...listState.query, cursor: more ? listState.cursor : null };
+      const data = await api('feed', payload, request.signal);
       if (!request.current()) return;
       const existing = new Map(listState.items.map((item) => [String(item.id), item]));
       for (const item of Array.isArray(data.items) ? data.items : []) existing.set(String(item.id), item);
       listState.items = [...existing.values()]; listState.cursor = data.next_cursor || null; listState.loaded = true;
-      renderList(kind); moreButton.hidden = !listState.cursor;
+      renderList(); moreButton.hidden = !listState.cursor;
     } catch (error) {
       if (!request.current() || cancelled(error)) return;
       if (!more) list.replaceChildren();
-      setFeedback(`${kind}-feedback`, `${message(error)} Usá Actualizar para volver a intentar.`);
+      setFeedback('mine-feedback', `${message(error)} Usá Actualizar para volver a intentar.`);
     } finally {
-      if (request.current()) { list.setAttribute('aria-busy', 'false'); moreButton.disabled = false; $(`${kind}-refresh`).disabled = false; }
+      if (request.current()) { list.setAttribute('aria-busy', 'false'); moreButton.disabled = false; $('mine-refresh').disabled = false; }
     }
+  }
+
+  function renderDashboard(dashboard) {
+    for (const [id, key] of Object.entries(DASHBOARD_METRICS)) $(id).textContent = Number(dashboard[key]).toLocaleString('es-AR');
+    const total = dashboard.total_recommendations.toLocaleString('es-AR');
+    const identified = dashboard.identified_players.toLocaleString('es-AR');
+    const unverified = dashboard.unverified_player_references.toLocaleString('es-AR');
+    $('dashboard-total').textContent = `${total} ${dashboard.total_recommendations === 1 ? 'recomendación registrada' : 'recomendaciones registradas'} · ${identified} ${dashboard.identified_players === 1 ? 'jugador identificado en el catálogo' : 'jugadores identificados en el catálogo'} · ${unverified} ${dashboard.unverified_player_references === 1 ? 'referencia sin identidad comprobada' : 'referencias sin identidad comprobada'}.`;
+    $('dashboard-updated').hidden = !shortDate(dashboard.as_of);
+    $('dashboard-updated').textContent = shortDate(dashboard.as_of) ? `Última consulta: ${date(dashboard.as_of)}.` : '';
+    renderRanking(dashboard.most_recommended_players);
+  }
+
+  function renderRanking(entries) {
+    const rows = (Array.isArray(entries) ? entries : [])
+      .filter((entry) => ['catalogue', 'member_reference'].includes(entry.identity_type) && (typeof entry.reference_recommendation_id === 'string' && entry.reference_recommendation_id || entry.identity_type === 'catalogue' && typeof entry.player_id === 'string' && entry.player_id) && Number.isSafeInteger(entry.recommendation_count) && entry.recommendation_count >= 2)
+      .sort((a, b) => b.recommendation_count - a.recommendation_count).slice(0, 10);
+    const list = $('ranking-list'); list.replaceChildren(); list.hidden = rows.length === 0;
+    $('ranking-empty').hidden = rows.length > 0;
+    $('ranking-empty').textContent = Array.isArray(entries) ? 'Todavía no hay jugadores con dos o más recomendaciones vinculadas a la misma referencia.' : 'El ranking no está disponible en esta consulta. Podés reintentar con Actualizar.';
+    for (const entry of rows) {
+      const item = node('li', 'ranking-item');
+      const identity = node('div');
+      const name = playerName(entry);
+      identity.append(node('p', 'ranking-name', name));
+      if (entry.club?.name) identity.append(node('p', 'ranking-club', `Club en el último aporte: ${entry.club.name}`));
+      identity.append(node('p', 'ranking-identity', entry.identity_type === 'member_reference' ? 'Identidad declarada por socios' : 'Identificado en el catálogo'));
+      const count = node('div', 'ranking-count');
+      count.append(node('strong', '', entry.recommendation_count.toLocaleString('es-AR')), node('span', '', 'recomendaciones'));
+      const button = node('button', 'button button-small button-secondary', 'Ver recomendaciones'); button.type = 'button';
+      button.setAttribute('aria-label', `Ver las ${entry.recommendation_count} recomendaciones de ${name}`);
+      button.addEventListener('click', () => showPlayerRecommendations(entry.reference_recommendation_id, entry.identity_type === 'catalogue' ? entry.player_id : null, name));
+      item.append(identity, count, button); list.append(item);
+    }
+  }
+
+  function showPlayerRecommendations(referenceRecommendationId, playerId, name) {
+    if (!referenceRecommendationId && !playerId) return;
+    state.rankedPlayerFilter = { referenceRecommendationId: referenceRecommendationId || null, playerId: referenceRecommendationId ? null : playerId, name };
+    $('player-filter-name').textContent = name; $('player-filter').hidden = false;
+    $('mine-status').value = ''; $('mine-query').value = ''; $('mine-only').checked = false;
+    state.list.loaded = false;
+    if ($('detail-dialog').open) $('detail-dialog').close();
+    activateTab('mine');
+    $('recommendations-title').scrollIntoView({ block: 'start' }); $('recommendations-title').focus({ preventScroll: true });
+  }
+
+  async function loadDashboard() {
+    if (!state.actor || state.expired || state.activeTab !== 'mine') return;
+    const request = requestChannel('dashboard');
+    state.dashboard.loaded = false;
+    $('dashboard-metrics').setAttribute('aria-busy', 'true');
+    setFeedback('dashboard-feedback', '');
+    try {
+      const data = await api('dashboard', {}, request.signal);
+      if (!request.current()) return;
+      const dashboard = data.dashboard;
+      const keys = [...Object.values(DASHBOARD_METRICS), 'total_recommendations', 'identified_players', 'unverified_player_references'];
+      if (!dashboard || dashboard.scope !== 'all_recommendations' || dashboard.milestone_unit !== 'player_references' || keys.some((key) => !Number.isSafeInteger(dashboard[key]) || dashboard[key] < 0)) {
+        throw new ApiError('No recibimos totales globales completos. Podés reintentar con Actualizar.', 'INVALID_DASHBOARD', 502);
+      }
+      state.dashboard.data = dashboard; state.dashboard.loaded = true;
+      renderDashboard(dashboard);
+    } catch (error) {
+      if (!request.current() || cancelled(error)) return;
+      setFeedback('dashboard-feedback', `${message(error)}${state.dashboard.data ? ' Los totales visibles corresponden a la consulta anterior.' : ' El listado puede consultarse mientras tanto.'}`);
+      if (!state.dashboard.data) {
+        $('dashboard-total').textContent = 'Los totales globales no están disponibles. Usá Actualizar para volver a consultar.';
+        $('ranking-empty').textContent = 'No pudimos consultar el ranking. Usá Actualizar para volver a intentar.';
+      }
+    } finally {
+      if (request.current()) $('dashboard-metrics').setAttribute('aria-busy', 'false');
+    }
+  }
+
+  function refreshOverview() {
+    loadList(); loadDashboard();
   }
 
   function detailPair(label, value) {
@@ -754,8 +1032,8 @@
     const section = node('section', 'detail-section'); section.append(node('h3', '', title), node('p', '', text || 'Sin información adicional.')); return section;
   }
 
-  function renderProof(proof) {
-    const details = node('details', 'proof-panel'); details.append(node('summary', '', 'Constancia de registro y auditoría'));
+  function renderProof(proof, initial = true) {
+    const details = node('details', 'proof-panel'); details.append(node('summary', '', initial ? 'Registro criptográfico y blockchain · recomendación inicial' : 'Registro criptográfico y blockchain · esta actuación'));
     const content = node('div', 'proof-content');
     const recognised = proof && Object.hasOwn(PROOF_STATUS, proof.status);
     content.append(node('p', '', recognised ? PROOF_STATUS[proof.status] : 'No hay una constancia de anclaje disponible para mostrar.'));
@@ -763,7 +1041,7 @@
     else if (proof?.status === 'preparada') content.append(node('p', '', 'El registro está preparado para su anclaje. Todavía no hay confirmación en blockchain.'));
     else if (proof?.status === 'enviada') content.append(node('p', '', 'El anclaje fue enviado y está pendiente de confirmación.'));
     const metadata = node('dl');
-    for (const [label, value] of [['Huella del registro inicial', proof?.commitment_hash], ['Registro de auditoría', proof?.audit_event_id], ['Huella en auditoría general', proof?.audit_event_hash], ['Lote', proof?.lot_id], ['Raíz Merkle', proof?.merkle_root], ['Transacción', proof?.transaction_hash], ['Bloque confirmado', proof?.status === 'anclada' ? proof?.block_number : null]]) {
+    for (const [label, value] of [[initial ? 'Huella del registro inicial' : 'Huella de esta actuación', proof?.commitment_hash], ['Registro de auditoría', proof?.audit_event_id], ['Huella en auditoría general', proof?.audit_event_hash], ['Lote', proof?.lot_id], ['Raíz Merkle', proof?.merkle_root], ['Transacción', proof?.transaction_hash], ['Bloque confirmado', proof?.status === 'anclada' ? proof?.block_number : null]]) {
       if (value === null || value === undefined || value === '') continue;
       const entry = node('div'); entry.append(node('dt', '', label), node('dd', '', value)); metadata.append(entry);
     }
@@ -777,10 +1055,40 @@
   }
 
   function eventTitle(event) {
+    const previous = STATUS[event.previous_status];
+    const current = STATUS[event.new_status || event.status];
+    if (previous && current && event.previous_status !== (event.new_status || event.status)) return `${previous} → ${current}`;
     if (/club_validated|club_validado/.test(event.type || '')) return 'Club validado para el catálogo';
     if (/created|cread|recibida/.test(event.type || '')) return 'Recomendación recibida';
     if (/info|aporte/.test(event.type || '') && !/solicit/.test(event.type || '')) return 'Información agregada';
-    return STATUS[event.status] || 'Actualización de la recomendación';
+    return current || 'Actualización de la recomendación';
+  }
+
+  function renderEventProof(event) {
+    if (typeof event.id !== 'string' || !event.id) return null;
+    const container = node('div', 'event-proof');
+    const button = node('button', 'button button-small button-subtle', 'Ver constancia de esta actuación'); button.type = 'button';
+    const feedback = node('div', 'feedback'); feedback.hidden = true; feedback.setAttribute('role', 'alert');
+    const output = node('div', 'event-proof-output');
+    const detailId = state.currentDetailId;
+    button.addEventListener('click', async () => {
+      if (button.disabled || !container.isConnected || !$('detail-dialog').open || state.currentDetailId !== detailId) return;
+      const request = requestChannel(`event-proof:${event.id}`);
+      button.disabled = true; button.textContent = 'Consultando constancia…'; setFeedback(feedback, '');
+      try {
+        const data = await api('event_proof', { event_id: event.id }, request.signal);
+        if (!request.current() || !container.isConnected || !$('detail-dialog').open || state.currentDetailId !== detailId) return;
+        if (data.event_id !== event.id || !data.proof) throw new ApiError('No recibimos la constancia de esta actuación. Podés reintentar.', 'INVALID_RESPONSE', 502);
+        const proof = renderProof(data.proof, false); proof.open = true;
+        output.replaceChildren(proof); button.hidden = true;
+      } catch (error) {
+        if (!request.current() || cancelled(error) || !container.isConnected || !$('detail-dialog').open) return;
+        setFeedback(feedback, message(error));
+      } finally {
+        if (request.current()) { button.disabled = false; button.textContent = 'Ver constancia de esta actuación'; }
+      }
+    });
+    container.append(button, feedback, output); return container;
   }
 
   function renderEvents(events) {
@@ -791,8 +1099,10 @@
     for (const event of rows) {
       const item = node('li');
       item.append(node('div', 'timeline-heading', eventTitle(event)));
-      item.append(node('div', 'timeline-meta', `${date(event.created_at)} · ${event.actor_name || (event.actor_role === 'admin' ? 'Equipo evaluador' : 'Socio')}${event.actor_role === 'admin' && event.actor_name ? ' · Equipo evaluador' : ''}`));
+      const actor = event.actor || { name: event.actor_name || (event.actor_role === 'admin' ? 'Equipo evaluador' : 'Socio de Club Abierto'), numero_socio: event.actor_numero_socio, role: event.actor_role };
+      item.append(node('div', 'timeline-meta', `${date(event.created_at)} · ${authorLabel(actor)}${actor.role === 'admin' ? ' · Equipo evaluador' : ''}`));
       if (event.message) item.append(node('p', 'timeline-message', event.message));
+      const proof = renderEventProof(event); if (proof) item.append(proof);
       timeline.append(item);
     }
     section.append(timeline); return section;
@@ -836,7 +1146,7 @@
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       const previous = state.mutations.get(mutationKey);
-      if (previous?.busy || state.expired) return;
+      if (previous?.busy || state.expired || (admin ? !canManage(recommendation) : recommendation.can_add_info !== true)) return;
       if (!previous?.payload && messageField.input.value.trim().length < 2) {
         messageField.input.setCustomValidity('Escribí al menos 2 caracteres.'); messageField.input.reportValidity(); return;
       }
@@ -850,8 +1160,8 @@
       try {
         await api(action, payload);
         state.mutations.delete(mutationKey);
-        state.lists.mine.loaded = false; state.lists.admin.loaded = false;
-        if (state.activeTab === 'mine' || state.activeTab === 'admin') loadList(state.activeTab);
+        state.list.loaded = false; state.dashboard.loaded = false;
+        if (state.activeTab === 'mine') refreshOverview();
         if ($('detail-dialog').open && state.currentDetailId === recommendation.id) await openDetail(recommendation.id, validateClub ? 'Club validado. La constancia ya está disponible en el historial.' : admin ? 'Seguimiento actualizado.' : 'Información agregada al historial.');
       } catch (error) {
         if (cancelled(error)) return;
@@ -879,6 +1189,7 @@
 
   async function openDetail(id, successMessage = '') {
     if (!id || state.expired) return;
+    for (const [key] of channels) if (key.startsWith('event-proof:')) cancelChannel(key);
     state.currentDetailId = id;
     const dialog = $('detail-dialog');
     $('detail-code').textContent = 'RECOMENDACIÓN'; $('detail-title').textContent = 'Cargando detalle';
@@ -902,17 +1213,28 @@
       for (const [label, value] of [
         ['Club', recommendation.club?.name], ['Ubicación', [recommendation.club?.city, recommendation.club?.province].filter(Boolean).join(' · ')],
         [recommendation.club?.reference_scope === 'primer_equipo_masculino' ? 'Competencia de referencia · primer equipo masculino' : 'Liga / competencia del club', recommendation.club?.competition_name || recommendation.club?.league], ['Categoría del jugador', recommendation.category],
-        ['Posición', recommendation.player?.position], ['Sector', { derecha: 'Derecha', izquierda: 'Izquierda', ambos: 'Ambos', no_especificado: 'Sin especificar' }[recommendation.player?.sector] || 'Sin especificar']
+        ['Edad al recomendar', ageLabel(recommendation.player)], ['Posición', recommendation.player?.position], ['Sector', { derecha: 'Derecha', izquierda: 'Izquierda', ambos: 'Ambos', no_especificado: 'Sin especificar' }[recommendation.player?.sector] || 'Sin especificar']
       ]) grid.append(detailPair(label, value));
-      grid.prepend(detailPair('Socio que recomienda', recommendation.author?.name || 'Socio de Club Abierto'));
+      grid.prepend(detailPair('Socio que recomienda', authorLabel(recommendation.author)));
+      const market = node('div', 'detail-market');
+      const marketValue = node('dd'); appendMarketValue(marketValue, recommendation.player?.market_value);
+      market.append(node('dt', '', 'Valor de mercado'), marketValue); grid.append(market);
       body.append(grid, textSection('Motivo de la recomendación', recommendation.reason));
       if (recommendation.observation) body.append(textSection('Contexto de la observación', recommendation.observation));
       if (recommendation.video_url || recommendation.transfermarkt_url) {
         const links = node('div', 'detail-links'); appendLink(links, recommendation.video_url, 'Ver video', 'video'); appendLink(links, recommendation.transfermarkt_url, 'Consultar Transfermarkt', 'transfermarkt');
         if (links.childElementCount) body.append(links);
       }
+      const playerActions = node('div', 'detail-player-actions');
+      const viewGroup = node('button', 'button button-secondary', 'Ver recomendaciones de este jugador'); viewGroup.type = 'button';
+      viewGroup.addEventListener('click', () => showPlayerRecommendations(recommendation.id, null, playerName(recommendation)));
+      if (canRecommend()) {
+        const also = node('button', 'button button-primary', 'Recomendar también'); also.type = 'button';
+        also.addEventListener('click', () => recommendAlso(recommendation)); playerActions.append(also);
+      }
+      playerActions.append(viewGroup); body.append(playerActions);
       body.append(renderProof(data.proof), renderEvents(data.events));
-      if (recommendation.can_manage === true) {
+      if (canManage(recommendation)) {
         body.append(renderActionForm(recommendation, true));
         if (recommendation.club?.source === 'manual' && recommendation.club_validated !== true) {
           const validation = node('details', 'club-validation');
@@ -939,6 +1261,8 @@
   $('boot-retry').addEventListener('click', boot);
   $('recommend-form').addEventListener('submit', createRecommendation);
   $('new-recommendation').addEventListener('click', newRecommendation);
+  $('dashboard-recommend').addEventListener('click', () => activateTab('recommend', true));
+  $('reference-clear').addEventListener('click', () => { clearRecommendationReference(); $('player-first-name').focus(); });
   $('success-detail').addEventListener('click', () => openDetail(state.successId));
   $('manual-club-toggle').addEventListener('change', () => setManualClub());
   for (const radio of document.querySelectorAll('[name="search-route"]')) radio.addEventListener('change', () => updateRoute());
@@ -978,22 +1302,28 @@
   $('player-choice').addEventListener('change', selectPlayer);
   $('players-more').addEventListener('click', () => loadPlayers($('players-more').dataset.retry !== 'true'));
   for (const id of ['player-first-name', 'player-last-name']) $(id).addEventListener('input', () => {
-    state.selectedPlayer = null; clearAutoPlayerProfile(); $('player-choice').value = ''; updatePlayerLookup();
+    if (state.referenceRecommendation) clearRecommendationReference(false);
+    state.selectedPlayer = null; clearAutoPlayerProfile(); clearAutoPlayerAge(); $('player-choice').value = ''; updatePlayerLookup();
   });
   $('transfermarkt-url').addEventListener('input', () => { state.playerAutoTransfermarktUrl = null; });
+  $('player-age').addEventListener('input', () => { state.playerAutoAge = null; });
   $('player-position').addEventListener('change', updateSector);
   $('recommend-reason').addEventListener('input', () => { $('reason-count').textContent = `${$('recommend-reason').value.length} / 4000`; });
   for (const input of $('recommend-form').querySelectorAll('input,select,textarea')) {
     input.addEventListener('input', () => { input.setCustomValidity(''); input.removeAttribute('aria-invalid'); });
     input.addEventListener('invalid', () => input.setAttribute('aria-invalid', 'true'));
   }
-  for (const kind of ['mine', 'admin']) {
-    $(`${kind}-status`).addEventListener('change', () => loadList(kind));
-    $(`${kind}-refresh`).addEventListener('click', () => loadList(kind));
-    $(`${kind}-more`).addEventListener('click', () => loadList(kind, true));
-  }
-  $('mine-only').addEventListener('change', () => loadList('mine'));
-  $('admin-query').addEventListener('input', () => { cancelChannel('list-admin'); debounce('admin-query', () => loadList('admin')); });
+  $('mine-status').addEventListener('change', () => loadList());
+  $('mine-refresh').addEventListener('click', refreshOverview);
+  $('mine-more').addEventListener('click', () => loadList(true));
+  $('mine-only').addEventListener('change', () => loadList());
+  $('player-filter-clear').addEventListener('click', () => {
+    state.rankedPlayerFilter = null; $('player-filter').hidden = true; $('player-filter-name').textContent = ''; loadList();
+  });
+  $('mine-query').addEventListener('input', () => {
+    cancelChannel('list'); state.list.loaded = false; $('mine-more').disabled = true;
+    debounce('list-query', () => loadList());
+  });
   for (const tab of document.querySelectorAll('[data-tab]')) {
     tab.addEventListener('click', () => activateTab(tab.dataset.tab));
     tab.addEventListener('keydown', (event) => {
@@ -1006,17 +1336,28 @@
     });
   }
   $('detail-close').addEventListener('click', () => $('detail-dialog').close());
-  $('detail-dialog').addEventListener('close', () => { cancelChannel('detail'); state.currentDetailId = null; });
-  window.addEventListener('pagehide', () => { for (const [key] of channels) cancelChannel(key); });
+  $('detail-dialog').addEventListener('close', () => {
+    for (const [key] of channels) if (key === 'detail' || key.startsWith('event-proof:')) cancelChannel(key);
+    state.currentDetailId = null;
+  });
+  window.addEventListener('pagehide', () => {
+    for (const [key] of channels) cancelChannel(key);
+    for (const timer of timers.values()) clearTimeout(timer);
+    timers.clear();
+  });
   window.addEventListener('pageshow', (event) => {
     if (event.persisted) { clearSessionState(); state.expired = false; boot(); }
     else checkSessionIdentity();
   });
   window.addEventListener('storage', (event) => { if (event.key === SESSION_KEY || event.key === null) checkSessionIdentity(); });
+  window.addEventListener('message', (event) => {
+    if (event.origin !== window.location.origin || event.source !== window.parent || event.data?.type !== 'club-abierto:scouting-context') return;
+    applyPanelContext(event.data.panel_context);
+  });
   document.addEventListener('visibilitychange', () => { if (!document.hidden) checkSessionIdentity(); });
   window.addEventListener('hashchange', () => {
-    if (state.actor && location.hash === '#gestion') activateTab('admin');
-    else if (state.actor && location.hash === '#mis-recomendaciones') { $('mine-only').checked = true; state.lists.mine.loaded = false; activateTab('mine'); }
+    if (state.actor && ['#gestion', '#tablero'].includes(location.hash)) activateTab('mine');
+    else if (state.actor && location.hash === '#mis-recomendaciones') { $('mine-only').checked = true; state.list.loaded = false; activateTab('mine'); }
     else if (state.actor && location.hash === '#recomendar') activateTab('recommend');
   });
   boot();

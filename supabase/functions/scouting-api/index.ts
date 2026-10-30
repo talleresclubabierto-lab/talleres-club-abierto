@@ -5,7 +5,7 @@ type Fetcher = typeof fetch;
 
 const MAX_BODY_BYTES = 32 * 1024;
 const ACTIONS = new Set([
-  "bootstrap", "clubs", "players", "create", "feed", "mine", "detail", "add_info",
+  "bootstrap", "dashboard", "event_proof", "clubs", "players", "create", "feed", "mine", "detail", "add_info",
   "admin_list", "admin_update", "admin_validate_club",
 ]);
 const DEFAULT_ORIGINS = [

@@ -580,6 +580,7 @@ body{
       <button class="btn-action-red" onclick="irAParedesDeCristal()"><span class="action-icon">▦</span>Paredes de Cristal<br><small style="font-weight:500;color:#64748b">Balance y auditoría económica ponderada</small></button>
       <a class="btn-action-red" href="/comunidad-formativa-seguimiento.html" style="display:block;text-decoration:none"><span class="action-icon">◉</span>Seguimiento de Comunidad Formativa<br><small style="font-weight:500;color:#64748b">Consultá estados y categorías generales de manera anonimizada</small></a>
       <button class="btn-action-red" onclick="irATuHistoria()"><span class="action-icon">✓</span>Tu historia con Talleres<br><small style="font-weight:500;color:#64748b">Partidos, asistencia y horarios de ingreso</small></button>
+      <button id="btnScoutingSocio" class="btn-action-red" type="button" onclick="irAScoutingColaborativo()"><span class="action-icon">⚽</span>Scouting colaborativo<br><small style="font-weight:500;color:#64748b">Recomendá jugadores y consultá su seguimiento</small></button>
       <button class="btn-action-red" onclick="irAHistorialAdministrativo()"><span class="action-icon">▤</span>Historial de cambios<br><small style="font-weight:500;color:#64748b">Consultá el registro protegido de cambios</small></button>
       <button class="btn-action-red" onclick="irAIntegracionBlockchain()"><span class="action-icon">⬡</span>Integración blockchain<br><small style="font-weight:500;color:#64748b">Estado, lotes y trazabilidad criptográfica</small></button>
       <button class="btn-action-red" onclick="irACambioClave()"><span class="action-icon">⌨</span>Cambiar contraseña<br><small style="font-weight:500;color:#64748b">Administrá tu clave personal</small></button>
@@ -618,11 +619,17 @@ body{
       <button id="btnGestionAdministradores" class="btn-action-red" style="display:none" onclick="mostrarSeccionAdmin('secGestionAdmins')"><span class="action-icon">♙</span>Gestionar administradores</button>
       <button class="btn-action-red" onclick="mostrarSeccionAdmin('secGestionPadron')"><span class="action-icon">☷</span>Gestionar padrón</button>
       <button class="btn-action-red" type="button" onclick="window.location.href='/comunidad-formativa.html#gestion'"><span class="action-icon">♧</span>Gestión de Comunidad Formativa<br><small style="font-weight:500;color:#64748b">Solicitudes de vínculo y validación administrativa</small></button>
+      <button id="btnScoutingAdmin" class="btn-action-red" type="button" onclick="irAScoutingColaborativo()"><span class="action-icon">⚽</span>Scouting colaborativo<br><small style="font-weight:500;color:#64748b">Tablero compartido y seguimiento de jugadores</small></button>
       <button class="btn-action-red" onclick="irACambioClave()"><span class="action-icon">⌨</span>Cambiar contraseña</button>
       <button class="btn-action-red" onclick="irAPasskey()"><span class="action-icon">◎</span>Identidad biométrica / Passkey</button>
     </div>
     
   </main><nav class="bottom-nav"><button class="active" onclick="regresarAlPanelInterno()"><span class="mini-icon">▦</span>Dashboard</button><button class="" onclick="irAResultadosGenerales()"><span class="mini-icon">◇</span>Votar</button><button class="" onclick="irAResultadosGenerales()"><span class="mini-icon">▥</span>Resultados</button><button class="" onclick="irAAuditoriaPublica()"><span class="mini-icon">◎</span>Auditoría</button></nav>
+</div>
+
+<div id="secScoutingColaborativo" class="sub-view full-width" aria-label="Scouting colaborativo">
+  <div class="topbar"><div class="brand"><span class="app-logo-mark" role="img" aria-label="Escudo Talleres Club Abierto"></span><span class="brand-role-label">TALLERES CLUB ABIERTO</span></div><div class="top-actions"><button type="button" onclick="regresarAlPanelInterno()">Volver</button><button type="button" onclick="volverAlLogin()">Salir</button></div></div>
+  <div id="scoutingFrameHost" style="display:flex;flex:1;min-height:calc(100dvh - 64px);width:100%;background:#061127"></div>
 </div>
 
 <div id="secRevisionRedes" class="sub-view full-width">
@@ -3249,9 +3256,39 @@ inicializarSelectorReset();
 actualizarCantidadAdministradores();
 }
 function ocultarTodo(){
+cerrarScoutingColaborativo();
 document.getElementById('loginScreen').style.display='none';
 document.querySelectorAll('.dashboard,.sub-view').forEach(function(v){v.style.display='none'});
 }
+function cerrarScoutingColaborativo(){
+var host=document.getElementById('scoutingFrameHost');
+if(host&&host.firstChild)host.replaceChildren();
+}
+function irAScoutingColaborativo(){
+if((ROL_ACTIVO!=='socio'&&ROL_ACTIVO!=='admin')||!ID_SOCIO_ACTIVO||!obtenerTokenSesionClub()){
+alert('Ingresá a tu panel para abrir Scouting colaborativo.');return;
+}
+var context=ROL_ACTIVO;
+ocultarTodo();
+var view=document.getElementById('secScoutingColaborativo'),host=document.getElementById('scoutingFrameHost');
+if(!view||!host)return;
+var frame=document.createElement('iframe');
+frame.id='scoutingFrame';
+frame.title='Scouting colaborativo — tablero y recomendaciones';
+frame.src='/scouting.html?panel_context='+encodeURIComponent(context)+'&v=20261030-dashboard';
+frame.setAttribute('referrerpolicy','no-referrer');
+frame.style.cssText='border:0;width:100%;height:calc(100dvh - 64px);min-height:480px;display:block;background:#061127';
+frame.addEventListener('load',function(){
+if(frame.isConnected&&ROL_ACTIVO===context)frame.contentWindow.postMessage({type:'club-abierto:scouting-context',panel_context:context},window.location.origin);
+});
+host.appendChild(frame);
+view.style.display='flex';
+}
+window.addEventListener('message',function(event){
+var frame=document.getElementById('scoutingFrame');
+if(!frame||event.origin!==window.location.origin||event.source!==frame.contentWindow)return;
+if(event.data&&event.data.type==='club-scouting-back')regresarAlPanelInterno();
+});
 function mostrarSeccionSocio(id){
 ocultarTodo();
 document.getElementById(id).style.display='flex';
@@ -5224,7 +5261,7 @@ var defs={
  ['Mi perfil','♙','Datos personales, antigüedad y seguridad',['Cambiar contraseña','Identidad biométrica / Passkey','Tu historia con Talleres']],
  ['Participación y votaciones','◇','Votaciones activas y resultados',['Votaciones activas','Resultados']],
  ['Transparencia y auditoría','▤','Balances, registros y estructura institucional',['Auditoría pública','Paredes de Cristal','Historial de cambios','Integración blockchain','Concursos y licitaciones','Estructura institucional','Seguimiento de Comunidad Formativa']],
- ['Otros accesos','☷','Herramientas adicionales del socio',['Banco de profesionales']]
+ ['Otros accesos','☷','Herramientas adicionales del socio',['Banco de profesionales','Scouting colaborativo']]
  ],
  adminDashboard:[
  ['Socios y padrón','♙','Padrón y credenciales',['Gestionar padrón']],
@@ -5234,7 +5271,8 @@ var defs={
  ['Contrataciones','▤','Concursos, proveedores y contratos',['Concursos y licitaciones']],
  ['Profesionales','♧','Directorio y convocatorias',['Banco de profesionales']],
  ['Seguridad y blockchain','⬡','Identidad, permisos e integración',['Integración blockchain','Cambiar contraseña','Identidad biométrica / Passkey','Gestionar administradores']],
- ['Historial institucional','▥','Registros de cambios y seguimiento',['Historial de cambios']]
+ ['Historial institucional','▥','Registros de cambios y seguimiento',['Historial de cambios']],
+ ['Otros accesos','☷','Herramientas adicionales del panel',['Scouting colaborativo']]
  ]
 };
 function label(b){var x=b.cloneNode(true);x.querySelectorAll('small,.action-icon').forEach(function(n){n.remove()});return x.textContent.trim().replace(/\s+/g,' ')}
@@ -5259,7 +5297,11 @@ function setup(id){
   }
   var matched=false;groups.forEach(function(g,i){if(!matched&&g[3].indexOf(name)>=0){buckets[i].push(b);matched=true}});if(!matched)rest.push(b)
  });
- if(rest.length){groups.push(['Otros accesos','☷','Más herramientas del panel',[]]);buckets.push(rest)}
+ if(rest.length){
+  var otherIndex=groups.findIndex(function(group){return group[0]==='Otros accesos'});
+  if(otherIndex<0){groups.push(['Otros accesos','☷','Más herramientas del panel',[]]);buckets.push(rest)}
+  else buckets[otherIndex]=buckets[otherIndex].concat(rest);
+ }
  function open(i){
   inner.replaceChildren();
   buckets[i].forEach(function(b){

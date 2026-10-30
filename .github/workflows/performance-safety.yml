@@ -4,6 +4,10 @@ on:
     paths:
       - 'scripts/build-cloudflare.mjs'
       - 'index.html'
+      - 'scouting.html'
+      - 'scouting/**'
+      - 'supabase/functions/scouting-api/**'
+      - 'scripts/test-scouting-*.mjs'
       - 'src/estructura-institucional.js'
       - 'comunidad-formativa*.html'
       - 'comunidad-formativa/**'
@@ -27,6 +31,12 @@ jobs:
         run: node scripts/test-navigation-stability.mjs
       - name: Validate formative HTML and routes
         run: node scripts/test-formative-html.mjs
+      - name: Validate scouting access in both panels
+        run: node scripts/test-scouting-navigation.mjs
+      - name: Validate shared scouting dashboard and references
+        run: node scripts/test-scouting-frontend.mjs
+      - name: Validate scouting API adapter
+        run: node --experimental-strip-types --test scripts/test-scouting-api.mjs
       - name: Check non-blocking startup dependencies
         run: |
           node --input-type=module <<'EOF'
