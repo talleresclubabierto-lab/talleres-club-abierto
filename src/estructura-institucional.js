@@ -44,7 +44,7 @@ function renderAsamblea(d){
  const content=document.getElementById('eiContent');
  content.innerHTML='<button class="ei-back" id="eiBack">← Volver a todas las áreas</button><section class="ei-assembly"><h3>Asambleístas</h3><p>'+items.length+' representantes</p><div class="ei-assembly-filters"><label class="ei-filter-field ei-filter-search"><span>Buscar asambleísta</span><input id="eiAssemblySearch" type="search" placeholder="Escribí un nombre o apellido" autocomplete="off"></label><label class="ei-filter-field"><span>Condición</span><select id="eiAssemblyType"><option value="todos">Titulares y suplentes</option><option value="titular">Titulares</option><option value="suplente">Suplentes</option></select></label><label class="ei-filter-field"><span>Agrupación de origen</span><select id="eiAssemblyGroup"><option value="todos">Todas las agrupaciones</option>'+groups.map(g=>'<option value="'+esc(g)+'">'+esc(g)+'</option>').join('')+'</select></label></div><p id="eiAssemblyCount" class="ei-assembly-count" aria-live="polite"></p><div id="eiAssemblyGroups"></div></section>';
  document.getElementById('eiBack').onclick=()=>renderInicio(d);
- const norm=s=>String(s||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().replace(/\\s+/g,' ').trim();
+ const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
  function update(){
   const q=norm(document.getElementById('eiAssemblySearch').value).split(' ').filter(Boolean);
   const type=document.getElementById('eiAssemblyType').value,group=document.getElementById('eiAssemblyGroup').value;
@@ -71,12 +71,15 @@ function inject(){
   });
   if(!correct)return;
   // The category router may already have the original institutional button.
-  // Do not append another one in that case.
+  // Match the stable class too: the observer must settle after one insertion,
+  // even if the button's wording changes.
   const matching=Array.from(grid.querySelectorAll('button')).filter(button=>
-   /estructura\\s+institucional/i.test((button.textContent||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,''))
+   button.classList.contains('ei-entry') ||
+   /estructura\s+institucional/i.test((button.textContent||'').normalize('NFD').replace(/[\u0300-\u036f]/g,''))
   );
   if(matching.length){
-   matching.slice(1).forEach(button=>{if(button.classList.contains('ei-entry'))button.remove()});
+   const keep=matching.find(button=>!button.classList.contains('ei-entry'))||matching[0];
+   matching.forEach(button=>{if(button!==keep&&button.classList.contains('ei-entry'))button.remove()});
    return;
   }
   const button=document.createElement('button');

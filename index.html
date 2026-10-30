@@ -505,8 +505,8 @@ body{
   #blockchainEstadoChip{margin-top:12px}
 }
 
-</style><script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</style><script async src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script async src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style id="comunidad-formativa-entry-css">.columns-container{grid-template-columns:minmax(0,760px);justify-content:center;width:100%;margin-inline:auto;gap:16px}@media(max-width:800px){.columns-container{grid-template-columns:minmax(0,1fr)}}</style><style id="home-responsive-20261020">
 #loginScreen .login-shell{width:100%;max-width:760px;padding-top:12px}
 #loginScreen .login-brand{margin-bottom:14px}
@@ -5264,7 +5264,7 @@ function setup(id){
   inner.replaceChildren();
   buckets[i].forEach(function(b){
    // Un único acceso a Estructura institucional, exclusivamente en su categoría.
-   if(/estructura\\s+institucional/i.test(label(b)) &&
+   if(/estructura\s+institucional/i.test(label(b)) &&
       groups[i][0] !== 'Transparencia y auditoría')return;
    inner.appendChild(b)
   });
@@ -5420,3 +5420,4 @@ window.descartarRevisionRedes=async function(button){var card=button.closest('.r
 })();
 </script>
 </body>
+
