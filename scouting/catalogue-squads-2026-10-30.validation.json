@@ -1,0 +1,163 @@
+{
+  "snapshot_file": "scouting/catalogue-squads-2026-10-30.json.gz",
+  "snapshot_sha256": "c09464dfcacc20ce03af7cad530c9826f295f17b078e67bcbd7488cc9b5b42a5",
+  "snapshot_bytes": 6201444,
+  "compact_import_sha256": "1f0209b8cf14b700c808d1e1f6b7675fea5635b6667c5fe503942c3af9ea2d5c",
+  "compact_import_bytes": 2441911,
+  "counts": {
+    "first_team_clubs": 153,
+    "reviewed_squad_sources": 264,
+    "successfully_retrieved_squad_sources": 263,
+    "squad_sources_with_players": 260,
+    "distinct_players": 5627,
+    "player_memberships": 5651,
+    "first_team_player_memberships": 4266,
+    "reserve_player_memberships": 1385,
+    "pending_named_rows": 16,
+    "unavailable_sources": 1,
+    "empty_reserve_sources": 3
+  },
+  "validation": {
+    "duplicate_identity_conflicts": 0,
+    "parse_errors": 0,
+    "named_player_rows_excluded": 16,
+    "explicit_membership_retirements": 2,
+    "no_recommendations_or_events_modified": true,
+    "no_network_requests_by_parser": true
+  },
+  "by_competition": [
+    {
+      "competition_slug": "federal-a",
+      "first_team_clubs": 37,
+      "first_team_player_memberships": 1114,
+      "reserve_sources_reviewed": 30,
+      "reserve_sources_with_players": 30,
+      "reserve_player_memberships": 120,
+      "unavailable_sources": 0,
+      "empty_source_squads": 0
+    },
+    {
+      "competition_slug": "primera-b",
+      "first_team_clubs": 22,
+      "first_team_player_memberships": 637,
+      "reserve_sources_reviewed": 13,
+      "reserve_sources_with_players": 13,
+      "reserve_player_memberships": 46,
+      "unavailable_sources": 0,
+      "empty_source_squads": 0
+    },
+    {
+      "competition_slug": "primera-c",
+      "first_team_clubs": 28,
+      "first_team_player_memberships": 613,
+      "reserve_sources_reviewed": 4,
+      "reserve_sources_with_players": 1,
+      "reserve_player_memberships": 3,
+      "unavailable_sources": 0,
+      "empty_source_squads": 3
+    },
+    {
+      "competition_slug": "primera-division",
+      "first_team_clubs": 30,
+      "first_team_player_memberships": 892,
+      "reserve_sources_reviewed": 30,
+      "reserve_sources_with_players": 30,
+      "reserve_player_memberships": 875,
+      "unavailable_sources": 0,
+      "empty_source_squads": 0
+    },
+    {
+      "competition_slug": "primera-nacional",
+      "first_team_clubs": 36,
+      "first_team_player_memberships": 1010,
+      "reserve_sources_reviewed": 34,
+      "reserve_sources_with_players": 33,
+      "reserve_player_memberships": 341,
+      "unavailable_sources": 1,
+      "empty_source_squads": 0
+    }
+  ],
+  "compact_import_file": "scouting/catalogue-squads-2026-10-30.import.json.gz",
+  "snapshot_uncompressed_file": "scouting/catalogue-squads-2026-10-30.json",
+  "compact_import_uncompressed_file": "scouting/catalogue-squads-2026-10-30.import.json",
+  "storage_format": "gzip; snapshot_sha256/snapshot_bytes and compact_import_sha256/compact_import_bytes refer to original uncompressed JSON bytes",
+  "compressed_artifacts": [
+    {
+      "path": "scouting/catalogue-squads-2026-10-30.json.gz",
+      "compression": {
+        "format": "gzip",
+        "mtime": 0,
+        "filename": "",
+        "level": 9
+      },
+      "compressed_bytes": 386066,
+      "compressed_sha256": "5f59d48b59eff888bc6044ba43b1157a389d80766d73c9fa2e1ac2f7f3bf43f6",
+      "git_blob_sha": "5044e5c2146bc95bca5687fdd29de7d7734bb849",
+      "uncompressed_path": "scouting/catalogue-squads-2026-10-30.json",
+      "uncompressed_bytes": 6201444,
+      "uncompressed_sha256": "c09464dfcacc20ce03af7cad530c9826f295f17b078e67bcbd7488cc9b5b42a5",
+      "round_trip_verified": true,
+      "github_blob_sha": "5044e5c2146bc95bca5687fdd29de7d7734bb849",
+      "github_blob_sha_verified": true
+    },
+    {
+      "path": "scouting/catalogue-squads-2026-10-30.import.json.gz",
+      "compression": {
+        "format": "gzip",
+        "mtime": 0,
+        "filename": "",
+        "level": 9
+      },
+      "compressed_bytes": 237862,
+      "compressed_sha256": "c3a38f700f88ea57bac735f98559d242108889198aabab129c131ecea9877f20",
+      "git_blob_sha": "a91cc6f8e9723e20222a4e1547027478989ca230",
+      "uncompressed_path": "scouting/catalogue-squads-2026-10-30.import.json",
+      "uncompressed_bytes": 2441911,
+      "uncompressed_sha256": "1f0209b8cf14b700c808d1e1f6b7675fea5635b6667c5fe503942c3af9ea2d5c",
+      "round_trip_verified": true,
+      "github_blob_sha": "a91cc6f8e9723e20222a4e1547027478989ca230",
+      "github_blob_sha_verified": true
+    }
+  ],
+  "database_import": {
+    "events": 0,
+    "api_md5": "debdc4297e4adebaf2a5ed447a91ecec",
+    "players": 5627,
+    "reviews": 264,
+    "published_at": "2026-10-30T19:48:31.595117+00:00",
+    "reserve_clubs": 107,
+    "content_sha256": "1f0209b8cf14b700c808d1e1f6b7675fea5635b6667c5fe503942c3af9ea2d5c",
+    "recommendations": 0,
+    "sending_enabled": false,
+    "first_team_clubs": 153,
+    "published_run_id": "4f07dbfd-271e-4364-a130-0345e90bae35",
+    "protected_changes": 0,
+    "active_memberships": 5651,
+    "reserve_memberships": 1385,
+    "inactive_memberships": 2,
+    "first_team_memberships": 4266,
+    "verified_market_values": 20,
+    "preserved_existing_players": 21,
+    "verified_after_commit": true,
+    "api_validation": {
+      "club": "Aldosivi",
+      "primera_total": 30,
+      "reserva_total": 32,
+      "primera_page_1": 25,
+      "primera_page_2": 5,
+      "primera_coverage": "verified",
+      "reserva_coverage": "verified"
+    },
+    "rehearsal_rolled_back": true,
+    "idempotent_replay_verified": true,
+    "initial_load_settings": {
+      "enable_seqscan": "off (transaction only)",
+      "jit": "off (transaction only)",
+      "analyzed_tables": [
+        "scouting.players",
+        "scouting.player_squads",
+        "scouting.squad_reviews"
+      ]
+    }
+  }
+}

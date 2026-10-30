@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="/scouting/scouting.css">
   <script src="/scouting/scouting.js" defer></script>
 </head>
-<body>
+<body data-scouting-standalone>
   <a class="skip-link" href="#main">Ir al contenido</a>
   <header class="site-header">
     <div class="header-inner">
@@ -20,12 +20,12 @@
         <div><span class="brand-title">TALLERES</span><span class="brand-subtitle">CLUB ABIERTO</span></div>
       </div>
       <div class="header-actions">
-        <span class="actor-chip" id="actor-label" hidden></span>
         <a class="button button-subtle back-button" href="/index.html" id="back-button"><span aria-hidden="true">←</span> Volver</a>
       </div>
     </div>
   </header>
 
+  <div id="scouting-content">
   <main class="page-shell" id="main">
     <section class="boot-panel panel" id="boot-panel" aria-labelledby="boot-title">
       <span class="loading-ring" id="boot-spinner" aria-hidden="true"></span>
@@ -44,6 +44,7 @@
           <p class="eyebrow">PARTICIPACIÓN DE LOS SOCIOS</p>
           <h1 id="page-title">Scouting <span>colaborativo</span></h1>
           <p class="page-lead">Recomendaciones del fútbol argentino, con autor, seguimiento y devoluciones a la vista de todos los socios.</p>
+          <span class="actor-chip" id="actor-label" hidden></span>
         </div>
         <span class="privacy-pill"><span class="privacy-dot" aria-hidden="true"></span> Paredes de cristal</span>
       </section>
@@ -115,10 +116,10 @@
                   <div class="field"><label for="player-category">Categoría del jugador <span class="required" aria-hidden="true">*</span></label><select id="player-category" required><option value="">Seleccioná una categoría</option></select></div>
                   <div class="field" id="custom-category-field" hidden><label for="custom-category">¿Qué categoría? <span class="required" aria-hidden="true">*</span></label><input id="custom-category" minlength="2" maxlength="100" placeholder="Ej.: Sub-18 de la liga local" disabled></div>
                 </div>
-                <details class="player-lookup" id="player-lookup" hidden>
-                  <summary>Buscar un jugador en el catálogo</summary>
-                  <div class="lookup-content"><label for="player-query">Nombre o apellido</label><input id="player-query" type="search" maxlength="100" placeholder="Buscar jugador" enterkeyhint="search"><label for="player-choice">Jugadores del catálogo</label><select id="player-choice" size="4"><option value="" disabled>Seleccioná una categoría</option></select><div class="result-footer"><p id="players-help" class="field-help" role="status">También podés completar el nombre y apellido abajo.</p><button class="button button-small button-secondary" id="players-more" type="button" hidden>Cargar más jugadores</button></div></div>
-                </details>
+                <section class="player-lookup" id="player-lookup" aria-labelledby="squad-title" hidden>
+                  <h3 class="lookup-title" id="squad-title">Plantel del equipo</h3>
+                  <div class="lookup-content"><p class="squad-status field-help" id="squad-status" role="status" hidden></p><a class="catalogue-reference" id="squad-source" target="_blank" rel="noopener noreferrer" hidden>Ver plantel en Transfermarkt ↗</a><label for="player-query">Nombre o apellido</label><input id="player-query" type="search" maxlength="100" placeholder="Buscar en este plantel" enterkeyhint="search"><label for="player-choice">Seleccioná un jugador</label><select id="player-choice" size="6"><option value="" disabled>Seleccioná una categoría</option></select><div class="result-footer"><p id="players-help" class="field-help" role="status">Seleccioná un jugador para completar su ficha.</p><button class="button button-small button-secondary" id="players-more" type="button" hidden>Cargar más jugadores</button></div></div>
+                </section>
                 <p class="field-help player-manual-help" id="player-manual-help">Completá los datos del jugador. No necesita figurar en el catálogo.</p>
                 <p class="field-help player-review" id="selected-player-review" hidden role="status"></p>
                 <div class="field-grid">
@@ -188,6 +189,7 @@
     <div class="dialog-top"><div><p class="eyebrow" id="detail-code">RECOMENDACIÓN</p><h2 id="detail-title" tabindex="-1">Cargando detalle</h2></div><button id="detail-close" class="button button-subtle dialog-close" type="button" aria-label="Cerrar detalle">×</button></div>
     <div class="dialog-body" id="detail-body"></div>
   </dialog>
+  </div>
   <noscript><div class="noscript-message">Para usar scouting necesitás habilitar JavaScript en tu navegador. <a href="/index.html">Volver a Club Abierto</a></div></noscript>
 </body>
 </html>

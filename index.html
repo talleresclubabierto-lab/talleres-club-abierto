@@ -629,7 +629,7 @@ body{
 
 <div id="secScoutingColaborativo" class="sub-view full-width" aria-label="Scouting colaborativo">
   <div class="topbar"><div class="brand"><span class="app-logo-mark" role="img" aria-label="Escudo Talleres Club Abierto"></span><span class="brand-role-label">TALLERES CLUB ABIERTO</span></div><div class="top-actions"><button type="button" onclick="regresarAlPanelInterno()">Volver</button><button type="button" onclick="volverAlLogin()">Salir</button></div></div>
-  <div id="scoutingFrameHost" style="display:flex;flex:1;min-height:calc(100dvh - 64px);width:100%;background:#061127"></div>
+  <div id="scoutingNativeHost" style="display:block;width:100%;min-width:0" aria-live="polite"></div>
 </div>
 
 <div id="secRevisionRedes" class="sub-view full-width">
@@ -3261,34 +3261,61 @@ document.getElementById('loginScreen').style.display='none';
 document.querySelectorAll('.dashboard,.sub-view').forEach(function(v){v.style.display='none'});
 }
 function cerrarScoutingColaborativo(){
-var host=document.getElementById('scoutingFrameHost');
-if(host&&host.firstChild)host.replaceChildren();
+SCOUTING_NATIVE_GENERATION=(SCOUTING_NATIVE_GENERATION||0)+1;
+if(SCOUTING_NATIVE_MOUNT){SCOUTING_NATIVE_MOUNT.dispose();SCOUTING_NATIVE_MOUNT=null;}
+var host=document.getElementById('scoutingNativeHost');
+if(host&&host.shadowRoot)host.shadowRoot.replaceChildren();
 }
-function irAScoutingColaborativo(){
+var SCOUTING_NATIVE_LOAD=null,SCOUTING_NATIVE_MOUNT=null,SCOUTING_NATIVE_GENERATION=0;
+function cargarRecursosScouting(){
+if(SCOUTING_NATIVE_LOAD)return SCOUTING_NATIVE_LOAD;
+var version='20261030-native-squads';
+function resource(path){
+var controller=new AbortController(),timeout=setTimeout(function(){controller.abort()},20000);
+return fetch(path+'?v='+version,{cache:'no-cache',credentials:'same-origin',signal:controller.signal}).then(function(response){
+if(!response.ok)throw new Error('No pudimos cargar Scouting.');
+return response.text();
+}).finally(function(){clearTimeout(timeout)});
+}
+var scriptReady=window.ClubAbiertoScouting?Promise.resolve():new Promise(function(resolve,reject){
+var script=document.createElement('script'),timeout=setTimeout(function(){script.remove();reject(new Error('La carga de Scouting está demorando.'))},20000);
+script.src='/scouting/scouting.js?v='+version;script.async=true;
+script.onload=function(){clearTimeout(timeout);if(window.ClubAbiertoScouting)resolve();else{script.remove();reject(new Error('No pudimos iniciar Scouting.'))}};
+script.onerror=function(){clearTimeout(timeout);script.remove();reject(new Error('No pudimos cargar Scouting.'))};
+document.head.appendChild(script);
+});
+SCOUTING_NATIVE_LOAD=Promise.all([resource('/scouting.html'),resource('/scouting/scouting.css'),scriptReady]).then(function(parts){
+var parsed=new DOMParser().parseFromString(parts[0],'text/html'),content=parsed.getElementById('scouting-content');
+if(!content||!content.querySelector('#application')||!content.querySelector('#detail-dialog'))throw new Error('La sección de Scouting no está disponible.');
+return {content:content,css:parts[1]};
+}).catch(function(error){SCOUTING_NATIVE_LOAD=null;throw error});
+return SCOUTING_NATIVE_LOAD;
+}
+async function irAScoutingColaborativo(){
 if((ROL_ACTIVO!=='socio'&&ROL_ACTIVO!=='admin')||!ID_SOCIO_ACTIVO||!obtenerTokenSesionClub()){
 alert('Ingresá a tu panel para abrir Scouting colaborativo.');return;
 }
-var context=ROL_ACTIVO;
+var context=ROL_ACTIVO,session=obtenerTokenSesionClub();
 ocultarTodo();
-var view=document.getElementById('secScoutingColaborativo'),host=document.getElementById('scoutingFrameHost');
+var generation=SCOUTING_NATIVE_GENERATION;
+var view=document.getElementById('secScoutingColaborativo'),host=document.getElementById('scoutingNativeHost');
 if(!view||!host)return;
-var frame=document.createElement('iframe');
-frame.id='scoutingFrame';
-frame.title='Scouting colaborativo — tablero y recomendaciones';
-frame.src='/scouting.html?panel_context='+encodeURIComponent(context)+'&v=20261030-dashboard';
-frame.setAttribute('referrerpolicy','no-referrer');
-frame.style.cssText='border:0;width:100%;height:calc(100dvh - 64px);min-height:480px;display:block;background:#061127';
-frame.addEventListener('load',function(){
-if(frame.isConnected&&ROL_ACTIVO===context)frame.contentWindow.postMessage({type:'club-abierto:scouting-context',panel_context:context},window.location.origin);
-});
-host.appendChild(frame);
+var root=host.shadowRoot||host.attachShadow({mode:'open'});
+var notice=document.createElement('p');notice.textContent='Preparando scouting…';notice.setAttribute('role','status');notice.style.cssText='color:#d5e6fa;padding:28px 0;font:15px/1.6 Inter,system-ui,sans-serif';root.replaceChildren(notice);
 view.style.display='flex';
+window.scrollTo({top:0,behavior:'instant'});
+try{
+var resources=await cargarRecursosScouting();
+if(generation!==SCOUTING_NATIVE_GENERATION||ROL_ACTIVO!==context||obtenerTokenSesionClub()!==session||view.style.display==='none')return;
+var style=document.createElement('style');style.textContent=resources.css;
+root.replaceChildren(style,document.importNode(resources.content,true));
+SCOUTING_NATIVE_MOUNT=window.ClubAbiertoScouting.mount(root,{panelContext:context,onBack:regresarAlPanelInterno});
+}catch(error){
+if(generation!==SCOUTING_NATIVE_GENERATION||ROL_ACTIVO!==context||obtenerTokenSesionClub()!==session||view.style.display==='none')return;
+notice.textContent=error.message||'No pudimos abrir Scouting.';
+var retry=document.createElement('button');retry.type='button';retry.textContent='Reintentar';retry.style.cssText='border:1px solid #7799c5;border-radius:8px;background:#15365c;color:white;padding:12px 20px;cursor:pointer';retry.addEventListener('click',irAScoutingColaborativo,{once:true});root.replaceChildren(notice,retry);
 }
-window.addEventListener('message',function(event){
-var frame=document.getElementById('scoutingFrame');
-if(!frame||event.origin!==window.location.origin||event.source!==frame.contentWindow)return;
-if(event.data&&event.data.type==='club-scouting-back')regresarAlPanelInterno();
-});
+}
 function mostrarSeccionSocio(id){
 ocultarTodo();
 document.getElementById(id).style.display='flex';
