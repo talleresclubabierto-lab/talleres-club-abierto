@@ -1,20 +1,7 @@
-name: Android build
+name: Android 1.5 - web snapshot 2026-10-30 17:26 ART
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - mobile/android
-    paths:
-      - 'android/**'
-      - 'capacitor.config.ts'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'scripts/build-mobile.mjs'
-      - 'index.html'
-      - 'manifest.webmanifest'
-      - 'service-worker.js'
-      - 'icon.svg'
 
 permissions:
   contents: read
@@ -22,15 +9,35 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 35
     steps:
-      - name: Checkout
+      - name: Checkout Android native 1.5
         uses: actions/checkout@v4
+
+      - name: Checkout pinned web source
+        uses: actions/checkout@v4
+        with:
+          ref: 5f86f8707255fe7c4f923fa0d8f143c3c7be5abb
+          path: web-snapshot
+
+      - name: Synchronize web source into Android
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in index.html scouting.html manifest.webmanifest service-worker.js icon.svg scripts/build-mobile.mjs; do
+            test -f "web-snapshot/$f"
+            cp "web-snapshot/$f" "$f"
+          done
+          mkdir -p scouting assets
+          cp web-snapshot/scouting/scouting.css scouting/scouting.css
+          cp web-snapshot/scouting/scouting.js scouting/scouting.js
+          cp web-snapshot/assets/club-abierto-logo.webp assets/club-abierto-logo.webp
+          echo "Web commit pinned: 5f86f8707255fe7c4f923fa0d8f143c3c7be5abb"
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: '22'
           cache: npm
 
       - name: Set up Java
@@ -43,19 +50,29 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Synchronize Android project
-        run: npm run cap:sync -- android
+      - name: Build and synchronize Capacitor
+        run: npm run cap:sync
 
-      - name: Build debug APK and unsigned release bundle
+      - name: Verify expected web assets
+        run: |
+          test -s www/index.html
+          test -s www/scouting.html
+          test -s www/scouting/scouting.js
+          test -s www/scouting/scouting.css
+          test -s www/assets/club-abierto-logo.webp
+          grep -q 'versionCode 6' android/app/build.gradle
+          grep -q 'versionName "1.5"' android/app/build.gradle
+
+      - name: Build unsigned release and debug APK
         working-directory: android
         run: |
-          ./gradlew assembleDebug
-          ./gradlew bundleRelease
+          chmod +x gradlew
+          ./gradlew assembleDebug bundleRelease
 
-      - name: Upload Android artifacts
+      - name: Upload builds (release is NOT signed for Play)
         uses: actions/upload-artifact@v4
         with:
-          name: talleres-club-abierto-android
+          name: talleres-android-1.5-web-20261030
           if-no-files-found: error
           retention-days: 14
           path: |
