@@ -57,6 +57,34 @@ function renderAsamblea(d){
  update();
 }
 async function abrir(){abrirVista();if(cache){renderInicio(cache);return}const t=token();if(!t){document.getElementById('eiContent').innerHTML='<div class="ei-error">Ingresá como socio para consultar la estructura institucional.</div>';return}try{const r=await fetch(API(),{method:'POST',headers:{'Content-Type':'application/json','X-Club-Session':t},body:JSON.stringify({accion:'estructura_institucional'})});const d=await r.json();if(!r.ok||!d.ok)throw new Error(d.mensaje||'Error');cache=d;renderInicio(d)}catch(e){document.getElementById('eiContent').innerHTML='<div class="ei-error">No se pudo cargar la estructura institucional. Intentá nuevamente.</div>';}}
-function inject(){document.querySelectorAll('.action-grid').forEach(grid=>{if(grid.querySelector('.ei-entry'))return;const b=document.createElement('button');b.className='btn-action-red ei-entry';b.innerHTML='<span class="action-icon">⌘</span>Estructura institucional<br><small style="font-weight:500;color:#64748b">Áreas, autoridades, responsables y fuentes</small>';b.onclick=abrir;grid.appendChild(b);});}
+function inject(){
+ // Never inject into every .action-grid: each category is an action-grid.
+ // The old implementation did exactly that, re-adding the button after removal.
+ const dashboards=[
+  {id:'socioDashboard',category:'Transparencia y auditoría'},
+  {id:'adminDashboard',category:'Economía y auditoría'}
+ ];
+ dashboards.forEach(({id,category})=>{
+  const dash=document.getElementById(id);if(!dash)return;
+  const panel=dash.querySelector('.ca-category-view');
+  const grid=panel?.querySelector('.action-grid');
+  const heading=panel?.querySelector('.ca-category-head h2');
+  const correct=!!(grid&&heading&&heading.textContent.trim()===category&&panel.classList.contains('ca-open'));
+  // Remove old copies in every other category and original hidden action grid.
+  dash.querySelectorAll('.ei-entry').forEach(button=>{
+   if(!correct||button.parentElement!==grid)button.remove();
+  });
+  if(!correct)return;
+  const existing=grid.querySelectorAll('.ei-entry');
+  existing.forEach((button,index)=>{if(index>0)button.remove()});
+  if(existing.length)return;
+  const button=document.createElement('button');
+  button.type='button';
+  button.className='btn-action-red ei-entry';
+  button.innerHTML='<span class="action-icon">⌘</span>Estructura institucional<br><small style="font-weight:500;color:#64748b">Áreas, autoridades, responsables y fuentes</small>';
+  button.addEventListener('click',abrir);
+  grid.appendChild(button);
+ });
+}
 window.abrirEstructuraInstitucional=abrir;document.addEventListener('DOMContentLoaded',()=>{inject();new MutationObserver(inject).observe(document.body,{childList:true,subtree:true})});
 })();
