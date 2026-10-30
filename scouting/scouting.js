@@ -1037,8 +1037,8 @@
     const content = node('div', 'proof-content');
     const recognised = proof && Object.hasOwn(PROOF_STATUS, proof.status);
     content.append(node('p', '', recognised ? PROOF_STATUS[proof.status] : 'No hay una constancia de anclaje disponible para mostrar.'));
-    if (proof?.status === 'registrada') content.append(node('p', '', 'El aporte tiene un registro de auditoría. Su anclaje en blockchain todavía no está confirmado.'));
-    else if (proof?.status === 'preparada') content.append(node('p', '', 'El registro está preparado para su anclaje. Todavía no hay confirmación en blockchain.'));
+    if (proof?.status === 'registrada') content.append(node('p', '', 'El registro está guardado y pendiente de incorporarse al próximo lote automático. Se conserva para su anclaje; todavía no está confirmado en blockchain.'));
+    else if (proof?.status === 'preparada') content.append(node('p', '', 'El registro está incluido en un lote preparado y conservado, pendiente de envío a blockchain. El envío requiere la integración activa. Todavía no hay confirmación en blockchain.'));
     else if (proof?.status === 'enviada') content.append(node('p', '', 'El anclaje fue enviado y está pendiente de confirmación.'));
     const metadata = node('dl');
     for (const [label, value] of [[initial ? 'Huella del registro inicial' : 'Huella de esta actuación', proof?.commitment_hash], ['Registro de auditoría', proof?.audit_event_id], ['Huella en auditoría general', proof?.audit_event_hash], ['Lote', proof?.lot_id], ['Raíz Merkle', proof?.merkle_root], ['Transacción', proof?.transaction_hash], ['Bloque confirmado', proof?.status === 'anclada' ? proof?.block_number : null]]) {

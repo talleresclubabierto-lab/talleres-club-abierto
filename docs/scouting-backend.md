@@ -304,6 +304,68 @@ registrar una recomendación o actuación no demuestra un anclaje nuevo. El mód
 informa la constancia real de cada evento; no cambia la configuración institucional,
 no ejecuta envíos de fondos y no presenta lotes preparados como confirmados.
 
+### Acumulación de lotes con Polygon inactiva
+
+Las recomendaciones y todas sus actuaciones ingresan en la misma auditoría general
+dentro de la transacción de escritura. Esa cola persiste aunque la integración esté
+en `estructurada_no_activada` o `desactivada`. La preparación de lotes no depende de
+la habilitación del envío a la cadena.
+
+La política vigente revisada es de **500 movimientos o 24 horas** desde el último
+lote preparado. El trigger evalúa el umbral por cantidad y el cron institucional
+`club-abierto-evaluar-anclaje-auditoria`, activo con frecuencia horaria, evalúa el
+vencimiento temporal. Con poco movimiento, el lote se prepara en la primera
+evaluación horaria que encuentre cumplido el plazo. No se crea un segundo cron ni
+un lote por recomendación. Un evento todavía en espera de cierre muestra
+`registrada`; una vez incluido en un lote muestra `preparada`, con su ID, raíz y
+prueba individual. Ningún estado pendiente se presenta como confirmación en cadena.
+
+Los preparadores ordinario, extraordinario y de rango toman al inicio el mismo
+bloqueo transaccional de la cadena de auditoría, antes de leer o construir el lote.
+Así, la evaluación horaria y las escrituras de los socios utilizan el mismo orden
+de bloqueo y no compiten para preparar simultáneamente un mismo tramo.
+
+Al activar institucionalmente la integración, el procedimiento existente prepara
+el remanente histórico hasta el máximo de auditoría que capturó, incluyendo un
+último lote de tamaño inferior al umbral. Los lotes ya preparados conservan sus
+fechas, rangos y raíces y siguen siendo elegibles para el worker: no se excluyen por
+ser anteriores a la activación ni por tener `chain_id` todavía vacío. El worker
+procesa los pendientes por antigüedad. La activación no altera las fechas de los
+hechos originales.
+
+El cron de conciliación observado invoca `reconcile`, que comprueba transacciones
+ya enviadas y devuelve `broadcast:false`; no dispara nuevos envíos ni encadena
+`anchor`. La habilitación e invocación del proceso de envío corresponden a la etapa
+de activación institucional. Esta entrega garantiza preparación y conservación,
+sin presentar la conciliación como un envío automático de la cola.
+
+La cobertura se comprueba por cada `scouting.events.audit_event_id`, buscando su
+auditoría y al menos un rango de lote que lo incluya, además de recomputar la raíz
+Merkle. Comparar solamente el máximo ID cubierto podría ocultar un hueco. El registro
+administrativo de la propia creación de un lote queda para el tramo siguiente;
+esto no deja fuera los eventos de scouting incluidos en el lote que se acaba de
+cerrar.
+
+El envío conserva sus mecanismos operativos existentes. Un lote que fallara después
+de ser reservado como `enviado` y antes de guardar un hash de transacción requiere
+la revisión señalada por la conciliación (`missing_transaction_hash_manual_review`).
+La conservación en lotes preparados y su elegibilidad no equivalen a garantizar una
+confirmación futura sin errores de red o de envío.
+
+La migración aplicada `20261030190632_audit_batch_preparation_shared_lock.sql`
+incorpora esos tres bloqueos tempranos y comprueba las definiciones y permisos
+antes y después. `supabase/tests/scouting-batching.sql` pasó junto con el contrato
+de scouting dentro de una transacción revertida: ocho actuaciones de una ficha,
+una segunda ficha, cierre real por cantidad, remanente extraordinario y rama
+temporal con reloj controlado. Para esta última se deriva un clon en `pg_temp`
+desde la función viva, cambiando sólo el encabezado y el reloj de comparación;
+no se modifican funciones públicas ni fechas históricas para simular el tiempo.
+Cada actuación terminó cubierta por un solo lote del ensayo, con raíz y prueba
+Merkle verificadas. Los reintentos no agregaron eventos ni lotes. Después del
+despliegue se confirmó la política original 500/24, envío deshabilitado, permisos
+conservados, ningún hueco previo al último rango cubierto y ningún socio sintético
+persistido. No se ejecutó una prueba de carga concurrente con socios reales.
+
 ## Verificación inicial — 29/10/2026
 
 Ejecutado localmente:
