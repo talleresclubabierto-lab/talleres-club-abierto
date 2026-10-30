@@ -1,5 +1,5 @@
 -- Integration regression for the current-season projection.
--- Run after the shared-dashboard migration, as a database test operator.
+-- Run after the shared-dashboard, reviewed-rosters or position-filter migration, as a database test operator.
 -- All identities, clubs and competitions are synthetic. No real session is read.
 -- ALWAYS execute the entire BEGIN / ROLLBACK block. No external worker is invoked.
 begin;
@@ -41,8 +41,8 @@ declare
   v_check_count integer := 0;
 begin
   v_def_md5 := md5(pg_get_functiondef('public.scouting_api(text,text,jsonb)'::regprocedure));
-  if v_def_md5 <> '8a135faf5ebfd96e1ac61c5e260a7536' then
-    raise exception 'Install the reviewed dashboard patch, which preserves the current-season projection, before running this regression';
+  if v_def_md5 not in ('8a135faf5ebfd96e1ac61c5e260a7536','debdc4297e4adebaf2a5ed447a91ecec','f194c6d6710ed861f55c76b7f6a63bbf') then
+    raise exception 'Install the reviewed dashboard, roster or position-filter patch, which preserves the current-season projection, before running this regression';
   end if;
   v_comp_a := 'qa-season-a-' || left(v_suffix,12);
   v_comp_b := 'qa-season-b-' || left(v_suffix,12);

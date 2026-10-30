@@ -96,6 +96,7 @@ No debe interpretarse el catálogo parcial como cobertura de todas las ligas.
 - `supabase/migrations/20261029202924_scouting_initial_official_catalogue.sql`: migración del catálogo inicial, aplicada.
 - `supabase/migrations/20261029214442_scouting_current_season_projection.sql`: proyección de temporada vigente y conservación de validaciones históricas, aplicada.
 - `supabase/migrations/20261030193757_scouting_reviewed_squads_and_category_memberships.sql`: membresías por categoría, revisión de planteles e importador privado, aplicada. La aplicación del esquema no acredita por sí sola la publicación de un lote de datos.
+- `supabase/migrations/20261030201040_scouting_players_position_filter.sql`: filtro de posición del plantel completo, aplicado antes de la paginación y del recuento de coincidencias.
 - `scouting/catalogue-seed.json`: datos y fuentes verificadas de los 11 clubes iniciales.
 - `supabase/functions/scouting-api/index.ts`: Edge Function independiente.
 - `supabase/tests/scouting-contract.sql`: prueba de integración, con datos ficticios
@@ -157,7 +158,7 @@ Las respuestas usan `Cache-Control: no-store`.
 | `bootstrap` | `{}` | `actor`, `provinces`, `competitions`, `positions`, `categories`, `catalogue` |
 | `dashboard` | `{}` | `dashboard` global, con hitos y `most_recommended_players` |
 | `clubs` | `province?`, `competition_id?`, `query?`, `cursor?` | `items`, `next_cursor` |
-| `players` | `club_id`, `category?`, `query?`, `cursor?` | `items`, `next_cursor`, `total_count`, `squad` |
+| `players` | `club_id`, `category?`, `position?`, `query?`, `cursor?` | `items`, `next_cursor`, `total_count`, `squad` |
 | `create` | Ver abajo | `recommendation`, `replayed` |
 | `feed` | `status?`, `query?`, `mine_only?`, `player_id?`, `reference_recommendation_id?`, `cursor?` | `items`, `next_cursor` |
 | `mine` | `status?`, `cursor?` | `items`, `next_cursor` |
@@ -180,6 +181,21 @@ automáticamente. El socio puede cambiar a **Reserva** u otra categoría. El sel
 informa cuántos jugadores muestra y el total correspondiente al filtro; una
 búsqueda sin coincidencias no se presenta como un plantel vacío. Mantiene la
 entrada manual de jugadores y la opción **Otro club**.
+
+**Filtrar por posición** reemplaza la búsqueda por nombre dentro del plantel.
+Usa las mismas posiciones de `bootstrap.positions`, además de **Todas las
+posiciones** y **Sin posición informada**. El filtro del RPC es opcional:
+`position` omitida, nula o vacía incluye todas; `__unknown__` incluye sólo los
+jugadores con posición nula; una posición informada debe coincidir con el catálogo
+común. Un valor inválido devuelve `PT422`. El filtro se aplica antes de paginar y
+también al `total_count`; `squad.player_count` conserva el total del plantel.
+La búsqueda por nombre `query` sigue disponible en el contrato para compatibilidad
+y, si se envía junto con una posición, ambas condiciones deben cumplirse.
+
+Cambiar el filtro reinicia la paginación y cancela la consulta anterior. Cambiar de
+club o categoría vuelve a **Todas las posiciones**. El campo **Posición principal**
+de la recomendación y la ficha seleccionada son independientes del filtro; sólo
+elegir otro jugador completa una nueva ficha.
 
 `players.squad` incluye `category`, `player_count`, `expected_count`, `status`,
 `checked_at`, `source_url`, `source_season`, `competition_season` y
