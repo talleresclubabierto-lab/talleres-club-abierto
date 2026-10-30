@@ -505,8 +505,8 @@ body{
   #blockchainEstadoChip{margin-top:12px}
 }
 
-</style><script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</style><script async src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script async src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style id="comunidad-formativa-entry-css">.columns-container{grid-template-columns:minmax(0,760px);justify-content:center;width:100%;margin-inline:auto;gap:16px}@media(max-width:800px){.columns-container{grid-template-columns:minmax(0,1fr)}}</style><style id="home-responsive-20261020">
 #loginScreen .login-shell{width:100%;max-width:760px;padding-top:12px}
 #loginScreen .login-brand{margin-bottom:14px}
@@ -578,7 +578,7 @@ body{
       <button class="btn-action-red" onclick="irAResultadosGenerales()"><span class="action-icon">▥</span>Resultados<br><small style="font-weight:500;color:#64748b">Votantes y ponderación en tiempo real</small></button>
       <button class="btn-action-red" onclick="irAAuditoriaPublica()"><span class="action-icon">◎</span>Auditoría pública<br><small style="font-weight:500;color:#64748b">Consultá qué votó cada socio</small></button>
       <button class="btn-action-red" onclick="irAParedesDeCristal()"><span class="action-icon">▦</span>Paredes de Cristal<br><small style="font-weight:500;color:#64748b">Balance y auditoría económica ponderada</small></button>
-      <a class="btn-action-red" href="/comunidad-formativa#socios-casos" style="display:block;text-decoration:none"><span class="action-icon">◉</span>Seguimiento de Comunidad Formativa<br><small style="font-weight:500;color:#64748b">Consultá estados y categorías generales de manera anonimizada</small></a>
+      <a class="btn-action-red" href="/comunidad-formativa-seguimiento.html" style="display:block;text-decoration:none"><span class="action-icon">◉</span>Seguimiento de Comunidad Formativa<br><small style="font-weight:500;color:#64748b">Consultá estados y categorías generales de manera anonimizada</small></a>
       <button class="btn-action-red" onclick="irATuHistoria()"><span class="action-icon">✓</span>Tu historia con Talleres<br><small style="font-weight:500;color:#64748b">Partidos, asistencia y horarios de ingreso</small></button>
       <button class="btn-action-red" onclick="irAHistorialAdministrativo()"><span class="action-icon">▤</span>Historial de cambios<br><small style="font-weight:500;color:#64748b">Consultá el registro protegido de cambios</small></button>
       <button class="btn-action-red" onclick="irAIntegracionBlockchain()"><span class="action-icon">⬡</span>Integración blockchain<br><small style="font-weight:500;color:#64748b">Estado, lotes y trazabilidad criptográfica</small></button>
@@ -5223,7 +5223,7 @@ var defs={
  socioDashboard:[
  ['Mi perfil','♙','Datos personales, antigüedad y seguridad',['Cambiar contraseña','Identidad biométrica / Passkey','Tu historia con Talleres']],
  ['Participación y votaciones','◇','Votaciones activas y resultados',['Votaciones activas','Resultados']],
- ['Transparencia y auditoría','▤','Balances, registros y estructura institucional',['Auditoría pública','Paredes de Cristal','Historial de cambios','Integración blockchain','Concursos y licitaciones','Estructura institucional']],
+ ['Transparencia y auditoría','▤','Balances, registros y estructura institucional',['Auditoría pública','Paredes de Cristal','Historial de cambios','Integración blockchain','Concursos y licitaciones','Estructura institucional','Seguimiento de Comunidad Formativa']],
  ['Otros accesos','☷','Herramientas adicionales del socio',['Banco de profesionales']]
  ],
  adminDashboard:[
@@ -5241,7 +5241,7 @@ function label(b){var x=b.cloneNode(true);x.querySelectorAll('small,.action-icon
 function setup(id){
  var dash=document.getElementById(id);if(!dash||dash.dataset.caOrganized)return;
  var original=dash.querySelector(':scope > main > .action-grid');if(!original)return;
- var buttons=Array.from(original.children).filter(function(x){return x.tagName==='BUTTON'});
+ var buttons=Array.from(original.children).filter(function(x){return x.tagName==='BUTTON'||x.tagName==='A'});
  var groups=defs[id],categories=document.createElement('div');categories.className='ca-categories';categories.setAttribute('aria-label','Categorías del panel');
  var view=document.createElement('section');view.className='ca-category-view';view.setAttribute('aria-label','Opciones de categoría');
  var heading=document.createElement('h2'),back=document.createElement('button'),inner=document.createElement('div'),head=document.createElement('div');
@@ -5264,7 +5264,7 @@ function setup(id){
   inner.replaceChildren();
   buckets[i].forEach(function(b){
    // Un único acceso a Estructura institucional, exclusivamente en su categoría.
-   if(/estructura\\s+institucional/i.test(label(b)) &&
+   if(/estructura\s+institucional/i.test(label(b)) &&
       groups[i][0] !== 'Transparencia y auditoría')return;
    inner.appendChild(b)
   });
@@ -5420,3 +5420,4 @@ window.descartarRevisionRedes=async function(button){var card=button.closest('.r
 })();
 </script>
 </body>
+

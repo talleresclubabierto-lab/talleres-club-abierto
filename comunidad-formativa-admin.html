@@ -88,6 +88,8 @@ main{width:min(1100px,100%);margin:0 auto;padding:28px 18px 60px}.eyebrow{color:
   const details=document.getElementById('request-details');
   let selectedId=null;
   let currentRequest=null;
+  let selectedCaseId=null;
+  let currentCase=null;
   async function call(action,data){
     const response=await fetch(endpoint,{method:'POST',mode:'cors',cache:'no-store',credentials:'omit',headers:{'Content-Type':'application/json','X-Club-Session':token},body:JSON.stringify(Object.assign({action},data||{}))});
     const result=await response.json().catch(()=>({}));
@@ -212,3 +214,4 @@ main{width:min(1100px,100%);margin:0 auto;padding:28px 18px 60px}.eyebrow{color:
 </script>
 </body>
 </html>
+

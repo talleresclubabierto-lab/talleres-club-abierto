@@ -4,6 +4,11 @@ on:
     paths:
       - 'scripts/build-cloudflare.mjs'
       - 'index.html'
+      - 'src/estructura-institucional.js'
+      - 'comunidad-formativa*.html'
+      - 'comunidad-formativa/**'
+      - 'scripts/test-formative-html.mjs'
+      - 'scripts/test-navigation-stability.mjs'
       - '.github/workflows/performance-safety.yml'
   workflow_dispatch:
 jobs:
@@ -18,6 +23,21 @@ jobs:
         run: node --check scripts/build-cloudflare.mjs
       - name: Build web
         run: node scripts/build-cloudflare.mjs
+      - name: Prevent institutional navigation observer loops
+        run: node scripts/test-navigation-stability.mjs
+      - name: Validate formative HTML and routes
+        run: node scripts/test-formative-html.mjs
+      - name: Check non-blocking startup dependencies
+        run: |
+          node --input-type=module <<'EOF'
+          import { readFileSync } from 'node:fs';
+          import assert from 'node:assert/strict';
+          const html = readFileSync('dist/index.html', 'utf8');
+          for (const tag of html.match(/<script\b[^>]*\bsrc=[^>]+>/gi) || []) {
+            if (tag.includes('cdn.jsdelivr.net')) assert(/\basync\b/.test(tag), 'External library blocks startup: ' + tag);
+          }
+          console.log('Startup remains independent of external library downloads');
+          EOF
       - name: Validate login bootstrap request deduplication
         run: |
           node --input-type=module <<'EOF'
@@ -63,3 +83,4 @@ jobs:
           assert(html.includes('data-v12="estructura-institucional"') && html.includes('data-v12="estructura-institucional">'), 'Institutional JS missing');
           console.log('Web build smoke checks passed');
           EOF
+

@@ -12,6 +12,8 @@ for (const file of [
   'comunidad-formativa-acompanamiento.html',
   'comunidad-formativa-integridad.html',
   'comunidad-formativa-presentaciones.html',
+  'comunidad-formativa-admin.html',
+  'comunidad-formativa-seguimiento.html',
   '_redirects',
   'manifest.webmanifest',
   'service-worker.js',
@@ -24,6 +26,8 @@ for (const file of [
 }
 
 await cp('comunidad-formativa', output + '/comunidad-formativa', { recursive: true });
+// Both the legacy URL and the routed family portal must serve the current form.
+await cp('comunidad-formativa/presentaciones/index.html', output + '/comunidad-formativa-presentaciones.html');
 await mkdir(output + '/scouting', { recursive: true });
 for (const file of ['scouting.css', 'scouting.js']) {
   await cp('scouting/' + file, output + '/scouting/' + file);
@@ -49,4 +53,5 @@ html = html.replace('</head>', '<style data-v12="estructura-institucional">' + c
 html = html.replace('</body>', '<script data-v12="estructura-institucional">' + js + '</script>\n</body>');
 await writeFile(indexPath, html, 'utf8');
 console.log('Cloudflare build: Estructura Institucional, Comunidad Formativa y Scouting integrados.');
+
 
