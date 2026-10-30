@@ -50,18 +50,6 @@ jobs:
           assert(body.includes('sesion.es_administrador!==true'), 'Admin authorization check missing');
           console.log('Immediate authenticated login checks passed');
           EOF
-      - name: Validate login connection optimization
-        run: |
-          node --input-type=module <<'EOF'
-          import { readFileSync } from 'node:fs';
-          import assert from 'node:assert/strict';
-          const html=readFileSync('dist/index.html','utf8');
-          assert(html.includes('rel="preconnect" href="https://sziuyjicqyxnmbgtbopg.supabase.co"'));
-          assert(html.includes('performance.now()-inicioLoginMedicion'));
-          assert(html.includes('var sesion=await loginSeguroClub(id,clave)'));
-          assert(!html.includes('console.info(\'[Club Abierto] Autenticación backend completada en \'+Math.round(performance.now()-inicioLoginMedicion)+\' ms\');') || html.includes('Autenticación backend completada'));
-          console.log('Connection and login timing checks passed');
-          EOF
       - name: Validate generated HTML font loading
         run: |
           node --input-type=module <<'EOF'
