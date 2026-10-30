@@ -42,6 +42,14 @@ ligas y categorías argentinas con evidencia suficiente. Debe informar qué
 alcance pudo revisar efectivamente, sin convertir una búsqueda parcial en
 una declaración de cobertura completa.
 
+La ampliación del 30/10/2026 se conserva en
+`scouting/catalogue-squads-2026-10-30.json.gz`: incluye las nóminas de los primeros
+equipos de los 153 clubes y las reservas que se pudieron consultar. Este corte
+supera la muestra inicial de 21 jugadores. **Cada ejecución mensual debe revisar
+los planteles por club y categoría, no limitarse a la lista de clubes ni a esa
+muestra inicial.** Conciliar siempre la cobertura y las exclusiones del corte
+con la base viva; una nómina parcial permanece identificada como parcial.
+
 Fuentes prioritarias: AFA, LPF, Consejo Federal, clubes y ligas oficiales.
 La pertenencia a un torneo y su temporada requieren documentación oficial
 del organizador; la afiliación de un jugador necesita corroboración individual
@@ -100,6 +108,14 @@ copiando una definición antigua.
 - **Jugadores:** verificar identidad, club y categoría individualmente antes
   de hacerlos seleccionables. Los pendientes y conflictos mantienen su estado
   hasta resolverlo. Las posiciones ambiguas no se fuerzan a una equivalencia.
+  Una fila de un plantel actual de Transfermarkt que muestra el nombre y enlaza
+  al perfil por su ID es evidencia de esa referencia de pertenencia y categoría;
+  no necesita un segundo artículo oficial por cada jugador para incorporarse.
+  Conservar URL, fecha de consulta, rótulo de temporada y alcance de la extracción.
+  Una noticia oficial específica que contradiga una nómina general requiere
+  conciliación, como los casos de Vigo y Barticciotto documentados abajo.
+  No derivar nombres de un slug ni crear identidades distintas para una persona
+  que figure en Primera y Reserva: usar `player_squads` con el mismo UUID.
 - **Edad:** conservar `birth_date`, `birth_date_source_url` y
   `birth_date_verified_at` sólo con evidencia individual. El servicio calcula la
   edad del catálogo con el calendario de Argentina y congela la edad al crear
@@ -130,6 +146,37 @@ copiando una definición antigua.
   con participantes comprobados. No inferir un cambio deportivo por el año
   del calendario. Verificar que búsquedas y creación de recomendaciones usen
   la temporada vigente y no mezclen relaciones de distintos años.
+  Conservar por separado `source_season`, el rótulo realmente observado en la
+  fuente. Una página actual sin rótulo explícito conserva ese campo nulo y su
+  limitación; no inventar el año ni modificar automáticamente `saison_id`.
+
+## Revisión de planteles
+
+1. Recorrer los clubes de las competencias cubiertas y sus categorías Primera
+   y Reserva. Seguir sólo enlaces públicos observados, conservando la asociación
+   explícita entre el club y su segundo equipo. No confundir juveniles, fútbol
+   femenino, competidores o movimientos de transferencias con el plantel elegido.
+2. Recuperar las filas de la tabla de jugadores con sus nombres y enlaces de
+   perfil. El normalizador local `scripts/parse-scouting-rosters.py` procesa HTML
+   previamente recuperado; no descarga páginas ni elude restricciones. Si el
+   extractor omite nombres, no completarlos por deducción. Registrar los pendientes.
+3. Guardar el número de filas observadas, incorporadas y excluidas por plantel,
+   su fuente, fecha, temporada y condición de cobertura. `complete` significa
+   todas las filas de la tabla consultada; no garantiza la exhaustividad del
+   plantel real. Una consulta inaccesible se registra como `unavailable` y no
+   equivale a una baja de jugadores.
+4. Resolver globalmente los ID de perfil antes de importar. Un ID en Primera
+   y Reserva del mismo club mantiene una sola persona y dos membresías. El mismo
+   ID observado en dos clubes requiere conciliación y no puede resolverse por el
+   orden de carga. Preservar las bajas deliberadas y las modificaciones más nuevas.
+5. Usar el importador privado versionado en la migración vigente. Una corrección
+   de categoría que retire una membresía debe ser explícita y demostrar ausencia
+   de la nómina completa de origen y presencia en la categoría destino. No aplicar
+   bajas masivas por ausencia en una consulta parcial. Verificar las huellas del
+   estado vivo inmediatamente antes de aplicar el corte.
+6. Comprobar el selector real del RPC: al menos un club por competencia, Primera
+   y Reserva, un plantel de más de 25 jugadores, búsquedas, cobertura parcial y
+   fuentes inaccesibles. Conservar todos los aportes y sus constancias anteriores.
 
 ## Snapshot y planilla
 
@@ -141,6 +188,17 @@ verificaciones individuales, pendientes, conflictos y diferencias antes/después
 Calcular SHA-256 sobre los bytes definitivos del snapshot y guardarlo en los
 metadatos del lote y su informe; no incluir un hash autorreferencial dentro
 del contenido que se está calculando.
+
+Los JSON grandes pueden conservarse comprimidos sin pérdida mediante gzip con
+`mtime=0`. El corte de planteles del 30/10 se distribuye en
+`scouting/catalogue-squads-2026-10-30.json.gz` (evidencia, esquema 3) y
+`scouting/catalogue-squads-2026-10-30.import.json.gz` (documento del importador,
+esquema 2). Descomprimir antes de validar o importar y comprobar que los bytes
+recuperados coincidan exactamente con los originales. Los hashes y tamaños del
+JSON registrados en `.validation.json` se mantienen: corresponden al contenido
+descomprimido, no al contenedor gzip. No volver a serializar, normalizar espacios
+ni alterar saltos de línea antes de comprobar esa integridad. Un hash adicional
+del archivo comprimido, si se registra, debe identificarse por separado.
 
 Generar una planilla XLSX fechada con **Cobertura, Clubes, Jugadores, Cambios y
 Fuentes**. Distinguir publicados, pendientes y conflictos y enlazar fuentes.
@@ -154,6 +212,12 @@ Preparar una operación explícita de actualización basada en el esquema vivo.
 Si requiere DDL, usar el mecanismo de migraciones de Supabase y conservar en
 GitHub la versión realmente aplicada. No reinstalar el RPC desde migraciones
 históricas ni modificar permisos para facilitar una importación.
+
+La migración aplicada
+`20261030193757_scouting_reviewed_squads_and_category_memberships.sql` incorpora
+`scouting.import_roster_batch(jsonb,text)` y las membresías por categoría. Consultar
+su definición vigente antes de cada ejecución; no volver a aplicar la migración
+ni confundir la disponibilidad del importador con un lote de datos publicado.
 
 Cada lote usa una clave nueva, por ejemplo `argentina-review-AAAA-MM-DD-r1`,
 y el hash del snapshot. En una transacción:
@@ -191,6 +255,51 @@ pertinentes y publicar los cambios autorizados. Supabase y GitHub deben referirs
 al mismo lote y hash. No hay una transacción distribuida entre ambos servicios:
 registrar las etapas alcanzadas y reanudar de forma idempotente si uno falla,
 sin borrar lo publicado ni declarar éxito completo antes de conciliar ambos.
+
+### Transporte de documentos grandes
+
+Cuando el documento completo supera el tamaño práctico de una llamada, usar una
+fila de transporte en `scouting.catalogue_runs`, separada del lote de importación.
+Este transporte privado no cambia los planteles ni declara publicado el catálogo.
+
+1. Descomprimir y validar el documento `.import.json.gz`. Fijar el SHA-256 y los
+   bytes UTF-8 del JSON original, la cantidad de fragmentos esperada y un
+   `transport_key` propio, distinto del `metadata.batch_key` del documento.
+2. Crear o reanudar sólo la fila correspondiente a ese transporte, con
+   `source='reviewed_squad_transport'` y `status='staging'`. Guardar los fragmentos
+   de texto en `metadata.document_parts`, identificados por índices numéricos.
+   Conservar el manifiesto de cantidad, bytes y hash. Repetir un fragmento idéntico
+   es inocuo; una clave o un índice con contenido diferente exige conciliación.
+3. Recuperar únicamente esa fila mediante su ID, origen, estado y `transport_key`.
+   Verificar índices únicos y contiguos y ensamblar los valores en orden numérico,
+   no lexicográfico: `jsonb_each_text(metadata->'document_parts')` y
+   `string_agg(value, '' order by key::integer)`. Comprobar cantidad de fragmentos,
+   `octet_length` y SHA-256 de los bytes UTF-8 antes de convertir el texto a JSONB.
+   Un fragmento faltante o cualquier diferencia impide la importación.
+4. Ensayar primero el documento completo dentro de un único `BEGIN` / `ROLLBACK`,
+   con `SET LOCAL lock_timeout='5s'` y `SET LOCAL statement_timeout='120s'`.
+   En una carga masiva desde un catálogo pequeño, usar también
+   `SET LOCAL enable_seqscan=off` y `SET LOCAL jit=off` dentro de esa transacción:
+   evita conservar un plan de búsqueda secuencial calculado para pocas filas
+   mientras crece la tabla. No cambiar estas opciones globalmente ni en el RPC.
+   Invocar el importador privado, comprobar identidades, membresías, exclusiones,
+   huellas, historiales y respuestas del RPC. Comprobar también la repetición
+   idempotente dentro del ensayo y verificar que el `ROLLBACK` no deje sus cambios.
+5. Tras el ensayo satisfactorio, ensamblar y validar otra vez e importar el
+   documento completo en una única transacción de publicación con los mismos
+   límites locales. No importar cada fragmento por separado. El importador vuelve
+   a validar las huellas y publica su propio lote atómicamente. Si la respuesta
+   es incierta, consultar el lote por `batch_key`, hash y contenido antes de
+   reintentar; la repetición idéntica recupera el resultado sin duplicar jugadores.
+6. Antes de terminar la transacción de carga, ejecutar `ANALYZE` sobre
+   `scouting.players`, `scouting.player_squads` y `scouting.squad_reviews` para
+   actualizar las estadísticas que usarán las consultas normales. Después del
+   commit, verificar el lote y sus recuentos. Limpiar
+   únicamente la fila staging del transporte propio, identificada con las mismas
+   condiciones, y sólo si no la referencia ningún registro del catálogo. Conservar
+   el lote publicado, el documento y sus evidencias. Si el proceso se interrumpe,
+   dejar el staging identificable para reanudarlo; no borrar otros transportes ni
+   lotes para resolver una colisión.
 
 ## Verificación e informe
 

@@ -1,8 +1,8 @@
-:root{color-scheme:dark;--bg:#061127;--panel:#0c1b36;--panel-raised:#112342;--border:#233754;--text:#f8faff;--muted:#b0bdd2;--blue:#3767ff;--blue-strong:#2554eb;--blue-soft:#a6bcff;--green:#90e6c0;--red:#ffb7b7;--radius:18px;--shadow:0 16px 40px rgba(0,0,0,.12)}
+:root,:host{color-scheme:dark;--bg:#061127;--panel:#0c1b36;--panel-raised:#112342;--border:#233754;--text:#f8faff;--muted:#b0bdd2;--blue:#3767ff;--blue-strong:#2554eb;--blue-soft:#a6bcff;--green:#90e6c0;--red:#ffb7b7;--radius:18px;--shadow:0 16px 40px rgba(0,0,0,.12)}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html{background:var(--bg);scroll-padding-top:104px;scroll-behavior:smooth}
-body{margin:0;min-width:280px;background:radial-gradient(ellipse at 86% 5%,rgba(37,84,235,.14),transparent 37%),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+body,:host{margin:0;min-width:280px;background:radial-gradient(ellipse at 86% 5%,rgba(37,84,235,.14),transparent 37%),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
 button,input,select,textarea{font:inherit}
 button,a,input,select,textarea,summary{-webkit-tap-highlight-color:transparent}
 button,a{touch-action:manipulation}
@@ -28,7 +28,7 @@ h3{font-size:1.08rem}
 .brand-title{font-weight:850;letter-spacing:.14em;font-size:17px;line-height:1.2}
 .brand-subtitle{font-size:10px;letter-spacing:.22em;font-weight:650;color:#cfdbf4}
 .header-actions{display:flex;align-items:center;gap:16px}
-.actor-chip{font-size:12px;color:#c7d5ef;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.actor-chip{display:block;font-size:12px;color:#c7d5ef;margin-top:10px;overflow-wrap:anywhere}
 .button{display:inline-flex;align-items:center;justify-content:center;gap:9px;border:1px solid transparent;border-radius:10px;min-height:44px;padding:10px 17px;text-decoration:none;color:var(--text);font-weight:680;font-size:14px;line-height:1.4;transition:background .15s,border-color .15s,box-shadow .15s}
 .button-primary{background:var(--blue);box-shadow:0 5px 18px rgba(28,77,235,.2)}
 .button-primary:hover:not(:disabled){background:#4876ff}
@@ -109,6 +109,8 @@ input[aria-invalid=true],select[aria-invalid=true],textarea[aria-invalid=true]{b
 .selected-club-description{font-size:12px;color:#b5c6e0}
 .catalogue-reference{justify-self:start;display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:5px 0;font-size:12px;font-weight:650;line-height:1.5}
 .player-lookup{margin-top:19px;border:1px solid #344e73;border-radius:10px;background:#102240}
+.lookup-title{font-size:14px;letter-spacing:0;padding:15px 15px 11px;color:#dce8ff}
+.squad-status{line-height:1.65;padding-bottom:5px}
 summary{cursor:pointer;min-height:44px;padding:12px 15px;color:#c3d3fa;font-size:13px;font-weight:650}
 .lookup-content{padding:0 15px 15px;display:flex;flex-direction:column;gap:9px}
 .player-manual-help{margin:19px 0 15px}
@@ -285,3 +287,21 @@ summary{cursor:pointer;min-height:44px;padding:12px 15px;color:#c3d3fa;font-size
 @media(max-width:580px){.ranking-panel{padding:19px 17px;margin-top:21px}.ranking-heading{display:block}.ranking-heading h2{font-size:20px}.ranking-limit{display:block;text-align:left;margin-top:9px}.ranking-description{font-size:11px}.ranking-item{grid-template-columns:25px minmax(0,1fr) auto;gap:11px}.ranking-name{font-size:12px}.ranking-count{font-size:9px}.ranking-count strong{font-size:19px}.ranking-item>.button{grid-column:2/-1;justify-self:end;min-height:40px}.player-filter{align-items:flex-start;flex-direction:column;gap:10px;padding:13px}.player-filter>.button{align-self:flex-end}}
 @media(max-width:580px){.reference-notice{padding:16px;flex-direction:column;gap:13px}.reference-notice>.button{align-self:flex-end;min-height:40px}.detail-player-actions{flex-direction:column}.detail-player-actions>.button{width:100%;min-height:44px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* Native panel layout: one institutional header, the document's own scroll,
+   and the full available width. The standalone route keeps its own shell. */
+:host{display:block;min-width:0;width:100%;background:transparent;overflow:visible;height:auto}
+:host .page-shell{max-width:none;padding:4px 0 36px;margin:0}
+:host .page-heading{margin-bottom:24px}
+:host .page-heading h1{font-size:clamp(1.9rem,3.6vw,2.8rem)}
+:host .page-lead{max-width:840px;font-size:15px}
+:host .recommend-layout{display:block}
+:host .guide-panel{display:none}
+:host .form-fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start;gap:22px}
+:host .form-section{margin:0;min-width:0;padding:25px}
+:host .reference-notice,:host .form-section:nth-of-type(3){grid-column:1/-1}
+:host .submit-panel{margin-top:22px}
+:host .page-footer{margin-bottom:0}
+:host [tabindex],:host .form-section,:host .success-panel{scroll-margin-top:90px}
+@media(max-width:1000px){:host .form-fields{grid-template-columns:1fr}:host .form-section{padding:22px}:host .page-shell{padding-top:0}}
+@media(max-width:580px){:host .form-fields{gap:16px}:host .form-section{padding:21px 17px}:host .page-heading h1{font-size:31px}:host .page-lead{font-size:14px}:host .page-shell{padding-bottom:26px}}

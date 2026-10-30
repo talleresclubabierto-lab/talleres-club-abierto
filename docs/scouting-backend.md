@@ -4,8 +4,13 @@
 
 El acceso **Scouting colaborativo** está en **Otros accesos** de Socio Activo y
 Administrador. Ambos abren el mismo módulo con tablero, ranking, listado, detalle
-e historial compartidos. El iframe se crea al entrar y se elimina al volver;
-no se cargan el catálogo ni el tablero durante el ingreso general a la plataforma.
+e historial compartidos. Scouting se monta directamente en la sección del panel,
+con su barra institucional y el desplazamiento del documento. No usa iframe ni un
+segundo encabezado. El componente utiliza Shadow DOM para aislar sus estilos y
+se desmonta al volver: cancela solicitudes, temporizadores y escuchas, y descarta
+respuestas tardías. Los recursos se cargan al abrirlo y se reutilizan; no se cargan
+el catálogo ni el tablero durante el ingreso general a la plataforma. La ruta
+independiente `/scouting` conserva el mismo componente y contrato de sesión.
 
 El proceso se inicia en **Socio Activo**. Sólo ese contexto muestra el formulario
 y las acciones **Recomendar jugador** y **Recomendar también**. Un administrador
@@ -90,6 +95,7 @@ No debe interpretarse el catálogo parcial como cobertura de todas las ligas.
 - `supabase/migrations/20261029202902_scouting_colaborativo_paredes_de_cristal.sql`: migración de estructura y RPC, aplicada.
 - `supabase/migrations/20261029202924_scouting_initial_official_catalogue.sql`: migración del catálogo inicial, aplicada.
 - `supabase/migrations/20261029214442_scouting_current_season_projection.sql`: proyección de temporada vigente y conservación de validaciones históricas, aplicada.
+- `supabase/migrations/20261030193757_scouting_reviewed_squads_and_category_memberships.sql`: membresías por categoría, revisión de planteles e importador privado, aplicada. La aplicación del esquema no acredita por sí sola la publicación de un lote de datos.
 - `scouting/catalogue-seed.json`: datos y fuentes verificadas de los 11 clubes iniciales.
 - `supabase/functions/scouting-api/index.ts`: Edge Function independiente.
 - `supabase/tests/scouting-contract.sql`: prueba de integración, con datos ficticios
@@ -151,7 +157,7 @@ Las respuestas usan `Cache-Control: no-store`.
 | `bootstrap` | `{}` | `actor`, `provinces`, `competitions`, `positions`, `categories`, `catalogue` |
 | `dashboard` | `{}` | `dashboard` global, con hitos y `most_recommended_players` |
 | `clubs` | `province?`, `competition_id?`, `query?`, `cursor?` | `items`, `next_cursor` |
-| `players` | `club_id`, `category?`, `query?`, `cursor?` | `items`, `next_cursor` |
+| `players` | `club_id`, `category?`, `query?`, `cursor?` | `items`, `next_cursor`, `total_count`, `squad` |
 | `create` | Ver abajo | `recommendation`, `replayed` |
 | `feed` | `status?`, `query?`, `mine_only?`, `player_id?`, `reference_recommendation_id?`, `cursor?` | `items`, `next_cursor` |
 | `mine` | `status?`, `cursor?` | `items`, `next_cursor` |
@@ -166,6 +172,120 @@ Cada página tiene como máximo 25 elementos. `next_cursor` es un valor opaco pa
 cliente; debe devolverse tal como se recibió. La implementación inicial utiliza un
 offset acotado, por lo que cambios simultáneos del listado pueden mover registros
 entre páginas; el cliente puede actualizar la primera página para reconciliarlo.
+
+### Planteles y selección de categoría
+
+Al seleccionar un club, el formulario elige **Primera** y consulta su plantel
+automáticamente. El socio puede cambiar a **Reserva** u otra categoría. El selector
+informa cuántos jugadores muestra y el total correspondiente al filtro; una
+búsqueda sin coincidencias no se presenta como un plantel vacío. Mantiene la
+entrada manual de jugadores y la opción **Otro club**.
+
+`players.squad` incluye `category`, `player_count`, `expected_count`, `status`,
+`checked_at`, `source_url`, `source_season`, `competition_season` y
+`available_categories`. Cada categoría disponible informa su propia cobertura.
+`competition_season` es la temporada de la competencia del catálogo;
+`source_season` conserva el rótulo observado en Transfermarkt, que puede ser
+diferente o desconocido. `season` es un alias de este último. La fecha de consulta
+no se convierte en fecha de valoración ni en temporada de la fuente.
+
+Los estados de cobertura son `verified` (todas las filas de jugadores de la tabla
+consultada se incorporaron), `partial`, `not_loaded` y `unavailable`. Una tabla
+completa en la fuente no garantiza la integridad del plantel real de la institución.
+Los planteles vacíos, las fuentes inaccesibles y las extracciones parciales quedan
+identificados, sin inferir que el club carece de jugadores.
+
+`scouting.player_squads` relaciona a una misma persona con Primera y Reserva,
+conservando su UUID. La identidad de Transfermarkt tiene un índice único por ID
+de perfil; no se deduplica por nombre. `scouting.squad_reviews` conserva el alcance
+de cada revisión. Ambas tablas son privadas, con RLS forzada y sin permisos para
+`anon`, `authenticated` ni acceso directo de `service_role`. El RPC valida la
+sesión de Club Abierto y devuelve únicamente el contrato documentado.
+
+El importador privado `scouting.import_roster_batch(jsonb,text)` recibe un corte
+revisado completo. Valida la huella previa de clubes y jugadores, conserva una
+clave y un hash por lote, admite una repetición idéntica sin duplicar datos y
+rechaza una clave reutilizada con otro contenido. Serializa las actualizaciones
+del catálogo y comprueba identidades repetidas entre clubes antes de importar.
+Los conflictos quedan registrados; no se decide una afiliación por el orden de
+carga ni se reactivan bajas deliberadas. Las ausencias en una fuente parcial no
+eliminan jugadores, membresías ni recomendaciones.
+
+La nómina revisada y sus fuentes se conservan en
+`scouting/catalogue-squads-2026-10-30.json.gz`. Su procedencia es `verified_manual`:
+consulta de páginas públicas y normalización de hechos deportivos, sin credenciales
+ni feed licenciado de Transfermarkt. Los valores de la tabla del plantel que no
+incluyen fecha de valoración individual no se publican como valores verificados;
+se conservan las referencias individuales comprobadas en el corte anterior.
+
+El corte contiene **5.627 jugadores distintos y 5.651 relaciones de plantel**:
+4.266 de Primera y 1.385 de Reserva. Los jugadores que figuran en ambas categorías
+se cuentan una vez como personas. Se revisaron 264 fuentes: 153 de Primera y 111
+de Reserva. Las reservas de 107 clubes contienen jugadores; tres páginas no
+publicaron filas y una no se pudo consultar.
+
+El lote `argentina-squads-2026-10-30` se confirmó en la base el 30/10/2026 a las
+19:48:31 UTC, con id `4f07dbfd-271e-4364-a130-0345e90bae35`. La consulta posterior
+confirmó esos recuentos, las 264 revisiones y la conservación de las 21 identidades
+previas y los 20 valores de mercado verificados, sin cambios en sus datos protegidos.
+El ensayo completo y la repetición idempotente pasaron antes de la confirmación.
+El RPC real devolvió Aldosivi Primera 30 (páginas de 25 y 5) y Reserva 32, también
+después del commit. Las sesiones sintéticas de comprobación se eliminaron mediante
+`ROLLBACK`. El manifiesto `.validation.json` conserva los resultados. El envío a
+Polygon seguía deshabilitado.
+
+En la carga inicial desde 21 jugadores, el planificador escogía búsquedas
+secuenciales por identidad. El ensayo completo excedió el tiempo de la llamada y
+se comprobó que no había persistido cambios. Con `SET LOCAL enable_seqscan=off`
+y `SET LOCAL jit=off`, el ensayo pasó en 13,1 segundos y la importación confirmada
+en 13,9 segundos, incluyendo el transporte de la herramienta. Se actualizaron las
+estadísticas de jugadores, membresías y revisiones mediante `ANALYZE`; las opciones
+locales no modifican el planificador de la aplicación ni su configuración global.
+
+| Competencia del primer equipo | Clubes | Jugadores de Primera | Reservas con jugadores | Jugadores de Reserva |
+| --- | ---: | ---: | ---: | ---: |
+| Primera División / Liga Profesional | 30 | 892 | 30 | 875 |
+| Primera Nacional | 36 | 1.010 | 33 | 341 |
+| Federal A | 37 | 1.114 | 30 | 120 |
+| Primera B | 22 | 637 | 13 | 46 |
+| Primera C | 28 | 613 | 1 | 3 |
+
+Estos recuentos describen las filas comprobadas en las fuentes, no todas las ligas
+argentinas ni la exhaustividad deportiva de las nóminas. Defensores de Belgrano
+(Primera) conserva 8 de las 24 filas del plantel; los otros 16 nombres quedaron
+pendientes tras un bloqueo de la fuente. All Boys (Reserva) registra una consulta
+inaccesible. Las reservas de Centro Español, Lugano y Puerto Nuevo no publicaron
+jugadores en las tablas consultadas. No se infirieron nombres ni bajas a partir
+de esos límites.
+
+`scouting/catalogue-squads-2026-10-30.import.json.gz` conserva exactamente el documento
+reducido que recibe el importador (esquema 2), incluidas las huellas del estado
+anterior. El snapshot de evidencia usa esquema 3. El archivo `.validation.json`
+registra los hashes de ambos; son contenidos distintos con finalidades distintas.
+Los dos archivos usan gzip sin pérdida, con `mtime=0`. Al descomprimir se recuperan
+exactamente los bytes de los JSON originales, incluidos espacios y saltos de línea.
+Los SHA-256 y tamaños originales de `.validation.json` siguen correspondiendo al
+contenido descomprimido; no se sustituyen por el hash ni el tamaño del contenedor
+gzip. La compresión no cambia el documento de importación ni la identidad del lote.
+Una ejecución mensual prepara una nueva clave y nuevas huellas: no modifica ni
+vuelve a utilizar este corte histórico como si fuera una consulta nueva.
+
+Para transportar un documento grande, se pueden almacenar fragmentos de su texto
+original en `catalogue_runs.metadata.document_parts`, con índices numéricos y un
+registro `status='staging'`, `source='reviewed_squad_transport'`. Su `transport_key`
+es distinto de `batch_key`: transportar fragmentos no publica ni importa jugadores.
+Antes de convertir el texto a JSONB, se ensambla en orden numérico y se comprueban
+cantidad de fragmentos, bytes UTF-8 y SHA-256 del documento original. La importación
+privada se ejecuta una sola vez sobre el documento completo dentro de una transacción,
+después de un ensayo con `ROLLBACK`. El lote publicado conserva su propia fila y
+sus evidencias. Sólo se elimina el registro de transporte propio, aún en staging y
+sin referencias, una vez verificado el resultado. El procedimiento de reanudación,
+ensayo y limpieza está en [scouting-monthly-refresh.md](scouting-monthly-refresh.md#transporte-de-documentos-grandes).
+
+Las correcciones de categoría son explícitas y requieren evidencia de una nómina
+completa de origen y de la pertenencia a la categoría destino. Conservan la persona,
+su UUID y sus datos históricos. Ninguna importación modifica recomendaciones,
+eventos de auditoría, compromisos criptográficos ni lotes pendientes de Polygon.
 
 `clubs.items[].competitions` muestra las relaciones de competencias activas cuya
 temporada coincide con `competitions.season`. Las relaciones de temporadas

@@ -1,6 +1,19 @@
 (() => {
   'use strict';
 
+  // The same component powers the standalone route and the native panel section.
+  // A ShadowRoot isolates styles; there is no iframe or separate scroll viewport.
+  function mount(root = document, options = {}) {
+  const embedded = root !== document;
+  const listeners = [];
+  const requests = new Set();
+  let disposed = false;
+  function listen(target, type, callback, settings) {
+    if (!target) return;
+    target.addEventListener(type, callback, settings);
+    listeners.push(() => target.removeEventListener(type, callback, settings));
+  }
+
   const API_URL = 'https://sziuyjicqyxnmbgtbopg.supabase.co/functions/v1/scouting-api';
   const SESSION_KEY = 'TD_club_session_v1';
   const OTHER_CATEGORY = '__other__';
@@ -32,13 +45,13 @@
   });
   const VIDEO_HOSTS = new Set(['youtube.com', 'www.youtube.com', 'm.youtube.com', 'youtu.be', 'vimeo.com', 'www.vimeo.com', 'player.vimeo.com']);
   const TRANSFERMARKT_HOSTS = new Set(['transfermarkt.com', 'transfermarkt.com.ar', 'transfermarkt.es', 'transfermarkt.de', 'transfermarkt.fr', 'transfermarkt.it', 'transfermarkt.pt', 'transfermarkt.co.uk', 'transfermarkt.nl']);
-  const $ = (id) => document.getElementById(id);
+  const $ = (id) => root.getElementById(id);
   const channels = new Map();
   const timers = new Map();
   const state = {
     actor: null, bootstrap: null, expired: false, activeToken: '', sessionGeneration: 0, activeTab: 'mine', panelContext: initialPanelContext(),
     clubs: new Map(), players: new Map(), clubsCursor: null, playersCursor: null, clubsQuery: null, playersQuery: null,
-    selectedClub: null, selectedPlayer: null, clubAutoCompetition: false, playerAutoTransfermarktUrl: null, playerAutoAge: null, createRequestId: null, createPending: null,
+    selectedClub: null, selectedPlayer: null, squad: null, clubAutoCompetition: false, playerAutoTransfermarktUrl: null, playerAutoAge: null, createRequestId: null, createPending: null,
     createBusy: false, successId: null, currentDetailId: null,
     list: { items: [], cursor: null, loaded: false, query: null },
     dashboard: { data: null, loaded: false },
@@ -74,11 +87,12 @@
   }
 
   function initialPanelContext() {
+    if (embedded) return options.panelContext === 'admin' ? 'admin' : 'socio';
     return new URLSearchParams(window.location.search).get('panel_context') === 'admin' ? 'admin' : 'socio';
   }
 
-  function canRecommend() { return Boolean(state.actor) && state.panelContext === 'socio'; }
-  function canManage(recommendation) { return state.panelContext === 'admin' && state.actor?.role === 'admin' && recommendation.can_manage === true; }
+  function canRecommend() { return !disposed && Boolean(state.actor) && state.panelContext === 'socio'; }
+  function canManage(recommendation) { return !disposed && state.panelContext === 'admin' && state.actor?.role === 'admin' && recommendation.can_manage === true; }
 
   function applyPanelContext(value) {
     if (!['socio', 'admin'].includes(value)) return;
@@ -182,6 +196,7 @@
     state.actor = null; state.bootstrap = null; state.activeToken = ''; state.activeTab = 'mine';
     state.clubs.clear(); state.players.clear(); state.mutations.clear();
     state.selectedClub = null; state.selectedPlayer = null; state.playerAutoTransfermarktUrl = null; state.playerAutoAge = null; state.createPending = null;
+    state.squad = null;
     state.createRequestId = null; state.successId = null; state.currentDetailId = null; state.createBusy = false;
     state.clubAutoCompetition = false; state.clubsQuery = null; state.playersQuery = null;
     state.list = { items: [], cursor: null, loaded: false, query: null };
@@ -225,6 +240,7 @@
   }
 
   async function api(action, payload = {}, externalSignal) {
+    if (disposed) throw new DOMException('Scouting closed', 'AbortError');
     const sessionToken = token();
     const generation = state.sessionGeneration;
     if (state.activeToken && sessionToken !== state.activeToken) {
@@ -241,6 +257,8 @@
     if (externalSignal?.aborted) abort();
     externalSignal?.addEventListener('abort', abort, { once: true });
     const timeout = setTimeout(() => { timedOut = true; controller.abort(); }, 25000);
+    const pendingRequest = { controller, timeout };
+    requests.add(pendingRequest);
     try {
       const response = await fetch(API_URL, {
         method: 'POST', mode: 'cors', cache: 'no-store', credentials: 'omit',
@@ -250,7 +268,7 @@
       let data;
       try { data = await response.json(); }
       catch (_) { throw new ApiError('La respuesta no pudo confirmarse. Intentá nuevamente.', 'INVALID_RESPONSE', response.status >= 400 ? response.status : 502); }
-      if (generation !== state.sessionGeneration) throw new DOMException('Session context changed', 'AbortError');
+      if (disposed || generation !== state.sessionGeneration) throw new DOMException('Session context changed', 'AbortError');
       if (token() !== sessionToken || state.expired) {
         expireSession('La sesión cambió. Volvé a abrir scouting desde tu panel.');
         throw new ApiError('La sesión cambió.', 'SESSION_CHANGED', 401);
@@ -263,6 +281,7 @@
       }
       return data;
     } catch (error) {
+      if (disposed) throw new DOMException('Scouting closed', 'AbortError');
       if (generation !== state.sessionGeneration && !state.expired) throw new DOMException('Session context changed', 'AbortError');
       if (externalSignal?.aborted) throw new DOMException('Request cancelled', 'AbortError');
       if (error?.name === 'AbortError' && generation !== state.sessionGeneration) throw error;
@@ -271,6 +290,7 @@
       throw new ApiError('No pudimos conectarnos. Comprobá tu conexión e intentá nuevamente.', 'NETWORK_ERROR', 0);
     } finally {
       clearTimeout(timeout);
+      requests.delete(pendingRequest);
       externalSignal?.removeEventListener('abort', abort);
     }
   }
@@ -285,7 +305,7 @@
     cancelChannel(key);
     const current = { controller: new AbortController(), id: Symbol(key) };
     channels.set(key, current);
-    return { signal: current.controller.signal, current: () => channels.get(key) === current };
+    return { signal: current.controller.signal, current: () => !disposed && channels.get(key) === current };
   }
 
   function debounce(key, callback, delay = 320) {
@@ -295,8 +315,8 @@
 
   function clearDebounce(key) { clearTimeout(timers.get(key)); timers.delete(key); }
   function uncertain(error) { return error instanceof ApiError && (error.status === 0 || error.status >= 500); }
-  function cancelled(error) { return error?.name === 'AbortError' || state.expired; }
-  function route() { return document.querySelector('[name="search-route"]:checked')?.value || 'province'; }
+  function cancelled(error) { return disposed || error?.name === 'AbortError' || state.expired; }
+  function route() { return root.querySelector('[name="search-route"]:checked')?.value || 'province'; }
   function manualClub() { return $('manual-club-toggle').checked; }
   function category() { return $('player-category').value === OTHER_CATEGORY ? $('custom-category').value.trim() : $('player-category').value; }
 
@@ -360,8 +380,8 @@
 
   function goBack(event) {
     event.preventDefault();
-    if (window.parent !== window) {
-      window.parent.postMessage({ type: 'club-scouting-back' }, window.location.origin);
+    if (embedded) {
+      options.onBack?.();
       return;
     }
     let sameOrigin = false;
@@ -371,6 +391,7 @@
   }
 
   async function boot() {
+    if (disposed) return;
     state.expired = false;
     if (!token()) {
       setBoot('Ingresá desde tu panel', 'Scouting colaborativo está disponible con tu sesión de Club Abierto. Ingresá a tu panel y abrí esta sección desde allí.', { login: true });
@@ -391,8 +412,8 @@
       applyPanelContext(state.panelContext);
       $('boot-panel').hidden = true;
       $('application').hidden = false;
-      $('mine-only').checked = location.hash === '#mis-recomendaciones';
-      activateTab(location.hash === '#recomendar' && canRecommend() ? 'recommend' : 'mine');
+      $('mine-only').checked = !embedded && location.hash === '#mis-recomendaciones';
+      activateTab(!embedded && location.hash === '#recomendar' && canRecommend() ? 'recommend' : 'mine');
     } catch (error) {
       if (!request.current() || cancelled(error)) return;
       setBoot('No pudimos abrir scouting', message(error), { retry: true, login: error.status === 403 });
@@ -423,7 +444,7 @@
     if (name === 'recommend' && !canRecommend()) name = 'mine';
     if (!['recommend', 'mine'].includes(name)) return;
     state.activeTab = name;
-    for (const tab of document.querySelectorAll('[data-tab]')) {
+    for (const tab of root.querySelectorAll('[data-tab]')) {
       const active = tab.dataset.tab === name;
       tab.setAttribute('aria-selected', String(active)); tab.tabIndex = active ? 0 : -1;
       $(`panel-${tab.dataset.tab}`).hidden = !active;
@@ -440,7 +461,7 @@
       $('mine-list').setAttribute('aria-busy', 'false'); $('dashboard-metrics').setAttribute('aria-busy', 'false');
       $('mine-refresh').disabled = false; $('mine-more').disabled = false;
       if (!manualClub() && !state.selectedClub) loadClubs();
-      if ($('player-lookup').open) loadPlayers();
+      if (!$('player-lookup').hidden) loadPlayers();
     }
   }
 
@@ -450,7 +471,9 @@
     cancelChannel('players'); clearDebounce('players');
     if (!referenced) clearAutoPlayerProfile();
     state.selectedPlayer = null; state.players.clear(); state.playersCursor = null;
+    state.squad = null;
     $('player-choice').replaceChildren(option('', 'Seleccioná una categoría', true));
+    $('squad-status').hidden = true; $('squad-source').hidden = true;
     $('players-more').hidden = true;
     $('player-query').value = '';
     $('player-first-name').value = ''; $('player-last-name').value = '';
@@ -468,6 +491,7 @@
     const competition = state.clubAutoCompetition && route() === 'province' ? '' : $('club-competition').value;
     state.clubAutoCompetition = false;
     state.selectedClub = null;
+    updateCategoryAvailability([]);
     updateClubReference();
     restoreCompetitions(competition);
     $('selected-club').hidden = true;
@@ -591,7 +615,10 @@
       $('competition-required').hidden = true;
     }
     showClubSummary();
+    if (!state.referenceRecommendation && [...$('player-category').options].some((entry) => entry.value === 'Primera')) $('player-category').value = 'Primera';
+    updateCustomCategory();
     updatePlayerLookup();
+    loadPlayers();
   }
 
   function applyClubCompetition(membership) {
@@ -634,11 +661,47 @@
   }
 
   function updatePlayerLookup() {
-    const available = !state.referenceRecommendation && !manualClub() && Boolean(state.selectedClub) && Number(state.bootstrap?.catalogue?.player_count || 0) > 0;
+    const available = !state.referenceRecommendation && !manualClub() && Boolean(state.selectedClub);
     $('player-lookup').hidden = !available;
-    if (!available) $('player-lookup').open = false;
     $('player-manual-help').textContent = state.referenceRecommendation ? 'La identidad está vinculada al aporte original. Para recomendar a otra persona, elegí Nuevo jugador. La posición y la edad que informes corresponden a tu nuevo aporte.' : state.selectedPlayer ? 'Datos del jugador seleccionado. Podés completar la posición que observaste.' : 'Completá los datos del jugador. No necesita figurar en el catálogo.';
     updatePlayerReview();
+  }
+
+  function reviewedEmptySquad(squad) {
+    return Boolean(squad && squad.player_count === 0 && squad.expected_count === 0
+      && squad.status !== 'unavailable' && squad.last_attempt_status !== 'unavailable'
+      && shortDate(squad.checked_at) && safeUrl(squad.source_url, 'transfermarkt'));
+  }
+
+  function updateCategoryAvailability(categories) {
+    const known = new Map((Array.isArray(categories) ? categories : []).map((entry) => [entry.category, entry]));
+    for (const choice of $('player-category').options) {
+      if (!choice.value || choice.value === OTHER_CATEGORY) continue;
+      const entry = known.get(choice.value);
+      const count = Number(entry?.player_count);
+      choice.textContent = !entry ? choice.value : count > 0 ? `${choice.value} · ${count} ${count === 1 ? 'jugador' : 'jugadores'}` : reviewedEmptySquad(entry) ? `${choice.value} · sin nómina publicada` : `${choice.value} · pendiente de carga`;
+    }
+  }
+
+  function renderSquad(squad) {
+    state.squad = squad || null;
+    const target = $('squad-status');
+    target.hidden = !squad;
+    $('squad-source').hidden = true;
+    if (!squad) return;
+    updateCategoryAvailability(squad.available_categories);
+    const count = Math.max(0, Number(squad.player_count) || 0);
+    const name = squad.category || category();
+    const reviewed = shortDate(squad.checked_at);
+    const season = squad.source_season ? `Temporada de la fuente: ${squad.source_season}.` : '';
+    if (squad.status === 'verified') target.textContent = `Plantel de ${name}: ${count} ${count === 1 ? 'jugador publicado' : 'jugadores publicados'} en Transfermarkt. ${season}${reviewed ? ` Consulta del ${reviewed}.` : ''}`;
+    else if (count > 0) target.textContent = `Plantel de ${name} parcialmente cargado: ${count} ${count === 1 ? 'jugador disponible' : 'jugadores disponibles'}. La nómina todavía no está completa.${reviewed ? ` Última revisión: ${reviewed}.` : ''}`;
+    else if (reviewedEmptySquad(squad)) target.textContent = `La fuente consultada no publica jugadores para este plantel de ${name}. Consulta del ${reviewed}. Podés recomendar un jugador ingresando sus datos manualmente.`;
+    else if (squad.status === 'unavailable') target.textContent = `El plantel de ${name} todavía no está cargado. No pudimos consultar su fuente en la última actualización. Podés recomendar un jugador manualmente.`;
+    else target.textContent = `El plantel de ${name} de este equipo todavía no está cargado en Club Abierto. Podés recomendar un jugador manualmente. Esto no significa que el plantel no exista en Transfermarkt.`;
+    const href = safeUrl(squad.source_url, 'transfermarkt');
+    if (href) { $('squad-source').href = href; $('squad-source').hidden = false; }
+    else $('squad-source').removeAttribute('href');
   }
 
   function updateReferenceNotice() {
@@ -682,12 +745,16 @@
     try {
       const data = await api('players', { ...state.playersQuery, cursor: more ? state.playersCursor : null }, request.signal);
       if (!request.current()) return;
+      renderSquad(data.squad);
       for (const player of Array.isArray(data.items) ? data.items : []) state.players.set(String(player.id), player);
       state.playersCursor = data.next_cursor || null;
-      $('player-choice').replaceChildren(option('', state.players.size ? 'Seleccioná un jugador' : 'No encontramos jugadores para esta búsqueda', true));
+      const noMatch = state.playersQuery.query && Number(data.squad?.player_count || 0) > 0;
+      const emptySource = reviewedEmptySquad(data.squad);
+      $('player-choice').replaceChildren(option('', state.players.size ? 'Seleccioná un jugador del plantel' : noMatch ? 'No hay coincidencias con este nombre' : emptySource ? 'Fuente sin nómina publicada' : 'Plantel pendiente de carga', true));
       for (const player of state.players.values()) $('player-choice').append(option(player.id, [player.first_name, player.last_name].filter(Boolean).join(' ') + (player.position ? ` · ${player.position}` : '')));
       if (selectedId && state.players.has(String(selectedId))) $('player-choice').value = String(selectedId);
-      $('players-help').textContent = state.players.size ? `${state.players.size} ${state.players.size === 1 ? 'jugador disponible' : 'jugadores disponibles'}. También podés cargar otro manualmente.` : 'Completá nombre y apellido en los campos de abajo.';
+      const total = Number.isInteger(data.total_count) && data.total_count >= state.players.size ? data.total_count : null;
+      $('players-help').textContent = state.players.size ? `${total === null ? `${state.players.size} jugadores cargados` : `Mostrando ${state.players.size} de ${total} jugadores`}${state.playersQuery.query ? ' para esta búsqueda' : ''}. Seleccioná uno para completar su ficha.` : noMatch ? 'Probá con otro nombre o borrá la búsqueda para ver el plantel.' : emptySource ? 'Podés ingresar nombre y apellido en los campos de abajo.' : 'Mientras se completa la carga, podés ingresar nombre y apellido en los campos de abajo.';
       $('players-more').hidden = !state.playersCursor;
       $('players-more').textContent = 'Cargar más jugadores'; delete $('players-more').dataset.retry;
     } catch (error) {
@@ -889,7 +956,7 @@
     actions.append(statusBadge(recommendation.status));
     const button = node('button', 'button button-secondary', 'Ver detalle'); button.type = 'button';
     button.setAttribute('aria-label', `Ver recomendación de ${playerName(recommendation)}`);
-    button.addEventListener('click', () => openDetail(recommendation.id));
+    listen(button, 'click', () => openDetail(recommendation.id));
     actions.append(button);
     if (recommendation.code) actions.append(node('span', 'card-reference', recommendation.code));
     article.append(content, actions); return article;
@@ -905,7 +972,7 @@
       empty.append(node('p', '', filtered ? 'Probá con otro estado o modificá la búsqueda.' : 'Los aportes de los socios aparecerán aquí, con su autor, sus datos y su seguimiento.'));
       if (canRecommend() && !filtered) {
         const button = node('button', 'button button-primary', 'Recomendar jugador'); button.type = 'button';
-        button.addEventListener('click', () => activateTab('recommend', true)); empty.append(button);
+        listen(button, 'click', () => activateTab('recommend', true)); empty.append(button);
       }
       list.append(empty);
     } else for (const item of items) list.append(card(item));
@@ -976,7 +1043,7 @@
       count.append(node('strong', '', entry.recommendation_count.toLocaleString('es-AR')), node('span', '', 'recomendaciones'));
       const button = node('button', 'button button-small button-secondary', 'Ver recomendaciones'); button.type = 'button';
       button.setAttribute('aria-label', `Ver las ${entry.recommendation_count} recomendaciones de ${name}`);
-      button.addEventListener('click', () => showPlayerRecommendations(entry.reference_recommendation_id, entry.identity_type === 'catalogue' ? entry.player_id : null, name));
+      listen(button, 'click', () => showPlayerRecommendations(entry.reference_recommendation_id, entry.identity_type === 'catalogue' ? entry.player_id : null, name));
       item.append(identity, count, button); list.append(item);
     }
   }
@@ -1071,7 +1138,7 @@
     const feedback = node('div', 'feedback'); feedback.hidden = true; feedback.setAttribute('role', 'alert');
     const output = node('div', 'event-proof-output');
     const detailId = state.currentDetailId;
-    button.addEventListener('click', async () => {
+    listen(button, 'click', async () => {
       if (button.disabled || !container.isConnected || !$('detail-dialog').open || state.currentDetailId !== detailId) return;
       const request = requestChannel(`event-proof:${event.id}`);
       button.disabled = true; button.textContent = 'Consultando constancia…'; setFeedback(feedback, '');
@@ -1112,7 +1179,7 @@
     const field = node('div', 'field'); const labelNode = node('label', '', label); labelNode.htmlFor = id;
     const input = document.createElement(type); input.id = id;
     for (const [key, value] of Object.entries(options)) input[key] = value;
-    input.addEventListener('input', () => input.setCustomValidity(''));
+    listen(input, 'input', () => input.setCustomValidity(''));
     field.append(labelNode, input); return { field, input };
   }
 
@@ -1143,7 +1210,7 @@
       fields.disabled = true; button.textContent = pending.busy ? 'Guardando…' : 'Reintentar actualización'; button.disabled = pending.busy;
       setFeedback(feedback, pending.busy ? 'Estamos registrando esta actualización.' : 'La actualización está pendiente de confirmar. Reintentá para recuperar el mismo envío.', 'info');
     }
-    form.addEventListener('submit', async (event) => {
+    listen(form, 'submit', async (event) => {
       event.preventDefault();
       const previous = state.mutations.get(mutationKey);
       if (previous?.busy || state.expired || (admin ? !canManage(recommendation) : recommendation.can_add_info !== true)) return;
@@ -1181,7 +1248,7 @@
             if (!uncertain(error)) setFeedback(replacement.querySelector('.feedback'), message(error), 'error');
           }
         }
-      } finally { button.disabled = false; }
+      } finally { if (!disposed) button.disabled = false; }
     });
     form.dataset.mutation = action;
     return form;
@@ -1227,10 +1294,10 @@
       }
       const playerActions = node('div', 'detail-player-actions');
       const viewGroup = node('button', 'button button-secondary', 'Ver recomendaciones de este jugador'); viewGroup.type = 'button';
-      viewGroup.addEventListener('click', () => showPlayerRecommendations(recommendation.id, null, playerName(recommendation)));
+      listen(viewGroup, 'click', () => showPlayerRecommendations(recommendation.id, null, playerName(recommendation)));
       if (canRecommend()) {
         const also = node('button', 'button button-primary', 'Recomendar también'); also.type = 'button';
-        also.addEventListener('click', () => recommendAlso(recommendation)); playerActions.append(also);
+        listen(also, 'click', () => recommendAlso(recommendation)); playerActions.append(also);
       }
       playerActions.append(viewGroup); body.append(playerActions);
       body.append(renderProof(data.proof), renderEvents(data.events));
@@ -1246,7 +1313,7 @@
       if (!request.current() || cancelled(error) || !dialog.open) return;
       $('detail-title').textContent = 'No pudimos cargar el detalle';
       const notice = node('div', 'feedback', message(error)); notice.setAttribute('role', 'alert');
-      const retry = node('button', 'button button-secondary', 'Reintentar'); retry.type = 'button'; retry.addEventListener('click', () => openDetail(id));
+      const retry = node('button', 'button button-secondary', 'Reintentar'); retry.type = 'button'; listen(retry, 'click', () => openDetail(id));
       $('detail-body').replaceChildren(notice, retry);
     }
   }
@@ -1257,20 +1324,20 @@
     loadClubs();
   }
 
-  $('back-button').addEventListener('click', goBack);
-  $('boot-retry').addEventListener('click', boot);
-  $('recommend-form').addEventListener('submit', createRecommendation);
-  $('new-recommendation').addEventListener('click', newRecommendation);
-  $('dashboard-recommend').addEventListener('click', () => activateTab('recommend', true));
-  $('reference-clear').addEventListener('click', () => { clearRecommendationReference(); $('player-first-name').focus(); });
-  $('success-detail').addEventListener('click', () => openDetail(state.successId));
-  $('manual-club-toggle').addEventListener('change', () => setManualClub());
-  for (const radio of document.querySelectorAll('[name="search-route"]')) radio.addEventListener('change', () => updateRoute());
-  $('club-province').addEventListener('change', () => {
+  listen($('back-button'), 'click', goBack);
+  listen($('boot-retry'), 'click', boot);
+  listen($('recommend-form'), 'submit', createRecommendation);
+  listen($('new-recommendation'), 'click', newRecommendation);
+  listen($('dashboard-recommend'), 'click', () => activateTab('recommend', true));
+  listen($('reference-clear'), 'click', () => { clearRecommendationReference(); $('player-first-name').focus(); });
+  listen($('success-detail'), 'click', () => openDetail(state.successId));
+  listen($('manual-club-toggle'), 'change', () => setManualClub());
+  for (const radio of root.querySelectorAll('[name="search-route"]')) listen(radio, 'change', () => updateRoute());
+  listen($('club-province'), 'change', () => {
     if (route() === 'province') $('club-competition').value = '';
     $('club-query').value = ''; invalidateClubSearch();
   });
-  $('club-competition').addEventListener('change', () => {
+  listen($('club-competition'), 'change', () => {
     const membership = route() === 'province' && state.selectedClub?.competitions?.find((entry) => String(entry.id) === $('club-competition').value);
     if (membership) {
       applyClubCompetition(membership); state.clubAutoCompetition = true;
@@ -1280,85 +1347,99 @@
     if (route() === 'competition') $('club-province').value = '';
     $('club-query').value = ''; invalidateClubSearch();
   });
-  $('club-query').addEventListener('input', () => {
+  listen($('club-query'), 'input', () => {
     clearClub(); cancelChannel('clubs');
     $('club-choice').replaceChildren(option('', 'Buscando clubes…', true));
     debounce('clubs', () => loadClubs());
   });
-  $('club-choice').addEventListener('change', selectClub);
-  $('clubs-more').addEventListener('click', () => {
+  listen($('club-choice'), 'change', selectClub);
+  listen($('clubs-more'), 'click', () => {
     const retry = $('clubs-more').dataset.retry === 'true';
     $('clubs-more').textContent = 'Cargar más clubes'; delete $('clubs-more').dataset.retry;
     loadClubs(!retry);
   });
-  $('player-category').addEventListener('change', () => {
-    updateCustomCategory(); clearPlayer(false); if ($('player-lookup').open) loadPlayers();
+  listen($('player-category'), 'change', () => {
+    updateCustomCategory(); clearPlayer(false); if (!$('player-lookup').hidden) loadPlayers();
   });
-  $('custom-category').addEventListener('input', () => {
-    clearPlayer(false); if ($('player-lookup').open) debounce('players', () => loadPlayers());
+  listen($('custom-category'), 'input', () => {
+    clearPlayer(false); if (!$('player-lookup').hidden) debounce('players', () => loadPlayers());
   });
-  $('player-lookup').addEventListener('toggle', () => { if ($('player-lookup').open) loadPlayers(); });
-  $('player-query').addEventListener('input', () => { cancelChannel('players'); debounce('players', () => loadPlayers()); });
-  $('player-choice').addEventListener('change', selectPlayer);
-  $('players-more').addEventListener('click', () => loadPlayers($('players-more').dataset.retry !== 'true'));
-  for (const id of ['player-first-name', 'player-last-name']) $(id).addEventListener('input', () => {
+  listen($('player-query'), 'input', () => { cancelChannel('players'); debounce('players', () => loadPlayers()); });
+  listen($('player-choice'), 'change', selectPlayer);
+  listen($('players-more'), 'click', () => loadPlayers($('players-more').dataset.retry !== 'true'));
+  for (const id of ['player-first-name', 'player-last-name']) listen($(id), 'input', () => {
     if (state.referenceRecommendation) clearRecommendationReference(false);
     state.selectedPlayer = null; clearAutoPlayerProfile(); clearAutoPlayerAge(); $('player-choice').value = ''; updatePlayerLookup();
   });
-  $('transfermarkt-url').addEventListener('input', () => { state.playerAutoTransfermarktUrl = null; });
-  $('player-age').addEventListener('input', () => { state.playerAutoAge = null; });
-  $('player-position').addEventListener('change', updateSector);
-  $('recommend-reason').addEventListener('input', () => { $('reason-count').textContent = `${$('recommend-reason').value.length} / 4000`; });
+  listen($('transfermarkt-url'), 'input', () => { state.playerAutoTransfermarktUrl = null; });
+  listen($('player-age'), 'input', () => { state.playerAutoAge = null; });
+  listen($('player-position'), 'change', updateSector);
+  listen($('recommend-reason'), 'input', () => { $('reason-count').textContent = `${$('recommend-reason').value.length} / 4000`; });
   for (const input of $('recommend-form').querySelectorAll('input,select,textarea')) {
-    input.addEventListener('input', () => { input.setCustomValidity(''); input.removeAttribute('aria-invalid'); });
-    input.addEventListener('invalid', () => input.setAttribute('aria-invalid', 'true'));
+    listen(input, 'input', () => { input.setCustomValidity(''); input.removeAttribute('aria-invalid'); });
+    listen(input, 'invalid', () => input.setAttribute('aria-invalid', 'true'));
   }
-  $('mine-status').addEventListener('change', () => loadList());
-  $('mine-refresh').addEventListener('click', refreshOverview);
-  $('mine-more').addEventListener('click', () => loadList(true));
-  $('mine-only').addEventListener('change', () => loadList());
-  $('player-filter-clear').addEventListener('click', () => {
+  listen($('mine-status'), 'change', () => loadList());
+  listen($('mine-refresh'), 'click', refreshOverview);
+  listen($('mine-more'), 'click', () => loadList(true));
+  listen($('mine-only'), 'change', () => loadList());
+  listen($('player-filter-clear'), 'click', () => {
     state.rankedPlayerFilter = null; $('player-filter').hidden = true; $('player-filter-name').textContent = ''; loadList();
   });
-  $('mine-query').addEventListener('input', () => {
+  listen($('mine-query'), 'input', () => {
     cancelChannel('list'); state.list.loaded = false; $('mine-more').disabled = true;
     debounce('list-query', () => loadList());
   });
-  for (const tab of document.querySelectorAll('[data-tab]')) {
-    tab.addEventListener('click', () => activateTab(tab.dataset.tab));
-    tab.addEventListener('keydown', (event) => {
+  for (const tab of root.querySelectorAll('[data-tab]')) {
+    listen(tab, 'click', () => activateTab(tab.dataset.tab));
+    listen(tab, 'keydown', (event) => {
       if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
       event.preventDefault();
-      const tabs = [...document.querySelectorAll('[data-tab]')].filter((entry) => !entry.hidden);
+      const tabs = [...root.querySelectorAll('[data-tab]')].filter((entry) => !entry.hidden);
       const current = tabs.indexOf(tab);
       const index = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : (current + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
       activateTab(tabs[index].dataset.tab, true);
     });
   }
-  $('detail-close').addEventListener('click', () => $('detail-dialog').close());
-  $('detail-dialog').addEventListener('close', () => {
+  listen($('detail-close'), 'click', () => $('detail-dialog').close());
+  listen($('detail-dialog'), 'close', () => {
     for (const [key] of channels) if (key === 'detail' || key.startsWith('event-proof:')) cancelChannel(key);
     state.currentDetailId = null;
   });
-  window.addEventListener('pagehide', () => {
+  listen(window, 'pagehide', () => {
     for (const [key] of channels) cancelChannel(key);
     for (const timer of timers.values()) clearTimeout(timer);
     timers.clear();
   });
-  window.addEventListener('pageshow', (event) => {
+  listen(window, 'pageshow', (event) => {
     if (event.persisted) { clearSessionState(); state.expired = false; boot(); }
     else checkSessionIdentity();
   });
-  window.addEventListener('storage', (event) => { if (event.key === SESSION_KEY || event.key === null) checkSessionIdentity(); });
-  window.addEventListener('message', (event) => {
-    if (event.origin !== window.location.origin || event.source !== window.parent || event.data?.type !== 'club-abierto:scouting-context') return;
-    applyPanelContext(event.data.panel_context);
-  });
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) checkSessionIdentity(); });
-  window.addEventListener('hashchange', () => {
+  listen(window, 'storage', (event) => { if (event.key === SESSION_KEY || event.key === null) checkSessionIdentity(); });
+  listen(document, 'visibilitychange', () => { if (!document.hidden) checkSessionIdentity(); });
+  listen(window, 'hashchange', () => {
+    if (embedded) return;
     if (state.actor && ['#gestion', '#tablero'].includes(location.hash)) activateTab('mine');
     else if (state.actor && location.hash === '#mis-recomendaciones') { $('mine-only').checked = true; state.list.loaded = false; activateTab('mine'); }
     else if (state.actor && location.hash === '#recomendar') activateTab('recommend');
   });
+  function dispose() {
+    if (disposed) return;
+    disposed = true;
+    // Invalidate every outstanding read or mutation before detaching the view.
+    clearSessionState();
+    for (const request of requests) {
+      clearTimeout(request.timeout);
+      request.controller.abort();
+    }
+    requests.clear();
+    for (const remove of listeners.splice(0)) remove();
+  }
+
   boot();
+  return Object.freeze({ dispose });
+  }
+
+  window.ClubAbiertoScouting = Object.freeze({ mount });
+  if (document.body?.hasAttribute('data-scouting-standalone')) mount(document);
 })();
