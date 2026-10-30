@@ -62,7 +62,7 @@ function inject(){
  // The old implementation did exactly that, re-adding the button after removal.
  const dashboards=[
   {id:'socioDashboard',category:'Transparencia y auditoría'},
-  {id:'adminDashboard',category:'Economía y auditoría'}
+  {id:'adminDashboard',category:'Transparencia y auditoría'}
  ];
  dashboards.forEach(({id,category})=>{
   const dash=document.getElementById(id);if(!dash)return;
