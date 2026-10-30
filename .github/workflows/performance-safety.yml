@@ -5,6 +5,9 @@ on:
       - 'scripts/build-cloudflare.mjs'
       - 'index.html'
       - 'src/estructura-institucional.js'
+      - 'comunidad-formativa*.html'
+      - 'comunidad-formativa/**'
+      - 'scripts/test-formative-html.mjs'
       - 'scripts/test-navigation-stability.mjs'
       - '.github/workflows/performance-safety.yml'
   workflow_dispatch:
@@ -22,6 +25,8 @@ jobs:
         run: node scripts/build-cloudflare.mjs
       - name: Prevent institutional navigation observer loops
         run: node scripts/test-navigation-stability.mjs
+      - name: Validate formative HTML and routes
+        run: node scripts/test-formative-html.mjs
       - name: Check non-blocking startup dependencies
         run: |
           node --input-type=module <<'EOF'
