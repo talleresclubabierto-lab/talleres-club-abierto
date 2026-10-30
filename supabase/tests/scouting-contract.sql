@@ -1,4 +1,4 @@
--- Run only after 20261029202902_scouting_colaborativo_paredes_de_cristal.sql exists, as a database test operator.
+-- Run after the shared-dashboard migration, as a database test operator.
 -- Synthetic fixtures are created inside this transaction. No existing member,
 -- administrator or session is queried or used as an identity. ALWAYS ROLLBACK.
 begin;
@@ -24,6 +24,7 @@ declare
   v_count integer;
   v_audit_count integer;
   v_hash text;
+  v_hash_document jsonb;
   v_nonce text;
   v_row record;
   v_lot uuid;
@@ -66,7 +67,7 @@ begin
     raise exception 'malformed UUID was accepted';
   exception when sqlstate 'PT422' then null; end;
 
-  v_payload:=jsonb_build_object('request_id',v_request,'club_id',null,
+  v_payload:=jsonb_build_object('panel_context','socio','request_id',v_request,'club_id',null,
     'club_manual',jsonb_build_object('province','Córdoba','city','Localidad de prueba',
       'name','SCOUTING TEST CLUB '||v_owner::text,'league','Liga de prueba'),
     'competition_id','liga-local','category','Sub-17','player_id',null,
@@ -121,8 +122,11 @@ begin
     or v_detail::text like '%private_nonce%' or v_detail::text like '%token_hash%'
     or v_detail::text like '%datos_extra%' or v_detail::text like '%"dni"%'
     then raise exception 'member response exposed private technical or identity fields';end if;
-  if exists(select 1 from jsonb_array_elements(v_detail->'events') x where x ? 'actor_numero_socio')
-    then raise exception 'events leaked actor identity';end if;
+  if not exists(select 1 from jsonb_array_elements(v_detail->'events') x
+    where x->>'type'='status_updated' and x#>>'{actor,numero_socio}'=v_admin::text
+      and x->>'actor_numero_socio'=v_admin::text and x->>'previous_status'='recibida'
+      and x->>'new_status'='en_revision' and x#>>'{actor,role}'='admin')
+    then raise exception 'public event actor or status transition is missing';end if;
   v_detail:=public.scouting_api(v_token_admin,'detail',jsonb_build_object('id',v_id));
   if v_detail::text like '%internal_note%' then raise exception 'private-note concept remains in detail';end if;
   begin
@@ -155,12 +159,16 @@ begin
       or to_jsonb(a)::text like '%TEST_ADMIN_PUBLIC%' or to_jsonb(a)::text like '%SCOUTING SYNTHETIC%'))
     then raise exception 'shared audit exposed identity or private content';end if;
   for v_row in select * from scouting.events where recommendation_id=v_id order by sequence_no loop
-    v_hash:=encode(extensions.digest(convert_to(jsonb_build_object(
-      'schema','scouting-event-v1','id',v_row.id,'recommendation_id',v_row.recommendation_id,
+    v_hash_document:=jsonb_build_object(
+      'schema','scouting-event-v'||v_row.hash_version,'id',v_row.id,'recommendation_id',v_row.recommendation_id,
       'sequence',v_row.sequence_no,'actor',v_row.actor_numero_socio,'role',v_row.actor_role,
       'type',v_row.event_type,'status',v_row.status,'message',v_row.member_message,
       'created_at',to_char(v_row.created_at at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"'),'original_commitment',(select commitment_hash from scouting.recommendations where id=v_id),
-      'previous',v_row.prev_hash,'nonce',v_row.private_nonce)::text,'UTF8'),'sha256'),'hex');
+      'previous',v_row.prev_hash,'nonce',v_row.private_nonce);
+    if v_row.hash_version=2 then
+      v_hash_document:=v_hash_document||jsonb_build_object('previous_status',v_row.previous_status);
+    end if;
+    v_hash:=encode(extensions.digest(convert_to(v_hash_document::text,'UTF8'),'sha256'),'hex');
     if v_hash<>v_row.event_hash then raise exception 'event commitment cannot be recomputed';end if;
   end loop;
 

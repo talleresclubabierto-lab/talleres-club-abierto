@@ -1,8 +1,73 @@
 # Scouting: backend y verificación
 
+## Paneles y seguimiento compartido — 30/10/2026
+
+El acceso **Scouting colaborativo** está en **Otros accesos** de Socio Activo y
+Administrador. Ambos abren el mismo módulo con tablero, ranking, listado, detalle
+e historial compartidos. El iframe se crea al entrar y se elimina al volver;
+no se cargan el catálogo ni el tablero durante el ingreso general a la plataforma.
+
+El proceso se inicia en **Socio Activo**. Sólo ese contexto muestra el formulario
+y las acciones **Recomendar jugador** y **Recomendar también**. Un administrador
+que quiera aportar puede entrar desde su panel de socio. El contexto administrador
+muestra las mismas recomendaciones y agrega los controles de gestión. El parámetro
+`panel_context` expresa este recorrido de interfaz: no es una credencial ni sustituye
+la validación de la sesión y del rol administrativo en el servidor.
+
+### Tablero global y repetición de recomendaciones
+
+`dashboard` calcula totales sobre todas las recomendaciones, independientemente de
+la página o los filtros del listado. Presenta jugadores/referencias recomendados,
+contactados, visitados, convocados a prueba, con prueba realizada y que no avanzan.
+Los hitos son **acumulados** y requieren una actuación explícita: pasar directamente
+a `prueba_realizada` no inventa un contacto o una visita anteriores. Un jugador
+puede haber alcanzado varios hitos y aparecer en más de un contador.
+
+La identidad se resuelve por el UUID estable del jugador del catálogo o por una
+referencia manual vinculada explícitamente. Los ingresos manuales independientes
+se mantienen separados; nunca se unen homónimos por nombre. El tablero distingue
+jugadores identificados en catálogo, referencias declaradas por socios y total de
+recomendaciones recibidas. Cada aporte conserva su autor, snapshot e historial;
+el módulo no inventa un estado único para todas las recomendaciones de una persona.
+
+**Jugadores más recomendados** muestra hasta diez identidades con dos o más aportes,
+ordenadas por cantidad y, en empates, por fecha del último aporte e identidad estable.
+Cada fila informa recomendaciones totales y socios distintos. El club mostrado es
+el del último aporte, no una afirmación de afiliación vigente. El enlace abre el
+grupo exacto de recomendaciones, sin depender de una búsqueda por nombre.
+
+**Recomendar también** inicia un aporte propio desde una recomendación visible.
+`reference_recommendation_id` permite que el servidor derive la identidad y los
+nombres de la ficha original. Para un jugador del catálogo vuelve a validar club,
+categoría y disponibilidad actuales. Para un jugador manual conserva un vínculo
+de identidad declarado por socios; no lo convierte en una identidad verificada.
+Club, categoría, posición, motivo y edad manual corresponden al nuevo aporte.
+El servidor rechaza un `player.reference_id` arbitrario enviado por el cliente.
+
+### Datos y estados visibles
+
+Debajo del tablero, cada aporte muestra fecha, nombre y **N.º de socio** del autor,
+jugador, equipo, competencia o liga, provincia, categoría, edad al recomendar,
+posición y valor de mercado. Si falta una referencia de valor verificada muestra
+**Sin valor informado**. El mercado conserva moneda, fuente Transfermarkt, fecha
+de valoración y fecha de comprobación; un precio escrito por un socio se rechaza.
+
+La edad del catálogo se calcula desde una fecha de nacimiento comprobada con el
+calendario de Argentina y se congela al recomendar. La fecha de nacimiento no se
+devuelve en la API. La edad manual es opcional, entre 1 y 100 años enteros, y se
+identifica como declarada por el socio. Los snapshots históricos no se reescriben
+cuando cambia la edad, el mercado o la afiliación en el catálogo.
+
+Los estados disponibles incluyen `contactado`, `visitado`, `convocado_a_prueba`,
+`prueba_realizada` y `no_avanza`, además de los estados previos `recibida`,
+`en_revision`, `informacion_solicitada`, `en_seguimiento` y `cerrada`. Sólo un
+administrador habilitado puede cambiarlos, dejando un motivo público. El historial
+identifica al responsable por nombre, número de socio y rol, y conserva fecha,
+estado anterior, estado nuevo y constancia criptográfica de cada actuación.
+
 ## Alcance implementado
 
-La nueva Edge Function `scouting-api` recibe la sesión existente de Club Abierto.
+La Edge Function `scouting-api` recibe la sesión existente de Club Abierto.
 No cambia `login`, `estado_inicial`, las votaciones ni la configuración de Polygon.
 El catálogo se consulta sólo cuando la sección lo solicita.
 
@@ -34,7 +99,7 @@ No debe interpretarse el catálogo parcial como cobertura de todas las ligas.
 - `scripts/test-scouting-api.mjs`: pruebas locales del adaptador HTTP con respuestas
   simuladas del RPC; no usan secretos ni servicios reales.
 
-El CLI Supabase no estaba disponible al preparar este cambio. Las dos migraciones
+El CLI Supabase no estaba disponible al preparar la implementación inicial. Las dos migraciones
 se aplicaron mediante `apply_migration` y se conservaron con sus versiones reales,
 `20261029202902` y `20261029202924`. No se inventaron timestamps de migración.
 
@@ -44,7 +109,8 @@ socios sintéticos. Para repetirla, conservar siempre el `ROLLBACK` del script.
 Si se compone dentro de otra transacción de ensayo, debe existir un único par externo
 de `BEGIN` / `ROLLBACK`.
 
-La Edge Function `scouting-api`, versión 1, quedó en estado `ACTIVE`. Una solicitud
+En la verificación inicial del 29/10, la Edge Function `scouting-api`, versión 1,
+quedó en estado `ACTIVE`. Una solicitud
 HTTP real con token inválido llegó al RPC y devolvió `401 session_expired`, con los
 encabezados CORS esperados. Esa comprobación confirma el rechazo de sesiones inválidas;
 la autorización y las operaciones válidas se comprobaron en la prueba SQL transaccional.
@@ -83,12 +149,14 @@ Las respuestas usan `Cache-Control: no-store`.
 | Acción | Carga útil | Respuesta |
 | --- | --- | --- |
 | `bootstrap` | `{}` | `actor`, `provinces`, `competitions`, `positions`, `categories`, `catalogue` |
+| `dashboard` | `{}` | `dashboard` global, con hitos y `most_recommended_players` |
 | `clubs` | `province?`, `competition_id?`, `query?`, `cursor?` | `items`, `next_cursor` |
 | `players` | `club_id`, `category?`, `query?`, `cursor?` | `items`, `next_cursor` |
 | `create` | Ver abajo | `recommendation`, `replayed` |
-| `feed` | `status?`, `query?`, `mine_only?`, `cursor?` | `items`, `next_cursor` |
+| `feed` | `status?`, `query?`, `mine_only?`, `player_id?`, `reference_recommendation_id?`, `cursor?` | `items`, `next_cursor` |
 | `mine` | `status?`, `cursor?` | `items`, `next_cursor` |
 | `detail` | `id` | `recommendation`, `events`, `proof` |
+| `event_proof` | `event_id` | `event_id`, `proof` de esa actuación |
 | `add_info` | `id`, `request_id`, `message` | `recommendation`, `replayed` |
 | `admin_list` | `status?`, `query?`, `cursor?` | `items`, `next_cursor` |
 | `admin_update` | `id`, `request_id`, `status`, `message` | `recommendation`, `replayed` |
@@ -113,6 +181,8 @@ la temporada, procedencia, fecha y fuentes de la referencia seleccionada.
 ```json
 {
   "request_id": "UUID generado para este envío",
+  "panel_context": "socio",
+  "reference_recommendation_id": null,
   "club_id": null,
   "club_manual": {
     "province": "Córdoba",
@@ -127,7 +197,8 @@ la temporada, procedencia, fecha y fuentes de la referencia seleccionada.
     "first_name": "Nombre",
     "last_name": "Apellido",
     "position": "Lateral",
-    "sector": "derecha"
+    "sector": "derecha",
+    "age_at_recommendation": 17
   },
   "reason": "Descripción deportiva de al menos veinte caracteres",
   "observation": "Contexto opcional de observación",
@@ -143,11 +214,13 @@ Ningún dato del formulario elige al socio propietario ni sus permisos.
 
 La respuesta de recomendación contiene `id`, `code`, fechas, `status`, `category`,
 `club`, `player`, `reason`, `observation`, enlaces, `source`, `audit_event_id` y
-`commitment_hash`. `author.name` muestra el nombre del autor. `can_add_info` aplica
+`commitment_hash`. `author.name` y `author.numero_socio` identifican al autor. `can_add_info` aplica
 el permiso real de autor y estado abierto; `can_manage` identifica la gestión
 administrativa; `club_validated` evita ofrecer una segunda validación del mismo club.
-Los eventos muestran tipo, estado, `actor_name`, `actor_role`, mensaje, fecha y hash.
-No se exponen DNI, teléfonos, emails, tokens, nonces ni números de socio ajenos.
+Los eventos muestran tipo, `previous_status`, `new_status`, `actor_name`,
+`actor_numero_socio`, `actor_role`, mensaje, fecha, `hash_version`, hash y referencia
+a la auditoría. Los números de socio se muestran por la premisa de transparencia;
+no se exponen DNI, teléfonos, emails, tokens ni nonces.
 No existen notas internas: todos los mensajes y decisiones son visibles para todos
 los socios habilitados. Un envío con `internal_note` no vacío es rechazado.
 
@@ -202,6 +275,17 @@ se expone. Esta separación evita publicar en blockchain los datos de la ficha.
 es el compromiso del primer evento que contiene el hash de esa ficha. Las actuaciones
 posteriores tienen sus propios hashes y referencias a la auditoría general.
 
+Las actuaciones nuevas usan `scouting-event-v2`: el hash compromete también el
+estado anterior registrado junto al estado nuevo, actor y rol. `hash_version=1`
+conserva los eventos previos sin recalcularlos; para esos eventos el estado anterior
+se puede reconstruir de la secuencia para mostrarlo, con
+`previous_status_source=event_sequence`, sin afirmar que formaba parte de su hash.
+`event_proof` calcula la constancia de la actuación solicitada, con la misma
+distinción de estados del registro inicial. Se consulta al abrirla, no una vez por
+fila de todo el listado.
+La atribución proviene de la sesión autenticada y la auditoría del sistema;
+no se presenta como una firma digital personal emitida por el administrador.
+
 La prueba de detalle calcula el camino Merkle sólo al solicitarla y distingue:
 
 - `registrada`: evento guardado, todavía sin lote.
@@ -214,7 +298,13 @@ Este módulo no activa la integración institucional ni llama al worker Polygon.
 La cola y la política de lotes existentes deciden el envío cuando estén habilitadas.
 Si falla cualquier parte del registro local/auditoría, se revierte toda la operación.
 
-## Verificación realizada y pendiente
+La consulta del 30/10/2026 encontró Polygon de producción configurada (chain 137),
+pero la integración general con estado `estructurada_no_activada`. Por lo tanto,
+registrar una recomendación o actuación no demuestra un anclaje nuevo. El módulo
+informa la constancia real de cada evento; no cambia la configuración institucional,
+no ejecuta envíos de fondos y no presenta lotes preparados como confirmados.
+
+## Verificación inicial — 29/10/2026
 
 Ejecutado localmente:
 
@@ -252,7 +342,7 @@ concurrencia real ni un benchmark de catálogo masivo; los bloqueos e índices n
 reemplazan esa medición. Estas comprobaciones tampoco confirman un envío nuevo a
 Polygon: no se activó la integración ni se creó una transacción de anclaje desde scouting.
 
-## Verificación visual de integración
+## Verificación visual inicial — 29/10/2026
 
 El recorrido se verificó en navegador con el HTML, CSS y JavaScript finales y
 respuestas simuladas aisladas del despliegue: listado compartido, detalle de otro
@@ -325,3 +415,64 @@ esperada, los permisos, el modo de ejecución y las huellas completas del catál
 153 clubes, 21 jugadores y todas sus relaciones permanecieron iguales. No quedaron
 socios ni recomendaciones de prueba. El cambio no modifica el circuito de auditoría
 ni confirma una nueva transacción blockchain.
+
+## Despliegue y regresión del tablero — 30/10/2026
+
+Se aplicaron mediante migraciones nativas de Supabase, conservadas con sus versiones
+reales:
+
+- `20261030185101_scouting_shared_dashboard_and_audited_states.sql`: tablero,
+  referencias de jugador, nuevos estados, autoría visible, metadatos y eventos v2.
+- `20261030185115_scouting_verified_player_details_2026_10_30.sql`: enriquecimiento
+  de 21 jugadores, 21 fechas de nacimiento comprobadas y 20 valores de mercado.
+
+El segundo lote usa el snapshot
+`scouting/catalogue-player-details-2026-10-30.json`, con SHA-256
+`23d77f77bb21429e55a4c4bb7dd638c71ea192d372558b91b3009ffb2ef70257`.
+Corrige además las afiliaciones de Alex Vigo a Independiente Rivadavia y Bruno
+Barticciotto a Huracán, con anuncios específicos de Talleres y perfiles contrastados.
+Conserva sus UUID, claves y evidencia anterior. Jeremías Florentín no tiene valor
+informado en la referencia revisada; se conserva `null`. Las fechas de los valores
+son las propias de cada valoración, no la fecha de esta carga.
+
+La Edge Function se desplegó como **versión 4, ACTIVE**, con `verify_jwt=false` y
+la misma validación de sesión propia. Se partió de la versión viva 3; el adaptador
+sólo agregó `dashboard` y `event_proof` a su lista de acciones.
+
+Antes de publicar se ensayaron, dentro de una única transacción revertida, ambas
+migraciones, la repetición idempotente del lote y las tres suites SQL. Cada suite
+se aisló con un savepoint. `supabase/tests/scouting-dashboard.sql` cubre 35 aportes
+sintéticos, conteos más allá de 25 filas, duplicados de catálogo y referencias
+manuales explícitas, homónimos independientes, estados y motivos, autores, roles,
+valores verificados, edad, snapshots inmutables, compatibilidad de hashes v1/v2
+y pruebas Merkle de la actuación correcta. También pasaron el contrato previo
+y las regresiones de temporada vigente e historial de afiliaciones.
+
+La comprobación posterior al despliegue confirmó 153 clubes, 21 jugadores activos,
+21 fechas de nacimiento y 20 valores verificados, además del hash de lote esperado,
+las dos afiliaciones corregidas y los permisos del RPC. Había cero recomendaciones
+reales en ese corte y no quedaron recomendaciones, eventos ni socios sintéticos.
+La revisión de seguridad no agregó hallazgos respecto de su línea base; los avisos
+preexistentes de otras funciones permanecieron fuera del cambio.
+
+Las pruebas locales de navegación, frontend y adaptador HTTP pasaron, junto con la
+compilación web y las regresiones de navegación general y Comunidad Formativa:
+
+```text
+node scripts/build-cloudflare.mjs
+node scripts/test-navigation-stability.mjs
+node scripts/test-formative-html.mjs
+node scripts/test-scouting-navigation.mjs
+node scripts/test-scouting-frontend.mjs
+node --experimental-strip-types --test scripts/test-scouting-api.mjs
+```
+
+La prueba de navegación realiza 50 recorridos de apertura/retorno y verifica la
+eliminación del iframe, el contexto por rol y los mensajes de origen válido. La
+suite del frontend usa el código real con un DOM y respuestas simuladas; cubre
+repetición de mensajes, paginación, referencias manuales, sesiones, constancias
+bajo demanda y cancelación de solicitudes. No equivale a una comprobación visual
+del recorrido autenticado en un navegador real. El acceso al fixture local fue
+bloqueado por la política del navegador; no se intentó eludirla ni se publicaron
+las pantallas con datos ficticios. Las pruebas tampoco confirman una transacción
+nueva en Polygon.

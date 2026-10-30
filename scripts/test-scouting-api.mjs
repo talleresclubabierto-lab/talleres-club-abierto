@@ -41,6 +41,60 @@ test('missing sessions, foreign origins and unsupported actions never reach the 
   assert.equal(calls, 0);
 });
 
+test('shared dashboard forwards one authenticated RPC and preserves global counts beyond one page', async () => {
+  let calls = 0;
+  let sent;
+  const expected = { ok: true, dashboard: {
+    total_recommendations: 37, identified_players: 2, unverified_player_references: 33,
+    total_player_references: 35, contacted: 4, visited: 2, invited_to_trial: 1,
+    trial_completed: 1, not_advanced: 1, milestone_unit: 'player_references',
+    scope: 'all_recommendations',
+  } };
+  const handler = makeHandler(env, async (_url, init) => {
+    calls++; sent = JSON.parse(init.body);
+    return Response.json(expected);
+  });
+  const response = await handler(request({ action: 'dashboard', payload: {} }));
+  assert.equal(response.status, 200);
+  assert.equal(calls, 1);
+  assert.deepEqual(sent, { p_token: token, p_action: 'dashboard', p_payload: {} });
+  assert.deepEqual(await response.json(), expected);
+  assert.match(response.headers.get('cache-control'), /no-store/);
+});
+
+test('member panel context and optional age reach the authoritative RPC unchanged', async () => {
+  let sent;
+  const payload = { panel_context: 'socio', request_id: '00000000-0000-4000-8000-000000000001',
+    reference_recommendation_id: '00000000-0000-4000-8000-000000000002',
+    player: { first_name: 'Synthetic', last_name: 'Player', age_at_recommendation: 17 } };
+  const handler = makeHandler(env, async (_url, init) => {
+    sent = JSON.parse(init.body);
+    return Response.json({ code: 'PT422', message: 'Faltan los otros datos de la ficha' }, { status: 422 });
+  });
+  const response = await handler(request({ action: 'create', payload }));
+  assert.equal(response.status, 422);
+  assert.deepEqual(sent, { p_token: token, p_action: 'create', p_payload: payload });
+  assert.equal((await response.json()).error.message, 'Faltan los otros datos de la ficha');
+});
+
+test('a selected event proof keeps its own event identity and unconfirmed status', async () => {
+  let sent;
+  const eventId = '00000000-0000-4000-8000-000000000003';
+  const expected = { ok: true, event_id: eventId, proof: {
+    status: 'preparada', commitment_hash: 'a'.repeat(64), audit_event_id: 42,
+    transaction_hash: null, merkle_valid: true,
+  } };
+  const handler = makeHandler(env, async (_url, init) => {
+    sent = JSON.parse(init.body);
+    return Response.json(expected);
+  });
+  const response = await handler(request({ action: 'event_proof', payload: { event_id: eventId } }));
+  assert.equal(response.status, 200);
+  assert.deepEqual(sent, { p_token: token, p_action: 'event_proof', p_payload: { event_id: eventId } });
+  assert.deepEqual(await response.json(), expected);
+  assert.match(response.headers.get('cache-control'), /no-store/);
+});
+
 test('preflight and method restrictions work independently of credentials', async () => {
   const handler = makeHandler(() => undefined, async () => { throw new Error('must not call'); });
   const preflight = await handler(new Request('https://local.example', { method: 'OPTIONS', headers: { origin } }));

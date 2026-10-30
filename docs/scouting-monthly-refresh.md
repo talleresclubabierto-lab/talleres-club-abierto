@@ -74,6 +74,14 @@ no significa que el club o jugador haya desaparecido.
    sin cambio deportivo, pendiente, conflicto o fuente inaccesible. Conservar
    valor anterior, propuesta, fuente y motivo.
 
+Conciliar también los cortes de enriquecimiento posteriores al snapshot completo.
+`scouting/catalogue-player-details-2026-10-30.json` es un delta de datos de 21
+jugadores: 21 fechas de nacimiento, 20 referencias de valor y dos correcciones
+de club verificadas. No reemplaza el catálogo completo de octubre ni sus referencias
+pendientes. Los metadatos del lote guardan las filas antes y después. El estado
+resultante requiere aplicar el corte completo y sus deltas publicados, además de
+conciliar las modificaciones administrativas posteriores.
+
 El importador puntual de octubre y sus migraciones son antecedentes de una
 carga, no programas recurrentes: contienen una temporada, una clave de lote
 y cantidades fijas. No ejecutarlos otra vez ni reconstruir funciones actuales
@@ -92,6 +100,18 @@ copiando una definición antigua.
 - **Jugadores:** verificar identidad, club y categoría individualmente antes
   de hacerlos seleccionables. Los pendientes y conflictos mantienen su estado
   hasta resolverlo. Las posiciones ambiguas no se fuerzan a una equivalencia.
+- **Edad:** conservar `birth_date`, `birth_date_source_url` y
+  `birth_date_verified_at` sólo con evidencia individual. El servicio calcula la
+  edad del catálogo con el calendario de Argentina y congela la edad al crear
+  cada recomendación; no actualiza edades históricas ni expone la fecha completa
+  de nacimiento en el listado de socios.
+- **Valor de mercado:** guardar importe, moneda, URL exacta de perfil Transfermarkt,
+  fecha propia de la valoración (`market_value_as_of`) y fecha de comprobación
+  (`market_value_verified_at`). Marcar `market_value_verified=true` únicamente con
+  evidencia suficiente. Una referencia sin valor conserva `null`, nunca cero.
+  La fecha de consulta no sustituye a la fecha del valor. No aceptar estimaciones
+  de socios como si fueran Transfermarkt; si la fuente no permite comprobar el
+  dato, informar la falta y conservar el antecedente con su fecha.
 - **Fechas:** separar consulta, hecho deportivo y fecha/antigüedad de la fuente.
   Renovar `checked_at` sólo cuando se haya comprobado de nuevo el registro.
   Una búsqueda fallida no permite presentar datos viejos como recién verificados.
@@ -99,6 +119,11 @@ copiando una definición antigua.
   o desactivarlo del catálogo actual, conservando evidencia anterior. No retirar
   registros por ausencia en un relevamiento parcial, ni reactivar bajas
   deliberadas. Preservar clubes manuales validados fuera del alcance investigado.
+  Una noticia oficial específica de salida puede corregir una nómina general
+  desactualizada; conservar ambas evidencias y el motivo. En el delta del 30/10,
+  Alex Vigo pasó a Independiente Rivadavia y Bruno Barticciotto a Huracán. Este
+  último préstamo fue informado hasta el 31/12/2026: revisar su continuidad con
+  nueva evidencia, sin programar un retorno ni una extensión por inferencia.
 - **Temporadas:** `competitions.season` expresa la temporada vigente de cada
   competencia; `club_competitions` conserva sus relaciones históricas. Cambiar
   ambas partes de la proyección actual dentro de una misma transacción y sólo
@@ -152,6 +177,8 @@ y el hash del snapshot. En una transacción:
 completa se guarda en los metadatos del lote y en el snapshot versionado.
 La procedencia de datos corroborados oficialmente es `official_reference`;
 un enlace Transfermarkt no convierte la procedencia en `licensed_transfermarkt`.
+Los campos individuales de nacimiento y valor conservan además sus columnas de
+procedencia; la evidencia extensa y los conflictos se guardan en el snapshot/lote.
 
 Si no hay novedades deportivas, registrar la revisión real y sus límites sin
 inventar cambios ni actualizar fechas de registros que no se comprobaron.
@@ -177,6 +204,10 @@ La política **PAREDES DE CRISTAL** permanece vigente: todos los socios habilita
 ven todas las recomendaciones y devoluciones. La antigüedad no modifica la
 visibilidad ni la prioridad deportiva. La actualización no activa Polygon ni
 cambia el circuito de auditoría. Un hash o lote local no confirma anclaje en cadena.
+No reescribir las fichas históricas, los autores ni los estados durante la carga.
+El tablero agrupa repeticiones por UUID estable de catálogo o vínculo manual
+explícito desde **Recomendar también**. Un cambio de club no debe crear otra
+identidad de jugador; los homónimos manuales independientes no se fusionan.
 
 Entregar por ChatGPT un informe con fecha, cobertura revisada, altas, cambios,
 salidas comprobadas, pendientes/conflictos, fuentes inaccesibles, totales

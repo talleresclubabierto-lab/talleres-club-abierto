@@ -49,12 +49,11 @@
       </section>
 
       <div class="tabs" role="tablist" aria-label="Secciones de scouting">
-        <button id="tab-mine" class="tab" type="button" role="tab" aria-controls="panel-mine" aria-selected="true" tabindex="0" data-tab="mine">Recomendaciones del club</button>
-        <button id="tab-recommend" class="tab" type="button" role="tab" aria-controls="panel-recommend" aria-selected="false" tabindex="-1" data-tab="recommend">Recomendar jugador</button>
-        <button id="tab-admin" class="tab" type="button" role="tab" aria-controls="panel-admin" aria-selected="false" tabindex="-1" data-tab="admin" hidden>Gestión</button>
+        <button id="tab-mine" class="tab" type="button" role="tab" aria-controls="panel-mine" aria-selected="true" tabindex="0" data-tab="mine">Tablero de scouting</button>
+        <button id="tab-recommend" class="tab" type="button" role="tab" aria-controls="panel-recommend" aria-selected="false" tabindex="-1" data-tab="recommend" hidden>Recomendar jugador</button>
       </div>
 
-      <section id="panel-recommend" class="tab-panel" role="tabpanel" aria-labelledby="tab-recommend">
+      <section id="panel-recommend" class="tab-panel" role="tabpanel" aria-labelledby="tab-recommend" hidden>
         <div id="create-success" class="panel success-panel" hidden tabindex="-1" role="status">
           <span class="success-mark" aria-hidden="true">✓</span>
           <p class="eyebrow">APORTE RECIBIDO</p>
@@ -72,6 +71,10 @@
             <div id="create-feedback" class="feedback" hidden role="alert" tabindex="-1"></div>
             <fieldset class="form-fields" id="create-fields">
               <legend class="sr-only">Datos de la recomendación</legend>
+              <div class="reference-notice" id="reference-notice" hidden>
+                <div><p class="eyebrow">RECOMENDAR TAMBIÉN</p><p>Nuevo aporte sobre <strong id="reference-player-name"></strong></p><p class="field-help" id="reference-description"></p></div>
+                <button class="button button-small button-secondary" id="reference-clear" type="button">Nuevo jugador</button>
+              </div>
               <section class="panel form-section" aria-labelledby="club-section-title">
                 <div class="section-heading"><span class="step-number" aria-hidden="true">01</span><div><h2 id="club-section-title">El equipo</h2><p>Ubicá el club donde juega.</p></div></div>
                 <fieldset class="route-picker">
@@ -121,6 +124,7 @@
                 <div class="field-grid">
                   <div class="field"><label for="player-first-name">Nombre <span class="required" aria-hidden="true">*</span></label><input id="player-first-name" required minlength="2" maxlength="100" autocapitalize="words"></div>
                   <div class="field"><label for="player-last-name">Apellido <span class="required" aria-hidden="true">*</span></label><input id="player-last-name" required minlength="2" maxlength="100" autocapitalize="words"></div>
+                  <div class="field"><label for="player-age">Edad al recomendar <span class="optional">opcional</span></label><input id="player-age" type="number" min="1" max="100" step="1" inputmode="numeric" placeholder="Si la conocés" aria-describedby="player-age-help"><p class="field-help" id="player-age-help">Ingresá los años cumplidos sólo si conocés la edad. Podés dejar este campo vacío.</p></div>
                   <div class="field"><label for="player-position">Posición principal <span class="required" aria-hidden="true">*</span></label><select id="player-position" required><option value="">Seleccioná una posición</option></select></div>
                   <div class="field" id="sector-field" hidden><label for="player-sector">Sector <span class="optional">opcional</span></label><select id="player-sector" disabled><option value="no_especificado">Sin especificar</option><option value="derecha">Derecha</option><option value="izquierda">Izquierda</option><option value="ambos">Ambos</option></select></div>
                 </div>
@@ -148,19 +152,33 @@
       </section>
 
       <section id="panel-mine" class="tab-panel" role="tabpanel" aria-labelledby="tab-mine" hidden>
-        <div class="list-heading"><div><h2>Recomendaciones del club</h2><p class="muted">Conocé quién recomienda, qué se observó y cuál fue la devolución.</p></div><button class="button button-secondary" id="mine-refresh" type="button">Actualizar</button></div>
-        <div class="list-toolbar panel"><div class="field"><label for="mine-status">Estado</label><select id="mine-status"><option value="">Todos los estados</option></select></div><label class="check-control own-filter"><input id="mine-only" type="checkbox"><span>Mis recomendaciones</span></label><span id="mine-count" class="muted" role="status"></span></div>
+        <section class="dashboard-summary" aria-labelledby="dashboard-title">
+          <div class="list-heading dashboard-heading"><div><p class="eyebrow">SEGUIMIENTO DEL CLUB</p><h2 id="dashboard-title">Resumen del scouting</h2><p class="muted">El mismo tablero y todas las recomendaciones, visibles para los socios y el equipo evaluador.</p></div><button class="button button-secondary" id="mine-refresh" type="button">Actualizar</button></div>
+          <div class="dashboard-metrics" id="dashboard-metrics" aria-busy="false">
+            <div class="metric-card metric-primary"><span class="metric-label">Jugadores recomendados</span><strong id="metric-recomendados" class="metric-value">—</strong><span class="metric-description">Catálogo + referencias manuales</span></div>
+            <div class="metric-card"><span class="metric-label">Contactados</span><strong id="metric-contactados" class="metric-value">—</strong><span class="metric-description">Contacto registrado</span></div>
+            <div class="metric-card"><span class="metric-label">Visitados</span><strong id="metric-visitados" class="metric-value">—</strong><span class="metric-description">Visita registrada</span></div>
+            <div class="metric-card"><span class="metric-label">Convocados a prueba</span><strong id="metric-convocados-a-prueba" class="metric-value">—</strong><span class="metric-description">Convocatoria registrada</span></div>
+            <div class="metric-card"><span class="metric-label">Pruebas realizadas</span><strong id="metric-prueba-realizada" class="metric-value">—</strong><span class="metric-description">Prueba registrada</span></div>
+            <div class="metric-card"><span class="metric-label">No avanzan</span><strong id="metric-no-avanzan" class="metric-value">—</strong><span class="metric-description">Decisión registrada</span></div>
+          </div>
+          <p class="dashboard-total" id="dashboard-total" role="status">Consultando los totales globales del scouting.</p>
+          <p class="dashboard-caption" id="dashboard-caption">Los jugadores del catálogo y las referencias vinculadas explícitamente se cuentan una vez. Los ingresos independientes se mantienen separados: no se unen por nombre. Los hitos son acumulados y sólo suman acciones registradas; los totales son globales y no cambian con los filtros.</p>
+          <p class="dashboard-updated" id="dashboard-updated" hidden></p>
+          <div class="feedback" id="dashboard-feedback" hidden role="alert"></div>
+        </section>
+        <section class="ranking-panel panel" aria-labelledby="ranking-title">
+          <div class="ranking-heading"><div><p class="eyebrow">APORTES DE LOS SOCIOS</p><h2 id="ranking-title">Jugadores más recomendados</h2></div><span class="ranking-limit">Hasta 10 jugadores · desde 2 recomendaciones</span></div>
+          <p class="ranking-description">Incluye jugadores del catálogo y referencias que los socios vincularon explícitamente. Cada aporte conserva sus datos, su autor y su seguimiento.</p>
+          <p class="ranking-empty" id="ranking-empty" role="status">El listado se mostrará cuando termine la consulta del tablero.</p>
+          <ol class="ranking-list" id="ranking-list" hidden></ol>
+        </section>
+        <div class="list-heading recommendations-heading"><div><h2 id="recommendations-title" tabindex="-1">Recomendaciones del club</h2><p class="muted">Cada aporte conserva su autor, sus datos y su historial de seguimiento.</p></div><button class="button button-primary" id="dashboard-recommend" type="button" hidden>Recomendar jugador <span aria-hidden="true">↗</span></button></div>
+        <div class="list-toolbar panel"><div class="field"><label for="mine-status">Estado actual</label><select id="mine-status"><option value="">Todos los estados</option></select></div><div class="field toolbar-search"><label for="mine-query">Buscar recomendación</label><input id="mine-query" type="search" maxlength="100" placeholder="Jugador, club o referencia" enterkeyhint="search"></div><label class="check-control own-filter"><input id="mine-only" type="checkbox"><span>Mis recomendaciones</span></label><span id="mine-count" class="muted" role="status"></span></div>
+        <div class="player-filter" id="player-filter" hidden><p>Recomendaciones de <strong id="player-filter-name"></strong></p><button class="button button-small button-subtle" id="player-filter-clear" type="button">Quitar filtro de jugador</button></div>
         <div class="feedback" id="mine-feedback" hidden role="alert"></div>
         <div class="recommendation-list" id="mine-list" aria-live="polite" aria-busy="false"></div>
         <div class="load-more-row"><button id="mine-more" class="button button-secondary" type="button" hidden>Cargar más recomendaciones</button></div>
-      </section>
-
-      <section id="panel-admin" class="tab-panel" role="tabpanel" aria-labelledby="tab-admin" hidden>
-        <div class="list-heading"><div><p class="eyebrow">EQUIPO EVALUADOR</p><h2>Gestión de scouting</h2><p class="muted">Revisá aportes y dejá un seguimiento visible para todos los socios.</p></div><button class="button button-secondary" id="admin-refresh" type="button">Actualizar</button></div>
-        <div class="list-toolbar panel"><div class="field"><label for="admin-status">Estado</label><select id="admin-status"><option value="">Todos los estados</option></select></div><div class="field toolbar-search"><label for="admin-query">Buscar recomendación</label><input id="admin-query" type="search" maxlength="100" placeholder="Jugador, club o referencia" enterkeyhint="search"></div><span id="admin-count" class="muted" role="status"></span></div>
-        <div class="feedback" id="admin-feedback" hidden role="alert"></div>
-        <div class="recommendation-list" id="admin-list" aria-live="polite" aria-busy="false"></div>
-        <div class="load-more-row"><button id="admin-more" class="button button-secondary" type="button" hidden>Cargar más recomendaciones</button></div>
       </section>
       <footer class="page-footer"><span>TALLERES CLUB ABIERTO</span><span>Scouting colaborativo · Fútbol argentino</span></footer>
     </div>
