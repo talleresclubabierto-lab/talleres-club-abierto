@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><meta name="theme-color" content="#021739"><meta name="application-name" content="Talleres Club Abierto"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Club Abierto"><link rel="manifest" href="./manifest.webmanifest"><link rel="icon" href="./icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="./icon.svg"><link rel="preconnect" href="https://sziuyjicqyxnmbgtbopg.supabase.co" crossorigin><link rel="dns-prefetch" href="//sziuyjicqyxnmbgtbopg.supabase.co"><title>Talleres Digital · Club Abierto</title><style>
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><meta name="theme-color" content="#021739"><meta name="application-name" content="Talleres Club Abierto"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Club Abierto"><link rel="manifest" href="./manifest.webmanifest"><link rel="icon" href="./icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="./icon.svg"><title>Talleres Digital · Club Abierto</title><style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
 :root{--navy:#001b35;--navy2:#003057;--blue:#3d608a;--paper:#f7fafc;--card:#fff;--soft:#f1f4f6;--line:#d9e0e6;--muted:#64748b;--text:#181c1e;--green:#1fa968;--green-bg:#e8f8ef;--gold:#d4af37;--red:#b42318;--red-bg:#fff1f0;--shadow:0 10px 30px rgba(0,27,53,.06)}
 *{box-sizing:border-box}html{background:var(--paper)}body{margin:0;background:var(--paper);color:var(--text);font-family:Inter,system-ui,sans-serif;min-height:100vh}.mono{font-family:'JetBrains Mono',monospace}.container{width:100%;max-width:1440px;margin:0 auto;padding:0 48px 56px}.full-width{width:100%}.text-left{text-align:left}.dashboard,.sub-view{display:none;width:100%;flex-direction:column}.screen{width:100%}
@@ -576,10 +576,9 @@ body{
     <div class="action-grid">
       <button class="btn-action-red" onclick="mostrarSeccionSocio('secVotaciones')"><span class="action-icon">◇</span>Votaciones activas<br><small style="font-weight:500;color:#64748b">Participá en decisiones abiertas</small></button>
       <button class="btn-action-red" onclick="irAResultadosGenerales()"><span class="action-icon">▥</span>Resultados<br><small style="font-weight:500;color:#64748b">Votantes y ponderación en tiempo real</small></button>
-      <button class="btn-action-red" type="button" onclick="irAScoutingColaborativo()"><span class="action-icon">◎</span>Scouting colaborativo<br><small style="font-weight:500;color:#64748b">Recomendá jugadores y conocé todos los aportes</small></button>
       <button class="btn-action-red" onclick="irAAuditoriaPublica()"><span class="action-icon">◎</span>Auditoría pública<br><small style="font-weight:500;color:#64748b">Consultá qué votó cada socio</small></button>
       <button class="btn-action-red" onclick="irAParedesDeCristal()"><span class="action-icon">▦</span>Paredes de Cristal<br><small style="font-weight:500;color:#64748b">Balance y auditoría económica ponderada</small></button>
-      <button class="btn-action-red" type="button" onclick="irASeguimientoComunidadFormativa()"><span class="action-icon">◉</span>Seguimiento de Comunidad Formativa<br><small style="font-weight:500;color:#64748b">Consultá presentaciones de forma anonimizada</small></button>
+      <a class="btn-action-red" href="/comunidad-formativa#socios-casos" style="display:block;text-decoration:none"><span class="action-icon">◉</span>Seguimiento de Comunidad Formativa<br><small style="font-weight:500;color:#64748b">Consultá estados y categorías generales de manera anonimizada</small></a>
       <button class="btn-action-red" onclick="irATuHistoria()"><span class="action-icon">✓</span>Tu historia con Talleres<br><small style="font-weight:500;color:#64748b">Partidos, asistencia y horarios de ingreso</small></button>
       <button class="btn-action-red" onclick="irAHistorialAdministrativo()"><span class="action-icon">▤</span>Historial de cambios<br><small style="font-weight:500;color:#64748b">Consultá el registro protegido de cambios</small></button>
       <button class="btn-action-red" onclick="irAIntegracionBlockchain()"><span class="action-icon">⬡</span>Integración blockchain<br><small style="font-weight:500;color:#64748b">Estado, lotes y trazabilidad criptográfica</small></button>
@@ -592,18 +591,6 @@ body{
       <div class="card"><div class="metric-label">Próximo escalón</div><div id="lblSocioDiasFaltantes" style="font-size:18px;font-weight:800;color:var(--navy);margin-top:8px">-</div></div>
     </div>
   </main><nav class="bottom-nav"><button class="active" onclick="regresarAlPanelInterno()"><span class="mini-icon">▦</span>Dashboard</button><button class="" onclick="mostrarSeccionSocio('secVotaciones')"><span class="mini-icon">◇</span>Votar</button><button class="" onclick="irAResultadosGenerales()"><span class="mini-icon">▥</span>Resultados</button><button class="" onclick="irAAuditoriaPublica()"><span class="mini-icon">◎</span>Auditoría</button></nav>
-</div>
-
-<section id="secScoutingColaborativo" class="sub-view full-width" aria-label="Scouting colaborativo">
-  <iframe id="scoutingFrame" title="Scouting colaborativo de Talleres Club Abierto" style="display:block;width:100%;height:100dvh;min-height:540px;border:0;background:#07172e" referrerpolicy="same-origin"></iframe>
-</section>
-
-<div id="secSeguimientoComunidadFormativa" class="sub-view full-width">
-  <div class="topbar"><div class="brand"><span class="app-logo-mark" role="img" aria-label="Escudo Talleres Club Abierto"></span><span class="brand-role-label">TALLERES CLUB ABIERTO · PANEL SOCIO ACTIVO</span></div><div class="top-actions"><span class="navlink"><span class="network-dot"></span>Seguimiento anonimizado</span><button type="button" onclick="regresarAlPanelInterno()">Volver al panel</button><button type="button" onclick="volverAlLogin()">Salir</button></div></div>
-  <main class="section-shell">
-    <div class="page-head"><div><div class="eyebrow">Panel de socio / Comunidad Formativa</div><h1 class="page-title">Seguimiento de presentaciones formativas</h1><p class="page-sub">Consultá el código, período, categoría general, estado y registro criptográfico. No se muestran la identidad del jugador o de su familia, el relato ni los archivos.</p></div><span class="status-chip">● Identidad reservada</span></div>
-    <section class="card" aria-labelledby="cf-member-cases-title"><h2 id="cf-member-cases-title" class="metric-label">Presentaciones registradas</h2><p class="page-sub">Las comunicaciones se consideran situaciones informadas hasta ser evaluadas. La información se presenta de forma anonimizada.</p><div id="cfMemberCasesStatus" class="admin-history-status warn" role="status" aria-live="polite">Cargando presentaciones…</div><div id="cfMemberCasesList" class="admin-history-list" aria-live="polite"></div></section>
-  </main>
 </div>
 
 <div id="adminDashboard" class="dashboard full-width">
@@ -630,7 +617,6 @@ body{
       <button class="btn-action-red" onclick="abrirRevisionRedes()"><span class="action-icon">✉</span>Revisión de respuestas <span id="contadorRevisionRedes" class="review-count" style="display:none">0</span><br><small style="font-weight:500;color:#64748b">Instagram y Facebook · aprobación humana</small></button>
       <button id="btnGestionAdministradores" class="btn-action-red" style="display:none" onclick="mostrarSeccionAdmin('secGestionAdmins')"><span class="action-icon">♙</span>Gestionar administradores</button>
       <button class="btn-action-red" onclick="mostrarSeccionAdmin('secGestionPadron')"><span class="action-icon">☷</span>Gestionar padrón</button>
-      <button class="btn-action-red" type="button" onclick="irAScoutingColaborativo()"><span class="action-icon">◎</span>Scouting colaborativo<br><small style="font-weight:500;color:#64748b">Revisá recomendaciones y su seguimiento</small></button>
       <button class="btn-action-red" type="button" onclick="window.location.href='/comunidad-formativa.html#gestion'"><span class="action-icon">♧</span>Gestión de Comunidad Formativa<br><small style="font-weight:500;color:#64748b">Solicitudes de vínculo y validación administrativa</small></button>
       <button class="btn-action-red" onclick="irACambioClave()"><span class="action-icon">⌨</span>Cambiar contraseña</button>
       <button class="btn-action-red" onclick="irAPasskey()"><span class="action-icon">◎</span>Identidad biométrica / Passkey</button>
@@ -3019,9 +3005,7 @@ finger.classList.add('accent-blue');
 finger.innerText='◌ ESTABLECIENDO CONEXIÓN SEGURA…';
 
 try{
-    var inicioLoginMedicion=performance.now();
     var sesion=await loginSeguroClub(id,clave);
-    console.info('[Club Abierto] Autenticación backend completada en '+Math.round(performance.now()-inicioLoginMedicion)+' ms');
     face.innerText='✓ CREDENCIALES VALIDADAS';
     finger.innerText='◌ CARGANDO SESIÓN PROTEGIDA…';
 
@@ -3265,58 +3249,8 @@ inicializarSelectorReset();
 actualizarCantidadAdministradores();
 }
 function ocultarTodo(){
-var scoutingFrame=document.getElementById('scoutingFrame');
-if(scoutingFrame&&scoutingFrame.hasAttribute('src'))scoutingFrame.removeAttribute('src');
 document.getElementById('loginScreen').style.display='none';
 document.querySelectorAll('.dashboard,.sub-view').forEach(function(v){v.style.display='none'});
-}
-function irAScoutingColaborativo(){
-    if(!obtenerTokenSesionClub()||(ROL_ACTIVO!=='socio'&&ROL_ACTIVO!=='admin')){
-        alert('Ingresá con tu sesión de socio o administrador para acceder a Scouting.');return;
-    }
-    ocultarTodo();
-    document.getElementById('secScoutingColaborativo').style.display='flex';
-    document.getElementById('scoutingFrame').src='./scouting.html'+(ROL_ACTIVO==='admin'?'#gestion':'');
-}
-window.addEventListener('message',function(event){
-    var frame=document.getElementById('scoutingFrame');
-    if(event.origin!==window.location.origin||!frame||event.source!==frame.contentWindow)return;
-    if(event.data&&event.data.type==='club-scouting-back')regresarAlPanelInterno();
-});
-async function irASeguimientoComunidadFormativa(){
-    if(ROL_ACTIVO!=='socio'){alert('Esta consulta está disponible desde una sesión de socio activo.');return;}
-    ocultarTodo();
-    var sec=document.getElementById('secSeguimientoComunidadFormativa');
-    sec.style.display='flex';
-    var status=document.getElementById('cfMemberCasesStatus');
-    var list=document.getElementById('cfMemberCasesList');
-    status.textContent='Validando sesión y cargando presentaciones…';
-    status.className='admin-history-status warn';
-    list.replaceChildren();
-    var token=obtenerTokenSesionClub();
-    if(!token){status.textContent='La sesión del Panel Socio Activo no está disponible. Volvé a ingresar.';return;}
-    try{
-        var response=await fetch('https://sziuyjicqyxnmbgtbopg.supabase.co/functions/v1/comunidad-formativa-api',{
-            method:'POST',mode:'cors',cache:'no-store',credentials:'omit',
-            headers:{'Content-Type':'application/json','X-Club-Session':token},
-            body:JSON.stringify({action:'member_cases_list'})
-        });
-        var data=await response.json().catch(function(){return {};});
-        if(!response.ok)throw new Error(data.error||'No se pudo validar la sesión del socio.');
-        var cases=Array.isArray(data.cases)?data.cases:[];
-        status.textContent=cases.length?'Se encontraron '+cases.length+' presentación(es).':'Todavía no hay presentaciones registradas.';
-        status.className='admin-history-status '+(cases.length?'ok':'warn');
-        cases.forEach(function(item){
-            var row=document.createElement('article');row.className='card';
-            var code=document.createElement('strong');code.textContent=item.codigo||'Presentación formativa';
-            var detail=document.createElement('p');detail.className='page-sub';
-            detail.textContent=[item.periodo,item.categoria_general,item.estado,'Registro criptográfico: '+(item.registro_criptografico||'pendiente')].filter(Boolean).join(' · ');
-            row.append(code,detail);list.appendChild(row);
-        });
-    }catch(error){
-        status.textContent=error&&error.message?error.message:'No se pudo cargar el seguimiento. Intentá nuevamente.';
-        status.className='admin-history-status error';
-    }
 }
 function mostrarSeccionSocio(id){
 ocultarTodo();
@@ -5288,9 +5222,9 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 var defs={
  socioDashboard:[
  ['Mi perfil','♙','Datos personales, antigüedad y seguridad',['Cambiar contraseña','Identidad biométrica / Passkey','Tu historia con Talleres']],
- ['Participación y votaciones','◇','Votaciones, resultados y recomendaciones deportivas',['Votaciones activas','Resultados','Scouting colaborativo']],
+ ['Participación y votaciones','◇','Votaciones activas y resultados',['Votaciones activas','Resultados']],
  ['Transparencia y auditoría','▤','Balances, registros y estructura institucional',['Auditoría pública','Paredes de Cristal','Historial de cambios','Integración blockchain','Concursos y licitaciones','Estructura institucional']],
- ['Otros accesos','☷','Más herramientas del panel',['Banco de profesionales']]
+ ['Comunidad profesional','♧','Directorio y colaboración de socios',['Banco de profesionales']]
  ],
  adminDashboard:[
  ['Socios y padrón','♙','Padrón y credenciales',['Gestionar padrón']],
@@ -5298,7 +5232,7 @@ var defs={
  ['Gobernanza','⚖','Reglas y organización institucional',['Gobernanza institucional']],
  ['Economía y auditoría','▦','Balances, auditorías y transparencia',['Paredes de Cristal','Auditoría pública','Estructura institucional']],
  ['Contrataciones','▤','Concursos, proveedores y contratos',['Concursos y licitaciones']],
- ['Profesionales y scouting','♧','Directorio y recomendaciones deportivas',['Banco de profesionales','Scouting colaborativo']],
+ ['Profesionales','♧','Directorio y convocatorias',['Banco de profesionales']],
  ['Seguridad y blockchain','⬡','Identidad, permisos e integración',['Integración blockchain','Cambiar contraseña','Identidad biométrica / Passkey','Gestionar administradores']],
  ['Historial institucional','▥','Registros de cambios y seguimiento',['Historial de cambios']]
  ]
@@ -5315,72 +5249,31 @@ function setup(id){
  head.appendChild(heading);head.appendChild(back);view.appendChild(head);view.appendChild(inner);
  var buckets=groups.map(function(){return []}),rest=[];
  var structureSeen=false;
- function normalizedButtonName(b){
-  var x=b.cloneNode(true);
-  x.querySelectorAll('small,.action-icon,svg,i').forEach(function(n){n.remove()});
-  return (x.textContent||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim().toLowerCase();
- }
- function isStructureButton(b){return /estructura\s+institucional/.test(normalizedButtonName(b))}
  buttons.forEach(function(b){
-  var name=label(b),isStructure=isStructureButton(b);
+  var name=label(b),isStructure=/^estructura institucional$/i.test(name);
   if(isStructure){
-   if(structureSeen){b.remove();return}
+   if(structureSeen){b.style.display='none';return}
    structureSeen=true;
    var target=groups.findIndex(function(g){return g[0]===(id==='socioDashboard'?'Transparencia y auditoría':'Economía y auditoría')});
    if(target>=0){buckets[target].push(b);return}
   }
-  var matched=false;
-  groups.forEach(function(g,i){if(!matched&&g[3].indexOf(name)>=0){buckets[i].push(b);matched=true}});
-  if(!matched)rest.push(b);
+  var matched=false;groups.forEach(function(g,i){if(!matched&&g[3].indexOf(name)>=0){buckets[i].push(b);matched=true}});if(!matched)rest.push(b)
  });
- if(rest.length){
-  var other=groups.findIndex(function(g){return g[0]==='Otros accesos'});
-  if(other>=0)buckets[other].push.apply(buckets[other],rest);
-  else{groups.push(['Otros accesos','☷','Más herramientas del panel',[]]);buckets.push(rest)}
- }
+ if(rest.length){groups.push(['Otros accesos','☷','Más herramientas del panel',[]]);buckets.push(rest)}
  function open(i){
-  // Each category gets only its own buttons, never shared or cloned menus.
   inner.replaceChildren();
-  var correct=groups[i][0]===(id==='socioDashboard'?'Transparencia y auditoría':'Economía y auditoría');
-  var seen=false;
   buckets[i].forEach(function(b){
-   if(isStructureButton(b)){
-    if(!correct||seen)return;
-    seen=true;
-   }
-   inner.appendChild(b);
+   // Un único acceso a Estructura institucional, exclusivamente en su categoría.
+   if(/estructura\\s+institucional/i.test(label(b)) &&
+      groups[i][0] !== (id==='socioDashboard'?'Transparencia y auditoría':'Economía y auditoría'))return;
+   inner.appendChild(b)
   });
-  heading.textContent=groups[i][0];
-  categories.classList.add('ca-hidden');
-  view.classList.add('ca-open');
-  view.classList.remove('ca-hidden');
-  back.focus();
+  heading.textContent=groups[i][0];categories.classList.add('ca-hidden');view.classList.add('ca-open');view.classList.remove('ca-hidden');back.focus()
  }
- // Recheck every category transition and any dynamically inserted buttons.
- function enforceUniqueStructure(){
-  var currentTitle=heading.textContent.trim();
-  var correct=currentTitle===(id==='socioDashboard'?'Transparencia y auditoría':'Economía y auditoría');
-  var found=false;
-  Array.from(view.querySelectorAll('.action-grid button')).forEach(function(b){
-   if(!isStructureButton(b))return;
-   if(!correct||found){b.remove();return}
-   found=true;
-  });
-  // The original action grid must never become a second visible menu.
-  original.style.setProperty('display','none','important');
-  original.setAttribute('aria-hidden','true');
- }
- view.addEventListener('click',enforceUniqueStructure,true);
- var scheduled=false;
- new MutationObserver(function(){
-  if(scheduled)return;
-  scheduled=true;
-  queueMicrotask(function(){scheduled=false;enforceUniqueStructure()});
- }).observe(view,{childList:true,subtree:true});
  function close(){view.classList.remove('ca-open');view.classList.add('ca-hidden');categories.classList.remove('ca-hidden')}
  back.addEventListener('click',close);
  groups.forEach(function(g,i){var card=document.createElement('button');card.type='button';card.className='ca-category';card.innerHTML='<span class="ca-category-icon" aria-hidden="true">'+g[1]+'</span><span class="ca-category-title">'+g[0]+'</span><span class="ca-category-desc">'+g[2]+'</span>';card.addEventListener('click',function(){open(i)});categories.appendChild(card)});
- original.style.setProperty('display','none','important');original.setAttribute('aria-hidden','true');original.after(categories,view);dash.dataset.caOrganized='1';
+ original.style.display='none';original.setAttribute('aria-hidden','true');original.after(categories,view);dash.dataset.caOrganized='1';
  // Cuando se vuelve al inicio, recuperar la vista de categorías.
  var observer=new MutationObserver(function(){if(dash.style.display==='flex')close()});
  observer.observe(dash,{attributes:true,attributeFilter:['style']});
@@ -5527,4 +5420,3 @@ window.descartarRevisionRedes=async function(button){var card=button.closest('.r
 })();
 </script>
 </body>
-
