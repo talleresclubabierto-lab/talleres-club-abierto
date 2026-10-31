@@ -2,9 +2,14 @@ import { cp, mkdir, rm, readFile, writeFile } from 'node:fs/promises';
 
 await rm('www', { recursive: true, force: true });
 await mkdir('www', { recursive: true });
-for (const file of ['index.html','manifest.webmanifest','service-worker.js','icon.svg']) {
+for (const file of ['index.html','scouting.html','manifest.webmanifest','service-worker.js','icon.svg']) {
   await cp(file, 'www/' + file);
 }
+
+await mkdir('www/scouting', { recursive: true });
+for (const f of ['scouting.css', 'scouting.js']) await cp('scouting/' + f, 'www/scouting/' + f);
+await mkdir('www/assets', { recursive: true });
+await cp('assets/club-abierto-logo.webp', 'www/assets/club-abierto-logo.webp');
 
 const indexPath = 'www/index.html';
 let html = await readFile(indexPath, 'utf8');
