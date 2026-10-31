@@ -1,4 +1,4 @@
-name: Android 1.5 - web snapshot 2026-10-30 17:26 ART
+name: Android 1.6 - web snapshot 2026-10-30 17:26 ART
 
 on:
   workflow_dispatch:
@@ -24,14 +24,16 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for f in index.html scouting.html manifest.webmanifest service-worker.js icon.svg scripts/build-mobile.mjs; do
+          for f in index.html scouting.html manifest.webmanifest service-worker.js icon.svg ; do
             test -f "web-snapshot/$f"
             cp "web-snapshot/$f" "$f"
           done
-          mkdir -p scouting assets
+          mkdir -p scouting assets src
           cp web-snapshot/scouting/scouting.css scouting/scouting.css
           cp web-snapshot/scouting/scouting.js scouting/scouting.js
           cp web-snapshot/assets/club-abierto-logo.webp assets/club-abierto-logo.webp
+          cp web-snapshot/src/estructura-institucional.css src/estructura-institucional.css
+          cp web-snapshot/src/estructura-institucional.js src/estructura-institucional.js
           echo "Web commit pinned: 5f86f8707255fe7c4f923fa0d8f143c3c7be5abb"
 
       - name: Set up Node.js
@@ -59,9 +61,10 @@ jobs:
           test -s www/scouting.html
           test -s www/scouting/scouting.js
           test -s www/scouting/scouting.css
+          grep -q 'data-v12="estructura-institucional"' www/index.html
           test -s www/assets/club-abierto-logo.webp
-          grep -q 'versionCode 6' android/app/build.gradle
-          grep -q 'versionName "1.5"' android/app/build.gradle
+          grep -q 'versionCode 7' android/app/build.gradle
+          grep -q 'versionName "1.6"' android/app/build.gradle
 
       - name: Build unsigned release and debug APK
         working-directory: android
@@ -72,7 +75,7 @@ jobs:
       - name: Upload builds (release is NOT signed for Play)
         uses: actions/upload-artifact@v4
         with:
-          name: talleres-android-1.5-web-20261030
+          name: talleres-android-1.6-web-20261030
           if-no-files-found: error
           retention-days: 14
           path: |
