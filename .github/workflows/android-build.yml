@@ -72,7 +72,43 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug bundleRelease
 
-      - name: Upload builds (release is NOT signed for Play)
+      - name: Sign Android App Bundle when signing secrets are configured
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${ANDROID_KEYSTORE_BASE64}" || -z "${ANDROID_KEYSTORE_PASSWORD}" ]]; then
+            echo "Signing secrets are missing. Release bundle remains UNSIGNED and cannot be uploaded to Play."
+            exit 0
+          fi
+          keyfile="$(mktemp)"
+          trap 'rm -f "$keyfile"' EXIT
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$keyfile"
+          chmod 600 "$keyfile"
+          signed="android/app/build/outputs/bundle/release/app-release-firmado.aab"
+          unsigned="android/app/build/outputs/bundle/release/app-release.aab"
+          if [[ -n "$ANDROID_KEY_PASSWORD" ]]; then
+            jarsigner -keystore "$keyfile" -storetype PKCS12 \
+              -storepass:env ANDROID_KEYSTORE_PASSWORD -keypass:env ANDROID_KEY_PASSWORD \
+              -sigalg SHA256withRSA -digestalg SHA-256 \
+              -signedjar "$signed" "$unsigned" clubabierto-upload
+          else
+            jarsigner -keystore "$keyfile" -storetype PKCS12 \
+              -storepass:env ANDROID_KEYSTORE_PASSWORD \
+              -sigalg SHA256withRSA -digestalg SHA-256 \
+              -signedjar "$signed" "$unsigned" clubabierto-upload
+          fi
+          jarsigner -verify "$signed" | grep -q 'jar verified.'
+          # Check that the signer is the Google Play upload key; do not log credentials.
+          cert_sha="$(keytool -list -v -keystore "$keyfile" -storetype PKCS12 -storepass:env ANDROID_KEYSTORE_PASSWORD -alias clubabierto-upload | sed -n 's/^[[:space:]]*SHA256: //p' | head -1)"
+          expected='0A:03:43:03:EE:E0:F1:D0:D9:11:3A:DF:2B:EB:3F:E1:89:06:B0:98:50:C0:06:CF:CB:71:56:47:9F:25:A4:3E'
+          [[ "$cert_sha" == "$expected" ]] || { echo 'Upload certificate SHA-256 does not match Google Play.'; rm -f "$signed"; exit 1; }
+          echo 'Release bundle signed and verified against Google Play upload certificate.'
+
+      - name: Upload builds
         uses: actions/upload-artifact@v4
         with:
           name: talleres-android-1.6-web-20261030
@@ -81,3 +117,4 @@ jobs:
           path: |
             android/app/build/outputs/apk/debug/app-debug.apk
             android/app/build/outputs/bundle/release/app-release.aab
+            android/app/build/outputs/bundle/release/app-release-firmado.aab
