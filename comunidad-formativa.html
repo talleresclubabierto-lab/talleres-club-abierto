@@ -101,6 +101,8 @@ body.cf-access-mode .page-head,body.cf-access-mode .profile-grid,body.cf-access-
 body.cf-access-mode .otp-panel{width:min(700px,100%);margin:16px auto 40px;padding:0;border:0;background:transparent;box-shadow:none;color:#fff;text-align:center}
 body.cf-access-mode .cf-entry-brand{display:flex;flex-direction:column;align-items:center;margin:0 auto 40px;color:#fff;text-align:center}
 body.cf-access-mode .cf-entry-logo-full{display:block;width:clamp(260px,20vw,340px);max-width:100%;height:auto;object-fit:contain;margin:0 auto}
+body.cf-access-mode .cf-home-link{display:block;border-radius:8px}
+body.cf-access-mode .cf-home-link:focus-visible{outline:3px solid #70dfff;outline-offset:7px}
 body.cf-access-mode #otp-title{margin:0 0 12px;color:#fff;font-size:clamp(25px,3vw,38px);font-weight:800;letter-spacing:.025em;text-transform:none;white-space:nowrap}
 body.cf-access-mode .otp-intro{margin:0 auto 22px;max-width:570px;color:#d5e7f2}
 body.cf-access-mode .otp-form{max-width:570px;margin:0 auto 16px;text-align:left}
@@ -110,6 +112,8 @@ body.cf-access-mode .otp-form input::placeholder{color:#eef5fa;opacity:1}
 body.cf-access-mode .otp-button{min-height:68px;border-radius:999px;background:#f4f9fb;color:#062a49;font-size:16px;font-weight:800;letter-spacing:.05em}
 body.cf-access-mode .otp-button:hover{background:#fff}
 body.cf-access-mode .otp-status,body.cf-access-mode .otp-footnote{color:#d5e7f2}
+body.cf-access-mode .cf-access-back{display:none;align-items:center;justify-content:center;margin:14px auto 0;padding:8px 12px;border-radius:8px;color:#d5e7f2;text-decoration:none;font-size:12px;font-weight:800;letter-spacing:.12em}
+body.cf-access-mode .cf-access-back:hover,body.cf-access-mode .cf-access-back:focus-visible{color:#fff;text-decoration:underline;outline:2px solid #70dfff;outline-offset:3px}
 body.cf-access-mode .intake-form{max-width:570px;margin:22px auto 0;text-align:left}
 body.cf-access-mode .intake-form label{color:#e5f1f7}
 body.cf-access-mode .intake-form input,body.cf-access-mode .intake-form select,body.cf-access-mode .intake-form textarea{min-height:48px;border-radius:10px}
@@ -130,6 +134,7 @@ body.cf-access-mode .intake-form input,body.cf-access-mode .intake-form select,b
  body.cf-access-mode .otp-button{min-height:clamp(46px,7svh,54px);padding:9px 12px;font-size:14px}
  body.cf-access-mode .otp-status{min-height:0;margin:5px 0;font-size:11px;line-height:1.3}
  body.cf-access-mode .otp-footnote{width:min(530px,90vw);margin:13px auto 0;font-size:10px;line-height:1.3}
+ body.cf-access-mode .cf-access-back{display:inline-flex;margin-top:8px;font-size:10px}
  body.cf-access-mode .intake-form{width:min(530px,76vw);max-width:none;gap:9px;margin:13px auto 0;padding-top:12px}
  body.cf-access-mode .intake-form label{gap:5px;font-size:10px}
  body.cf-access-mode .intake-form input,body.cf-access-mode .intake-form select,body.cf-access-mode .intake-form textarea{min-height:38px;padding:7px 8px;font-size:12px}
@@ -157,7 +162,7 @@ body.cf-access-mode .intake-form input,body.cf-access-mode .intake-form select,b
 <div class="card"><div class="metric-label">ADHESIÓN FORMATIVA</div><div class="metric-value">Vínculo familiar</div><p class="card-note">La etapa inicial permite solicitar la incorporación. El padrón institucional podrá sumarse luego sin rehacer las cuentas ni esta estructura.</p></div>
 </section>
 <section class="card otp-panel" id="otp-panel" aria-labelledby="otp-title">
-<div class="cf-entry-brand"><img class="cf-entry-logo-full" src="/assets/club-abierto-logo.webp" alt="Logotipo de Talleres Club Abierto"></div>
+<div class="cf-entry-brand"><a class="cf-home-link" href="/" aria-label="Volver al inicio"><img class="cf-entry-logo-full" src="/assets/club-abierto-logo.webp" alt=""></a></div>
 <h2 id="otp-title">Comunidad Formativa</h2>
 <p class="otp-intro">Ingresá el correo registrado y solicitá un código. Si el vínculo ya fue aprobado, el código abrirá tu sesión; si no, vas a poder presentar una solicitud.</p>
 <form class="otp-form" id="otp-request-form">
@@ -184,6 +189,7 @@ body.cf-access-mode .intake-form input,body.cf-access-mode .intake-form select,b
 <div class="intake-result" id="intake-result" role="status" aria-live="polite" hidden></div>
 <p class="otp-status" id="otp-status" role="status" aria-live="polite"></p>
 <p class="otp-footnote">El mismo acceso sirve para volver después de la aprobación: ingresá el correo registrado, pedí un nuevo código y, si el vínculo está validado, entrarás al panel familiar. Si la solicitud sigue pendiente, no se habilita la sesión.</p>
+<a class="cf-access-back" href="/">← VOLVER AL INICIO</a>
 </section>
 <section class="action-grid" aria-label="Opciones de Comunidad Formativa">
 <a class="action-card" href="./comunidad-formativa/presentaciones/?tipo=acompanamiento#nueva-presentacion"><span class="action-icon">＋</span><span><span class="action-title">Pedir ayuda o acompañamiento</span><span class="action-copy">Solicitá apoyo para transporte, entrenamiento, alimentación, salud, educación u otra necesidad formativa.</span></span></a>
