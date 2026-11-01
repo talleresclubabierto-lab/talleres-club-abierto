@@ -34,6 +34,7 @@ for (const file of ['scouting.css', 'scouting.js']) {
 }
 await mkdir(output + '/assets', { recursive: true });
 await cp('assets/club-abierto-logo.webp', output + '/assets/club-abierto-logo.webp');
+await cp('assets/club-abierto-background.webp', output + '/assets/club-abierto-background.webp');
 // Publish the canonical institutional assets, never the obsolete root-level overlay.
 await cp('src/estructura-institucional.js', output + '/estructura-institucional.js');
 await cp('src/estructura-institucional.css', output + '/estructura-institucional.css');
