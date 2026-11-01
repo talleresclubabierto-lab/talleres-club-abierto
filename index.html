@@ -535,7 +535,7 @@ body{
  #loginScreen .login-panel{padding:14px}
  #loginScreen .count-pill{font-size:9px}
 }
-</style><script>(function(){var p=window.location.pathname;if(p.endsWith('/acceso-socios.html'))document.documentElement.setAttribute('data-access-route','socio');else if(p.endsWith('/acceso-administrador.html'))document.documentElement.setAttribute('data-access-route','admin')})();</script>
+</style><script>(function(){var p=window.location.pathname.replace(/\/+$/,'').replace(/\.html$/,'');if(p.endsWith('/acceso-socios'))document.documentElement.setAttribute('data-access-route','socio');else if(p.endsWith('/acceso-administrador'))document.documentElement.setAttribute('data-access-route','admin')})();</script>
 </head>
 <body>
 <div class="container">
@@ -5692,9 +5692,9 @@ window.descartarRevisionRedes=async function(button){var card=button.closest('.r
 </script>
 <script>
 (function(){
-  var path=window.location.pathname;
-  if(path.endsWith('/acceso-socios.html'))abrirAcceso('socio');
-  else if(path.endsWith('/acceso-administrador.html'))abrirAcceso('admin');
+  var path=window.location.pathname.replace(/\/+$/,'').replace(/\.html$/,'');
+  if(path.endsWith('/acceso-socios'))abrirAcceso('socio');
+  else if(path.endsWith('/acceso-administrador'))abrirAcceso('admin');
 })();
 </script>
 </body>
