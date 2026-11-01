@@ -565,9 +565,9 @@ body{
   <div id="loginShell" class="login-shell access-shell full-width" style="display:none">
     <section id="socioAccessScreen" class="access-screen" aria-labelledby="socioAccessTitle" style="display:none">
       <div class="access-identity">
-        <div class="entry-brand">
-          <img class="entry-logo-full" src="/assets/club-abierto-logo.webp" alt="Logotipo de Talleres Club Abierto">
-        </div>
+        <a class="entry-brand access-home-link" href="/" aria-label="Volver al inicio">
+          <img class="entry-logo-full" src="/assets/club-abierto-logo.webp" alt="">
+        </a>
       </div>
       <div class="access-form-column">
         <section class="access-form-card">
@@ -587,9 +587,9 @@ body{
 
     <section id="adminAccessScreen" class="access-screen" aria-labelledby="adminAccessTitle" style="display:none">
       <div class="access-identity">
-        <div class="entry-brand">
-          <img class="entry-logo-full" src="/assets/club-abierto-logo.webp" alt="Logotipo de Talleres Club Abierto">
-        </div>
+        <a class="entry-brand access-home-link" href="/" aria-label="Volver al inicio">
+          <img class="entry-logo-full" src="/assets/club-abierto-logo.webp" alt="">
+        </a>
       </div>
       <div class="access-form-column">
         <section class="access-form-card">
@@ -5550,6 +5550,8 @@ html[data-access-route="admin"] #adminAccessScreen{display:grid!important}
 .access-screen{min-height:min(780px,calc(100svh - 60px));grid-template-columns:minmax(0,1fr) minmax(390px,.9fr);align-items:center;gap:clamp(40px,8vw,120px)}
 .access-identity{display:flex;justify-content:center;align-items:center;padding:26px}
 .access-identity .entry-logo-full{width:clamp(260px,20vw,340px)}
+.access-home-link{text-decoration:none;border-radius:8px}
+.access-home-link:focus-visible{outline:3px solid #70dfff;outline-offset:7px}
 .access-form-column{width:100%;max-width:570px;justify-self:center}
 .access-form-card{text-align:center;color:#fff}
 .access-form-card h2{font-size:clamp(25px,3vw,38px);line-height:1.2;font-weight:800;letter-spacing:.025em;margin:0 0 10px;color:#fff;text-transform:none;white-space:nowrap}
