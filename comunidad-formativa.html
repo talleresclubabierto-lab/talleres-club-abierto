@@ -89,12 +89,39 @@ footer{max-width:1180px;margin:25px auto 0;padding:15px 0 26px;border-top:1px so
 .public-case-row{display:grid;gap:5px;padding:11px 12px;margin:8px 0;border:1px solid #d8e4ec;border-radius:8px;background:#f7fafc;color:#244055;font-size:12px;line-height:1.5}.public-case-row strong{color:#063d66;font:700 12px 'JetBrains Mono',monospace}.public-case-row span{color:#536b7d}
 
 .member-access-link{display:inline-flex;align-items:center;justify-content:center;margin-top:10px;padding:10px 14px;border-radius:8px;background:#075c91;color:#fff;text-decoration:none;font-size:12px;font-weight:700}.member-access-link:hover{background:#034873}.member-access-link:focus-visible{outline:3px solid #62dcff;outline-offset:2px}
+
+/* Acceso independiente de Comunidad Formativa, solicitado desde la portada. */
+.cf-entry-brand{display:none}
+body.cf-access-mode{min-height:100svh;background:linear-gradient(120deg,#01142d 0%,#01142d 22%,#06264a 22.15%,#06264a 43%,#031b38 43.15%,#031b38 67%,#0a3158 67.15%,#021733 100%)!important;background-attachment:fixed!important}
+body.cf-access-mode .topbar{width:min(1240px,100%);margin:0 auto;background:transparent;border:0;justify-content:flex-end}
+body.cf-access-mode .topbar .brand{display:none}
+body.cf-access-mode .cf-return-home{color:#e4f3fb;font-size:12px;letter-spacing:.12em}
+body.cf-access-mode main{width:min(1180px,100%);padding-top:20px}
+body.cf-access-mode .page-head,body.cf-access-mode .profile-grid,body.cf-access-mode main>.action-grid,body.cf-access-mode .glass-dark-note,body.cf-access-mode footer{display:none!important}
+body.cf-access-mode .otp-panel{width:min(700px,100%);margin:16px auto 40px;padding:0;border:0;background:transparent;box-shadow:none;color:#fff;text-align:center}
+body.cf-access-mode .cf-entry-brand{display:flex;flex-direction:column;align-items:center;margin:0 auto 40px;color:#fff;text-align:center}
+body.cf-access-mode .cf-entry-crest{display:block;width:clamp(118px,18vw,205px);height:clamp(108px,16vw,190px);background:url('/assets/club-abierto-logo.webp') center top/110% auto no-repeat;filter:drop-shadow(0 0 11px rgba(0,203,255,.43));margin-bottom:5px}
+body.cf-access-mode .cf-entry-brand strong{font-size:clamp(30px,4vw,48px);line-height:1.08;letter-spacing:.04em}
+body.cf-access-mode .cf-entry-brand>span:last-child{margin-top:14px;color:#d5e7f2;font-size:clamp(12px,1.6vw,18px);line-height:1.5;font-weight:800;letter-spacing:.12em}
+body.cf-access-mode #otp-title{margin:0 0 12px;color:#fff;font-size:clamp(23px,3vw,34px);font-weight:800;letter-spacing:.04em}
+body.cf-access-mode .otp-intro{margin:0 auto 22px;max-width:620px;color:#d5e7f2}
+body.cf-access-mode .otp-form{max-width:610px;margin:0 auto 16px;text-align:left}
+body.cf-access-mode .otp-form label{color:#d5e7f2;font-weight:800;letter-spacing:.08em}
+body.cf-access-mode .otp-form input{min-height:62px;border:2px solid rgba(207,227,239,.35);border-radius:17px;background:rgba(229,241,249,.12);color:#fff;font-size:16px;font-weight:700}
+body.cf-access-mode .otp-form input::placeholder{color:#eef5fa;opacity:1}
+body.cf-access-mode .otp-button{min-height:68px;border-radius:999px;background:#f4f9fb;color:#062a49;font-size:16px;font-weight:800;letter-spacing:.05em}
+body.cf-access-mode .otp-button:hover{background:#fff}
+body.cf-access-mode .otp-status,body.cf-access-mode .otp-footnote{color:#d5e7f2}
+body.cf-access-mode .intake-form{max-width:700px;margin:22px auto 0;text-align:left}
+body.cf-access-mode .intake-form label{color:#e5f1f7}
+body.cf-access-mode .intake-form input,body.cf-access-mode .intake-form select,body.cf-access-mode .intake-form textarea{min-height:48px;border-radius:10px}
+@media(max-width:700px){body.cf-access-mode .topbar{height:auto;padding:13px 16px}.cf-access-mode main{padding:10px 16px 34px}.cf-access-mode .otp-panel{margin-top:0}.cf-access-mode .cf-entry-brand{margin-bottom:30px}.cf-access-mode .cf-entry-crest{width:130px;height:120px}.cf-access-mode .cf-entry-brand strong{font-size:32px}.cf-access-mode .otp-intro{font-size:13px;line-height:1.5}.cf-access-mode .otp-form input{min-height:58px}.cf-access-mode .otp-footnote{font-size:12px}}
 </style>
 </head>
 <body>
 <header class="topbar">
 <a class="brand" href="./" aria-label="Talleres Club Abierto, inicio"><span class="app-logo-mark" aria-hidden="true"></span><span class="brand-role-label">TALLERES CLUB ABIERTO · COMUNIDAD FORMATIVA</span></a>
-<nav class="top-actions" aria-label="Navegación principal"><span class="navlink"><span class="network-dot"></span>ÁREA FORMATIVA</span><a href="./">Salir</a></nav>
+<nav class="top-actions" aria-label="Navegación principal"><a class="navlink cf-return-home" href="./">← VOLVER AL INICIO</a></nav>
 </header>
 <main class="section-shell">
 <section class="page-head">
@@ -106,7 +133,8 @@ footer{max-width:1180px;margin:25px auto 0;padding:15px 0 26px;border-top:1px so
 <div class="card"><div class="metric-label">ADHESIÓN FORMATIVA</div><div class="metric-value">Vínculo familiar</div><p class="card-note">La etapa inicial permite solicitar la incorporación. El padrón institucional podrá sumarse luego sin rehacer las cuentas ni esta estructura.</p></div>
 </section>
 <section class="card otp-panel" id="otp-panel" aria-labelledby="otp-title">
-<h2 id="otp-title">Ingresá a Comunidad Formativa</h2>
+<div class="cf-entry-brand" aria-label="Talleres Club Abierto. El futuro de la T, también lo decidís vos."><span class="cf-entry-crest" role="img" aria-label="Escudo tecnológico de Talleres Club Abierto"></span><strong>TALLERES<br>CLUB ABIERTO</strong><span>EL FUTURO DE LA T<br>TAMBIÉN LO DECIDÍS VOS</span></div>
+<h2 id="otp-title">COMUNIDAD FORMATIVA</h2>
 <p class="otp-intro">Ingresá el correo registrado y solicitá un código. Si el vínculo ya fue aprobado, el código abrirá tu sesión; si no, vas a poder presentar una solicitud.</p>
 <form class="otp-form" id="otp-request-form">
 <label>Correo electrónico<input id="otp-email" name="email" type="email" autocomplete="email" maxlength="254" required placeholder="tu correo electrónico"></label>
@@ -351,6 +379,7 @@ footer{max-width:1180px;margin:25px auto 0;padding:15px 0 26px;border-top:1px so
  })
  .catch(()=>{showMemberLogin('No se pudo validar tu sesión del Panel Socio Activo. Volvé al ingreso de socios e intentá nuevamente.');});
 })();
-</script></body>
+</script><script>if(new URLSearchParams(window.location.search).get('acceso')==='1'){document.body.classList.add('cf-access-mode');}</script>
+</body>
 </html>
 

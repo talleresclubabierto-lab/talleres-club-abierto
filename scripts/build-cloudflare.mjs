@@ -52,6 +52,9 @@ html = html.replace('</head>', '<link rel="preconnect" href="https://fonts.googl
 html = html.replace('</head>', '<style data-v12="estructura-institucional">' + css + '</style>\n</head>');
 html = html.replace('</body>', '<script data-v12="estructura-institucional">' + js + '</script>\n</body>');
 await writeFile(indexPath, html, 'utf8');
+// Each access button opens a dedicated web page with the matching login screen.
+await writeFile(output + '/acceso-socios.html', html, 'utf8');
+await writeFile(output + '/acceso-administrador.html', html, 'utf8');
 console.log('Cloudflare build: Estructura Institucional, Comunidad Formativa y Scouting integrados.');
 
 
