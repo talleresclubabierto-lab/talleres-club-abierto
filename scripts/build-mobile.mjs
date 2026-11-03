@@ -20,4 +20,9 @@ if (!html.includes('data-v12="estructura-institucional"')) {
   html = html.replace('</body>', '<script data-v12="estructura-institucional">' + js + '</script>\n</body>');
 }
 await writeFile(indexPath, html, 'utf8');
-console.log('Android: estructura institucional integrada desde el mismo modulo web.');
+// The landing screen routes to these two independent access pages. Cloudflare
+// generates the same pages from index.html; Capacitor must package them too.
+for (const route of ['acceso-socios.html', 'acceso-administrador.html']) {
+  await writeFile('www/' + route, html, 'utf8');
+}
+console.log('Android: tres accesos empaquetados (Socios, Administrador y Comunidad Formativa).');
