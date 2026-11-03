@@ -1,4 +1,4 @@
-name: Android 1.7 - web snapshot 2026-11-02 21:23 ART
+name: Android 1.8 - web snapshot 2026-11-02 21:23 ART
 
 on:
   workflow_dispatch:
@@ -59,13 +59,20 @@ jobs:
         run: |
           test -s www/index.html
           test -s www/comunidad-formativa.html
+          test -s www/acceso-socios.html
+          test -s www/acceso-administrador.html
+          grep -q 'data-access-route' www/acceso-socios.html
+          grep -q 'data-access-route' www/acceso-administrador.html
+          grep -q 'href="./acceso-socios.html"' www/index.html
+          grep -q 'href="./acceso-administrador.html"' www/index.html
+          grep -q 'href="./comunidad-formativa.html?acceso=1"' www/index.html
           test -s www/scouting.html
           test -s www/scouting/scouting.js
           test -s www/scouting/scouting.css
           grep -q 'data-v12="estructura-institucional"' www/index.html
           test -s www/assets/club-abierto-logo.webp
-          grep -q 'versionCode 8' android/app/build.gradle
-          grep -q 'versionName "1.7"' android/app/build.gradle
+          grep -q 'versionCode 9' android/app/build.gradle
+          grep -q 'versionName "1.8"' android/app/build.gradle
 
       - name: Build unsigned release and debug APK
         working-directory: android
@@ -112,7 +119,7 @@ jobs:
       - name: Upload builds
         uses: actions/upload-artifact@v4
         with:
-          name: talleres-android-1.7-web-20261030
+          name: talleres-android-1.8-hotfix-three-accesses-20261102
           if-no-files-found: error
           retention-days: 14
           path: |
