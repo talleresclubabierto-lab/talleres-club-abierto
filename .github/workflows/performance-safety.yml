@@ -3,6 +3,8 @@ on:
   pull_request:
     paths:
       - 'scripts/build-cloudflare.mjs'
+      - 'scripts/build-mobile.mjs'
+      - 'scripts/test-mobile-build.mjs'
       - 'index.html'
       - 'scouting.html'
       - 'scouting/**'
@@ -25,8 +27,10 @@ jobs:
           node-version: '22'
       - name: Check build script syntax
         run: node --check scripts/build-cloudflare.mjs
-      - name: Build web
-        run: node scripts/build-cloudflare.mjs
+      - name: Build web and Android assets from the same source
+        run: node scripts/build-mobile.mjs
+      - name: Validate Android asset parity and access routes
+        run: node scripts/test-mobile-build.mjs
       - name: Prevent institutional navigation observer loops
         run: node scripts/test-navigation-stability.mjs
       - name: Validate formative HTML and routes

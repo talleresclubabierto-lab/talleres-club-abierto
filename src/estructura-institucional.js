@@ -64,7 +64,7 @@ function inject(){
   const panel=dash.querySelector('.ca-category-view');
   const grid=panel?.querySelector('.action-grid');
   const heading=panel?.querySelector('.ca-category-head h2');
-  const correct=!!(grid&&heading&&heading.textContent.trim()==='Transparencia y auditoría'&&panel.classList.contains('ca-open'));
+  const correct=!!(grid&&heading&&/^Transparencia y Auditoría$/i.test(heading.textContent.trim())&&panel.classList.contains('ca-open'));
   // Remove only buttons created by this module outside the intended category.
   dash.querySelectorAll('.ei-entry').forEach(button=>{
    if(!correct||button.parentElement!==grid)button.remove();
@@ -77,9 +77,18 @@ function inject(){
    button.classList.contains('ei-entry') ||
    /estructura\s+institucional/i.test((button.textContent||'').normalize('NFD').replace(/[\u0300-\u036f]/g,''))
   );
+  function place(button){
+   const blockchain=Array.from(grid.children).find(entry=>entry!==button&&
+    /integracion\s+blockchain/i.test((entry.textContent||'').normalize('NFD').replace(/[\u0300-\u036f]/g,''))
+   );
+   // Avoid moving an already ordered node: this observer watches its own writes.
+   if(blockchain){if(button.nextElementSibling!==blockchain)grid.insertBefore(button,blockchain)}
+   else if(button.parentElement!==grid)grid.appendChild(button);
+  }
   if(matching.length){
    const keep=matching.find(button=>!button.classList.contains('ei-entry'))||matching[0];
    matching.forEach(button=>{if(button!==keep&&button.classList.contains('ei-entry'))button.remove()});
+   place(keep);
    return;
   }
   const button=document.createElement('button');
@@ -87,7 +96,7 @@ function inject(){
   button.className='btn-action-red ei-entry';
   button.innerHTML='<span class="action-icon">⌘</span>Estructura institucional<br><small style="font-weight:500;color:#64748b">Áreas, autoridades, responsables y fuentes</small>';
   button.addEventListener('click',abrir);
-  grid.appendChild(button);
+  place(button);
  });
 }
 window.abrirEstructuraInstitucional=abrir;document.addEventListener('DOMContentLoaded',()=>{inject();new MutationObserver(inject).observe(document.body,{childList:true,subtree:true})});

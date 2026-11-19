@@ -1,14 +1,13 @@
-import { cp, mkdir, rm } from 'node:fs/promises';
+import { cp, rm } from 'node:fs/promises';
+import { basename } from 'node:path';
+import './build-cloudflare.mjs';
 
+// Package the same transformed pages and assets as the web, including access routes.
+// Hosting directives have no effect in Capacitor's local static server.
+const hostingFiles = new Set(['_headers', '_redirects']);
 await rm('www', { recursive: true, force: true });
-await mkdir('www', { recursive: true });
-for (const file of ['index.html','scouting.html','manifest.webmanifest','service-worker.js','icon.svg']) {
-  await cp(file, 'www/' + file);
-}
-await mkdir('www/scouting', { recursive: true });
-for (const file of ['scouting.css','scouting.js']) {
-  await cp('scouting/' + file, 'www/scouting/' + file);
-}
-await mkdir('www/assets', { recursive: true });
-await cp('assets/club-abierto-logo.webp', 'www/assets/club-abierto-logo.webp');
-
+await cp('dist', 'www', {
+  recursive: true,
+  filter: source => !hostingFiles.has(basename(source))
+});
+console.log('Mobile build: same pages, panel order and assets as the web.');
