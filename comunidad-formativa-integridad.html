@@ -62,7 +62,8 @@ footer{margin:24px 0 0;padding:16px 0;border-top:1px solid rgba(117,217,248,.2);
 <section aria-label="Datos de ubicación y actividad">
 <p class="note"><strong>Ubicación y actividad.</strong> Elegí país primero y después la provincia, estado o región. Para fútbol se muestran ligas y divisiones; indicá categoría deportiva y subcategoría en los campos siguientes. Las estructuras locales pueden variar: podés elegir “Otro / no aparece”.</p>
 <label class="field">Temporada<select name="season" required><option value="2026" selected>2026</option><option value="2025">2025</option><option value="2024">2024</option><option value="2027">2027</option></select></label>
-<label class="field">País<select name="country" required><option value="">Seleccioná un país</option></select></label>\n<label class="field">Provincia, estado o región<select name="province" required><option value="">Seleccioná primero un país</option></select></label>
+<label class="field">País<select name="country" required><option value="">Seleccioná un país</option></select></label>
+<label class="field">Provincia, estado o región<select name="province" required><option value="">Seleccioná primero un país</option></select></label>
 <label class="field">Localidad / ciudad<input name="locality" maxlength="120" placeholder="Ej.: Córdoba, Mendiolaza, Río Cuarto o No lo sé"></label>
 <label class="field">Sede, academia, escuela o filial (si la conocés)<input name="venue" maxlength="160" placeholder="Podés escribir No aparece"></label>
 <label class="field">Deporte<select name="sport" required><option value="">Seleccioná un deporte</option><option>Fútbol</option><option>Hockey</option><option>Básquet</option><option>Vóley</option><option>Patín</option><option>No lo sé</option><option>Otro / no aparece</option></select></label>
@@ -178,8 +179,10 @@ function cfInitClassificationForm(form){
   refreshCompetition();
  });
  sport.addEventListener("change",refreshCompetition);
-}\nfunction wireCaseForm(){
+}
+function wireCaseForm(){
  const form=document.getElementById('case-form');if(!form)return;
+ cfInitClassificationForm(form);
  form.addEventListener('submit',async function(e){
    e.preventDefault();
    if(!form.reportValidity())return;
