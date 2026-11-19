@@ -19,8 +19,8 @@ const definitions = html.match(/var defs=(\{[\s\S]*?\n\});\nfunction label\(b\)/
 assert(definitions, 'Panel categories missing');
 const categories = vm.runInNewContext('(' + definitions[1] + ')');
 for (const [panel, button] of [['socioDashboard', 'btnScoutingSocio'], ['adminDashboard', 'btnScoutingAdmin']]) {
-  const others = categories[panel].filter(group => group[0] === 'Otros accesos');
-  assert.equal(others.length, 1, `${panel}: expected one Otros accesos category`);
+  const others = categories[panel].filter(group => group[0] === 'Comunidad y Colaboración');
+  assert.equal(others.length, 1, `${panel}: expected one Comunidad y Colaboración category`);
   assert(others[0][3].includes('Scouting colaborativo'));
   const start = html.indexOf(`<div id="${panel}"`);
   const end = html.indexOf('\n</div>', start);
@@ -110,4 +110,4 @@ context.ROL_ACTIVO = 'socio'; currentToken = token;
 await context.irAScoutingColaborativo(); assert.equal(live, 1);
 await context.irAScoutingColaborativo(); assert.equal(live, 1, 'Double activation accumulated components');
 context.ocultarTodo(); assert.equal(live, 0);
-console.log('PASS native navigation: both Otros accesos entries, no iframe/message bridge, one document scroll, lazy assets cached, 50 open/back cycles, single component, role/session checks and late-load cancellation.');
+console.log('PASS native navigation: both Comunidad y Colaboración entries, no iframe/message bridge, one document scroll, lazy assets cached, 50 open/back cycles, single component, role/session checks and late-load cancellation.');

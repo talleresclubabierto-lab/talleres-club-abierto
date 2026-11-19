@@ -650,7 +650,7 @@ body{
       <div class="card"><div class="metric-label">Rol</div><div class="metric-value" style="font-size:20px">Administrador</div></div>
     </div>
     <div class="action-grid admin-accent">
-      <button class="btn-action-red" onclick="mostrarSeccionAdmin('secModificar')"><span class="action-icon">✎</span>Modificar encuestas</button>
+      <button class="btn-action-red" onclick="mostrarSeccionAdmin('secModificar')"><span class="action-icon">✎</span>Modificar encuesta</button>
       <button class="btn-action-red" onclick="mostrarSeccionAdmin('secAgregar')"><span class="action-icon">＋</span>Nueva encuesta</button>
       <button class="btn-action-red" onclick="irAResultadosGenerales()"><span class="action-icon">▥</span>Resultados</button>
       <button class="btn-action-red" onclick="mostrarSeccionAdmin('secPorcentuales')"><span class="action-icon">%</span>Participación</button>
@@ -5355,24 +5355,20 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 (function(){
 var defs={
  socioDashboard:[
- ['Mi perfil','♙','Datos personales, antigüedad y seguridad',['Cambiar contraseña','Identidad biométrica / Passkey','Tu historia con Talleres']],
- ['Participación y votaciones','◇','Votaciones activas y resultados',['Votaciones activas','Resultados']],
- ['Transparencia y auditoría','▤','Balances, registros y estructura institucional',['Auditoría pública','Paredes de Cristal','Historial de cambios','Integración blockchain','Concursos y licitaciones','Estructura institucional','Seguimiento de Comunidad Formativa']],
- ['Otros accesos','☷','Herramientas adicionales del socio',['Banco de profesionales','Scouting colaborativo']]
+ ['Mi Perfil','♙','Tu historia y seguridad de la cuenta',['Tu historia con Talleres','Cambiar contraseña','Identidad biométrica / Passkey']],
+ ['Participación y Votaciones','◇','Votaciones, resultados y auditoría pública',['Votaciones activas','Resultados','Auditoría pública']],
+ ['Transparencia y Auditoría','▤','Contrataciones, registros y estructura institucional',['Concursos y licitaciones','Paredes de Cristal','Historial de cambios','Estructura institucional','Integración blockchain']],
+ ['Comunidad y Colaboración','☷','Scouting, profesionales y comunidad formativa',['Scouting colaborativo','Banco de profesionales','Seguimiento de Comunidad Formativa']]
  ],
  adminDashboard:[
- ['Socios y padrón','♙','Padrón y credenciales',['Gestionar padrón']],
- ['Votaciones','◇','Encuestas, participación y resultados',['Modificar encuestas','Nueva encuesta','Resultados','Participación','Ciclo de vida']],
- ['Gobernanza','⚖','Reglas y organización institucional',['Gobernanza institucional']],
- ['Transparencia y auditoría','▦','Balances, auditorías y transparencia',['Paredes de Cristal','Auditoría pública','Estructura institucional']],
- ['Contrataciones','▤','Concursos, proveedores y contratos',['Concursos y licitaciones']],
- ['Profesionales','♧','Directorio y convocatorias',['Banco de profesionales']],
- ['Seguridad y blockchain','⬡','Identidad, permisos e integración',['Integración blockchain','Cambiar contraseña','Identidad biométrica / Passkey','Gestionar administradores']],
- ['Historial institucional','▥','Registros de cambios y seguimiento',['Historial de cambios']],
- ['Otros accesos','☷','Herramientas adicionales del panel',['Scouting colaborativo']]
+ ['Socios y Accesos','♙','Padrón, administradores y seguridad de la cuenta',['Gestionar padrón','Gestionar administradores','Cambiar contraseña','Identidad biométrica / Passkey']],
+ ['Participación y Votaciones','◇','Encuestas, ciclo de vida, resultados y auditoría pública',['Nueva encuesta','Modificar encuesta','Ciclo de vida','Participación','Resultados','Auditoría pública']],
+ ['Transparencia y Auditoría','▦','Gobernanza, registros y gestión institucional',['Gobernanza institucional','Paredes de Cristal','Historial de cambios','Concursos y licitaciones','Estructura institucional','Integración blockchain']],
+ ['Comunidad y Colaboración','☷','Scouting, profesionales, comunidad y respuestas',['Scouting colaborativo','Banco de profesionales','Gestión de Comunidad Formativa','Revisión de respuestas']]
  ]
 };
-function label(b){var x=b.cloneNode(true);x.querySelectorAll('small,.action-icon').forEach(function(n){n.remove()});return x.textContent.trim().replace(/\s+/g,' ')}
+function label(b){var x=b.cloneNode(true);x.querySelectorAll('small,.action-icon,.review-count').forEach(function(n){n.remove()});return x.textContent.trim().replace(/\s+/g,' ')}
+function labelKey(name){return name.toLocaleLowerCase('es').replace(/\s+/g,' ').trim()}
 function setup(id){
  var dash=document.getElementById(id);if(!dash||dash.dataset.caOrganized)return;
  var original=dash.querySelector(':scope > main > .action-grid');if(!original)return;
@@ -5389,22 +5385,28 @@ function setup(id){
   if(isStructure){
    if(structureSeen){b.style.display='none';return}
    structureSeen=true;
-   var target=groups.findIndex(function(g){return g[0]==='Transparencia y auditoría'});
+   var target=groups.findIndex(function(g){return labelKey(g[0])==='transparencia y auditoría'});
    if(target>=0){buckets[target].push(b);return}
   }
-  var matched=false;groups.forEach(function(g,i){if(!matched&&g[3].indexOf(name)>=0){buckets[i].push(b);matched=true}});if(!matched)rest.push(b)
+  var matched=false;groups.forEach(function(g,i){if(!matched&&g[3].some(function(item){return labelKey(item)===labelKey(name)})){buckets[i].push(b);matched=true}});if(!matched)rest.push(b)
  });
+ // Keep any future, uncatalogued entry reachable without creating a fifth category.
  if(rest.length){
-  var otherIndex=groups.findIndex(function(group){return group[0]==='Otros accesos'});
-  if(otherIndex<0){groups.push(['Otros accesos','☷','Más herramientas del panel',[]]);buckets.push(rest)}
-  else buckets[otherIndex]=buckets[otherIndex].concat(rest);
+  console.warn('Accesos pendientes de categorizar en '+id,rest.map(label));
+  buckets[buckets.length-1]=buckets[buckets.length-1].concat(rest);
  }
+ // The declared order is shared by desktop, mobile web and the Android bundle.
+ buckets.forEach(function(bucket,i){
+  var ordered=groups[i][3].map(labelKey);
+  function rank(button){var position=ordered.indexOf(labelKey(label(button)));return position<0?ordered.length:position}
+  bucket.sort(function(a,b){return rank(a)-rank(b)});
+ });
  function open(i){
   inner.replaceChildren();
   buckets[i].forEach(function(b){
    // Un único acceso a Estructura institucional, exclusivamente en su categoría.
    if(/estructura\s+institucional/i.test(label(b)) &&
-      groups[i][0] !== 'Transparencia y auditoría')return;
+      labelKey(groups[i][0]) !== 'transparencia y auditoría')return;
    inner.appendChild(b)
   });
   heading.textContent=groups[i][0];categories.classList.add('ca-hidden');view.classList.add('ca-open');view.classList.remove('ca-hidden');back.focus()
@@ -5502,7 +5504,7 @@ function normalize(){
    var name=clone.textContent.replace(/\s+/g,' ').trim();
    if(/^estructura institucional$/i.test(name)){
     var heading=dash.querySelector('.ca-category-head h2');
-    if(heading && heading.textContent.trim()!=='Transparencia y auditoría')b.remove();
+    if(heading && heading.textContent.trim().toLocaleLowerCase('es')!=='transparencia y auditoría')b.remove();
    }
   });
  }

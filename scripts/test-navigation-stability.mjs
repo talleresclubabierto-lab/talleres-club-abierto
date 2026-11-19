@@ -48,6 +48,8 @@ function createDOM() {
       this.children = [];
       this.parentElement = null;
       this.id = '';
+      this.style = {};
+      this.disabled = false;
       this._text = '';
       this._classes = new Set();
       this.classList = {
@@ -71,6 +73,21 @@ function createDOM() {
       if (child.parentElement) child.remove();
       child.parentElement = this;
       this.children.push(child);
+      changed(this);
+      return child;
+    }
+    get nextElementSibling() {
+      if (!this.parentElement) return null;
+      const siblings = this.parentElement.children;
+      return siblings[siblings.indexOf(this) + 1] || null;
+    }
+    insertBefore(child, reference) {
+      if (reference == null) return this.appendChild(child);
+      assert.equal(reference.parentElement, this, 'insertBefore reference must belong to the parent');
+      if (child === reference) return child;
+      if (child.parentElement) child.remove();
+      child.parentElement = this;
+      this.children.splice(this.children.indexOf(reference), 0, child);
       changed(this);
       return child;
     }
@@ -146,7 +163,7 @@ function createDOM() {
     fixture.grid.replaceChildren(...buttons);
     fixture.heading.textContent = title;
     fixture.panel.classList.add('ca-open');
-    flush();
+    return flush();
   }
   return { document, panels, flush, openCategory, add };
 }
@@ -156,6 +173,9 @@ for (const fixture of dom.panels) {
   // Existing original button must be reused without losing its click handler.
   const original = dom.document.createElement('button');
   original.textContent = '⌘ Estructura institucional Áreas, autoridades y fuentes';
+  original.id = fixture.dashboard.id + '-existing-institution';
+  original.style.display = 'none';
+  original.disabled = true;
   const existingHandler = () => {};
   original.addEventListener('click', existingHandler);
   dom.openCategory(fixture, 'Transparencia y auditoría', [original]);
@@ -163,32 +183,63 @@ for (const fixture of dom.panels) {
   assert.equal(fixture.grid.querySelector('button'), original);
   assert.equal(original.events.get('click'), existingHandler);
 
-  // Missing original: insert precisely one entry and reach a stable DOM.
-  dom.openCategory(fixture, 'Transparencia y auditoría');
+  const labels = fixture.dashboard.id === 'socioDashboard'
+    ? ['Concursos y Licitaciones', 'Paredes de Cristal', 'Historial de Cambios']
+    : ['Gobernanza Institucional', 'Paredes de Cristal', 'Historial de Cambios', 'Concursos y Licitaciones'];
+  const prefix = labels.map(text => {
+    const button = dom.document.createElement('button');
+    button.textContent = text;
+    return button;
+  });
+  const blockchain = dom.document.createElement('button');
+  blockchain.textContent = '⬡ Integración Blockchain Estado, lotes y trazabilidad criptográfica';
+
+  // The approved title and order work for originals at either end of the grid.
+  for (const buttons of [[original, ...prefix, blockchain], [...prefix, blockchain, original]]) {
+    assert(dom.openCategory(fixture, 'Transparencia y Auditoría', buttons) <= 2);
+    assert.deepEqual(fixture.grid.children, [...prefix, original, blockchain]);
+    assert.equal(original.events.get('click'), existingHandler, 'Moving a button must retain its handler');
+    assert.equal(original.style.display, 'none', 'Moving a button must not bypass role visibility');
+    assert.equal(original.disabled, true, 'Moving a button must not change permission-related state');
+    assert.equal(original.id, fixture.dashboard.id + '-existing-institution');
+  }
+
+  // Missing original: insert precisely one entry immediately before Blockchain.
+  assert(dom.openCategory(fixture, 'Transparencia y Auditoría', [...prefix, blockchain]) <= 2);
   assert.equal(fixture.grid.querySelectorAll('.ei-entry').length, 1);
   const injected = fixture.grid.querySelector('.ei-entry');
   assert.equal(typeof injected.events.get('click'), 'function');
+  assert.deepEqual(fixture.grid.children, [...prefix, injected, blockchain]);
+
+  // An unrelated mutation must not cause a redundant move and observer feedback.
+  const probe = dom.add(fixture.dashboard, 'span', '', 'Unrelated status update');
+  assert.equal(dom.flush(), 1, 'An already ordered menu must require no additional DOM writes');
+  probe.remove();
+  assert.equal(dom.flush(), 1);
 
   // Stable identity must work even if the UI wording changes later.
   injected.textContent = 'Organización del club';
   dom.flush();
-  assert.equal(fixture.grid.querySelectorAll('button').length, 1);
+  assert.deepEqual(fixture.grid.children, [...prefix, injected, blockchain]);
 
   // Recover already-duplicated entries and retain the router's original.
   const duplicate = dom.document.createElement('button');
   duplicate.className = 'ei-entry';
   duplicate.textContent = 'Estructura institucional';
-  dom.openCategory(fixture, 'Transparencia y auditoría', [original, injected, duplicate]);
-  assert.deepEqual(fixture.grid.querySelectorAll('button'), [original]);
-  dom.openCategory(fixture, 'Transparencia y auditoría', [injected, duplicate, original]);
-  assert.deepEqual(fixture.grid.querySelectorAll('button'), [original]);
+  dom.openCategory(fixture, 'Transparencia y auditoría', [original, ...prefix, blockchain, injected, duplicate]);
+  assert.deepEqual(fixture.grid.children, [...prefix, original, blockchain]);
+  dom.openCategory(fixture, 'TRANSPARENCIA Y AUDITORÍA', [injected, duplicate, ...prefix, blockchain, original]);
+  assert.deepEqual(fixture.grid.children, [...prefix, original, blockchain]);
 
   // Repeated navigation must never grow the menu or leave entries in other sections.
   for (let i = 0; i < 25; i++) {
-    dom.openCategory(fixture, 'Mi perfil');
+    dom.openCategory(fixture, 'Mi Perfil');
     assert.equal(fixture.dashboard.querySelectorAll('.ei-entry').length, 0);
-    dom.openCategory(fixture, 'Transparencia y auditoría');
-    assert.equal(fixture.grid.querySelectorAll('button').length, 1);
+    dom.openCategory(fixture, 'Transparencia y Auditoría', [...prefix, blockchain]);
+    const entry = fixture.grid.querySelector('.ei-entry');
+    assert(entry, 'Institutional entry must return on every visit');
+    assert.deepEqual(fixture.grid.children, [...prefix, entry, blockchain]);
+    assert.equal(fixture.grid.querySelectorAll('.ei-entry').length, 1);
   }
 }
-console.log('Navigation stability passed: both roles, existing/missing entries, duplicates, label changes, 50 category round trips.');
+console.log('Navigation stability passed: both roles, approved order before Blockchain, title case, preserved handlers and permissions, duplicates, label changes, 50 category round trips.');
