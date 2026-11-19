@@ -1,0 +1,314 @@
+{
+  "review_date": "2026-11-19",
+  "scope": "Five newly reviewed countries; Argentina retains its existing catalogue and is not reimported by this snapshot.",
+  "countries": {
+    "BR": {
+      "clubs": 275,
+      "competitions": 31,
+      "first_team_sources": 275,
+      "first_team_sources_with_players": 275,
+      "first_team_source_player_rows": 6718,
+      "reserve_sources": 35,
+      "reserve_sources_with_players": 10,
+      "reserve_source_player_rows": 12,
+      "historical_reserve_sources_excluded": 1,
+      "city_from_explicit_address": 101,
+      "region_from_explicit_address": 4,
+      "source_season_labels": {
+        "2026": 111,
+        "26/27": 194,
+        "25/26": 5
+      },
+      "import_template": {
+        "clubs": 275,
+        "new_competitions": 27,
+        "competition_memberships": 543,
+        "squads": 310,
+        "player_memberships": 6634,
+        "unique_player_ids": 6634,
+        "ambiguous_player_memberships_excluded": 96,
+        "mononym_memberships": 3083,
+        "review_statuses": {
+          "complete": 252,
+          "partial": 57,
+          "unavailable": 1
+        }
+      }
+    },
+    "CL": {
+      "clubs": 46,
+      "competitions": 3,
+      "first_team_sources": 46,
+      "first_team_sources_with_players": 46,
+      "first_team_source_player_rows": 1273,
+      "reserve_sources": 7,
+      "reserve_sources_with_players": 1,
+      "reserve_source_player_rows": 3,
+      "historical_reserve_sources_excluded": 0,
+      "city_from_explicit_address": 39,
+      "region_from_explicit_address": 0,
+      "source_season_labels": {
+        "2026": 44,
+        "25/26": 2,
+        "26/27": 7
+      },
+      "import_template": {
+        "clubs": 46,
+        "new_competitions": 0,
+        "competition_memberships": 46,
+        "squads": 53,
+        "player_memberships": 1276,
+        "unique_player_ids": 1276,
+        "ambiguous_player_memberships_excluded": 0,
+        "mononym_memberships": 2,
+        "review_statuses": {
+          "complete": 47,
+          "partial": 6
+        }
+      }
+    },
+    "CO": {
+      "clubs": 36,
+      "competitions": 2,
+      "first_team_sources": 36,
+      "first_team_sources_with_players": 36,
+      "first_team_source_player_rows": 1099,
+      "reserve_sources": 23,
+      "reserve_sources_with_players": 15,
+      "reserve_source_player_rows": 47,
+      "historical_reserve_sources_excluded": 0,
+      "city_from_explicit_address": 32,
+      "region_from_explicit_address": 0,
+      "source_season_labels": {
+        "2026": 36,
+        "26/27": 23
+      },
+      "import_template": {
+        "clubs": 36,
+        "new_competitions": 0,
+        "competition_memberships": 36,
+        "squads": 59,
+        "player_memberships": 1146,
+        "unique_player_ids": 1146,
+        "ambiguous_player_memberships_excluded": 0,
+        "mononym_memberships": 4,
+        "review_statuses": {
+          "complete": 51,
+          "partial": 8
+        }
+      }
+    },
+    "EC": {
+      "clubs": 51,
+      "competitions": 3,
+      "first_team_sources": 51,
+      "first_team_sources_with_players": 49,
+      "first_team_source_player_rows": 1216,
+      "reserve_sources": 11,
+      "reserve_sources_with_players": 2,
+      "reserve_source_player_rows": 2,
+      "historical_reserve_sources_excluded": 0,
+      "city_from_explicit_address": 23,
+      "region_from_explicit_address": 0,
+      "source_season_labels": {
+        "2026": 28,
+        "26/27": 34
+      },
+      "import_template": {
+        "clubs": 51,
+        "new_competitions": 1,
+        "competition_memberships": 79,
+        "squads": 62,
+        "player_memberships": 1216,
+        "unique_player_ids": 1216,
+        "ambiguous_player_memberships_excluded": 2,
+        "mononym_memberships": 2,
+        "review_statuses": {
+          "complete": 49,
+          "partial": 13
+        }
+      }
+    },
+    "UY": {
+      "clubs": 50,
+      "competitions": 3,
+      "first_team_sources": 50,
+      "first_team_sources_with_players": 48,
+      "first_team_source_player_rows": 1365,
+      "reserve_sources": 25,
+      "reserve_sources_with_players": 22,
+      "reserve_source_player_rows": 128,
+      "historical_reserve_sources_excluded": 0,
+      "city_from_explicit_address": 37,
+      "region_from_explicit_address": 0,
+      "source_season_labels": {
+        "2026": 30,
+        "26/27": 45
+      },
+      "import_template": {
+        "clubs": 50,
+        "new_competitions": 1,
+        "competition_memberships": 74,
+        "squads": 75,
+        "player_memberships": 1493,
+        "unique_player_ids": 1492,
+        "ambiguous_player_memberships_excluded": 0,
+        "mononym_memberships": 8,
+        "review_statuses": {
+          "complete": 70,
+          "partial": 5
+        }
+      }
+    }
+  },
+  "totals": {
+    "clubs": 458,
+    "competitions_with_verified_2026_participation": 42,
+    "club_competition_memberships": 778,
+    "first_team_sources": 458,
+    "reserve_sources": 101,
+    "source_player_rows": 11863,
+    "source_unique_player_ids": 11813,
+    "ambiguous_player_ids_held_for_review": 49,
+    "ambiguous_player_rows_excluded": 98,
+    "eligible_unique_player_ids_before_existing_Argentina_reconciliation": 11764,
+    "eligible_player_memberships_before_existing_Argentina_reconciliation": 11765,
+    "cities_from_explicit_address": 232,
+    "regions_from_explicit_address": 4,
+    "unresolved_source_fetches": 0
+  },
+  "limits": [
+    "Coverage is limited to the explicitly listed competition and club sources. It is not every club registered in each country or every Transfermarkt club.",
+    "26 Brazilian state championships and 3 domestic cups add clubs outside the national-league core. Cup participation is not relabelled as national-league membership.",
+    "Campeonato Amazonense source labels2024; its participant list is excluded from2026 participation.",
+    "Chile Tercera A/B, Ecuador Segunda Categoría, Uruguay Divisional C/D/OFI and Colombia Primera C do not gain fabricated national-league affiliations. Some lower clubs are included through verified cup participation.",
+    "U20/U21 and other youth links are preserved as discovery evidence and not classified as Reserva.",
+    "A complete source-table review means every retrieved player row was parsed, not exhaustive real-world squad coverage.",
+    "Only4 state/province fields are explicit in the retrieved club addresses; other regions remain null. No region is inferred from city or state-competition membership.",
+    "Source season label and URL season parameter are preserved separately: for example selected2026 can use parameter2025.",
+    "Current market values are null because squad pages do not supply a verified individual valuation date.",
+    "49 player IDs present in multiple parent clubs are excluded globally from import templates pending explicit reconciliation. Additional matches to existing Argentine player identities require backend review and preserve prior UUIDs."
+  ],
+  "empty_first_team_sources": [
+    {
+      "club": "Nazareno SC",
+      "country_code": "EC",
+      "source_url": "https://www.transfermarkt.com/nazareno-sc/startseite/verein/140910",
+      "source_season": "26/27",
+      "checked_at": "2026-11-19T21:53:32.778Z"
+    },
+    {
+      "club": "Club Deportivo Bejucal Sport",
+      "country_code": "EC",
+      "source_url": "https://www.transfermarkt.com/club-deportivo-bejucal-sport/startseite/verein/140907",
+      "source_season": "26/27",
+      "checked_at": "2026-11-19T21:53:18.078Z"
+    },
+    {
+      "club": "Gladiador FC",
+      "country_code": "UY",
+      "source_url": "https://www.transfermarkt.com/gladiador-fc/startseite/verein/145948",
+      "source_season": "26/27",
+      "checked_at": "2026-11-19T21:53:18.078Z"
+    },
+    {
+      "club": "Racing Durazno",
+      "country_code": "UY",
+      "source_url": "https://www.transfermarkt.com/racing-durazno/startseite/verein/145947",
+      "source_season": "26/27",
+      "checked_at": "2026-11-19T21:53:18.078Z"
+    }
+  ],
+  "historical_sources": [
+    {
+      "club": "Grêmio Foot-Ball Porto Alegrense",
+      "source_team_name": "Grêmio FBPA B (-2022)",
+      "source_url": "https://www.transfermarkt.com/gremio-porto-alegre-b/startseite/verein/14704",
+      "notes": "La fuente identifica un equipo histórico o una temporada fuera del alcance actual; no se publican jugadores como plantilla vigente."
+    }
+  ],
+  "verified_regions": [
+    {
+      "club": "Clube Náutico Marcílio Dias (SC)",
+      "city": "Itajaí",
+      "province": "Brasil — Santa Catarina",
+      "source_url": "https://www.transfermarkt.com/clube-nautico-marcilio-dias-sc-/startseite/verein/4759",
+      "evidence": {
+        "address_fields": {
+          "streetAddress": [],
+          "postalCode": [
+            "Itajaí - SC"
+          ],
+          "addressLocality": [
+            "Brazil"
+          ],
+          "addressRegion": []
+        },
+        "city_extraction": "explicit_city_in_published_postal_address_line",
+        "province_extraction": "explicit_address_state"
+      }
+    },
+    {
+      "club": "EC Democrata",
+      "city": "Governador Valadares",
+      "province": "Brasil — Minas Gerais",
+      "source_url": "https://www.transfermarkt.com/ec-democrata-mg-/startseite/verein/3364",
+      "evidence": {
+        "address_fields": {
+          "streetAddress": [],
+          "postalCode": [
+            "Governador Valadares (MG)"
+          ],
+          "addressLocality": [
+            "Brazil"
+          ],
+          "addressRegion": []
+        },
+        "city_extraction": "explicit_city_in_published_postal_address_line",
+        "province_extraction": "explicit_address_state"
+      }
+    },
+    {
+      "club": "Várzea Grande EC (MT)",
+      "city": "Várzea Grande",
+      "province": "Brasil — Mato Grosso",
+      "source_url": "https://www.transfermarkt.com/operario-futebol-clube-ltda-mt-/startseite/verein/32542",
+      "evidence": {
+        "address_fields": {
+          "streetAddress": [
+            "Alameda Júlio Müller, 10"
+          ],
+          "postalCode": [
+            "78118-860 Várzea Grande, MT"
+          ],
+          "addressLocality": [
+            "Brazil"
+          ],
+          "addressRegion": []
+        },
+        "city_extraction": "explicit_city_in_published_postal_address_line",
+        "province_extraction": "explicit_address_state"
+      }
+    },
+    {
+      "club": "São Raimundo EC (PA)",
+      "city": "Santarém",
+      "province": "Brasil — Pará",
+      "source_url": "https://www.transfermarkt.com/sao-raimundo-esporte-clube-pa-/startseite/verein/32192",
+      "evidence": {
+        "address_fields": {
+          "streetAddress": [],
+          "postalCode": [
+            "Santarém (PA)"
+          ],
+          "addressLocality": [
+            "Brazil"
+          ],
+          "addressRegion": []
+        },
+        "city_extraction": "explicit_city_in_published_postal_address_line",
+        "province_extraction": "explicit_address_state"
+      }
+    }
+  ]
+}

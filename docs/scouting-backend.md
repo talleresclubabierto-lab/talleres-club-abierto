@@ -1,5 +1,174 @@
 # Scouting: backend y verificación
 
+## Países, identidad y preparación de lotes — 19/11/2026
+
+Scouting admite **Argentina (`AR`), Brasil (`BR`), Chile (`CL`), Colombia (`CO`),
+Ecuador (`EC`) y Uruguay (`UY`)**. La migración nativa
+`20261119220235_scouting_south_america_countries.sql` agrega el país a regiones,
+competencias y clubes, preservando las claves existentes. La ampliación se limita
+al módulo de Scouting; no cambia Comunidad Formativa, el ingreso general, la
+autorización de socios o administradores ni el circuito de lotes Polygon.
+
+### Selección del país y geografía
+
+`bootstrap`, `clubs`, `players` y `create` aceptan `payload.country_code`.
+El servidor normaliza espacios y mayúsculas; omitirlo, enviarlo nulo o vacío
+conserva **Argentina** como valor predeterminado para clientes anteriores. Un
+código ajeno a los seis admitidos devuelve `PT422`. Para seleccionar o recomendar
+un club extranjero se debe enviar su país explícitamente.
+
+`bootstrap` devuelve el país seleccionado y `countries`, con `code`, `name` y
+`region_label`. También devuelve `regions`, cuyos elementos contienen `value`,
+`label`, `country_code` y `club_count`. El valor de una región mantiene la clave
+ya existente, por ejemplo `Brasil — São Paulo`; su etiqueta visible es `São Paulo`.
+El campo legado `provinces` conserva un arreglo de valores de región. Regiones,
+competencias, recuentos de clubes y jugadores y fecha de revisión del catálogo
+corresponden al país seleccionado. Las posiciones y categorías son comunes a
+los seis países.
+
+`clubs` devuelve `country_code`, `country_name`, `region_name` y las competencias
+vigentes de cada club. Un club brasileño puede pertenecer a una competencia
+nacional y a una estadual sin duplicarse. `competition_id` filtra esa membresía;
+`total_count` cuenta todos los clubes que cumplen los filtros antes de paginar.
+El catálogo conserva `province=NULL` o `city=NULL` cuando la ubicación no está
+comprobada. La búsqueda por nombre y la selección por competencia siguen
+funcionando con esa geografía incompleta.
+
+`players` valida que el club pertenece al país y, si se envía `competition_id`,
+que existe esa afiliación en la temporada vigente. El plantel pertenece al
+club/categoría y no se duplica por competencia. La posición y la búsqueda se
+aplican a todas las coincidencias antes de paginar; `squad.player_count` sigue
+describiendo el plantel completo de la categoría.
+
+**Otro club** exige una región válida del país, ciudad, nombre del equipo y liga.
+Una región extranjera no se interpreta como argentina cuando falta el país.
+Los datos declarados quedan en el snapshot del aporte; sólo un administrador
+habilitado puede validar ese club y asociarlo al catálogo. Los clubes importados
+sólo completan región o ciudad cuando el documento incluye evidencia geográfica
+explícita. Un cambio incompatible con una ubicación verificada exige conciliación.
+
+### Nombres deportivos e historial global
+
+La persona del catálogo conserva un UUID y una identidad Transfermarkt global,
+independientemente de país y categoría. Los nombres deportivos de una palabra se
+representan como `name_kind='sporting_mononym'`, con el nombre exacto en
+`first_name` y `last_name=''`. Los demás usan `name_kind='display_name_parts'`.
+`players` agrega `display_name` para mostrar la concatenación sin espacios
+sobrantes. Estos campos no afirman un nombre legal ni inventan un apellido.
+
+La excepción de apellido vacío corresponde sólo a un jugador seleccionado del
+catálogo. El ingreso manual sigue exigiendo nombre y apellido; un cliente no
+obtiene esa excepción enviando un `name_kind` arbitrario. Al editar el nombre de
+un jugador seleccionado, la interfaz lo desvincula del catálogo y vuelve a exigir
+los campos manuales. **Recomendar también** conserva el UUID del monónimo y vuelve
+a validar país, club y categoría actuales.
+
+Los nuevos snapshots incluyen `club.country_code`, `club.country_name`,
+`club.region_name` y, para un jugador de catálogo, `player.name_kind`. Los
+snapshots anteriores no se reescriben: mantienen su compromiso, identidad,
+afiliación y datos al momento del aporte. Los registros históricos sin país
+corresponden al catálogo argentino previo.
+
+El país selecciona el **catálogo para recomendar**. `feed`, `dashboard`, `detail`
+y el listado administrativo siguen mostrando el historial global de todos los
+socios. Los recuentos de recomendaciones y jugadores más recomendados no quedan
+limitados al país que el socio está explorando.
+
+### Importadores privados y control de identidad
+
+`scouting.import_club_batch(jsonb,text)` incorpora clubes y membresías de
+competencia desde un documento revisado de un país. Su metadata usa
+`schema_version=1`, `kind='reviewed_clubs'`, `country_code`, `country`, `batch_key`
+y las huellas previas de clubes, competencias y relaciones club/competencia.
+Los clubes nuevos usan `source_key='tm-club-<ID>'`; un índice único global de
+`transfermarkt_id` impide crear dos clubes para la misma referencia. Los clubes
+argentinos conservaron sus UUID y claves anteriores al agregar ese identificador.
+
+Las competencias existentes se reutilizan. Las nuevas requieren una identidad,
+nombre, temporada y fuente explícitos; no se reemplazan por coincidencias de
+nombre ni se cambia silenciosamente su país o temporada. Cada relación de club
+con una competencia conserva su propia fuente y fecha. Una participación
+comprobada en una copa no implica una afiliación nacional que la fuente no haya
+verificado. El importador no reactiva clubes inactivos ni elimina membresías
+ausentes en el documento.
+
+`scouting.import_roster_batch(jsonb,text)` conserva el documento de planteles de
+`schema_version=2` y admite los seis países. Los lotes nuevos usan
+`fingerprint_scope='country'`, con un país explícito y las huellas de jugadores y
+clubes de ese país. Los documentos argentinos legados conservan su contrato y
+sus repeticiones idempotentes. Primera y Reserva comparten identidad de persona;
+un equipo juvenil no se convierte en Reserva por una deducción del importador.
+
+`scouting.catalogue_country_fingerprints(text)` devuelve los recuentos y hashes
+para preparar un lote contra el estado actual. El chequeo de concurrencia abarca
+el país; `before_players` y `after_players` sólo conservan las identidades
+observadas en ese lote. Para clubes se conservan los registros y relaciones
+afectados. Esto evita copiar todos los jugadores de Argentina o del país por
+cada fragmento. El documento, las fuentes, las exclusiones y el hash del corte
+revisado permanecen asociados a la ejecución.
+
+Los importadores son funciones privadas sin permiso de ejecución para `anon`,
+`authenticated` ni `service_role`; no son acciones del API del socio. Comparten
+un bloqueo de actualización del catálogo, verifican fingerprints y procesan cada
+lote en una transacción. Una repetición con la misma clave, contenido y SHA-256
+devuelve el resultado registrado; reutilizar una clave con otro contenido falla.
+Una fuente que ubica un TMID existente en otro club produce
+`affiliation_requires_reconciliation`: no duplica la persona ni modifica su club
+automáticamente. Las ausencias en fuentes parciales no eliminan jugadores.
+
+La revisión de ambigüedades se realiza **antes de dividir el corte en lotes**.
+Si un mismo TMID aparece en clubes distintos dentro de las fuentes del corte,
+sus observaciones ambiguas se excluyen globalmente y los planteles afectados
+quedan parciales. Así el orden de ejecución de los países no decide una
+afiliación. Una transferencia que deba actualizarse requiere evidencia explícita
+y una conciliación posterior que conserve los UUID y el historial.
+
+### Preparación reproducible de lotes pequeños
+
+`scripts/prepare-scouting-country-batches.py` lee los templates revisados y su
+`manifest.json`, comprueba sus hashes y prepara archivos sin consultar ni escribir
+en Supabase. Admite los seis códigos; por defecto prepara la ampliación nueva en
+orden **CL, EC, UY, BR, CO**. Argentina requiere una selección explícita. Cada país
+ejecuta primero todos sus lotes de clubes y después los de planteles.
+
+```sh
+python scripts/prepare-scouting-country-batches.py \
+  --templates ../sources/import-templates \
+  --output ../imports/pending \
+  --date 2026-11-19
+```
+
+Cada archivo contiene como máximo **40 clubes o 20 planteles**, y no supera
+**400.000 bytes de JSON UTF-8**. La comprobación de tamaño reserva el espacio de
+las huellas definitivas de 64 caracteres. Se conservan las filas y su orden,
+metadata y fuentes; las competencias nuevas figuran sólo en el primer lote de
+clubes del país. Las claves son estables, por ejemplo
+`scouting-2026-11-19-country-cl-rosters-001`.
+
+El manifiesto de preparación incluye `mode`, `country`, `path`, `count`, orden,
+clave de lote, bytes, hash pendiente y referencia al template de origen. Las
+huellas se mantienen como `REQUIRES_CURRENT_COUNTRY_FINGERPRINT`. Justo antes de
+ensayar o importar cada archivo, el operador obtiene el estado actual del país y
+completa únicamente los campos `expected_*_sha256` requeridos. Después recalcula
+bytes y SHA-256 del documento final; el hash pendiente no es el hash del contenido
+que se ejecuta. Una vez confirmado un lote, se obtienen huellas nuevas para el
+siguiente. El script no sobrescribe archivos existentes con contenido diferente.
+
+El plan preparado el 19/11 contiene **44 lotes**: 458 clubes, 559 revisiones de
+plantel y 11.765 observaciones correspondientes a 11.764 TMID, con 29 competencias
+nuevas. Las 98 observaciones de 49 identidades ambiguas se excluyeron previamente
+y permanecen documentadas en las fuentes. Estas cifras describen el corte
+revisado y su preparación; la publicación de cada lote se acredita mediante su
+registro confirmado en `catalogue_runs`.
+
+El ensayo `supabase/tests/scouting-countries.sql` pasó con `ROLLBACK`: seis países,
+compatibilidad AR, clubes y jugadores más allá de una página, clubes con varias
+competencias, nombres deportivos, identidad compartida entre categorías,
+recomendaciones manuales, validación administrativa, feed global, fingerprints,
+repeticiones, conflictos de afiliación e inmutabilidad del historial. Las sesiones
+y socios de prueba fueron sintéticos. El adaptador Edge vigente reenvía el payload
+completo y admite los nuevos campos sin cambiar acciones ni autenticación.
+
 ## Paneles y seguimiento compartido — 30/10/2026
 
 El acceso **Scouting colaborativo** está en **Otros accesos** de Socio Activo y
@@ -97,12 +266,17 @@ No debe interpretarse el catálogo parcial como cobertura de todas las ligas.
 - `supabase/migrations/20261029214442_scouting_current_season_projection.sql`: proyección de temporada vigente y conservación de validaciones históricas, aplicada.
 - `supabase/migrations/20261030193757_scouting_reviewed_squads_and_category_memberships.sql`: membresías por categoría, revisión de planteles e importador privado, aplicada. La aplicación del esquema no acredita por sí sola la publicación de un lote de datos.
 - `supabase/migrations/20261030201040_scouting_players_position_filter.sql`: filtro de posición del plantel completo, aplicado antes de la paginación y del recuento de coincidencias.
+- `supabase/migrations/20261119220235_scouting_south_america_countries.sql`: país explícito, regiones y competencias por país, identidad global de clubes, nombres deportivos e importadores por lotes, aplicada.
 - `scouting/catalogue-seed.json`: datos y fuentes verificadas de los 11 clubes iniciales.
 - `supabase/functions/scouting-api/index.ts`: Edge Function independiente.
 - `supabase/tests/scouting-contract.sql`: prueba de integración, con datos ficticios
   dentro de `BEGIN` / `ROLLBACK`.
 - `supabase/tests/scouting-current-season.sql`: regresión de temporada, afiliaciones
   futuras/históricas y validación tardía de clubes manuales, con `ROLLBACK`.
+- `supabase/tests/scouting-countries.sql`: regresión sintética de países, geografía,
+  monónimos, importadores y transparencia global, con `ROLLBACK`.
+- `scripts/prepare-scouting-country-batches.py`: prepara lotes revisables por país,
+  sin acceso a servicios ni credenciales.
 - `scripts/test-scouting-api.mjs`: pruebas locales del adaptador HTTP con respuestas
   simuladas del RPC; no usan secretos ni servicios reales.
 
@@ -155,10 +329,10 @@ Las respuestas usan `Cache-Control: no-store`.
 
 | Acción | Carga útil | Respuesta |
 | --- | --- | --- |
-| `bootstrap` | `{}` | `actor`, `provinces`, `competitions`, `positions`, `categories`, `catalogue` |
+| `bootstrap` | `country_code?` (AR por omisión) | `actor`, `country_code`, `countries`, `regions`, `provinces`, `competitions`, `positions`, `categories`, `catalogue` |
 | `dashboard` | `{}` | `dashboard` global, con hitos y `most_recommended_players` |
-| `clubs` | `province?`, `competition_id?`, `query?`, `cursor?` | `items`, `next_cursor` |
-| `players` | `club_id`, `category?`, `position?`, `query?`, `cursor?` | `items`, `next_cursor`, `total_count`, `squad` |
+| `clubs` | `country_code?`, `province?`, `competition_id?`, `query?`, `cursor?` | `items`, `next_cursor`, `total_count`, `country_code` |
+| `players` | `country_code?`, `club_id`, `competition_id?`, `category?`, `position?`, `query?`, `cursor?` | `items`, `next_cursor`, `total_count`, `squad` |
 | `create` | Ver abajo | `recommendation`, `replayed` |
 | `feed` | `status?`, `query?`, `mine_only?`, `player_id?`, `reference_recommendation_id?`, `cursor?` | `items`, `next_cursor` |
 | `mine` | `status?`, `cursor?` | `items`, `next_cursor` |
@@ -318,6 +492,7 @@ la temporada, procedencia, fecha y fuentes de la referencia seleccionada.
 {
   "request_id": "UUID generado para este envío",
   "panel_context": "socio",
+  "country_code": "AR",
   "reference_recommendation_id": null,
   "club_id": null,
   "club_manual": {

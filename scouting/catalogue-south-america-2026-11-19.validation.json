@@ -1,0 +1,283 @@
+{
+  "review_date": "2026-11-19",
+  "status": "source_facts_and_import_templates_frozen; database import still requires live fingerprints and existing-identity checks",
+  "checks": {
+    "exact_TM_profile_row_identity": true,
+    "no_inferred_names_or_birth_dates": true,
+    "sporting_mononyms_preserved": true,
+    "all_import_conflicts_excluded_globally": true,
+    "historical_reserve_not_selectable": true,
+    "no_unresolved_source_jobs": true,
+    "raw_HTML_not_in_published_files": true,
+    "gzip_mtime": 0,
+    "roundtrip_exact": true,
+    "xz_roundtrip_matches_original_gzip_json_exactly": true,
+    "published_facts_compression": "xz"
+  },
+  "totals": {
+    "clubs": 458,
+    "competitions_with_verified_2026_participation": 42,
+    "club_competition_memberships": 778,
+    "first_team_sources": 458,
+    "reserve_sources": 101,
+    "source_player_rows": 11863,
+    "source_unique_player_ids": 11813,
+    "ambiguous_player_ids_held_for_review": 49,
+    "ambiguous_player_rows_excluded": 98,
+    "eligible_unique_player_ids_before_existing_Argentina_reconciliation": 11764,
+    "eligible_player_memberships_before_existing_Argentina_reconciliation": 11765,
+    "cities_from_explicit_address": 232,
+    "regions_from_explicit_address": 4,
+    "unresolved_source_fetches": 0
+  },
+  "artifacts": [
+    {
+      "path": "scouting/catalogue-south-america-2026-11-19.json.xz",
+      "bytes": 635572,
+      "sha256": "388d67028cebb99992d720c7f3277a944106822430da2fb4d1b0f1d4d6b0006d",
+      "git_blob_sha": "d9c441d9913818228b3e8912a240a137365f3fd1",
+      "uncompressed_bytes": 14893160,
+      "uncompressed_sha256": "bdfe8e85ecba7fd7abddd906548006af72ef62c2e2834eacb7d3fe3ae763adaf",
+      "compression": "xz",
+      "compression_filter": "LZMA2",
+      "repacked_from_frozen_artifact": {
+        "path": "scouting/catalogue-south-america-2026-11-19.json.gz",
+        "bytes": 869452,
+        "sha256": "c73bd04cbf2ec3d5116731a951e3f73307977088db8ff13fd87c9e566ea85ad0",
+        "git_blob_sha": "1fc6c3e87bf60b37ffea1fc31becd5979e5e72ec"
+      }
+    },
+    {
+      "path": "scouting/catalogue-south-america-2026-11-19.sources.json.gz",
+      "bytes": 35616,
+      "sha256": "131daf243d08e34c326742b45c90c2a4d68b5e898009a42461b781c9c1ed839d",
+      "git_blob_sha": "1572348983678fe33ec4f1ebec9bf8e7bdbb6b30",
+      "uncompressed_bytes": 577966,
+      "uncompressed_sha256": "b54879e335c0dc2ad2df70a85f8bae3bba98700f29af96cdaf361cb9b36fd10c"
+    }
+  ],
+  "import_templates": {
+    "status": "review_templates_require_current_fingerprints",
+    "source_facts_sha256": "bdfe8e85ecba7fd7abddd906548006af72ef62c2e2834eacb7d3fe3ae763adaf",
+    "competition_id_mapping": {
+      "CLPD": "chile-primera-division",
+      "CL2B": "chile-primera-b",
+      "CHI3": "chile-segunda-profesional",
+      "EC1N": "ecuador-serie-a",
+      "EC2L": "ecuador-serie-b",
+      "URUC": "uruguay-primera-division",
+      "URU2": "uruguay-segunda-profesional",
+      "BRA1": "brasil-serie-a",
+      "BRA2": "brasil-serie-b",
+      "COL1": "colombia-liga-betplay",
+      "CO22": "colombia-torneo-betplay",
+      "BRA3": "brasil-serie-c",
+      "BRA4": "brasil-serie-d",
+      "BCP1": "brasil-campeonato-paulista",
+      "BRPI": "brasil-campeonato-piauiense",
+      "BRAC": "brasil-campeonato-acreano",
+      "BRAL": "brasil-campeonato-alagoano",
+      "BRAP": "brasil-campeonato-amapaense",
+      "BRC": "brasil-copa-do-brasil",
+      "BRCB": "brasil-campeonato-baiano",
+      "BRCE": "brasil-campeonato-cearense",
+      "BRCG": "brasil-campeonato-carioca",
+      "BRCM": "brasil-campeonato-mineiro",
+      "BRDF": "brasil-campeonato-brasiliense",
+      "BRES": "brasil-campeonato-capixaba",
+      "BRGO": "brasil-campeonato-goiano",
+      "BRMA": "brasil-campeonato-maranhense",
+      "BRMS": "brasil-campeonato-mato-grossense",
+      "BRMT": "brasil-campeonato-sul-mato-grossense",
+      "BRPA": "brasil-campeonato-paraense",
+      "BRPB": "brasil-campeonato-paraibano",
+      "BRPE": "brasil-campeonato-pernambucano",
+      "BRPR": "brasil-campeonato-paranaense",
+      "BRRD": "brasil-campeonato-rondoniense",
+      "BRRN": "brasil-campeonato-potiguar",
+      "BRRR": "brasil-campeonato-roraimense",
+      "BRRS": "brasil-campeonato-gaucho",
+      "BRSC": "brasil-campeonato-catarinense",
+      "BRSE": "brasil-campeonato-sergipano",
+      "BRTO": "brasil-campeonato-tocantinense",
+      "ECUP": "ecuador-copa-ecuador",
+      "URP1": "uruguay-copa-auf-uruguay"
+    },
+    "cross_club_player_conflicts_excluded": [
+      "75111",
+      "112062",
+      "144781",
+      "158488",
+      "177539",
+      "202907",
+      "215839",
+      "227462",
+      "231009",
+      "256362",
+      "265837",
+      "290250",
+      "355258",
+      "374097",
+      "411437",
+      "479498",
+      "520430",
+      "541230",
+      "555432",
+      "592346",
+      "598975",
+      "642019",
+      "689455",
+      "697848",
+      "701485",
+      "728908",
+      "734281",
+      "740406",
+      "796350",
+      "844809",
+      "853529",
+      "883724",
+      "884089",
+      "940144",
+      "942644",
+      "979843",
+      "985382",
+      "1011198",
+      "1029803",
+      "1074487",
+      "1083249",
+      "1090242",
+      "1094114",
+      "1094314",
+      "1095627",
+      "1095753",
+      "1152256",
+      "1159085",
+      "1369619"
+    ],
+    "countries": {
+      "BR": {
+        "clubs": 275,
+        "new_competitions": 27,
+        "competition_memberships": 543,
+        "squads": 310,
+        "player_memberships": 6634,
+        "unique_player_ids": 6634,
+        "ambiguous_player_memberships_excluded": 96,
+        "mononym_memberships": 3083,
+        "review_statuses": {
+          "complete": 252,
+          "partial": 57,
+          "unavailable": 1
+        }
+      },
+      "CL": {
+        "clubs": 46,
+        "new_competitions": 0,
+        "competition_memberships": 46,
+        "squads": 53,
+        "player_memberships": 1276,
+        "unique_player_ids": 1276,
+        "ambiguous_player_memberships_excluded": 0,
+        "mononym_memberships": 2,
+        "review_statuses": {
+          "complete": 47,
+          "partial": 6
+        }
+      },
+      "CO": {
+        "clubs": 36,
+        "new_competitions": 0,
+        "competition_memberships": 36,
+        "squads": 59,
+        "player_memberships": 1146,
+        "unique_player_ids": 1146,
+        "ambiguous_player_memberships_excluded": 0,
+        "mononym_memberships": 4,
+        "review_statuses": {
+          "complete": 51,
+          "partial": 8
+        }
+      },
+      "EC": {
+        "clubs": 51,
+        "new_competitions": 1,
+        "competition_memberships": 79,
+        "squads": 62,
+        "player_memberships": 1216,
+        "unique_player_ids": 1216,
+        "ambiguous_player_memberships_excluded": 2,
+        "mononym_memberships": 2,
+        "review_statuses": {
+          "complete": 49,
+          "partial": 13
+        }
+      },
+      "UY": {
+        "clubs": 50,
+        "new_competitions": 1,
+        "competition_memberships": 74,
+        "squads": 75,
+        "player_memberships": 1493,
+        "unique_player_ids": 1492,
+        "ambiguous_player_memberships_excluded": 0,
+        "mononym_memberships": 8,
+        "review_statuses": {
+          "complete": 70,
+          "partial": 5
+        }
+      }
+    },
+    "files": [
+      {
+        "path": "import-templates/br-clubs.template.json",
+        "bytes": 261943,
+        "sha256": "77e1a3122271190138507d7d0502c0720333a0b6972354aba9666effdaefc58d"
+      },
+      {
+        "path": "import-templates/br-rosters.template.json",
+        "bytes": 2931825,
+        "sha256": "326eaf98162c49d54669e641579815d3334b5aa490896df4af9d2f77a7208ba8"
+      },
+      {
+        "path": "import-templates/cl-clubs.template.json",
+        "bytes": 32647,
+        "sha256": "1596ebbd9589b5c04959f7a0785769821e60f665a366c0534c7effeb8b0d0a6d"
+      },
+      {
+        "path": "import-templates/cl-rosters.template.json",
+        "bytes": 583350,
+        "sha256": "e5b5748bfd52c745345e3dd5fd139804d3c56d5a7dd0672da13136fec511d376"
+      },
+      {
+        "path": "import-templates/co-clubs.template.json",
+        "bytes": 26142,
+        "sha256": "f4f527287e789627d88140913bcd50494584d5674f2ea55cdfae388ad5e262fa"
+      },
+      {
+        "path": "import-templates/co-rosters.template.json",
+        "bytes": 529206,
+        "sha256": "48e4b02ac06a90520a4490202ae9ce6c26fec8d486c2ae90d4a82e057cd23ea2"
+      },
+      {
+        "path": "import-templates/ec-clubs.template.json",
+        "bytes": 40844,
+        "sha256": "66f4a26fb813b451b90ebbbf0de72700b79128bd773c13126944569626555c98"
+      },
+      {
+        "path": "import-templates/ec-rosters.template.json",
+        "bytes": 549869,
+        "sha256": "024ef1dd14c29222b14cd73761794d194a7087f30150c3146bd18bddfcf91a9f"
+      },
+      {
+        "path": "import-templates/uy-clubs.template.json",
+        "bytes": 41824,
+        "sha256": "d2ec796b35dbbb750d4ecaa46c8f337226a7d428e1210ae1d709d138f860997f"
+      },
+      {
+        "path": "import-templates/uy-rosters.template.json",
+        "bytes": 680996,
+        "sha256": "94c4f91fc379b62d2b5204cbe4b7e68d386d57a60d9a1d83791bd0dfddb313c7"
+      }
+    ]
+  }
+}

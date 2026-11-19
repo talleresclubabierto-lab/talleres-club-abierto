@@ -68,6 +68,9 @@ h3{font-size:1.08rem}
 .section-heading h2{font-size:21px;padding-top:1px}
 .section-heading p{font-size:13px;color:var(--muted);margin-top:7px}
 .route-picker{border:0;padding:0;margin:0 0 19px;min-width:0}
+.country-field{margin-bottom:20px}
+.country-club-fields{border:0;padding:0;margin:0;min-width:0}
+#country-feedback,#country-retry{margin-bottom:16px}
 .route-picker legend{font-size:13px;font-weight:650;margin-bottom:9px}
 .segmented-control{display:grid;grid-template-columns:1fr 1fr;gap:6px;border:1px solid #314768;background:#08172d;border-radius:11px;padding:5px}
 .segmented-control label{position:relative;cursor:pointer;min-width:0}

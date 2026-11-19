@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "review_date": "2026-11-19",
+  "scope": "scouting_only",
+  "base_commit": "75e56ad6394b7cb2349affc836be2789f562a91b",
+  "migration": "20261119220235_scouting_south_america_countries",
+  "web_asset_version": "20261119-south-america",
+  "database_validation": "passed",
+  "frontend_build_validation": "passed",
+  "web_deployment_evidence": "The PR checks, merge commit and production resource checks record deployment separately from these database receipts.",
+  "totals": {
+    "events": 1,
+    "by_country": [
+      {
+        "clubs": 153,
+        "players": 5627,
+        "country_code": "AR"
+      },
+      {
+        "clubs": 275,
+        "players": 6634,
+        "country_code": "BR"
+      },
+      {
+        "clubs": 46,
+        "players": 1276,
+        "country_code": "CL"
+      },
+      {
+        "clubs": 36,
+        "players": 1146,
+        "country_code": "CO"
+      },
+      {
+        "clubs": 51,
+        "players": 1216,
+        "country_code": "EC"
+      },
+      {
+        "clubs": 50,
+        "players": 1492,
+        "country_code": "UY"
+      }
+    ],
+    "event_hash": "a92c2585342f02528b6b8db4e9514511",
+    "batch_count": 44,
+    "memberships": 17418,
+    "active_clubs": 611,
+    "club_hash_ar": "89b5be2e3fd4cf2c3f029e56e1497567",
+    "active_players": 17391,
+    "player_hash_ar": "90e687f1a470233a5304073dc312b62a",
+    "recommendations": 1,
+    "blockchain_enabled": false,
+    "recommendation_hash": "1b7dceeba5559e47267bdd91c72dfbdc"
+  },
+  "integrity": {
+    "argentina_clubs_unchanged": true,
+    "argentina_players_unchanged": true,
+    "recommendations_unchanged": true,
+    "events_unchanged": true,
+    "community_formative_source_files_unchanged": true,
+    "index_changes_limited_to_scouting_asset_version": true
+  },
+  "imports": {
+    "batches": 44,
+    "clubs_inserted": 458,
+    "players_inserted": 11764,
+    "memberships_inserted": 11765,
+    "pre_import_ambiguous_identities_excluded": 49,
+    "cross_argentina_identities": 0,
+    "observations_skipped": 0,
+    "unexpected_conflicts": 0
+  },
+  "validation": {
+    "migration_and_synthetic_contract": "passed_with_rollback",
+    "real_catalogue_api": "catalogue-south-america-2026-11-19.api-validation.json",
+    "legacy_current_season": "passed_with_rollback",
+    "native_navigation": "passed",
+    "frontend_logic": "passed",
+    "api_adapter_tests": 10,
+    "cloudflare_build": "passed"
+  },
+  "advisors": {
+    "security": [
+      {
+        "name": "rls_enabled_no_policy",
+        "level": "INFO",
+        "before": 88,
+        "after": 88,
+        "new_findings": []
+      },
+      {
+        "name": "function_search_path_mutable",
+        "level": "WARN",
+        "before": 1,
+        "after": 1,
+        "new_findings": []
+      },
+      {
+        "name": "anon_security_definer_function_executable",
+        "level": "WARN",
+        "before": 1,
+        "after": 1,
+        "new_findings": []
+      },
+      {
+        "name": "authenticated_security_definer_function_executable",
+        "level": "WARN",
+        "before": 1,
+        "after": 1,
+        "new_findings": []
+      }
+    ],
+    "performance": [
+      {
+        "name": "unindexed_foreign_keys",
+        "level": "INFO",
+        "before": 67,
+        "after": 67,
+        "new_findings": []
+      },
+      {
+        "name": "unused_index",
+        "level": "INFO",
+        "before": 24,
+        "after": 24,
+        "new_findings": []
+      },
+      {
+        "name": "duplicate_index",
+        "level": "WARN",
+        "before": 1,
+        "after": 1,
+        "new_findings": []
+      }
+    ]
+  },
+  "automation": {
+    "enabled_on_entry": false,
+    "schedule_preserved": true,
+    "scope_countries": [
+      "AR",
+      "BR",
+      "CL",
+      "CO",
+      "EC",
+      "UY"
+    ]
+  }
+}
