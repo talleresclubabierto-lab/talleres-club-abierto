@@ -41,7 +41,7 @@ declare
   v_check_count integer := 0;
 begin
   v_def_md5 := md5(pg_get_functiondef('public.scouting_api(text,text,jsonb)'::regprocedure));
-  if v_def_md5 not in ('8a135faf5ebfd96e1ac61c5e260a7536','debdc4297e4adebaf2a5ed447a91ecec','f194c6d6710ed861f55c76b7f6a63bbf') then
+  if v_def_md5 not in ('8a135faf5ebfd96e1ac61c5e260a7536','debdc4297e4adebaf2a5ed447a91ecec','f194c6d6710ed861f55c76b7f6a63bbf','af043051f1a6def682a825b00f1beb75') then
     raise exception 'Install the reviewed dashboard, roster or position-filter patch, which preserves the current-season projection, before running this regression';
   end if;
   v_comp_a := 'qa-season-a-' || left(v_suffix,12);

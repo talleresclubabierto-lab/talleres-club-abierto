@@ -10,8 +10,29 @@ const html = fs.readFileSync(path.join(app, 'scouting.html'), 'utf8');
 const source = fs.readFileSync(path.join(app, 'scouting/scouting.js'), 'utf8');
 const tick = () => new Promise(resolve => setTimeout(resolve, 0));
 const reply = data => ({ ok: true, status: 200, json: async () => ({ ok: true, ...data }) });
-const exported = 'state,channels,timers,initialiseForm,applyPanelContext,canRecommend,canManage,createPayload,verifiedMarketValue,card,loadDashboard,loadList,renderList,activateTab,openDetail,clearSessionState,selectPlayer,renderRanking,renderEvents,renderProof,recommendAlso,clearRecommendationReference,loadPlayers,selectClub,renderSquad,dispose,api';
+const exported = 'state,channels,timers,initialiseForm,applyPanelContext,canRecommend,canManage,createPayload,verifiedMarketValue,card,loadDashboard,loadList,renderList,activateTab,openDetail,clearSessionState,selectPlayer,renderRanking,renderEvents,renderProof,recommendAlso,clearRecommendationReference,loadPlayers,loadClubs,selectClub,renderSquad,changeCountry,newRecommendation,dispose,api';
 assert(source.includes('  boot();\n  return Object.freeze({ dispose });'), 'The test harness must replace only the component boot call.');
+
+const countries = [
+  { code: 'AR', name: 'Argentina', region_label: 'Provincia' },
+  { code: 'BR', name: 'Brasil', region_label: 'Estado' },
+  { code: 'CL', name: 'Chile', region_label: 'Región' },
+  { code: 'CO', name: 'Colombia', region_label: 'Departamento' },
+  { code: 'EC', name: 'Ecuador', region_label: 'Provincia' },
+  { code: 'UY', name: 'Uruguay', region_label: 'Departamento' }
+];
+const regionNames = { AR: 'Córdoba', BR: 'São Paulo', CL: 'Metropolitana', CO: 'Antioquia', EC: 'Pichincha', UY: 'Montevideo' };
+function countryBootstrap(code, overrides = {}) {
+  const country = countries.find(entry => entry.code === code);
+  const value = code === 'AR' ? regionNames[code] : `${country.name} — ${regionNames[code]}`;
+  return {
+    country_code: code, countries, actor: { role: 'socio', numero_socio: '123' },
+    regions: [{ value, label: regionNames[code], country_code: code, club_count: 1 }], provinces: [value],
+    competitions: [{ id: `${code}-national`, name: `Liga ${country.name}`, country_code: code, season: '2026' }],
+    catalogue: { club_count: code === 'AR' ? 153 : 40, player_count: code === 'AR' ? 5627 : 1200 },
+    categories: ['Primera', 'Reserva'], positions: ['Arquero', 'Defensor Central'], ...overrides
+  };
+}
 
 function harness(context = 'socio', embedded = true) {
   const elements = new Map();
@@ -29,9 +50,9 @@ function harness(context = 'socio', embedded = true) {
     removeAttribute(key) { delete this.attributes[key]; delete this[key]; }
     setCustomValidity(value) { this.validationMessage = value; }
     reportValidity() { return true; }
-    append(...children) { this.children.push(...children); }
+    append(...children) { for (const child of children) { if (child.parentNode) child.parentNode.children = child.parentNode.children.filter(entry => entry !== child); child.parentNode = this; this.children.push(child); } }
     prepend(...children) { this.children.unshift(...children); }
-    replaceChildren(...children) { this._text = ''; this.children = children; if (this.tagName === 'SELECT') this.value = children[0]?.value || ''; }
+    replaceChildren(...children) { this._text = ''; for (const child of this.children) child.parentNode = null; this.children = []; this.append(...children); if (this.tagName === 'SELECT') this.value = children[0]?.value || ''; }
     querySelectorAll() { return []; }
     querySelector() { return null; }
     focus() {}
@@ -46,20 +67,23 @@ function harness(context = 'socio', embedded = true) {
   }
   const el = id => { assert(elements.has(id), 'Missing static HTML ID: ' + id); return elements.get(id); };
   const tabs = ['mine', 'recommend'].map(id => { const element = el('tab-' + id); element.dataset.tab = id; return element; });
+  const routes = ['province', 'competition'].map(value => { const element = new Element('input'); element.value = value; element.checked = value === 'province'; return element; });
+  const querySelector = selector => selector === '[name="search-route"]:checked' ? routes.find(element => element.checked) : null;
+  const querySelectorAll = selector => selector === '[data-tab]' ? tabs : selector === '[name="search-route"]' ? routes : [];
   const events = new Map(); const documentEvents = new Map(); const parent = {};
   const window = { location: { origin: 'https://club.example', search: '?panel_context=' + context }, parent, addEventListener(type, callback) { const callbacks = events.get(type) || []; callbacks.push(callback); events.set(type, callbacks); }, removeEventListener(type, callback) { events.set(type, (events.get(type) || []).filter(item => item !== callback)); } };
   const fireWindow = (type, event = {}) => { for (const callback of events.get(type) || []) callback(event); };
-  const calls = []; let handler = async () => reply({ items: [], next_cursor: null });
-  const sandbox = { window, location: { hash: '' }, document: { body: { hasAttribute: () => false }, getElementById: el, createElement: tag => new Element(tag), querySelector: () => ({ value: 'province' }), querySelectorAll: selector => selector === '[data-tab]' ? tabs : [], addEventListener(type, callback) { const callbacks = documentEvents.get(type) || []; callbacks.push(callback); documentEvents.set(type, callbacks); }, removeEventListener(type, callback) { documentEvents.set(type, (documentEvents.get(type) || []).filter(item => item !== callback)); } }, sessionStorage: { getItem: () => 'test-session' }, URL, URLSearchParams, Date, Intl, AbortController, DOMException, setTimeout, clearTimeout, crypto: webcrypto, Option: class extends Element { constructor(text, value) { super('option'); this._text = text; this.value = String(value); } }, fetch: async (_url, options) => { const request = JSON.parse(options.body); calls.push(request); return handler(request, options.signal); } };
+  const calls = []; let handler = async () => reply({ items: [], next_cursor: null }); let sessionToken = 'test-session';
+  const sandbox = { window, location: { hash: '' }, document: { body: { hasAttribute: () => false }, getElementById: el, createElement: tag => new Element(tag), querySelector, querySelectorAll, addEventListener(type, callback) { const callbacks = documentEvents.get(type) || []; callbacks.push(callback); documentEvents.set(type, callbacks); }, removeEventListener(type, callback) { documentEvents.set(type, (documentEvents.get(type) || []).filter(item => item !== callback)); } }, sessionStorage: { getItem: () => sessionToken }, URL, URLSearchParams, Date, Intl, AbortController, DOMException, setTimeout, clearTimeout, crypto: webcrypto, Option: class extends Element { constructor(text, value) { super('option'); this._text = text; this.value = String(value); } }, fetch: async (_url, options) => { const request = JSON.parse(options.body); calls.push(request); return handler(request, options.signal); } };
   vm.runInNewContext(source.replace('  boot();\n  return Object.freeze({ dispose });', '  globalThis.review={' + exported + '};\n  return Object.freeze({ dispose });'), sandbox, { filename: 'scouting.js' });
   const mountRoot = embedded ? { getElementById: el, querySelector: sandbox.document.querySelector, querySelectorAll: sandbox.document.querySelectorAll } : sandbox.document;
   if (embedded) { sandbox.document.getElementById = () => { throw new Error('Native component escaped its DOM scope'); }; sandbox.document.querySelectorAll = () => { throw new Error('Native component queried the outer panel'); }; }
   window.ClubAbiertoScouting.mount(mountRoot, { panelContext: context });
   const review = sandbox.review;
   review.state.actor = { role: 'socio', numero_socio: '123' }; review.state.activeToken = 'test-session';
-  review.state.bootstrap = { catalogue: { club_count: 153, player_count: 21 }, provinces: ['Córdoba'], competitions: [], categories: ['Primera', 'Reserva'], positions: ['Arquero', 'Defensor Central'] };
+  review.state.bootstrap = countryBootstrap('AR', { competitions: [] });
   review.initialiseForm(review.state.bootstrap);
-  return { ...review, el, calls, window, parent, fireWindow, listenerCount: () => [...events.values(), ...documentEvents.values(), ...[...elements.values()].flatMap(element => [...element.listeners.values()])].reduce((total, callbacks) => total + callbacks.length, 0), setHandler: next => { handler = next; } };
+  return { ...review, el, calls, window, parent, fireWindow, listenerCount: () => [...events.values(), ...documentEvents.values(), ...[...elements.values(), ...routes].flatMap(element => [...element.listeners.values()])].reduce((total, callbacks) => total + callbacks.length, 0), setHandler: next => { handler = next; }, setToken: value => { sessionToken = value; }, setRoute: value => { for (const element of routes) element.checked = element.value === value; return routes.find(element => element.checked).fire('change'); } };
 }
 
 const recommendation = { id: 'r-1', code: 'SC-001', status: 'contactado', created_at: '2026-10-30T12:00:00Z', player: { first_name: 'Jugador', last_name: 'Demostración', position: 'Arquero', age_at_recommendation: null, market_value: null }, club: { name: 'Club de prueba', province: 'Córdoba', competition_name: 'Liga local' }, author: { numero_socio: '123', name: 'Socio Visible' }, category: 'Primera', can_manage: true, can_add_info: true };
@@ -259,8 +283,190 @@ const dashboard = { total_player_references: 137, total_recommendations: 150, id
   assert.equal(h.state.playersQuery.position, '__unknown__'); assert.equal(h.state.players.size, 5); assert([...h.state.players.values()].every(player => player.position === null));
   assert.equal($('players-more').hidden, true); h.dispose();
   assert(!html.includes('id="player-query"') && !html.includes('Buscar en este plantel'));
-  assert(html.includes('/scouting/scouting.js?v=20261030-position-filter'));
+  assert(html.includes('/scouting/scouting.js?v=20261119-south-america'));
   console.log('PASS position filter: bootstrap options, server-wide results beyond original page, filtered pagination, unknown/all, independent recommendation position and selection, club/category resets, aborted/stale requests discarded.');
+}
+
+// Countries scope only the recommendation catalogue. The optional location route
+// must not hide a real club whose source has no province/city information.
+{
+  const h = harness(); const $ = h.el;
+  assert.equal($('club-country').value, 'AR');
+  assert.deepEqual($('club-country').options.map(option => option.value), countries.map(country => country.code));
+  assert.equal($('club-region-label').textContent, 'Provincia');
+  assert.deepEqual($('club-filter-flow').children, [$('province-field'), $('competition-field'), $('club-picker-field')]);
+  h.setHandler(async request => { assert.equal(request.action, 'bootstrap'); return reply(countryBootstrap(request.payload.country_code)); });
+  for (const code of ['BR', 'CL', 'CO', 'EC', 'UY', 'AR']) {
+    $('club-country').value = code; await $('club-country').fire('change');
+    assert.equal(h.state.countryCode, code); assert.equal(h.state.countryReady, true);
+    assert.equal(h.calls.at(-1).payload.country_code, code);
+    const country = countries.find(entry => entry.code === code);
+    assert.equal($('club-region-label').textContent, country.region_label); assert.equal($('manual-region-label').textContent, country.region_label);
+    assert.equal($('club-province').options[1].textContent, regionNames[code]);
+    assert.equal($('manual-province').options[1].value, countryBootstrap(code).regions[0].value);
+    assert.deepEqual($('club-competition').options.map(option => option.value), ['', `${code}-national`]);
+    assert.match($('catalogue-notice').textContent, new RegExp(`Catálogo de ${country.name}:`));
+    assert.equal($('country-club-fields').disabled, false);
+    if (code !== 'AR') {
+      assert.equal($('club-province').required, false, 'A new country must start with optional location');
+      assert.equal($('club-competition').required, true);
+      assert.deepEqual($('club-filter-flow').children, [$('competition-field'), $('province-field'), $('club-picker-field')]);
+    }
+  }
+  const national = { id: 'BR-national', name: 'Série A', country_code: 'BR', division: 'Primera', season: '2026' };
+  const estadual = { id: 'BR-state', name: 'Campeonato Paulista', country_code: 'BR', division: 'Estadual', season: '2026' };
+  const club = { id: 'club-br', name: 'Club Brasileño', country_code: 'BR', country_name: 'Brasil', region_name: null, province: null, city: null, competition_id: national.id, competition_name: national.name, competitions: [national, estadual] };
+  const player = { id: 'player-br', first_name: 'Jugador', last_name: 'Brasileño', position: 'Defensor Central', age_current: 23 };
+  h.setHandler(async request => {
+    if (request.action === 'bootstrap') return reply(countryBootstrap('BR', { competitions: [national, estadual] }));
+    if (request.action === 'clubs') return reply({ items: [club], next_cursor: null });
+    if (request.action === 'players') return reply({ items: request.payload.cursor ? [{ ...player, id: 'player-br-2' }] : [player], next_cursor: request.payload.cursor ? null : 'next-player', total_count: 2, squad: { category: 'Primera', player_count: 2, expected_count: 2, status: 'verified' } });
+    throw new Error('Unexpected request: ' + request.action);
+  });
+  await h.changeCountry('BR'); h.state.activeTab = 'recommend'; await h.setRoute('competition');
+  assert.equal($('club-province').required, false); assert.equal($('club-province').value, '');
+  assert.equal($('club-province').options[0].textContent, 'Todos los estados');
+  $('club-competition').value = estadual.id; await $('club-competition').fire('change'); await tick();
+  assert.equal(h.calls.at(-1).action, 'clubs'); assert.equal(h.calls.at(-1).payload.country_code, 'BR'); assert.equal(h.calls.at(-1).payload.province, null); assert.equal(h.calls.at(-1).payload.competition_id, estadual.id);
+  $('club-choice').value = club.id; h.selectClub(); await tick();
+  assert.equal($('club-competition').value, estadual.id); assert.equal(h.state.selectedClub.competition_id, estadual.id);
+  assert.equal(h.calls.at(-1).action, 'players'); assert.equal(h.calls.at(-1).payload.country_code, 'BR'); assert.equal(h.calls.at(-1).payload.competition_id, estadual.id);
+  assert.match($('selected-club-description').textContent, /Brasil/); assert.match($('selected-club-description').textContent, /Campeonato Paulista/);
+  assert(!$('selected-club-description').textContent.includes('Série A')); assert(!/null|undefined/.test($('selected-club-description').textContent));
+  $('player-choice').value = player.id; h.selectPlayer(); $('recommend-reason').value = 'Una observación deportiva completa sobre este jugador.';
+  $('player-position-filter').value = 'Defensor Central'; await $('player-position-filter').fire('change');
+  await $('players-more').fire('click'); await tick();
+  assert.equal(h.calls.at(-1).payload.cursor, 'next-player'); assert.equal(h.calls.at(-1).payload.country_code, 'BR'); assert.equal(h.calls.at(-1).payload.competition_id, estadual.id); assert.equal(h.calls.at(-1).payload.position, 'Defensor Central');
+  let payload = h.createPayload(); assert.equal(payload.country_code, 'BR'); assert.equal(payload.competition_id, estadual.id); assert.equal(payload.player_id, player.id);
+  assert.equal('nationality' in payload, false); assert.equal('nationality' in payload.player, false);
+  await h.setRoute('province'); $('club-province').value = 'Brasil — São Paulo'; await $('club-province').fire('change'); await tick();
+  $('club-competition').value = estadual.id; await $('club-competition').fire('change'); await tick();
+  $('club-choice').value = club.id; h.selectClub(); await tick();
+  assert.equal(h.state.selectedClub.competition_id, estadual.id, 'A province search replaced the explicitly selected estadual');
+  $('player-choice').value = player.id; h.selectPlayer();
+  $('club-competition').value = national.id; await $('club-competition').fire('change'); await tick();
+  assert.equal(h.state.selectedClub.competition_id, national.id); assert.equal(h.state.selectedPlayer.id, player.id); assert.equal($('player-first-name').value, player.first_name);
+  assert.equal(h.calls.at(-1).payload.competition_id, national.id);
+  h.dispose();
+  console.log('PASS country catalogue: all six countries, scoped regions/competitions/counts, country-first flow, clubs without location through competition, explicit estadual retained, country+competition+position pagination, and no player-nationality inference.');
+}
+
+// Manual club inputs must belong to the selected country; pending writes keep
+// their original immutable payload and cannot be moved to another country.
+{
+  const h = harness(); const $ = h.el;
+  h.setHandler(async request => reply(countryBootstrap(request.payload.country_code)));
+  await h.changeCountry('EC'); $('manual-club-toggle').checked = true; await $('manual-club-toggle').fire('change');
+  $('manual-province').value = 'Córdoba'; $('manual-city').value = 'Quito'; $('manual-club-name').value = 'Club Local'; $('manual-league').value = 'Liga de Quito';
+  $('player-first-name').value = 'Jugador'; $('player-last-name').value = 'Recomendado'; $('player-position').value = 'Arquero'; $('player-category').value = 'Primera'; $('recommend-reason').value = 'Una observación deportiva para este jugador recomendado.';
+  assert.equal(h.createPayload(), null); assert.match($('manual-province').validationMessage, /país elegido/);
+  $('manual-province').value = 'Ecuador — Pichincha';
+  const payload = h.createPayload(); assert.equal(payload.country_code, 'EC'); assert.equal(payload.club_manual.province, 'Ecuador — Pichincha'); assert.equal(payload.club_manual.city, 'Quito'); assert.equal(payload.club_id, null);
+  assert.deepEqual($('manual-league-options').children.map(option => option.value), ['Liga Ecuador · 2026']);
+  const requests = h.calls.length; h.state.createPending = payload;
+  assert.equal(await h.changeCountry('BR'), false); assert.equal(h.calls.length, requests); assert.equal(h.state.countryCode, 'EC'); assert.equal(h.state.createPending, payload);
+  h.state.createPending = null; await h.changeCountry('UY');
+  for (const id of ['manual-city', 'manual-club-name', 'manual-league', 'player-first-name', 'player-last-name', 'player-position-filter']) assert.equal($(id).value, '', 'Country change retained ' + id);
+  assert.equal(h.state.selectedClub, null); assert.equal(h.state.selectedPlayer, null); assert.equal(h.state.playersQuery, null); assert.equal(h.state.playersCursor, null); assert.equal(h.state.clubsCursor, null);
+  h.dispose();
+  console.log('PASS manual countries: region validation against current country, country-scoped league suggestions, explicit country in creation, pending write preserved, previous manual/player fields and cursors cleared.');
+}
+
+// Country changes invalidate all catalogue work, even when an aborted transport
+// resolves late. Global recommendations and the current authenticated actor stay put.
+{
+  const h = harness(); const $ = h.el; const pending = new Map();
+  h.state.activeTab = 'recommend'; h.state.list.items = [recommendation];
+  h.state.selectedClub = { id: 'old-club', country_code: 'AR' }; h.state.selectedPlayer = { id: 'old-player' };
+  $('club-province').value = 'Córdoba'; $('player-category').value = 'Primera'; $('player-lookup').hidden = false;
+  $('player-first-name').value = 'Anterior'; $('player-last-name').value = 'Jugador';
+  h.setHandler((request, signal) => new Promise(resolve => pending.set(request.action + ':' + request.payload.country_code, { resolve, signal })));
+  const oldClubs = h.loadClubs(); const oldPlayers = h.loadPlayers();
+  const toBR = h.recommendAlso({ ...recommendation, id: 'foreign-reference', club: { id: 'br-club', country_code: 'BR', country_name: 'Brasil', name: 'Club Brasil', competition_id: 'BR-national' } });
+  assert.equal(pending.get('clubs:AR').signal.aborted, true); assert.equal(pending.get('players:AR').signal.aborted, true);
+  assert.equal(h.state.selectedClub, null); assert.equal(h.state.selectedPlayer, null); assert.equal($('country-club-fields').disabled, true); assert.equal($('create-submit').disabled, true);
+  const toCL = h.changeCountry('CL'); assert.equal(pending.get('bootstrap:BR').signal.aborted, true);
+  pending.get('bootstrap:CL').resolve(reply(countryBootstrap('CL', { actor: { role: 'admin', numero_socio: '999' } })));
+  assert.equal(await toCL, true); assert.equal(h.state.actor.role, 'socio'); assert.equal(h.state.actor.numero_socio, '123');
+  pending.get('bootstrap:BR').resolve(reply(countryBootstrap('BR'))); await toBR;
+  pending.get('clubs:AR').resolve(reply({ items: [{ id: 'stale-club', name: 'Club anterior' }], next_cursor: 'stale' }));
+  pending.get('players:AR').resolve(reply({ items: [{ id: 'stale-player', first_name: 'Anterior', last_name: 'Jugador' }], next_cursor: 'stale' }));
+  await oldClubs; await oldPlayers;
+  assert.equal(h.state.countryCode, 'CL'); assert.equal($('club-country').value, 'CL'); assert.equal($('club-region-label').textContent, 'Región');
+  assert.equal(h.state.referenceRecommendation, null); assert.equal(h.state.clubs.size, 0); assert.equal(h.state.players.size, 0); assert.equal(h.state.clubsCursor, null); assert.equal(h.state.playersCursor, null);
+  assert.equal($('player-first-name').value, ''); assert.equal($('player-last-name').value, ''); assert.equal(h.state.list.items[0], recommendation);
+  h.setHandler(async () => reply(countryBootstrap('AR'))); assert.equal(await h.changeCountry('UY'), false);
+  assert.equal(h.state.countryReady, false); assert.equal($('country-retry').hidden, false); assert.equal($('country-club-fields').disabled, true); assert.equal(h.createPayload(), null);
+  h.setHandler(async request => reply(countryBootstrap(request.payload.country_code))); await $('country-retry').fire('click');
+  assert.equal(h.state.countryCode, 'UY'); assert.equal(h.state.countryReady, true); assert.equal($('country-retry').hidden, true);
+  h.state.list.loaded = true; h.state.dashboard.loaded = true; h.applyPanelContext('admin');
+  const before = h.calls.length; assert.equal(await h.changeCountry('BR'), false); assert.equal(h.calls.length, before); assert.equal(h.createPayload(), null);
+  h.applyPanelContext('socio'); let resolveSession, sessionSignal;
+  h.setHandler((_request, signal) => { sessionSignal = signal; return new Promise(resolve => { resolveSession = resolve; }); });
+  const sessionRead = h.changeCountry('BR'); h.setToken('another-session'); resolveSession(reply(countryBootstrap('BR'))); await sessionRead;
+  assert.equal(sessionSignal.aborted, true); assert.equal(h.state.actor, null); assert.equal(h.state.bootstrap, null); assert.equal(h.state.countryCode, 'AR'); assert.equal(h.state.countryReady, false);
+  assert.equal($('club-country').value, 'AR'); assert.equal($('manual-province').options.length, 0); assert.equal($('country-feedback').textContent, '');
+  h.dispose();
+  console.log('PASS country lifecycle: aborts clubs/players/bootstrap, stale cross-country recommend-also cannot repopulate fields, mismatched response blocked/retryable, global rows and actor preserved, role gate and changed-session cleanup.');
+}
+
+// A verified catalogue sporting mononym is not a request to invent a surname.
+// Editing the identity returns to the ordinary manual name requirements.
+{
+  const h = harness(); const $ = h.el;
+  const club = { id: 'br-mononym-club', name: 'Club del catálogo', country_code: 'BR', country_name: 'Brasil', competition_id: 'BR-national', competition_name: 'Liga Brasil', competitions: [{ id: 'BR-national', name: 'Liga Brasil' }] };
+  const mononym = { id: 'verified-mononym', first_name: 'Hulk', last_name: null, name_kind: 'sporting_mononym', position: 'Defensor Central' };
+  h.setHandler(async request => request.action === 'bootstrap' ? reply(countryBootstrap(request.payload.country_code)) : request.action === 'clubs' ? reply({ items: [club], next_cursor: null }) : reply({ items: [mononym], next_cursor: null, total_count: 1, squad: { category: 'Primera', player_count: 1, expected_count: 1, status: 'verified' } }));
+  await h.changeCountry('BR'); h.state.activeTab = 'recommend'; await h.setRoute('competition'); $('club-competition').value = 'BR-national'; await $('club-competition').fire('change'); await tick();
+  $('club-choice').value = club.id; h.selectClub(); await tick();
+  assert.match($('player-choice').textContent, /Hulk/); assert(!/null|undefined/.test($('player-choice').textContent));
+  $('player-choice').value = mononym.id; h.selectPlayer(); $('recommend-reason').value = 'Una observación deportiva suficiente para este jugador.';
+  assert.equal($('player-first-name').value, 'Hulk'); assert.equal($('player-last-name').value, ''); assert.equal($('player-last-name').required, false); assert.equal($('player-last-name').minLength, 0); assert.equal($('last-name-required').hidden, true); assert.equal($('catalogue-name-help').hidden, false);
+  let payload = h.createPayload(); assert.equal(payload.player_id, mononym.id); assert.equal(payload.player.first_name, 'Hulk'); assert.equal(payload.player.last_name, ''); assert.equal(payload.country_code, 'BR');
+  $('player-first-name').value = 'Otro jugador'; await $('player-first-name').fire('input');
+  assert.equal(h.state.selectedPlayer, null); assert.equal($('player-last-name').required, true); assert.equal($('player-last-name').minLength, 2); assert.equal($('catalogue-name-help').hidden, true); assert.equal(h.createPayload(), null);
+  $('player-last-name').value = 'Manual'; payload = h.createPayload(); assert.equal(payload.player_id, null); assert.equal(payload.player.last_name, 'Manual');
+  $('player-last-name').setCustomValidity('El apellido debe tener al menos 2 caracteres.');
+  $('player-last-name').setAttribute('aria-invalid', 'true');
+  $('player-choice').value = mononym.id; h.selectPlayer();
+  assert.equal($('player-last-name').validationMessage, ''); assert.equal($('player-last-name').getAttribute('aria-invalid'), null);
+  await h.changeCountry('AR');
+  assert.equal(h.state.selectedPlayer, null); assert.equal($('player-last-name').required, true); assert.equal($('catalogue-name-help').hidden, true);
+  h.dispose();
+  console.log('PASS sporting mononym: exact catalogue name, nullable surname rendered empty, selected UUID retained, surname optional only while verified identity is linked, manual validation restored on edits/country changes.');
+}
+
+// A country selector never turns the shared feed into a country-restricted feed.
+// New snapshots identify their club's country; old snapshots retain the AR fallback.
+{
+  const h = harness(); const $ = h.el; const legacyBefore = JSON.stringify(recommendation);
+  const foreign = countries.filter(country => country.code !== 'AR').map(country => ({ ...recommendation, id: 'rec-' + country.code, club: { id: 'club-' + country.code, name: 'Club ' + country.name, country_code: country.code, country_name: country.name, province: null, city: null, competition_id: country.code + '-national', competition_name: 'Liga ' + country.name } }));
+  foreign[0] = { ...foreign[0], player: { first_name: 'Hulk', last_name: '', name_kind: 'sporting_mononym', position: 'Defensor Central' } };
+  h.setHandler(async request => {
+    if (request.action === 'bootstrap') return reply(countryBootstrap(request.payload.country_code));
+    if (request.action === 'feed') return reply({ items: [recommendation, ...foreign], next_cursor: null });
+    if (request.action === 'dashboard') return reply({ dashboard });
+    if (request.action === 'detail') return reply({ recommendation: foreign[0], events: [], proof: { status: 'registrada' } });
+    return reply({ items: [], next_cursor: null });
+  });
+  await h.changeCountry('BR'); await h.loadList(); await h.loadDashboard();
+  for (const request of h.calls.filter(request => ['feed', 'dashboard'].includes(request.action))) assert.equal('country_code' in request.payload, false);
+  assert.equal($('mine-list').children.length, 6); assert.equal($('metric-recomendados').textContent, '137');
+  for (const country of countries) assert.match($('mine-list').textContent, new RegExp(country.name));
+  assert.match(h.card(recommendation).textContent, /Argentina/); assert.equal(JSON.stringify(recommendation), legacyBefore);
+  await h.openDetail(foreign[0].id); assert.match($('detail-body').textContent, /País del club Brasil/); assert(!/null|undefined/.test($('detail-body').textContent));
+  h.renderRanking([{ identity_type: 'catalogue', player_id: 'verified-mononym', recommendation_count: 3, player: foreign[0].player, club: foreign[0].club }]); assert.match($('ranking-list').textContent, /Club Brasil · Brasil/);
+  await h.changeCountry('AR'); await h.recommendAlso(foreign[0]);
+  assert.equal(h.state.countryCode, 'BR'); assert.equal($('club-country').value, 'BR'); assert.equal(h.state.referenceRecommendation.id, foreign[0].id);
+  assert.equal(h.state.selectedClub.country_code, 'BR'); assert.equal($('club-competition').value, 'BR-national'); assert.equal($('club-province').required, false);
+  assert.equal($('player-first-name').value, 'Hulk'); assert.equal($('player-last-name').value, ''); assert.equal($('player-last-name').required, false);
+  $('recommend-reason').value = 'Mi propia observación deportiva del mismo jugador registrado.';
+  const payload = h.createPayload(); assert.equal(payload.reference_recommendation_id, foreign[0].id); assert.equal(payload.country_code, 'BR'); assert.equal(payload.competition_id, 'BR-national'); assert.equal(payload.player_id, null); assert.equal(payload.player.last_name, '');
+  await h.setRoute('province'); h.newRecommendation(false);
+  assert.equal($('club-country').value, 'BR'); assert.equal($('player-last-name').required, true); assert.equal($('club-province').required, false); assert.equal($('club-competition').required, true);
+  await h.recommendAlso(recommendation); assert.equal(h.state.countryCode, 'AR'); assert.equal($('club-country').value, 'AR'); assert.equal($('manual-province').value, 'Córdoba');
+  h.dispose();
+  console.log('PASS shared countries: global feed/dashboard across all countries, country in cards/detail/ranking, immutable legacy AR fallback, cross-country recommend-also with mononym and location-free club, and same-country reset.');
 }
 
 // A disposed native view aborts all work, including mutations outside read channels.

@@ -9,7 +9,7 @@
   <title>Scouting colaborativo · Talleres Club Abierto</title>
   <link rel="icon" href="/icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/scouting/scouting.css">
-  <script src="/scouting/scouting.js?v=20261030-position-filter" defer></script>
+  <script src="/scouting/scouting.js?v=20261119-south-america" defer></script>
 </head>
 <body data-scouting-standalone>
   <a class="skip-link" href="#main">Ir al contenido</a>
@@ -43,7 +43,7 @@
         <div>
           <p class="eyebrow">PARTICIPACIÓN DE LOS SOCIOS</p>
           <h1 id="page-title">Scouting <span>colaborativo</span></h1>
-          <p class="page-lead">Recomendaciones del fútbol argentino, con autor, seguimiento y devoluciones a la vista de todos los socios.</p>
+          <p class="page-lead">Recomendaciones de Argentina, Brasil, Chile, Colombia, Ecuador y Uruguay, con autor, seguimiento y devoluciones a la vista de todos los socios.</p>
           <span class="actor-chip" id="actor-label" hidden></span>
         </div>
         <span class="privacy-pill"><span class="privacy-dot" aria-hidden="true"></span> Paredes de cristal</span>
@@ -78,10 +78,15 @@
               </div>
               <section class="panel form-section" aria-labelledby="club-section-title">
                 <div class="section-heading"><span class="step-number" aria-hidden="true">01</span><div><h2 id="club-section-title">El equipo</h2><p>Ubicá el club donde juega.</p></div></div>
+                <div class="field country-field"><label for="club-country">País del club <span class="required" aria-hidden="true">*</span></label><select id="club-country" required aria-describedby="country-help"><option value="AR">Argentina</option></select><p class="field-help" id="country-help">Elegí el país donde compite el club. Las recomendaciones de todos los países se comparten en el mismo tablero.</p></div>
+                <p class="field-help" id="country-feedback" role="status" hidden></p>
+                <button class="button button-small button-secondary" id="country-retry" type="button" hidden>Reintentar carga del país</button>
+                <fieldset class="country-club-fields" id="country-club-fields">
+                <legend class="sr-only">Club del país seleccionado</legend>
                 <fieldset class="route-picker">
                   <legend>¿Cómo querés buscarlo?</legend>
                   <div class="segmented-control">
-                    <label><input type="radio" name="search-route" value="province" checked><span>Por provincia o región</span></label>
+                    <label><input type="radio" name="search-route" value="province" checked><span id="route-region-label">Por provincia</span></label>
                     <label><input type="radio" name="search-route" value="competition"><span>Por competencia</span></label>
                   </div>
                 </fieldset>
@@ -91,23 +96,24 @@
 
                 <div id="catalogue-fields">
                   <div id="club-filter-flow" class="field-stack">
-                    <div class="field" id="province-field"><label for="club-province">Provincia / estado o región <span class="required" id="province-required" aria-hidden="true">*</span></label><select id="club-province"><option value="">Seleccioná una provincia o región</option></select></div>
+                    <div class="field" id="province-field"><label for="club-province"><span id="club-region-label">Provincia</span> <span class="required" id="province-required" aria-hidden="true">*</span></label><select id="club-province" aria-describedby="region-help"><option value="">Seleccioná una provincia</option></select><p class="field-help" id="region-help">Si no conocés la ubicación o no aparece, podés buscar por competencia.</p></div>
+                    <div class="field" id="competition-field"><label for="club-competition">Liga / competencia <span class="required" id="competition-required" aria-hidden="true" hidden>*</span></label><select id="club-competition" aria-describedby="competition-help"><option value="">Todas las competencias</option></select><p class="field-help" id="competition-help">Podés filtrar la competencia antes de elegir el equipo.</p></div>
                     <div class="field club-picker" id="club-picker-field">
                       <label for="club-query">Buscar club</label><input id="club-query" type="search" maxlength="100" placeholder="Nombre del club o localidad" enterkeyhint="search" aria-describedby="clubs-help">
                       <label for="club-choice">Equipo <span class="required" aria-hidden="true">*</span></label><select id="club-choice" size="4" aria-describedby="clubs-help"><option value="" disabled>Elegí una provincia o región para buscar</option></select>
                       <div class="result-footer"><p class="field-help" id="clubs-help" role="status">Podés usar Otro club si no lo encontrás.</p><button id="clubs-more" class="button button-small button-secondary" type="button" hidden>Cargar más clubes</button></div>
                     </div>
-                    <div class="field" id="competition-field"><label for="club-competition">Liga / competencia <span class="required" id="competition-required" aria-hidden="true" hidden>*</span></label><select id="club-competition" aria-describedby="competition-help"><option value="">Todas las competencias</option></select><p class="field-help" id="competition-help">La competencia se completa cuando está asociada al equipo.</p></div>
                   </div>
                   <div class="selected-club" id="selected-club" hidden><span class="selected-label">EQUIPO SELECCIONADO</span><strong id="selected-club-name"></strong><span class="selected-club-description" id="selected-club-description"></span><a class="catalogue-reference" id="selected-club-transfermarkt" target="_blank" rel="noopener noreferrer" hidden>Ver club en Transfermarkt <span aria-hidden="true">↗</span></a></div>
                 </div>
 
                 <div id="manual-club-fields" class="field-grid" hidden>
-                  <div class="field"><label for="manual-province">Provincia / estado o región <span class="required" aria-hidden="true">*</span></label><select id="manual-province" disabled><option value="">Seleccioná una provincia o región</option></select></div>
+                  <div class="field"><label for="manual-province"><span id="manual-region-label">Provincia</span> <span class="required" aria-hidden="true">*</span></label><select id="manual-province" disabled><option value="">Seleccioná una provincia</option></select></div>
                   <div class="field"><label for="manual-city">Ciudad o localidad <span class="required" aria-hidden="true">*</span></label><input id="manual-city" minlength="2" maxlength="100" disabled></div>
                   <div class="field"><label for="manual-club-name">Nombre del club <span class="required" aria-hidden="true">*</span></label><input id="manual-club-name" minlength="2" maxlength="160" disabled></div>
                   <div class="field"><label for="manual-league">Liga / competencia <span class="required" aria-hidden="true">*</span></label><input id="manual-league" list="manual-league-options" minlength="2" maxlength="160" placeholder="Elegí o escribí la liga o el torneo" disabled><datalist id="manual-league-options"></datalist></div>
                 </div>
+                </fieldset>
               </section>
 
               <section class="panel form-section" aria-labelledby="player-section-title">
@@ -124,7 +130,7 @@
                 <p class="field-help player-review" id="selected-player-review" hidden role="status"></p>
                 <div class="field-grid">
                   <div class="field"><label for="player-first-name">Nombre <span class="required" aria-hidden="true">*</span></label><input id="player-first-name" required minlength="2" maxlength="100" autocapitalize="words"></div>
-                  <div class="field"><label for="player-last-name">Apellido <span class="required" aria-hidden="true">*</span></label><input id="player-last-name" required minlength="2" maxlength="100" autocapitalize="words"></div>
+                  <div class="field"><label for="player-last-name">Apellido <span class="required" id="last-name-required" aria-hidden="true">*</span></label><input id="player-last-name" required minlength="2" maxlength="100" autocapitalize="words" aria-describedby="catalogue-name-help"><p class="field-help" id="catalogue-name-help" hidden>El catálogo registra un único nombre deportivo para este jugador.</p></div>
                   <div class="field"><label for="player-age">Edad al recomendar <span class="optional">opcional</span></label><input id="player-age" type="number" min="1" max="100" step="1" inputmode="numeric" placeholder="Si la conocés" aria-describedby="player-age-help"><p class="field-help" id="player-age-help">Ingresá los años cumplidos sólo si conocés la edad. Podés dejar este campo vacío.</p></div>
                   <div class="field"><label for="player-position">Posición principal <span class="required" aria-hidden="true">*</span></label><select id="player-position" required><option value="">Seleccioná una posición</option></select></div>
                   <div class="field" id="sector-field" hidden><label for="player-sector">Sector <span class="optional">opcional</span></label><select id="player-sector" disabled><option value="no_especificado">Sin especificar</option><option value="derecha">Derecha</option><option value="izquierda">Izquierda</option><option value="ambos">Ambos</option></select></div>

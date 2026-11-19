@@ -17,6 +17,14 @@
   const API_URL = 'https://sziuyjicqyxnmbgtbopg.supabase.co/functions/v1/scouting-api';
   const SESSION_KEY = 'TD_club_session_v1';
   const OTHER_CATEGORY = '__other__';
+  const COUNTRY_LABELS = Object.freeze({
+    AR: { name: 'Argentina', region_label: 'Provincia' },
+    BR: { name: 'Brasil', region_label: 'Estado' },
+    CL: { name: 'Chile', region_label: 'Región' },
+    CO: { name: 'Colombia', region_label: 'Departamento' },
+    EC: { name: 'Ecuador', region_label: 'Provincia' },
+    UY: { name: 'Uruguay', region_label: 'Departamento' }
+  });
   const STATUS = Object.freeze({
     recibida: 'Recibida',
     en_revision: 'En revisión',
@@ -50,6 +58,7 @@
   const timers = new Map();
   const state = {
     actor: null, bootstrap: null, expired: false, activeToken: '', sessionGeneration: 0, activeTab: 'mine', panelContext: initialPanelContext(),
+    countryCode: 'AR', countryReady: false,
     clubs: new Map(), players: new Map(), clubsCursor: null, playersCursor: null, clubsQuery: null, playersQuery: null,
     selectedClub: null, selectedPlayer: null, squad: null, clubAutoCompetition: false, playerAutoTransfermarktUrl: null, playerAutoAge: null, createRequestId: null, createPending: null,
     createBusy: false, successId: null, currentDetailId: null,
@@ -100,7 +109,7 @@
     state.panelContext = value;
     $('tab-recommend').hidden = !canRecommend();
     $('dashboard-recommend').hidden = !canRecommend();
-    $('create-submit').disabled = !canRecommend() || state.createBusy;
+    $('create-submit').disabled = !canRecommend() || state.createBusy || !state.countryReady;
     if (changed && $('detail-dialog').open) $('detail-dialog').close();
     if (state.actor && state.activeTab === 'recommend' && !canRecommend()) activateTab('mine');
     else if (changed && state.actor && state.list.loaded) renderList();
@@ -194,6 +203,7 @@
     timers.clear();
     if ($('detail-dialog').open) $('detail-dialog').close();
     state.actor = null; state.bootstrap = null; state.activeToken = ''; state.activeTab = 'mine';
+    state.countryCode = 'AR'; state.countryReady = false;
     state.clubs.clear(); state.players.clear(); state.mutations.clear();
     state.selectedClub = null; state.selectedPlayer = null; state.playerAutoTransfermarktUrl = null; state.playerAutoAge = null; state.createPending = null;
     state.squad = null;
@@ -203,7 +213,11 @@
     state.dashboard = { data: null, loaded: false };
     state.rankedPlayerFilter = null; state.referenceRecommendation = null;
     $('recommend-form').reset();
-    updateClubReference(); updatePlayerReview(); updateReferenceNotice();
+    $('club-country').replaceChildren(option('AR', 'Argentina'));
+    $('country-club-fields').disabled = true;
+    $('country-feedback').textContent = ''; $('country-feedback').hidden = true; $('country-retry').hidden = true;
+    for (const id of ['club-province', 'manual-province', 'club-competition', 'manual-league-options']) $(id).replaceChildren();
+    updateClubReference(); updatePlayerLookup(); updateReferenceNotice();
     for (const id of ['mine-list', 'detail-body']) $(id).replaceChildren();
     for (const id of ['success-description', 'selected-club-name', 'selected-club-description', 'actor-label', 'mine-count']) $(id).textContent = '';
     $('mine-query').value = ''; $('mine-only').checked = false;
@@ -215,7 +229,7 @@
     $('player-filter').hidden = true; $('player-filter-name').textContent = '';
     $('dashboard-metrics').setAttribute('aria-busy', 'false');
     setFeedback('dashboard-feedback', ''); setFeedback('mine-feedback', '');
-    $('club-choice').replaceChildren(option('', 'Elegí una provincia o región para buscar', true));
+    $('club-choice').replaceChildren(option('', 'Elegí un país para buscar', true));
     $('player-choice').replaceChildren(option('', 'Seleccioná una categoría', true));
     setFeedback('create-feedback', '');
     $('create-success').hidden = true; $('recommend-layout').hidden = false;
@@ -320,6 +334,50 @@
   function manualClub() { return $('manual-club-toggle').checked; }
   function category() { return $('player-category').value === OTHER_CATEGORY ? $('custom-category').value.trim() : $('player-category').value; }
 
+  function countryOptions() {
+    return Array.isArray(state.bootstrap?.countries) && state.bootstrap.countries.length
+      ? state.bootstrap.countries : [{ code: 'AR', ...COUNTRY_LABELS.AR }];
+  }
+
+  function countryInfo(code = state.countryCode) {
+    return { ...(COUNTRY_LABELS[code] || { name: 'País no informado', region_label: 'Ubicación' }), ...countryOptions().find((entry) => entry.code === code) };
+  }
+
+  function clubCountryCode(club) { return typeof club?.country_code === 'string' && club.country_code.trim() ? club.country_code.trim().toUpperCase() : 'AR'; }
+  function clubCountryName(club) { return club?.country_name || countryInfo(clubCountryCode(club)).name; }
+  function clubRegionName(club) {
+    if (club?.region_name) return club.region_name;
+    const province = club?.province || '';
+    const prefix = `${clubCountryName(club)} — `;
+    return province.startsWith(prefix) ? province.slice(prefix.length) : province;
+  }
+
+  function regionTerms() {
+    const label = countryInfo().region_label;
+    const terms = {
+      provincia: ['una provincia', 'Todas las provincias'],
+      región: ['una región', 'Todas las regiones'],
+      estado: ['un estado', 'Todos los estados'],
+      departamento: ['un departamento', 'Todos los departamentos']
+    }[label.toLocaleLowerCase('es-AR')] || ['una ubicación', 'Todas las ubicaciones'];
+    return { label, prompt: `Seleccioná ${terms[0]}`, all: terms[1], prerequisite: `Elegí ${terms[0]} para buscar` };
+  }
+
+  function countryRegions(data = state.bootstrap) {
+    return Array.isArray(data?.regions)
+      ? data.regions.filter((entry) => entry.country_code === state.countryCode).map((entry) => ({ value: entry.value, label: entry.label }))
+      : (Array.isArray(data?.provinces) ? data.provinces : []).map((entry) => ({ value: entry, label: entry }));
+  }
+
+  function defaultCountryRoute() {
+    if (state.countryCode === 'AR') return;
+    for (const radio of root.querySelectorAll('[name="search-route"]')) radio.checked = radio.value === 'competition';
+  }
+
+  function catalogueMononym() {
+    return state.selectedPlayer?.name_kind === 'sporting_mononym' || state.referenceRecommendation?.nameKind === 'sporting_mononym';
+  }
+
   function option(value, text, disabled = false) {
     const result = new Option(String(text), String(value)); result.disabled = disabled; return result;
   }
@@ -401,7 +459,7 @@
     setBoot('Preparando scouting', 'Estamos verificando tu sesión.', { loading: true });
     const request = requestChannel('bootstrap');
     try {
-      const data = await api('bootstrap', {}, request.signal);
+      const data = await api('bootstrap', { country_code: 'AR' }, request.signal);
       if (!request.current()) return;
       if (!data.actor || !['socio', 'admin'].includes(data.actor.role)) throw new ApiError('Tu sesión no tiene acceso a esta sección.', 'ACCESS_DENIED', 403);
       state.actor = data.actor;
@@ -421,10 +479,6 @@
   }
 
   function initialiseForm(data) {
-    const provinces = (Array.isArray(data.provinces) ? data.provinces : []).map((entry) => ({ value: entry, label: entry }));
-    replaceOptions($('club-province'), provinces, 'Seleccioná una provincia o región');
-    replaceOptions($('manual-province'), provinces, 'Seleccioná una provincia o región');
-    restoreCompetitions();
     const categories = (Array.isArray(data.categories) ? data.categories : []).filter((item) => !/^otra(?: categoría)?$/i.test(item)).map((item) => ({ value: item, label: item }));
     categories.push({ value: OTHER_CATEGORY, label: 'Otra categoría' });
     replaceOptions($('player-category'), categories, 'Seleccioná una categoría');
@@ -432,14 +486,75 @@
     replaceOptions($('player-position'), positions, 'Seleccioná una posición');
     replaceOptions($('player-position-filter'), [...positions, { value: '__unknown__', label: 'Sin posición informada' }], 'Todas las posiciones');
     replaceOptions($('mine-status'), Object.entries(STATUS).map(([value, label]) => ({ value, label })), 'Todos los estados');
+    initialiseCatalogue(data);
+  }
+
+  function initialiseCatalogue(data) {
+    state.bootstrap = data;
+    state.countryCode = data.country_code || 'AR';
+    state.countryReady = true;
+    $('club-country').replaceChildren(...countryOptions().map((entry) => option(entry.code, entry.name)));
+    $('club-country').value = state.countryCode;
+    defaultCountryRoute();
+    const terms = regionTerms();
+    const regions = countryRegions(data);
+    replaceOptions($('club-province'), regions, terms.prompt);
+    replaceOptions($('manual-province'), regions, terms.prompt);
+    $('club-region-label').textContent = terms.label; $('manual-region-label').textContent = terms.label;
+    $('route-region-label').textContent = `Por ${terms.label.toLocaleLowerCase('es-AR')}`;
+    restoreCompetitions();
     const clubCount = Math.max(0, Number(data.catalogue?.club_count) || 0);
     const playerCount = Math.max(0, Number(data.catalogue?.player_count) || 0);
     const empty = clubCount === 0;
     $('catalogue-notice').hidden = false;
-    $('catalogue-notice').textContent = `Catálogo de clubes verificados de Argentina: ${clubCount.toLocaleString('es-AR')} ${clubCount === 1 ? 'club' : 'clubes'} y ${playerCount.toLocaleString('es-AR')} ${playerCount === 1 ? 'jugador registrado' : 'jugadores registrados'}. La selección de competencias ya incluye divisiones nacionales 2026 de Argentina, Brasil, Chile, Ecuador, Uruguay y Colombia. La cobertura de clubes y planteles todavía es parcial; si no encontrás un equipo, usá Otro club e indicá su región y liga.`;
+    $('catalogue-notice').textContent = `Catálogo de ${countryInfo().name}: ${clubCount.toLocaleString('es-AR')} ${clubCount === 1 ? 'club' : 'clubes'} y ${playerCount.toLocaleString('es-AR')} ${playerCount === 1 ? 'jugador registrado' : 'jugadores registrados'}. La cobertura es parcial. Podés buscar por competencia aunque el club no tenga ubicación informada, o usar Otro club si no lo encontrás.`;
+    $('country-club-fields').disabled = false;
+    $('country-feedback').textContent = ''; $('country-feedback').hidden = true; $('country-retry').hidden = true;
+    $('create-submit').disabled = !canRecommend() || state.createBusy;
     $('manual-club-toggle').checked = empty;
     setManualClub(false);
     updateRoute(false);
+  }
+
+  async function changeCountry(code = $('club-country').value) {
+    if (!canRecommend() || state.createBusy || state.createPending) {
+      $('club-country').value = state.countryCode;
+      return false;
+    }
+    if (!countryOptions().some((entry) => entry.code === code)) {
+      $('club-country').value = state.countryCode;
+      return false;
+    }
+    if (state.countryReady && code === state.countryCode) return true;
+    const request = requestChannel('country');
+    state.countryCode = code; state.countryReady = false;
+    $('club-country').value = code;
+    for (const channel of ['clubs', 'players']) { cancelChannel(channel); clearDebounce(channel); }
+    clearRecommendationReference(false); clearClub();
+    state.clubs.clear(); state.clubsCursor = null; state.clubsQuery = null; state.playersQuery = null;
+    state.createRequestId = null;
+    for (const id of ['club-query', 'manual-city', 'manual-club-name', 'manual-league']) $(id).value = '';
+    for (const id of ['club-province', 'manual-province', 'club-competition']) replaceOptions($(id), [], 'Cargando…');
+    $('manual-league-options').replaceChildren();
+    $('club-choice').replaceChildren(option('', 'Cargando el catálogo del país…', true));
+    $('clubs-more').hidden = true;
+    $('club-choice').setAttribute('aria-busy', 'false'); $('player-choice').setAttribute('aria-busy', 'false');
+    $('country-club-fields').disabled = true; $('create-submit').disabled = true;
+    $('country-feedback').hidden = false; $('country-retry').hidden = true;
+    $('country-feedback').textContent = `Cargando clubes y competencias de ${countryInfo(code).name}…`;
+    $('catalogue-notice').hidden = true;
+    try {
+      const data = await api('bootstrap', { country_code: code }, request.signal);
+      if (!request.current() || state.countryCode !== code) return false;
+      if ((data.country_code || 'AR') !== code) throw new ApiError('No recibimos el catálogo del país seleccionado. Reintentá la carga.', 'INVALID_COUNTRY_RESPONSE', 502);
+      initialiseCatalogue(data);
+      return true;
+    } catch (error) {
+      if (!request.current() || cancelled(error)) return false;
+      $('country-feedback').textContent = `${message(error)} Reintentá la carga o elegí otro país.`;
+      $('country-retry').hidden = false;
+      return false;
+    }
   }
 
   function activateTab(name, focus = false) {
@@ -472,7 +587,7 @@
     const previous = referenced ? { age: $('player-age').value, position: $('player-position').value, sector: $('player-sector').value } : null;
     cancelChannel('players'); clearDebounce('players');
     if (!referenced) clearAutoPlayerProfile();
-    state.selectedPlayer = null; state.players.clear(); state.playersCursor = null;
+    state.selectedPlayer = null; state.players.clear(); state.playersCursor = null; state.playersQuery = null;
     state.squad = null;
     $('player-choice').replaceChildren(option('', 'Seleccioná una categoría', true));
     $('squad-status').hidden = true; $('squad-source').hidden = true;
@@ -545,32 +660,33 @@
       $('club-province').value = ''; $('club-competition').value = ''; $('club-query').value = '';
       clearClub();
     }
-    const order = byProvince ? ['province-field', 'club-picker-field', 'competition-field'] : ['competition-field', 'province-field', 'club-picker-field'];
+    const order = byProvince ? ['province-field', 'competition-field', 'club-picker-field'] : ['competition-field', 'province-field', 'club-picker-field'];
     for (const id of order) flow.append($(id));
     $('province-required').hidden = !byProvince;
     $('competition-required').hidden = byProvince;
     $('club-province').required = byProvince && !manualClub();
     $('club-competition').required = !byProvince && !manualClub();
-    $('club-province').options[0].textContent = byProvince ? 'Seleccioná una provincia o región' : 'Todas las provincias o regiones';
+    const terms = regionTerms();
+    $('club-province').options[0].textContent = byProvince ? terms.prompt : terms.all;
     $('club-competition').options[0].textContent = byProvince ? 'Todas las competencias' : 'Seleccioná una competencia';
-    $('competition-help').textContent = byProvince ? 'La competencia del primer equipo se completa cuando está disponible. La categoría del jugador se elige por separado.' : 'Elegí la competencia para consultar sus equipos. La categoría del jugador se elige por separado.';
+    $('competition-help').textContent = byProvince ? 'Podés filtrar por competencia antes de elegir el equipo. Si participa en varias, elegí la que corresponde a tu recomendación.' : 'Elegí la competencia para consultar sus equipos. La ubicación es opcional; también aparecen los clubes que no la tienen informada.';
     if (!manualClub()) loadClubs();
   }
 
   function clubsPayload(cursor = null) {
-    return { province: $('club-province').value || null, competition_id: $('club-competition').value || null, query: $('club-query').value.trim(), cursor };
+    return { country_code: state.countryCode, province: $('club-province').value || null, competition_id: $('club-competition').value || null, query: $('club-query').value.trim(), cursor };
   }
 
   async function loadClubs(more = false) {
     if (state.activeTab !== 'recommend' || !canRecommend()) return;
-    if (!state.bootstrap || manualClub()) return;
+    if (!state.bootstrap || !state.countryReady || manualClub()) return;
     clearDebounce('clubs');
     const request = requestChannel('clubs');
     const selectedId = state.selectedClub?.id;
     if (!more) { state.clubs.clear(); state.clubsCursor = null; state.clubsQuery = clubsPayload(); }
     const prerequisites = route() === 'province' ? $('club-province').value : $('club-competition').value;
     if (!prerequisites) {
-      $('club-choice').replaceChildren(option('', route() === 'province' ? 'Elegí una provincia o región para buscar' : 'Elegí una competencia para buscar', true));
+      $('club-choice').replaceChildren(option('', route() === 'province' ? regionTerms().prerequisite : 'Elegí una competencia para buscar', true));
       $('clubs-help').textContent = 'Podés usar Otro club si no lo encontrás.';
       $('clubs-more').hidden = true; return;
     }
@@ -585,7 +701,7 @@
       state.clubsCursor = data.next_cursor || null;
       $('club-choice').replaceChildren(option('', state.clubs.size ? 'Seleccioná un equipo' : 'No encontramos clubes para estos filtros', true));
       for (const item of state.clubs.values()) {
-        const label = [item.name, item.city, route() === 'province' ? item.competition_name : item.province].filter(Boolean).join(' · ');
+        const label = [item.name, item.city, route() === 'province' ? item.competition_name : clubRegionName(item)].filter(Boolean).join(' · ');
         $('club-choice').append(option(item.id, label));
       }
       if (selectedId && state.clubs.has(String(selectedId))) $('club-choice').value = String(selectedId);
@@ -605,21 +721,32 @@
   }
 
   function selectClub() {
-    const club = state.clubs.get($('club-choice').value);
+    const candidate = state.clubs.get($('club-choice').value);
+    const club = candidate && state.countryReady && clubCountryCode(candidate) === state.countryCode ? candidate : null;
+    const selectedCompetitionId = $('club-competition').value;
     clearPlayer(true);
     if (route() === 'province') restoreCompetitions();
     state.clubAutoCompetition = false;
     state.selectedClub = club ? { ...club } : null;
     $('selected-club').hidden = !club;
-    if (!club) return;
+    if (!club) { updatePlayerLookup(); return; }
     const memberships = Array.isArray(club.competitions) ? club.competitions : [];
+    const chosenMembership = memberships.find((entry) => String(entry.id) === selectedCompetitionId);
     if (route() === 'province' && memberships.length) {
       replaceOptions($('club-competition'), memberships.map((entry) => ({ value: entry.id, label: `${entry.name}${entry.season ? ` · ${entry.season}` : ''}` })), 'Seleccioná una competencia del club');
       $('club-competition').required = true; $('competition-required').hidden = false;
-      state.clubAutoCompetition = true;
-      $('club-competition').value = memberships.length === 1 ? String(memberships[0].id) : '';
-      if (memberships.length === 1) applyClubCompetition(memberships[0]);
-      else { state.selectedClub.competition_id = null; state.selectedClub.competition_name = null; }
+      state.clubAutoCompetition = !chosenMembership;
+      const membership = chosenMembership || (memberships.length === 1 ? memberships[0] : null);
+      $('club-competition').value = membership ? String(membership.id) : '';
+      if (membership) applyClubCompetition(membership);
+      else { state.selectedClub.competition_id = null; state.selectedClub.competition_name = null; state.selectedClub.division = null; state.selectedClub.reference_scope = null; }
+    } else if (chosenMembership) {
+      $('club-competition').value = String(chosenMembership.id);
+      applyClubCompetition(chosenMembership);
+    } else if (route() === 'competition' && selectedCompetitionId) {
+      $('club-competition').value = selectedCompetitionId;
+      const membership = state.bootstrap?.competitions?.find((entry) => String(entry.id) === selectedCompetitionId);
+      if (membership) applyClubCompetition(membership);
     } else if (club.competition_id && [...$('club-competition').options].some((entry) => entry.value === String(club.competition_id))) {
       $('club-competition').value = String(club.competition_id); state.clubAutoCompetition = route() === 'province';
     } else if (route() === 'province') {
@@ -645,7 +772,8 @@
     if (!club) return;
     $('selected-club-name').textContent = club.name;
     const scope = club.reference_scope === 'primer_equipo_masculino' ? 'Referencia: primer equipo masculino' : '';
-    $('selected-club-description').textContent = [club.city, club.province, club.competition_name || club.league, club.division, scope].filter(Boolean).join(' · ');
+    const competition = club.competitions?.length > 1 && !club.competition_id ? 'Seleccioná la competencia del club' : club.competition_name || club.league;
+    $('selected-club-description').textContent = [clubCountryName(club), club.city, clubRegionName(club), competition, club.division, scope].filter(Boolean).join(' · ');
   }
 
   function updateClubReference() {
@@ -677,6 +805,10 @@
     const available = !state.referenceRecommendation && !manualClub() && Boolean(state.selectedClub);
     $('player-lookup').hidden = !available;
     $('player-manual-help').textContent = state.referenceRecommendation ? 'La identidad está vinculada al aporte original. Para recomendar a otra persona, elegí Nuevo jugador. La posición y la edad que informes corresponden a tu nuevo aporte.' : state.selectedPlayer ? 'Datos del jugador seleccionado. Podés completar la posición que observaste.' : 'Completá los datos del jugador. No necesita figurar en el catálogo.';
+    const mononym = catalogueMononym();
+    $('player-last-name').required = !mononym; $('player-last-name').minLength = mononym ? 0 : 2;
+    $('last-name-required').hidden = mononym; $('catalogue-name-help').hidden = !mononym;
+    if (mononym) { $('player-last-name').setCustomValidity(''); $('player-last-name').removeAttribute('aria-invalid'); }
     updatePlayerReview();
   }
 
@@ -739,12 +871,12 @@
   }
 
   async function loadPlayers(more = false) {
-    if (state.activeTab !== 'recommend' || !canRecommend() || !state.selectedClub || manualClub() || $('player-lookup').hidden) return;
+    if (state.activeTab !== 'recommend' || !canRecommend() || !state.countryReady || !state.selectedClub || manualClub() || $('player-lookup').hidden) return;
     clearDebounce('players');
     const request = requestChannel('players');
     if (!more) {
       state.players.clear(); state.playersCursor = null;
-      state.playersQuery = { club_id: state.selectedClub.id, category: category(), position: $('player-position-filter').value || null };
+      state.playersQuery = { country_code: state.countryCode, club_id: state.selectedClub.id, competition_id: state.selectedClub.competition_id || $('club-competition').value || null, category: category(), position: $('player-position-filter').value || null };
     }
     if (!category() || category().length < 2) {
       $('player-choice').replaceChildren(option('', 'Seleccioná una categoría para buscar', true));
@@ -806,12 +938,24 @@
 
   function createPayload() {
     if (!canRecommend()) return null;
+    if (!state.countryReady || $('club-country').value !== state.countryCode) {
+      setFeedback('create-feedback', 'Esperá a que termine la carga del país seleccionado o reintentá la consulta.', 'error', true);
+      return null;
+    }
     if (!$('recommend-form').reportValidity()) return null;
     if (!manualClub() && !state.selectedClub) {
       setFeedback('create-feedback', 'Seleccioná un equipo del listado o activá Otro club para ingresarlo manualmente.', 'error', true);
       return null;
     }
-    const required = [['player-first-name', 2, 'El nombre'], ['player-last-name', 2, 'El apellido'], ['recommend-reason', 20, 'El motivo']];
+    if (!manualClub() && clubCountryCode(state.selectedClub) !== state.countryCode) {
+      setFeedback('create-feedback', 'Seleccioná un club del país elegido.', 'error', true); return null;
+    }
+    if (manualClub() && !countryRegions().some((entry) => entry.value === $('manual-province').value)) {
+      $('manual-province').setCustomValidity('Seleccioná una ubicación del país elegido.'); $('manual-province').reportValidity(); return null;
+    }
+    $('manual-province').setCustomValidity('');
+    const required = [['player-first-name', 2, 'El nombre'], ['recommend-reason', 20, 'El motivo']];
+    if (!catalogueMononym()) required.splice(1, 0, ['player-last-name', 2, 'El apellido']);
     if (manualClub()) required.unshift(['manual-city', 2, 'La ciudad'], ['manual-club-name', 2, 'El nombre del club'], ['manual-league', 2, 'La liga']);
     if ($('player-category').value === OTHER_CATEGORY) required.push(['custom-category', 2, 'La categoría']);
     for (const [id, minimum, label] of required) if (!validateField(id, minimum, label)) return null;
@@ -833,6 +977,7 @@
     return {
       request_id: state.createRequestId,
       panel_context: 'socio',
+      country_code: state.countryCode,
       reference_recommendation_id: state.referenceRecommendation?.id || null,
       club_id: manualClub() ? null : state.selectedClub.id,
       club_manual: manualClub() ? { province: $('manual-province').value, city: $('manual-city').value.trim(), name: $('manual-club-name').value.trim(), league: $('manual-league').value.trim() } : null,
@@ -861,8 +1006,8 @@
       state.createPending = null; state.createRequestId = null; state.successId = recommendation.id;
       state.list.loaded = false; state.dashboard.loaded = false;
       $('recommend-layout').hidden = true; $('create-success').hidden = false;
-      const name = [recommendation.player?.first_name || payload.player.first_name, recommendation.player?.last_name || payload.player.last_name].join(' ');
-      $('success-description').textContent = `${name}${recommendation.club?.name ? ` · ${recommendation.club.name}` : ''}. Referencia: ${recommendation.code || recommendation.id}.`;
+      const name = [recommendation.player?.first_name || payload.player.first_name, recommendation.player?.last_name || payload.player.last_name].filter(Boolean).join(' ');
+      $('success-description').textContent = `${name}${recommendation.club?.name ? ` · ${recommendation.club.name} · ${clubCountryName(recommendation.club)}` : ''}. Referencia: ${recommendation.code || recommendation.id}.`;
       setFeedback('create-feedback', '');
       $('create-success').focus(); $('create-success').scrollIntoView({ block: 'start', behavior: 'smooth' });
     } catch (error) {
@@ -877,7 +1022,7 @@
       if (generation === state.sessionGeneration) {
         state.createBusy = false;
         $('create-fields').disabled = Boolean(state.createPending);
-        $('create-submit').disabled = !canRecommend();
+        $('create-submit').disabled = !canRecommend() || !state.countryReady;
         $('create-submit').textContent = state.createPending ? 'Reintentar envío' : 'Enviar recomendación ↗';
       }
     }
@@ -887,37 +1032,53 @@
     if (!canRecommend()) return;
     state.referenceRecommendation = null;
     $('recommend-form').reset();
+    $('club-country').value = state.countryCode;
+    defaultCountryRoute();
     updateReferenceNotice();
     for (const input of $('recommend-form').querySelectorAll('input,select,textarea')) input.setCustomValidity('');
     state.createRequestId = null; state.createPending = null; state.successId = null;
     $('manual-club-toggle').checked = Number(state.bootstrap?.catalogue?.club_count || 0) === 0;
     $('create-success').hidden = true; $('recommend-layout').hidden = false;
     $('create-fields').disabled = false; $('reason-count').textContent = '0 / 4000';
+    $('country-club-fields').disabled = !state.countryReady;
     clearClub(); updateRoute(); setManualClub(false); updateCustomCategory();
     setFeedback('create-feedback', '');
     if (focus) {
       $('club-section-title').scrollIntoView({ block: 'start' });
-      const target = manualClub() ? $('manual-province') : $('club-province'); target.focus();
+      $('club-country').focus();
     }
   }
 
-  function recommendAlso(recommendation) {
+  async function recommendAlso(recommendation) {
     if (!canRecommend() || !recommendation?.id) return;
     if (state.createBusy || state.createPending) {
       if ($('detail-dialog').open) $('detail-dialog').close();
       activateTab('recommend');
       setFeedback('create-feedback', 'Primero confirmá el envío pendiente antes de iniciar otra recomendación.', 'info', true); return;
     }
-    newRecommendation(false);
-    state.referenceRecommendation = { id: recommendation.id, code: recommendation.code, firstName: (recommendation.player?.first_name || '').trim(), lastName: (recommendation.player?.last_name || '').trim() };
     const club = recommendation.club || {};
+    const countryCode = clubCountryCode(club);
+    if (!state.countryReady || countryCode !== state.countryCode) {
+      const generation = state.sessionGeneration;
+      const pending = changeCountry(countryCode);
+      if ($('detail-dialog').open) $('detail-dialog').close();
+      activateTab('recommend', true);
+      if (!await pending || !canRecommend() || generation !== state.sessionGeneration || state.countryCode !== countryCode) return;
+    }
+    newRecommendation(false);
+    state.referenceRecommendation = { id: recommendation.id, code: recommendation.code, firstName: (recommendation.player?.first_name || '').trim(), lastName: (recommendation.player?.last_name || '').trim(), nameKind: recommendation.player?.name_kind || 'display_name_parts' };
     const manual = !club.id || club.source === 'manual';
     $('manual-club-toggle').checked = manual; setManualClub(false);
     if (manual) {
       $('manual-province').value = club.province || ''; $('manual-city').value = club.city || '';
       $('manual-club-name').value = club.name || ''; $('manual-league').value = club.league || club.competition_name || '';
     } else {
+      if (!club.province && club.competition_id) {
+        for (const radio of root.querySelectorAll('[name="search-route"]')) radio.checked = radio.value === 'competition';
+        updateRoute(false);
+      }
       $('club-province').value = club.province || '';
+      $('club-competition').value = club.competition_id || '';
       const referenceClub = { ...club, competitions: club.competition_id ? [{ id: club.competition_id, name: club.competition_name || club.league || 'Competencia del aporte original', season: club.season, division: club.division, reference_scope: club.reference_scope }] : [] };
       state.clubs.set(String(club.id), referenceClub);
       $('club-choice').replaceChildren(option(club.id, club.name || 'Equipo del aporte original'));
@@ -956,8 +1117,9 @@
       ['Fecha de recomendación', date(recommendation.created_at)],
       ['Socio que recomienda', authorLabel(recommendation.author)],
       ['Club', recommendation.club?.name],
+      ['País del club', clubCountryName(recommendation.club)],
       ['Liga / competencia', recommendation.club?.competition_name || recommendation.club?.league],
-      ['Provincia / estado o región', recommendation.club?.province],
+      [countryInfo(clubCountryCode(recommendation.club)).region_label, clubRegionName(recommendation.club)],
       ['Edad al recomendar', ageLabel(recommendation.player)],
       ['Posición', recommendation.player?.position]
     ]) facts.append(detailPair(label, value));
@@ -1050,7 +1212,7 @@
       const identity = node('div');
       const name = playerName(entry);
       identity.append(node('p', 'ranking-name', name));
-      if (entry.club?.name) identity.append(node('p', 'ranking-club', `Club en el último aporte: ${entry.club.name}`));
+      if (entry.club?.name) identity.append(node('p', 'ranking-club', `Club en el último aporte: ${entry.club.name} · ${clubCountryName(entry.club)}`));
       identity.append(node('p', 'ranking-identity', entry.identity_type === 'member_reference' ? 'Identidad declarada por socios' : 'Identificado en el catálogo'));
       const count = node('div', 'ranking-count');
       count.append(node('strong', '', entry.recommendation_count.toLocaleString('es-AR')), node('span', '', 'recomendaciones'));
@@ -1291,7 +1453,7 @@
       const statusRow = node('div', 'detail-status-row'); statusRow.append(statusBadge(recommendation.status), node('span', '', `Enviada el ${date(recommendation.created_at)}`)); body.append(statusRow);
       const grid = node('dl', 'detail-grid');
       for (const [label, value] of [
-        ['Club', recommendation.club?.name], ['Ubicación', [recommendation.club?.city, recommendation.club?.province].filter(Boolean).join(' · ')],
+        ['Club', recommendation.club?.name], ['País del club', clubCountryName(recommendation.club)], ['Ubicación', [recommendation.club?.city, clubRegionName(recommendation.club)].filter(Boolean).join(' · ')],
         [recommendation.club?.reference_scope === 'primer_equipo_masculino' ? 'Competencia de referencia · primer equipo masculino' : 'Liga / competencia del club', recommendation.club?.competition_name || recommendation.club?.league], ['Categoría del jugador', recommendation.category],
         ['Edad al recomendar', ageLabel(recommendation.player)], ['Posición', recommendation.player?.position], ['Sector', { derecha: 'Derecha', izquierda: 'Izquierda', ambos: 'Ambos', no_especificado: 'Sin especificar' }[recommendation.player?.sector] || 'Sin especificar']
       ]) grid.append(detailPair(label, value));
@@ -1344,6 +1506,8 @@
   listen($('dashboard-recommend'), 'click', () => activateTab('recommend', true));
   listen($('reference-clear'), 'click', () => { clearRecommendationReference(); $('player-first-name').focus(); });
   listen($('success-detail'), 'click', () => openDetail(state.successId));
+  listen($('club-country'), 'change', () => changeCountry());
+  listen($('country-retry'), 'click', () => changeCountry());
   listen($('manual-club-toggle'), 'change', () => setManualClub());
   for (const radio of root.querySelectorAll('[name="search-route"]')) listen(radio, 'change', () => updateRoute());
   listen($('club-province'), 'change', () => {
@@ -1353,8 +1517,8 @@
   listen($('club-competition'), 'change', () => {
     const membership = route() === 'province' && state.selectedClub?.competitions?.find((entry) => String(entry.id) === $('club-competition').value);
     if (membership) {
-      applyClubCompetition(membership); state.clubAutoCompetition = true;
-      clearPlayer(true); showClubSummary(); return;
+      applyClubCompetition(membership); state.clubAutoCompetition = false;
+      showClubSummary(); loadPlayers(); return;
     }
     state.clubAutoCompetition = false;
     if (route() === 'competition') $('club-province').value = '';
