@@ -215,7 +215,7 @@
     $('player-filter').hidden = true; $('player-filter-name').textContent = '';
     $('dashboard-metrics').setAttribute('aria-busy', 'false');
     setFeedback('dashboard-feedback', ''); setFeedback('mine-feedback', '');
-    $('club-choice').replaceChildren(option('', 'Elegí una provincia para buscar', true));
+    $('club-choice').replaceChildren(option('', 'Elegí una provincia o región para buscar', true));
     $('player-choice').replaceChildren(option('', 'Seleccioná una categoría', true));
     setFeedback('create-feedback', '');
     $('create-success').hidden = true; $('recommend-layout').hidden = false;
@@ -422,8 +422,8 @@
 
   function initialiseForm(data) {
     const provinces = (Array.isArray(data.provinces) ? data.provinces : []).map((entry) => ({ value: entry, label: entry }));
-    replaceOptions($('club-province'), provinces, 'Seleccioná una provincia');
-    replaceOptions($('manual-province'), provinces, 'Seleccioná una provincia');
+    replaceOptions($('club-province'), provinces, 'Seleccioná una provincia o región');
+    replaceOptions($('manual-province'), provinces, 'Seleccioná una provincia o región');
     restoreCompetitions();
     const categories = (Array.isArray(data.categories) ? data.categories : []).filter((item) => !/^otra(?: categoría)?$/i.test(item)).map((item) => ({ value: item, label: item }));
     categories.push({ value: OTHER_CATEGORY, label: 'Otra categoría' });
@@ -436,7 +436,7 @@
     const playerCount = Math.max(0, Number(data.catalogue?.player_count) || 0);
     const empty = clubCount === 0;
     $('catalogue-notice').hidden = false;
-    $('catalogue-notice').textContent = `Catálogo de Argentina: ${clubCount.toLocaleString('es-AR')} ${clubCount === 1 ? 'club' : 'clubes'} y ${playerCount.toLocaleString('es-AR')} ${playerCount === 1 ? 'jugador registrado' : 'jugadores registrados'}. La cobertura de ligas, categorías y planteles es parcial. Si falta el equipo, usá Otro club. También podés recomendar un jugador cargando sus datos manualmente.`;
+    $('catalogue-notice').textContent = `Catálogo de clubes verificados de Argentina: ${clubCount.toLocaleString('es-AR')} ${clubCount === 1 ? 'club' : 'clubes'} y ${playerCount.toLocaleString('es-AR')} ${playerCount === 1 ? 'jugador registrado' : 'jugadores registrados'}. La selección de competencias ya incluye divisiones nacionales 2026 de Argentina, Brasil, Chile, Ecuador, Uruguay y Colombia. La cobertura de clubes y planteles todavía es parcial; si no encontrás un equipo, usá Otro club e indicá su región y liga.`;
     $('manual-club-toggle').checked = empty;
     setManualClub(false);
     updateRoute(false);
@@ -502,8 +502,15 @@
   }
 
   function restoreCompetitions(value = '') {
-    const competitions = (Array.isArray(state.bootstrap?.competitions) ? state.bootstrap.competitions : []).map((entry) => ({ value: entry.id, label: `${entry.name}${entry.season ? ` · ${entry.season}` : ''}` }));
+    const catalogueCompetitions = Array.isArray(state.bootstrap?.competitions) ? state.bootstrap.competitions : [];
+    const competitions = catalogueCompetitions.map((entry) => ({ value: entry.id, label: `${entry.name}${entry.season ? ` · ${entry.season}` : ''}` }));
     replaceOptions($('club-competition'), competitions, route() === 'province' ? 'Todas las competencias' : 'Seleccioná una competencia');
+    const leagueList = $('manual-league-options');
+    if (leagueList) leagueList.replaceChildren(...catalogueCompetitions.map((entry) => {
+      const item = document.createElement('option');
+      item.value = `${entry.name}${entry.season ? ` · ${entry.season}` : ''}`;
+      return item;
+    }));
     $('club-competition').value = value;
     $('club-competition').disabled = manualClub();
     $('club-competition').required = route() === 'competition' && !manualClub();
@@ -523,6 +530,10 @@
     $('club-province').required = !manual && route() === 'province';
     $('club-competition').required = !manual && route() === 'competition';
     if (manual && !$('manual-province').value) $('manual-province').value = $('club-province').value;
+    if (manual && !$('manual-league').value) {
+      const selectedCompetition = state.bootstrap?.competitions?.find((entry) => entry.id === $('club-competition').value);
+      if (selectedCompetition) $('manual-league').value = `${selectedCompetition.name}${selectedCompetition.season ? ` · ${selectedCompetition.season}` : ''}`;
+    }
     updatePlayerLookup();
     if (!manual) loadClubs();
   }
@@ -540,7 +551,7 @@
     $('competition-required').hidden = byProvince;
     $('club-province').required = byProvince && !manualClub();
     $('club-competition').required = !byProvince && !manualClub();
-    $('club-province').options[0].textContent = byProvince ? 'Seleccioná una provincia' : 'Todas las provincias';
+    $('club-province').options[0].textContent = byProvince ? 'Seleccioná una provincia o región' : 'Todas las provincias o regiones';
     $('club-competition').options[0].textContent = byProvince ? 'Todas las competencias' : 'Seleccioná una competencia';
     $('competition-help').textContent = byProvince ? 'La competencia del primer equipo se completa cuando está disponible. La categoría del jugador se elige por separado.' : 'Elegí la competencia para consultar sus equipos. La categoría del jugador se elige por separado.';
     if (!manualClub()) loadClubs();
@@ -559,7 +570,7 @@
     if (!more) { state.clubs.clear(); state.clubsCursor = null; state.clubsQuery = clubsPayload(); }
     const prerequisites = route() === 'province' ? $('club-province').value : $('club-competition').value;
     if (!prerequisites) {
-      $('club-choice').replaceChildren(option('', route() === 'province' ? 'Elegí una provincia para buscar' : 'Elegí una competencia para buscar', true));
+      $('club-choice').replaceChildren(option('', route() === 'province' ? 'Elegí una provincia o región para buscar' : 'Elegí una competencia para buscar', true));
       $('clubs-help').textContent = 'Podés usar Otro club si no lo encontrás.';
       $('clubs-more').hidden = true; return;
     }
@@ -946,7 +957,7 @@
       ['Socio que recomienda', authorLabel(recommendation.author)],
       ['Club', recommendation.club?.name],
       ['Liga / competencia', recommendation.club?.competition_name || recommendation.club?.league],
-      ['Provincia / CABA', recommendation.club?.province],
+      ['Provincia / estado o región', recommendation.club?.province],
       ['Edad al recomendar', ageLabel(recommendation.player)],
       ['Posición', recommendation.player?.position]
     ]) facts.append(detailPair(label, value));
