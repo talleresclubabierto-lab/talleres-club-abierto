@@ -48,14 +48,15 @@ footer{margin:24px 0 0;padding:16px 0;border-top:1px solid rgba(117,217,248,.2);
 <label class="field">Tipo de comunicación<select name="category" required><option value="">Elegí una opción</option><option value="consulta">Consulta</option><option value="sugerencia">Sugerencia</option><option value="educacion_acompanamiento">Educación o acompañamiento</option><option value="otra_situacion">Otra situación</option></select></label>
 <label class="field">Relato<textarea name="narrative" maxlength="10000" required placeholder="Contanos qué necesitás. Evitá incluir datos médicos si no son necesarios."></textarea></label>
 <section aria-label="Datos de ubicación y actividad">
-<p class="note"><strong>Ubicación y actividad.</strong> Elegí país primero y después la provincia, estado o región. Para fútbol se muestran ligas y divisiones; indicá categoría deportiva y subcategoría en los campos siguientes. Las estructuras locales pueden variar: podés elegir “Otro / no aparece”.</p>
-<label class="field">Temporada<select name="season" required><option value="2026" selected>2026</option><option value="2025">2025</option><option value="2024">2024</option><option value="2027">2027</option></select></label>
-<label class="field">País<select name="country" required><option value="">Seleccioná un país</option></select></label>
-<label class="field">Provincia, estado o región<select name="province" required><option value="">Seleccioná primero un país</option></select></label>
+<p class="note"><strong>Ubicación y actividad.</strong> La categoría se guarda junto a la temporada elegida para que los cambios futuros no alteren el historial. Si no conocés un dato, elegí “No lo sé” o escribí “No aparece”.</p>
+<label class="field">Temporada<select name="season" required><option value="2026" selected>2026</option></select></label>
+<label class="field">Provincia<select name="province" required>
+<option value="">Seleccioná primero una provincia</option><option>Córdoba</option><option>Buenos Aires</option><option>Ciudad Autónoma de Buenos Aires</option><option>Santa Fe</option><option>Catamarca</option><option>Chaco</option><option>Chubut</option><option>Corrientes</option><option>Entre Ríos</option><option>Formosa</option><option>Jujuy</option><option>La Pampa</option><option>La Rioja</option><option>Mendoza</option><option>Misiones</option><option>Neuquén</option><option>Río Negro</option><option>Salta</option><option>San Juan</option><option>San Luis</option><option>Santa Cruz</option><option>Santiago del Estero</option><option>Tierra del Fuego</option><option>Tucumán</option><option>No lo sé</option><option>Otra / no aparece</option>
+</select></label>
 <label class="field">Localidad / ciudad<input name="locality" maxlength="120" placeholder="Ej.: Córdoba, Mendiolaza, Río Cuarto o No lo sé"></label>
 <label class="field">Sede, academia, escuela o filial (si la conocés)<input name="venue" maxlength="160" placeholder="Podés escribir No aparece"></label>
 <label class="field">Deporte<select name="sport" required><option value="">Seleccioná un deporte</option><option>Fútbol</option><option>Hockey</option><option>Básquet</option><option>Vóley</option><option>Patín</option><option>No lo sé</option><option>Otro / no aparece</option></select></label>
-<label class="field">Liga o competencia<select name="competition" required><option value="">Seleccioná primero país y deporte</option></select></label>
+<label class="field">Competencia o circuito<select name="competition" required><option value="">Seleccioná una opción</option><option>AFA</option><option>Liga Cordobesa / local</option><option>Federado / provincial</option><option>Escuela oficial / academia</option><option>No lo sé</option><option>Otro / no aparece</option></select></label>
 <label class="field">Categoría deportiva (opcional)<input name="sport_category" maxlength="100" placeholder="Ej.: 5.ª, Reserva, U17, Sub 16; o No aparece"></label>
 <label class="field">División o subcategoría (opcional)<input name="division" maxlength="100" placeholder="Ej.: AFA, local, Línea B, desarrollo; o No lo sé"></label>
 </section><input type="hidden" name="communication_type" value="acompanamiento">
@@ -131,46 +132,8 @@ async function loadCases(){
    for(const item of cases)list.append(displayCase(item));
  }catch(_){list.textContent='No se pudo cargar el seguimiento. Volvé a ingresar con un nuevo código.';}
 }
-const cfRegions={
-"Argentina":["Buenos Aires","Ciudad Autónoma de Buenos Aires","Catamarca","Chaco","Chubut","Córdoba","Corrientes","Entre Ríos","Formosa","Jujuy","La Pampa","La Rioja","Mendoza","Misiones","Neuquén","Río Negro","Salta","San Juan","San Luis","Santa Cruz","Santa Fe","Santiago del Estero","Tierra del Fuego","Tucumán"],
-"Chile":["Arica y Parinacota","Tarapacá","Antofagasta","Atacama","Coquimbo","Valparaíso","Metropolitana de Santiago","O’Higgins","Maule","Ñuble","Biobío","La Araucanía","Los Ríos","Los Lagos","Aysén","Magallanes"],
-"Ecuador":["Azuay","Bolívar","Cañar","Carchi","Chimborazo","Cotopaxi","El Oro","Esmeraldas","Galápagos","Guayas","Imbabura","Loja","Los Ríos","Manabí","Morona Santiago","Napo","Orellana","Pastaza","Pichincha","Santa Elena","Santo Domingo de los Tsáchilas","Sucumbíos","Tungurahua","Zamora Chinchipe"],
-"Uruguay":["Artigas","Canelones","Cerro Largo","Colonia","Durazno","Flores","Florida","Lavalleja","Maldonado","Montevideo","Paysandú","Río Negro","Rivera","Rocha","Salto","San José","Soriano","Tacuarembó","Treinta y Tres"],
-"Brasil":["Acre","Alagoas","Amapá","Amazonas","Bahia","Ceará","Distrito Federal","Espírito Santo","Goiás","Maranhão","Mato Grosso","Mato Grosso do Sul","Minas Gerais","Pará","Paraíba","Paraná","Pernambuco","Piauí","Rio de Janeiro","Rio Grande do Norte","Rio Grande do Sul","Rondônia","Roraima","Santa Catarina","São Paulo","Sergipe","Tocantins"],
-"Colombia":["Amazonas","Antioquia","Arauca","Atlántico","Bogotá D.C.","Bolívar","Boyacá","Caldas","Caquetá","Casanare","Cauca","Cesar","Chocó","Córdoba","Cundinamarca","Guainía","Guaviare","Huila","La Guajira","Magdalena","Meta","Nariño","Norte de Santander","Putumayo","Quindío","Risaralda","San Andrés y Providencia","Santander","Sucre","Tolima","Valle del Cauca","Vaupés","Vichada"]};
-const cfFootballCompetitions={
-"Argentina":["Primera División · Liga Profesional","Primera Nacional","Primera B Metropolitana","Primera C","Torneo Federal A","Torneo Regional Federal Amateur","Ligas provinciales y regionales","AFA Juveniles","Liga local / regional"],
-"Chile":["Primera División","Primera B / Ascenso","Segunda División Profesional","Tercera A","Tercera B","Fútbol amateur regional ANFA"],
-"Ecuador":["Serie A","Serie B","Segunda Categoría provincial","Segunda Categoría nacional","Fútbol amateur provincial"],
-"Uruguay":["Primera División AUF","Segunda División Profesional","Primera División Amateur (C)","Divisional D","Ligas de OFI / interior"],
-"Brasil":["Campeonato Brasileiro Série A","Campeonato Brasileiro Série B","Campeonato Brasileiro Série C","Campeonato Brasileiro Série D","Campeonatos estaduais (divisões variáveis)"],
-"Colombia":["Primera A · Liga BetPlay","Primera B · Torneo BetPlay","Primera C · DIFUTBOL","Ligas departamentales / regionales"]};
-const cfGeneralCompetitions=["Federado / provincial","Liga local / regional","Escuela oficial / academia"];
-function cfSetOptions(select,placeholder,items){
- if(!select)return;
- const previous=select.value;
- select.replaceChildren(new Option(placeholder,""));
- for(const item of items)select.add(new Option(item,item));
- if(items.includes(previous))select.value=previous;
-}
-function cfInitClassificationForm(form){
- const country=form.elements.country,region=form.elements.province,sport=form.elements.sport,competition=form.elements.competition;
- cfSetOptions(country,"Seleccioná un país",Object.keys(cfRegions));
- cfSetOptions(region,"Seleccioná primero un país",[]);
- cfSetOptions(competition,"Seleccioná país y deporte",[]);
- function refreshCompetition(){
-  let items=sport.value==="Fútbol"?(cfFootballCompetitions[country.value]||[]):cfGeneralCompetitions.slice();
-  cfSetOptions(competition,"Seleccioná una liga o competencia",items.concat(["No lo sé","Otro / no aparece"]));
- }
- country.addEventListener("change",function(){
-  cfSetOptions(region,"Seleccioná una provincia, estado o región",cfRegions[country.value]||[]);
-  refreshCompetition();
- });
- sport.addEventListener("change",refreshCompetition);
-}
 function wireCaseForm(){
  const form=document.getElementById('case-form');if(!form)return;
- cfInitClassificationForm(form);
  form.addEventListener('submit',async function(e){
    e.preventDefault();
    if(!form.reportValidity())return;
@@ -186,7 +149,7 @@ function wireCaseForm(){
        approx_date:data.get('approx_date')||'',
        communication_type:data.get('communication_type')||'acompanamiento',
        season:data.get('season')||'2026',
-       province:(data.get('country')||'')+' · '+(data.get('province')||''),
+       province:data.get('province')||'',
        locality:data.get('locality')||'',
        venue:data.get('venue')||'',
        sport:data.get('sport')||'',
