@@ -1,0 +1,23 @@
+{
+  "name": "talleres-club-abierto-ios",
+  "version": "1.9.0",
+  "private": true,
+  "type": "module",
+  "description": "Build iOS de Talleres Club Abierto a partir del mismo contenido web que Android",
+  "scripts": {
+    "ios:prepare": "node prepare.mjs",
+    "generate": "node prepare.mjs && node generate.mjs",
+    "sync": "node prepare.mjs && cap sync ios && node configure-native.mjs",
+    "open": "cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/core": "8.5.1",
+    "@capacitor/ios": "8.5.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.1"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}
