@@ -1,0 +1,177 @@
+name: iPhone - compilacion inicial sin firma
+
+on:
+  pull_request:
+    paths:
+      - 'mobile/ios/**'
+      - '.github/workflows/ios-build.yml'
+      - 'scripts/build-mobile.mjs'
+      - 'scripts/build-cloudflare.mjs'
+      - 'scripts/test-mobile-build.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 35
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Descargar la misma base de contenido que Android
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: mobile/ios/package-lock.json
+
+      - name: Seleccionar Xcode compatible con Capacitor 8
+        run: |
+          python3 - <<'PY'
+          import glob, os, re, subprocess
+          candidates = []
+          for app in glob.glob('/Applications/Xcode*.app'):
+              if 'beta' in app.lower():
+                  continue
+              developer = app + '/Contents/Developer'
+              result = subprocess.run([developer + '/usr/bin/xcodebuild', '-version'], capture_output=True, text=True, env={**os.environ, 'DEVELOPER_DIR': developer})
+              match = re.search(r'Xcode (\d+)\.(\d+)(?:\.(\d+))?', result.stdout)
+              if result.returncode == 0 and match and int(match[1]) >= 26:
+                  candidates.append((tuple(int(v or 0) for v in match.groups()), developer))
+          if not candidates:
+              raise SystemExit('Este runner no tiene Xcode 26 o superior.')
+          version, developer = max(candidates)
+          with open(os.environ['GITHUB_ENV'], 'a') as target:
+              target.write('DEVELOPER_DIR=' + developer + '\n')
+          print('Xcode seleccionado:', '.'.join(map(str, version)))
+          PY
+
+      - name: Instalar herramientas iOS con versiones fijadas
+        working-directory: mobile/ios
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Generar proyecto Xcode y verificar paridad
+        working-directory: mobile/ios
+        run: |
+          npm run generate
+          node verify-bundle.mjs
+          xcodebuild -version
+
+      - name: Compilar para simulador de iPhone
+        working-directory: mobile/ios
+        run: |
+          mkdir -p artifacts
+          set -o pipefail
+          xcodebuild \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build/simulator \
+            MARKETING_VERSION=1.9 \
+            CURRENT_PROJECT_VERSION="${GITHUB_RUN_NUMBER}" \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY='' \
+            build | tee artifacts/build-simulator.log
+          node verify-bundle.mjs build/simulator/Build/Products/Debug-iphonesimulator/App.app/public
+          ditto -c -k --sequesterRsrc --keepParent \
+            build/simulator/Build/Products/Debug-iphonesimulator/App.app \
+            artifacts/talleres-ios-simulador.zip
+
+      - name: Abrir la app en un simulador y capturar el inicio
+        working-directory: mobile/ios
+        run: |
+          python3 - <<'PY'
+          import json, subprocess
+          data = json.loads(subprocess.check_output(['xcrun', 'simctl', 'list', 'devices', 'available', '--json']))
+          devices = [d for group in data['devices'].values() for d in group if d['name'].startswith('iPhone') and d.get('isAvailable')]
+          if not devices:
+              raise SystemExit('No se encontró un simulador de iPhone disponible.')
+          device = next((d for d in devices if d['name'] == 'iPhone 16'), devices[0])
+          udid = device['udid']
+          print('Simulador:', device['name'], flush=True)
+          if device['state'] != 'Booted':
+              subprocess.run(['xcrun', 'simctl', 'boot', udid], check=True)
+          subprocess.run(['xcrun', 'simctl', 'bootstatus', udid, '-b'], check=True)
+          subprocess.run(['xcrun', 'simctl', 'install', udid, 'build/simulator/Build/Products/Debug-iphonesimulator/App.app'], check=True)
+          subprocess.run(['xcrun', 'simctl', 'launch', udid, 'com.talleresclubabierto.app'], check=True)
+          with open('build/simulator-udid', 'w') as target:
+              target.write(udid)
+          PY
+          sleep 8
+          xcrun simctl io "$(cat build/simulator-udid)" screenshot artifacts/inicio-iphone.png
+
+      - name: Compilar archivo de iPhone sin firma de distribución
+        working-directory: mobile/ios
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build/device \
+            -archivePath build/TalleresClubAbierto.xcarchive \
+            MARKETING_VERSION=1.9 \
+            CURRENT_PROJECT_VERSION="${GITHUB_RUN_NUMBER}" \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY='' \
+            archive | tee artifacts/build-device.log
+          node verify-bundle.mjs build/TalleresClubAbierto.xcarchive/Products/Applications/App.app/public
+          ditto -c -k --sequesterRsrc --keepParent \
+            build/TalleresClubAbierto.xcarchive artifacts/talleres-ios-archivo-sin-firma.zip
+
+      - name: Guardar fuentes nativas generadas y resultados
+        working-directory: mobile/ios
+        run: |
+          cp source-build.json artifacts/source-build.json
+          mkdir -p build/source
+          cp -R ios www build/source/
+          cp package.json package-lock.json capacitor.config.json source-build.json build/source/
+          node --input-type=module <<'JS'
+          import { readFileSync, writeFileSync } from 'node:fs';
+          const path = 'build/source/package.json';
+          const packageJson = JSON.parse(readFileSync(path, 'utf8'));
+          packageJson.scripts = { sync: 'cap sync ios', open: 'cap open ios' };
+          writeFileSync(path, JSON.stringify(packageJson, null, 2) + '\n');
+          writeFileSync('build/source/LEEME.txt', [
+            'Talleres Club Abierto — proyecto Xcode inicial, sin firma.',
+            'En macOS con Xcode 26+ y Node 22+:',
+            '1. npm ci --ignore-scripts',
+            '2. npm run sync',
+            '3. npm run open',
+            'Este ZIP contiene el contenido web ya preparado.',
+            'Para actualizar contenido y conservar los ajustes nativos, usar la rama del repositorio:',
+            'https://github.com/talleresclubabierto-lab/talleres-club-abierto/tree/mobile/ios-preparacion-20261119',
+            'Se necesita configurar el equipo Apple y la firma antes de distribuir.'
+          ].join('\n') + '\n');
+          JS
+          ditto -c -k --sequesterRsrc --keepParent build/source artifacts/talleres-ios-proyecto-xcode.zip
+          shasum -a 256 artifacts/*.zip > artifacts/SHA256SUMS.txt
+          {
+            echo '## Talleres Club Abierto — iOS inicial'
+            echo '- Compilación de simulador y archivo de dispositivo SIN firma.'
+            echo '- No es un IPA instalable ni una publicación en TestFlight/App Store.'
+            echo '- El contenido empaquetado coincide con la web del commit de esta ejecución.'
+            echo '- Falta validar login, roles, OTP, passkeys y operaciones en iPhone físico.'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Conservar artefactos y evidencia de compilación
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: talleres-ios-inicial-${{ github.run_number }}-sin-firma
+          path: mobile/ios/artifacts/
+          if-no-files-found: warn
+          retention-days: 14
+

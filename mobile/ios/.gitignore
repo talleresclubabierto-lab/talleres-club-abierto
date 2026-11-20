@@ -1,0 +1,11 @@
+node_modules/
+www/
+ios/
+build/
+artifacts/
+source-build.json
+*.xcarchive
+*.ipa
+*.p12
+*.mobileprovision
+

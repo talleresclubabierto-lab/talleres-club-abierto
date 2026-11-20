@@ -1,0 +1,14 @@
+{
+  "appId": "com.talleresclubabierto.app",
+  "appName": "Talleres Club Abierto",
+  "webDir": "www",
+  "server": {
+    "iosScheme": "capacitor",
+    "hostname": "localhost"
+  },
+  "ios": {
+    "contentInset": "automatic",
+    "backgroundColor": "#021739"
+  }
+}
+
