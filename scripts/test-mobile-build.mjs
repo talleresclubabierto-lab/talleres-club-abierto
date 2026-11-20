@@ -57,3 +57,43 @@ assert(!index.includes('id="ei-embedded-js"'), 'Android still embeds the obsolet
 assert.equal(digest(join(mobileRoot, 'estructura-institucional.js')), digest('src/estructura-institucional.js'));
 assert.equal(digest(join(mobileRoot, 'estructura-institucional.css')), digest('src/estructura-institucional.css'));
 console.log(`PASS mobile bundle: ${expectedFiles.length} web-identical files, access destinations, community/scouting dependencies and current institutional module.`);
+
+
+// Release guards: the Android package must contain the six-country Scouting UI,
+// the agreed four ordered categories per panel and the exact web background asset.
+const scouting = readFileSync(join(mobileRoot, 'scouting/scouting.js'), 'utf8');
+for (const [code, name] of Object.entries({
+  AR: 'Argentina', BR: 'Brasil', CL: 'Chile',
+  CO: 'Colombia', EC: 'Ecuador', UY: 'Uruguay'
+})) {
+  assert(scouting.includes(code + ": { name: '" + name + "'"),
+    'Scouting country missing in Android: ' + name);
+}
+assert(scouting.includes("'club-competition'") && scouting.includes("'club-country'"),
+  'Scouting competition or country selector missing');
+
+const defsStart = index.lastIndexOf('var defs={');
+const defsEnd = index.indexOf('function label(b)', defsStart);
+assert(defsStart >= 0 && defsEnd > defsStart, 'Panel categories not found');
+const definitions = index.slice(defsStart, defsEnd);
+const socioStart = definitions.indexOf('socioDashboard:[');
+const adminStart = definitions.indexOf('adminDashboard:[');
+assert(socioStart >= 0 && adminStart > socioStart, 'Missing socio/admin panel category definitions');
+for (const [panel, block] of [
+  ['Socio Activo', definitions.slice(socioStart, adminStart)],
+  ['Administrador', definitions.slice(adminStart)]
+]) {
+  const categoryLines = block.split('\n').filter(line => /^\s*\['[^']+','[^']+','[^']+',\[/.test(line));
+  assert.equal(categoryLines.length, 4, panel + ': expected exactly four categories');
+  for (const expected of ['Participación y Votaciones', 'Transparencia y Auditoría', 'Comunidad y Colaboración']) {
+    assert(categoryLines.some(line => line.includes("['" + expected + "'")),
+      panel + ': missing ' + expected);
+  }
+}
+assert(index.includes('var(--app-background-club-abierto)'), 'Shared background not applied in index');
+assert(index.includes('club-abierto-background.webp'), 'Shared background asset not referenced');
+assert.equal(
+  digest(join(mobileRoot, 'assets/club-abierto-background.webp')),
+  digest(join(webRoot, 'assets/club-abierto-background.webp')),
+  'Android background asset does not match web');
+console.log('PASS release guards: 6 Scouting countries, 4 categories per panel, identical background asset.');
