@@ -52,6 +52,15 @@ jobs:
           rm -rf www
           cp -R production-web/www www
 
+      - name: Asignar nueva version Android sin cambiar appId
+        run: |
+          grep -q 'versionCode 9' android/app/build.gradle
+          grep -q 'versionName "1.8"' android/app/build.gradle
+          sed -i 's/versionCode 9/versionCode 10/; s/versionName "1.8"/versionName "1.9"/' android/app/build.gradle
+          grep -q 'versionCode 10' android/app/build.gradle
+          grep -q 'versionName "1.9"' android/app/build.gradle
+          grep -q 'applicationId "com.talleresclubabierto.app"' android/app/build.gradle
+
       - name: Sincronizar Capacitor
         # Keep the native branch's locked dependencies/config, but do not rerun its old web builder.
         run: |
@@ -59,6 +68,10 @@ jobs:
           cmp production-web/www/index.html android/app/src/main/assets/public/index.html
           cmp production-web/www/acceso-socios.html android/app/src/main/assets/public/acceso-socios.html
           cmp production-web/www/acceso-administrador.html android/app/src/main/assets/public/acceso-administrador.html
+          cmp production-web/www/scouting/scouting.js android/app/src/main/assets/public/scouting/scouting.js
+          cmp production-web/www/scouting/scouting.css android/app/src/main/assets/public/scouting/scouting.css
+          cmp production-web/www/assets/club-abierto-background.webp android/app/src/main/assets/public/assets/club-abierto-background.webp
+          cmp production-web/www/comunidad-formativa.html android/app/src/main/assets/public/comunidad-formativa.html
 
       - name: Compilar Android
         working-directory: android
@@ -66,10 +79,17 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug bundleRelease
 
+      - name: Verificar artefactos generados
+        run: |
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
+          test -s android/app/build/outputs/bundle/release/app-release.aab
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/bundle/release/app-release.aab
+          echo "ATENCION: bundleRelease no configura firma de publicacion; este AAB NO se considera firmado ni apto para subir a Google Play."
+
       - name: Guardar compilacion
         uses: actions/upload-artifact@v4
         with:
-          name: talleres-android-actualizado
+          name: talleres-android-1.9-codigo10-sin-firma-produccion
           path: |
             android/app/build/outputs/apk/debug/*.apk
             android/app/build/outputs/bundle/release/*.aab
