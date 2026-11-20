@@ -84,7 +84,7 @@ jobs:
           test -s android/app/build/outputs/apk/debug/app-debug.apk
           test -s android/app/build/outputs/bundle/release/app-release.aab
           sha256sum android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/bundle/release/app-release.aab
-          echo "ATENCION: bundleRelease no configura firma de publicacion; este AAB NO se considera firmado ni apto para subir a Google Play."
+          echo "Bundle preliminar generado; se exige firma verificada en el paso siguiente."
 
       - name: Firmar AAB con clave de carga existente y validar certificado
         shell: bash
@@ -134,4 +134,5 @@ jobs:
           path: |
             android/app/build/outputs/apk/debug/*.apk
             android/app/build/outputs/bundle/release/app-release-firmado.aab
+          if-no-files-found: error
           retention-days: 14
